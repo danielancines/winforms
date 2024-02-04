@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -17,7 +16,7 @@ public class LinkLabelLinkClickedEventArgsTests
     [MemberData(nameof(Ctor_LinkLabelLink_TestData))]
     public void Ctor_LinkLabelLink(LinkLabel.Link link)
     {
-        var e = new LinkLabelLinkClickedEventArgs(link);
+        LinkLabelLinkClickedEventArgs e = new(link);
         Assert.Equal(link, e.Link);
         Assert.Equal(MouseButtons.Left, e.Button);
     }
@@ -33,7 +32,7 @@ public class LinkLabelLinkClickedEventArgsTests
     [MemberData(nameof(Ctor_LinkLabelLink_MouseButtons_TestData))]
     public void Ctor_LinkLabelLink_MouseButtons(LinkLabel.Link link, MouseButtons button)
     {
-        var e = new LinkLabelLinkClickedEventArgs(link, button);
+        LinkLabelLinkClickedEventArgs e = new(link, button);
         Assert.Equal(link, e.Link);
         Assert.Equal(button, e.Button);
     }

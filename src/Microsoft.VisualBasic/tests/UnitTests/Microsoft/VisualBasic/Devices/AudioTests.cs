@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace Microsoft.VisualBasic.Devices.Tests;
 
@@ -9,8 +8,8 @@ public class AudioTests
     [Fact]
     public void Play()
     {
-        var location = Path.Combine(Path.GetTempPath(), GetUniqueName());
-        var audio = new Audio();
+        string location = Path.Combine(Path.GetTempPath(), GetUniqueName());
+        Audio audio = new();
         Assert.Throws<FileNotFoundException>(() => audio.Play(location));
     }
 
@@ -20,7 +19,7 @@ public class AudioTests
     [Fact]
     public void Stop()
     {
-        var audio = new Audio();
+        Audio audio = new();
         audio.Stop();
     }
 

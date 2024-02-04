@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.ComponentModel.Design;
@@ -42,7 +41,7 @@ internal class MaskedTextBoxDesignerActionList : DesignerActionList
     /// </summary>
     public void SetMask()
     {
-        string mask = MaskPropertyEditor.EditMask(_discoverySvc, _uiSvc, _maskedTextBox, _helpService);
+        string? mask = MaskPropertyEditor.EditMask(_discoverySvc, _uiSvc, _maskedTextBox, _helpService);
 
         if (mask is null)
         {
@@ -58,7 +57,7 @@ internal class MaskedTextBoxDesignerActionList : DesignerActionList
     /// </summary>
     public override DesignerActionItemCollection GetSortedActionItems()
     {
-        DesignerActionItemCollection items = new DesignerActionItemCollection();
+        DesignerActionItemCollection items = new();
         items.Add(new DesignerActionMethodItem(this, "SetMask", SR.MaskedTextBoxDesignerVerbsSetMaskDesc));
         return items;
     }

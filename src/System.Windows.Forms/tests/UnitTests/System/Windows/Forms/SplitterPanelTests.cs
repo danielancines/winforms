@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Drawing;
@@ -21,7 +20,7 @@ public class SplitterPanelTests
     [MemberData(nameof(Ctor_SplitContainer_TestData))]
     public void SplitterPanel_Ctor_SplitContainer(SplitContainer owner)
     {
-        using var control = new SplitterPanel(owner);
+        using SplitterPanel control = new(owner);
         Assert.Null(control.AccessibleDefaultActionDescription);
         Assert.Null(control.AccessibleDescription);
         Assert.Null(control.AccessibleName);
@@ -107,7 +106,7 @@ public class SplitterPanelTests
     [MemberData(nameof(ControlTests.Anchor_Set_TestData), MemberType = typeof(ControlTests))]
     public void SplitterPanel_Anchor_Set_GetReturnsExpected(AnchorStyles value, AnchorStyles expected)
     {
-        using var control = new SplitterPanel(null)
+        using SplitterPanel control = new(null)
         {
             Anchor = value
         };
@@ -126,7 +125,7 @@ public class SplitterPanelTests
     [BoolData]
     public void SplitterPanel_AutoSize_Set_GetReturnsExpected(bool value)
     {
-        using var control = new SplitterPanel(null);
+        using SplitterPanel control = new(null);
         int layoutCallCount = 0;
         control.Layout += (sender, e) => layoutCallCount++;
 
@@ -151,7 +150,7 @@ public class SplitterPanelTests
     [WinFormsFact]
     public void SplitterPanel_AutoSize_SetWithHandler_CallsAutoSizeChanged()
     {
-        using var control = new SplitterPanel(null)
+        using SplitterPanel control = new(null)
         {
             AutoSize = true
         };
@@ -191,7 +190,7 @@ public class SplitterPanelTests
     [InvalidEnumData<AutoSizeMode>]
     public void SplitterPanel_AutoSizeMode_Set_GetReturnsExpected(AutoSizeMode value)
     {
-        using var control = new SplitterPanel(null);
+        using SplitterPanel control = new(null);
         int layoutCallCount = 0;
         control.Layout += (sender, e) => layoutCallCount++;
 
@@ -212,8 +211,8 @@ public class SplitterPanelTests
     [InvalidEnumData<AutoSizeMode>]
     public void SplitterPanel_AutoSizeMode_SetWithParent_GetReturnsExpected(AutoSizeMode value)
     {
-        using var parent = new Control();
-        using var control = new SplitterPanel(null)
+        using Control parent = new();
+        using SplitterPanel control = new(null)
         {
             Parent = parent
         };
@@ -243,7 +242,7 @@ public class SplitterPanelTests
     [InvalidEnumData<AutoSizeMode>]
     public void SplitterPanel_AutoSizeMode_SetWithHandle_GetReturnsExpected(AutoSizeMode value)
     {
-        using var control = new SplitterPanel(null);
+        using SplitterPanel control = new(null);
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -273,8 +272,8 @@ public class SplitterPanelTests
     [InvalidEnumData<AutoSizeMode>]
     public void SplitterPanel_AutoSizeMode_SetWithHandleWithParent_GetReturnsExpected(AutoSizeMode value)
     {
-        using var parent = new Control();
-        using var control = new SplitterPanel(null)
+        using Control parent = new();
+        using SplitterPanel control = new(null)
         {
             Parent = parent
         };
@@ -328,7 +327,7 @@ public class SplitterPanelTests
     [EnumData<BorderStyle>]
     public void SplitterPanel_BorderStyle_Set_GetReturnsExpected(BorderStyle value)
     {
-        using var control = new SplitterPanel(null)
+        using SplitterPanel control = new(null)
         {
             BorderStyle = value
         };
@@ -347,7 +346,7 @@ public class SplitterPanelTests
     [InlineData(BorderStyle.None, 0)]
     public void SplitterPanel_BorderStyle_SetWithHandle_GetReturnsExpected(BorderStyle value, int expectedInvalidatedCallCount)
     {
-        using var control = new SplitterPanel(null);
+        using SplitterPanel control = new(null);
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -376,7 +375,7 @@ public class SplitterPanelTests
     [InvalidEnumData<BorderStyle>]
     public void SplitterPanel_BorderStyle_SetInvalid_ThrowsInvalidEnumArgumentException(BorderStyle value)
     {
-        using var control = new SplitterPanel(null);
+        using SplitterPanel control = new(null);
         Assert.Throws<InvalidEnumArgumentException>("value", () => control.BorderStyle = value);
     }
 
@@ -384,7 +383,7 @@ public class SplitterPanelTests
     [EnumData<DockStyle>]
     public void SplitterPanel_Dock_Set_GetReturnsExpected(DockStyle value)
     {
-        using var control = new SplitterPanel(null)
+        using SplitterPanel control = new(null)
         {
             Dock = value
         };
@@ -400,7 +399,7 @@ public class SplitterPanelTests
     [WinFormsFact]
     public void SplitterPanel_Dock_SetWithHandler_CallsDockChanged()
     {
-        using var control = new SplitterPanel(null)
+        using SplitterPanel control = new(null)
         {
             Dock = DockStyle.None
         };
@@ -439,7 +438,7 @@ public class SplitterPanelTests
     [InvalidEnumData<DockStyle>]
     public void SplitterPanel_Dock_SetInvalid_ThrowsInvalidEnumArgumentException(DockStyle value)
     {
-        using var control = new SplitterPanel(null);
+        using SplitterPanel control = new(null);
         Assert.Throws<InvalidEnumArgumentException>("value", () => control.Dock = value);
     }
 
@@ -450,7 +449,7 @@ public class SplitterPanelTests
     [InlineData(40)]
     public void SplitterPanel_Height_Set_ThrowsNotSupportedException(int value)
     {
-        using var control = new SplitterPanel(null);
+        using SplitterPanel control = new(null);
         int layoutCallCount = 0;
         int resizeCallCount = 0;
         int sizeChangedCallCount = 0;
@@ -511,7 +510,7 @@ public class SplitterPanelTests
     [MemberData(nameof(Location_Set_TestData))]
     public void SplitterPanel_Location_Set_GetReturnsExpected(Point value, int expectedLocationChangedCallCount)
     {
-        using var control = new SplitterPanel(null);
+        using SplitterPanel control = new(null);
         int moveCallCount = 0;
         int locationChangedCallCount = 0;
         int layoutCallCount = 0;
@@ -584,7 +583,7 @@ public class SplitterPanelTests
     [WinFormsFact]
     public void SplitterPanel_Location_SetWithHandler_CallsLocationChanged()
     {
-        using var control = new SplitterPanel(null);
+        using SplitterPanel control = new(null);
         int locationChangedCallCount = 0;
         EventHandler locationChangedHandler = (sender, e) =>
         {
@@ -639,7 +638,7 @@ public class SplitterPanelTests
     [MemberData(nameof(ControlTests.MaximumSize_Set_TestData), MemberType = typeof(ControlTests))]
     public void SplitterPanel_MaximumSize_Set_GetReturnsExpected(Size value)
     {
-        using var control = new SplitterPanel(null)
+        using SplitterPanel control = new(null)
         {
             Size = Size.Empty
         };
@@ -664,7 +663,7 @@ public class SplitterPanelTests
     [MemberData(nameof(ControlTests.MinimumSize_Set_TestData), MemberType = typeof(ControlTests))]
     public void SplitterPanel_MinimumSize_Set_GetReturnsExpected(Size value, Size expectedSize, int expectedLayoutCallCount)
     {
-        using var control = new SplitterPanel(null)
+        using SplitterPanel control = new(null)
         {
             Size = Size.Empty
         };
@@ -695,7 +694,7 @@ public class SplitterPanelTests
     [NormalizedStringData]
     public void SplitterPanel_Name_Set_GetReturnsExpected(string value, string expected)
     {
-        using var control = new SplitterPanel(null)
+        using SplitterPanel control = new(null)
         {
             Name = value
         };
@@ -719,7 +718,7 @@ public class SplitterPanelTests
     [MemberData(nameof(Parent_Set_TestData))]
     public void SplitterPanel_Parent_Set_GetReturnsExpected(Control value)
     {
-        using var control = new SplitterPanel(null)
+        using SplitterPanel control = new(null)
         {
             Parent = value
         };
@@ -735,8 +734,8 @@ public class SplitterPanelTests
     [WinFormsFact]
     public void SplitterPanel_Parent_SetWithHandler_CallsParentChanged()
     {
-        using var parent = new Control();
-        using var control = new SplitterPanel(null);
+        using Control parent = new();
+        using SplitterPanel control = new(null);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -782,7 +781,7 @@ public class SplitterPanelTests
     [MemberData(nameof(Size_Set_TestData))]
     public void SplitterPanel_Size_Set_GetReturnsExpected(Size value, int expectedLayoutCallCount)
     {
-        using var control = new SplitterPanel(null);
+        using SplitterPanel control = new(null);
         int layoutCallCount = 0;
         int resizeCallCount = 0;
         int sizeChangedCallCount = 0;
@@ -869,7 +868,7 @@ public class SplitterPanelTests
     [InlineData(2)]
     public void SplitterPanel_TabIndex_Set_GetReturnsExpected(int value)
     {
-        using var control = new SplitterPanel(null)
+        using SplitterPanel control = new(null)
         {
             TabIndex = value
         };
@@ -885,7 +884,7 @@ public class SplitterPanelTests
     [WinFormsFact]
     public void SplitterPanel_TabIndex_SetWithHandler_CallsTabIndexChanged()
     {
-        using var control = new SplitterPanel(null)
+        using SplitterPanel control = new(null)
         {
             TabIndex = 0
         };
@@ -923,7 +922,7 @@ public class SplitterPanelTests
     [WinFormsFact]
     public void SplitterPanel_TabIndex_SetNegative_CallsArgumentOutOfRangeException()
     {
-        using var control = new SplitterPanel(null);
+        using SplitterPanel control = new(null);
         Assert.Throws<ArgumentOutOfRangeException>("value", () => control.TabIndex = -1);
     }
 
@@ -931,7 +930,7 @@ public class SplitterPanelTests
     [BoolData]
     public void SplitterPanel_TabStop_Set_GetReturnsExpected(bool value)
     {
-        using var control = new SplitterPanel(null)
+        using SplitterPanel control = new(null)
         {
             TabStop = value
         };
@@ -953,7 +952,7 @@ public class SplitterPanelTests
     [BoolData]
     public void SplitterPanel_TabStop_SetWithHandle_GetReturnsExpected(bool value)
     {
-        using var control = new SplitterPanel(null);
+        using SplitterPanel control = new(null);
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -989,7 +988,7 @@ public class SplitterPanelTests
     [WinFormsFact]
     public void SplitterPanel_TabStop_SetWithHandler_CallsTabStopChanged()
     {
-        using var control = new SplitterPanel(null)
+        using SplitterPanel control = new(null)
         {
             TabStop = true
         };
@@ -1028,7 +1027,7 @@ public class SplitterPanelTests
     [NormalizedStringData]
     public void SplitterPanel_Text_Set_GetReturnsExpected(string value, string expected)
     {
-        using var control = new SplitterPanel(null)
+        using SplitterPanel control = new(null)
         {
             Text = value
         };
@@ -1045,7 +1044,7 @@ public class SplitterPanelTests
     [NormalizedStringData]
     public void SplitterPanel_Text_SetWithHandle_GetReturnsExpected(string value, string expected)
     {
-        using var control = new SplitterPanel(null);
+        using SplitterPanel control = new(null);
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -1073,7 +1072,7 @@ public class SplitterPanelTests
     [WinFormsFact]
     public void SplitterPanel_Text_SetWithHandler_CallsTextChanged()
     {
-        using var control = new SplitterPanel(null);
+        using SplitterPanel control = new(null);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -1109,7 +1108,7 @@ public class SplitterPanelTests
     [BoolData]
     public void SplitterPanel_Visible_Set_GetReturnsExpected(bool value)
     {
-        using var control = new SplitterPanel(null)
+        using SplitterPanel control = new(null)
         {
             Visible = value
         };
@@ -1130,7 +1129,7 @@ public class SplitterPanelTests
     [WinFormsFact]
     public void SplitterPanel_Visible_SetWithHandler_CallsVisibleChanged()
     {
-        using var control = new SplitterPanel(null)
+        using SplitterPanel control = new(null)
         {
             Visible = true
         };
@@ -1172,7 +1171,7 @@ public class SplitterPanelTests
     [InlineData(40)]
     public void SplitterPanel_Width_Set_ThrowsNotSupportedException(int value)
     {
-        using var control = new SplitterPanel(null);
+        using SplitterPanel control = new(null);
         int layoutCallCount = 0;
         int resizeCallCount = 0;
         int sizeChangedCallCount = 0;

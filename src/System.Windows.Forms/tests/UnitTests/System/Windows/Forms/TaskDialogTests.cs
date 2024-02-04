@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using Microsoft.DotNet.RemoteExecutor;
 
@@ -17,7 +16,7 @@ public class TaskDialogTests
             Application.EnableVisualStyles();
             Control.CheckForIllegalCrossThreadCalls = true;
 
-            TaskDialogPage page = new TaskDialogPage();
+            TaskDialogPage page = new();
             page.Created += (_, __) =>
             {
                 // Set the property in the same thread.
@@ -41,7 +40,7 @@ public class TaskDialogTests
             Application.EnableVisualStyles();
             Control.CheckForIllegalCrossThreadCalls = true;
 
-            TaskDialogPage page = new TaskDialogPage();
+            TaskDialogPage page = new();
             page.Created += (_, __) =>
             {
                 // Set the property in a different thread.

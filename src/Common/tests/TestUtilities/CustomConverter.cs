@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 
@@ -52,7 +51,7 @@ public static class CustomConverter
             [DynamicallyAccessedMembers((DynamicallyAccessedMemberTypes)(-1))] Type objectType,
             object? instance) => new TypeConverterProvider(base.GetTypeDescriptor(objectType, instance), _converter);
 
-        private class TypeConverterProvider : CustomTypeDescriptor
+        private sealed class TypeConverterProvider : CustomTypeDescriptor
         {
             private TypeConverter _converter;
 

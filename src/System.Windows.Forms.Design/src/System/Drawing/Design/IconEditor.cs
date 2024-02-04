@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Windows.Forms;
@@ -64,7 +63,7 @@ public class IconEditor : UITypeEditor
         if (_fileDialog is null)
         {
             _fileDialog = new OpenFileDialog();
-            var filter = CreateFilterEntry(this);
+            string filter = CreateFilterEntry(this);
 
             Debug.Assert(s_imageExtenders.Length <= 0, "Why does IconEditor have subclasses if Icon doesn't?");
 
@@ -117,15 +116,20 @@ public class IconEditor : UITypeEditor
 
         // If icon is smaller than rectangle, just center it unscaled in the rectangle.
         Rectangle rectangle = e.Bounds;
+        Graphics g = e.Graphics;
+        using var transform = g.Transform;
+        rectangle.X -= (int)transform.OffsetX;
+        rectangle.Y -= (int)transform.OffsetY;
+
         if (icon.Width < rectangle.Width)
         {
-            rectangle.X = (rectangle.Width - icon.Width) / 2;
+            rectangle.X += (rectangle.Width - icon.Width) / 2;
             rectangle.Width = icon.Width;
         }
 
         if (icon.Height < rectangle.Height)
         {
-            rectangle.X = (rectangle.Height - icon.Height) / 2;
+            rectangle.Y += (rectangle.Height - icon.Height) / 2;
             rectangle.Height = icon.Height;
         }
 

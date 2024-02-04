@@ -1,27 +1,31 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System;
 
 public abstract class FileCleanupTestBase : IDisposable
 {
-    public readonly string TestDirectory;
+    private string? _testDirectory;
 
-    protected FileCleanupTestBase()
+    public string TestDirectory
     {
-        TestDirectory = Path.Combine(Path.GetTempPath(), GetUniqueName());
-        Directory.CreateDirectory(TestDirectory);
+        get
+        {
+            if (_testDirectory is null)
+            {
+                _testDirectory = Path.Combine(Path.GetTempPath(), GetUniqueName());
+                Directory.CreateDirectory(_testDirectory);
+            }
+
+            return _testDirectory;
+        }
     }
 
-    ~FileCleanupTestBase()
-    {
-        Dispose(false);
-    }
+    ~FileCleanupTestBase() => Dispose(disposing: false);
 
     public void Dispose()
     {
-        Dispose(true);
+        Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
 

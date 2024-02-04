@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 using System.Reflection;
@@ -768,7 +767,7 @@ public class DesignerSerializationManager : IDesignerSerializationManager
 
         if (instance is null)
         {
-            ResolveNameEventArgs e = new ResolveNameEventArgs(name);
+            ResolveNameEventArgs e = new(name);
             OnResolveName(e);
             instance = e.Value;
         }

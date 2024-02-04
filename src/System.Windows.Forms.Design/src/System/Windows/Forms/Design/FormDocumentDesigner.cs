@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 #nullable disable
 
@@ -105,7 +104,7 @@ internal class FormDocumentDesigner : DocumentDesigner
             }
             else
             {
-                Size size = new Size(-1, -1);
+                Size size = new(-1, -1);
                 if (Component is Form form)
                 {
                     size = form.ClientSize;
@@ -182,12 +181,12 @@ internal class FormDocumentDesigner : DocumentDesigner
     {
         get
         {
-            ArrayList snapLines = null;
+            IList<SnapLine> snapLines = null;
             AddPaddingSnapLines(ref snapLines);
             if (snapLines is null)
             {
                 Debug.Fail("why did base.AddPaddingSnapLines return null?");
-                snapLines = new ArrayList(4);
+                snapLines = new List<SnapLine>(4);
             }
 
             // if the padding has not been set - then we'll auto-add padding to form - this is a Usability request
@@ -213,13 +212,13 @@ internal class FormDocumentDesigner : DocumentDesigner
 
                         if (paddingsFound == 4)
                         {
-                            break; //we adjusted all of our paddings
+                            break; // we adjusted all of our paddings
                         }
                     }
                 }
             }
 
-            return snapLines;
+            return (IList)snapLines;
         }
     }
 
@@ -262,7 +261,7 @@ internal class FormDocumentDesigner : DocumentDesigner
         if (!baseVar.IsEmpty)
         {
             SizeF newVarF = Form.GetAutoScaleSize(form.Font);
-            Size newVar = new Size((int)Math.Round(newVarF.Width), (int)Math.Round(newVarF.Height));
+            Size newVar = new((int)Math.Round(newVarF.Width), (int)Math.Round(newVarF.Height));
             // We save a significant amount of time by bailing early if there's no work to be done
             if (baseVar.Equals(newVar))
             {
@@ -452,7 +451,7 @@ internal class FormDocumentDesigner : DocumentDesigner
         PropertyDescriptor prop;
         base.PreFilterProperties(properties);
         // Handle shadowed properties
-        string[] shadowProps = new string[] { "Opacity", "IsMdiContainer", "Size", "ShowInTaskBar", "WindowState", "AutoSize", "AcceptButton", "CancelButton" };
+        string[] shadowProps = ["Opacity", "IsMdiContainer", "Size", "ShowInTaskBar", "WindowState", "AutoSize", "AcceptButton", "CancelButton"];
         Attribute[] empty = Array.Empty<Attribute>();
         for (int i = 0; i < shadowProps.Length; i++)
         {

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Drawing;
@@ -10,7 +9,6 @@ using System.Text;
 using System.Windows.Forms.VisualStyles;
 using Microsoft.Win32;
 using Microsoft.Office;
-using static Interop;
 using Directory = System.IO.Directory;
 
 namespace System.Windows.Forms;
@@ -42,10 +40,6 @@ public sealed partial class Application
     private static readonly object s_internalSyncObject = new();
     private static bool s_useWaitCursor;
 
-    private static bool s_useEverettThreadAffinity;
-    private static bool s_checkedThreadAffinity;
-    private const string EverettThreadAffinityValue = "EnableSystemEventsThreadAffinityCompatibility";
-
     /// <summary>
     ///  Events the user can hook into
     /// </summary>
@@ -58,6 +52,8 @@ public sealed partial class Application
 
     // Used to avoid recursive exit
     private static bool s_exiting;
+
+    private static bool s_parkingWindowCreated;
 
     /// <summary>
     ///  This class is static, there is no need to ever create it.
@@ -143,43 +139,6 @@ public sealed partial class Application
 
     internal static string CommonAppDataRegistryKeyName
         => $"Software\\{CompanyName}\\{ProductName}\\{ProductVersion}";
-
-    internal static bool UseEverettThreadAffinity
-    {
-        get
-        {
-            if (!s_checkedThreadAffinity)
-            {
-                s_checkedThreadAffinity = true;
-                try
-                {
-                    // We need access to be able to read from the registry here.  We're not creating a
-                    // registry key, nor are we returning information from the registry to the user.
-                    RegistryKey? key = Registry.LocalMachine.OpenSubKey(CommonAppDataRegistryKeyName);
-                    if (key is not null)
-                    {
-                        object? value = key.GetValue(EverettThreadAffinityValue);
-                        key.Close();
-
-                        if (value is not null && (int)value != 0)
-                        {
-                            s_useEverettThreadAffinity = true;
-                        }
-                    }
-                }
-                catch (Security.SecurityException)
-                {
-                    // Can't read the key: use default value (false)
-                }
-                catch (InvalidCastException)
-                {
-                    // Key is of wrong type: use default value (false)
-                }
-            }
-
-            return s_useEverettThreadAffinity;
-        }
-    }
 
     /// <summary>
     ///  Gets the path for the application data that is shared among all users.
@@ -292,8 +251,7 @@ public sealed partial class Application
     ///  Gets the current <see cref="HighDpiMode"/> mode for the process.
     /// </summary>
     /// <value>One of the enumeration values that indicates the high DPI mode.</value>
-    public static HighDpiMode HighDpiMode
-        => DpiHelper.GetWinformsApplicationDpiAwareness();
+    public static HighDpiMode HighDpiMode => ScaleHelper.GetThreadHighDpiMode();
 
     /// <summary>
     ///  Gets the path for the application data specific to a local, non-roaming user.
@@ -844,7 +802,7 @@ public sealed partial class Application
     /// <summary>
     ///  Informs all message pumps that they are to terminate and then closes all
     ///  application windows after the messages have been processed. e.Cancel indicates
-    ///  whether any of the open forms cancelled the exit call.
+    ///  whether any of the open forms canceled the exit call.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static void Exit(CancelEventArgs? e)
@@ -867,11 +825,22 @@ public sealed partial class Application
             try
             {
                 // Raise the FormClosing and FormClosed events for each open form
-                if (s_forms is not null)
+                if (s_forms?.Count > 0)
                 {
-                    foreach (Form f in s_forms)
+                    HashSet<Form> processedForms = new(s_forms.Count);
+                    int version = s_forms.AddVersion;
+                    // We need to iterate in backward order to not violate MDI closing events rules
+                    for (int i = s_forms.Count - 1; i > -1; i--)
                     {
-                        if (f.RaiseFormClosingOnAppExit())
+                        Form? form = s_forms[i];
+                        if (form is null || processedForms.Contains(form))
+                        {
+                            continue;
+                        }
+
+                        processedForms.Add(form);
+                        // Here user can remove existing forms or add new
+                        if (form.RaiseFormClosingOnAppExit())
                         {
                             // A form refused to close
                             if (e is not null)
@@ -879,14 +848,35 @@ public sealed partial class Application
                                 e.Cancel = true;
                             }
 
+                            processedForms.Clear();
                             return;
+                        }
+
+                        if (version != s_forms.AddVersion) // A new form was added, we need to iterate again
+                        {
+                            version = s_forms.AddVersion;
+                            i = s_forms.Count;
+                        }
+                        else
+                        {
+                            i = Math.Min(i, s_forms.Count); // Form can be removed from the collection, we need to check it
                         }
                     }
 
+                    processedForms.Clear();
                     while (s_forms.Count > 0)
                     {
-                        // OnFormClosed removes the form from the FormCollection
-                        s_forms[0]!.RaiseFormClosedOnAppExit();
+                        // We need to iterate in backward order to not violate MDI closing events rules
+                        Form? form = s_forms[^1];
+                        if (form is not null)
+                        {
+                            // OnFormClosed removes the form from the FormCollection
+                            form.RaiseFormClosedOnAppExit();
+                        }
+                        else
+                        {
+                            s_forms.RemoveAt(s_forms.Count - 1);
+                        }
                     }
                 }
 
@@ -1059,10 +1049,10 @@ public sealed partial class Application
     }
 
     /// <summary>
-    ///  Park control handle on a parkingwindow that has matching DpiAwareness.
+    ///  Park control handle on a parking window that has matching DpiAwareness.
     /// </summary>
-    /// <param name="cp"> create params for control handle</param>
-    /// <param name="dpiAwarenessContext"> dpi awareness</param>
+    /// <param name="cp">Create params for control handle.</param>
+    /// <param name="dpiAwarenessContext">DPI awareness.</param>
     internal static void ParkHandle(CreateParams cp, DPI_AWARENESS_CONTEXT dpiAwarenessContext)
     {
         ThreadContext threadContext = ThreadContext.FromCurrent();
@@ -1132,7 +1122,7 @@ public sealed partial class Application
             currentStartInfo.FileName = ExecutablePath;
             if (arguments.Length >= 2)
             {
-                StringBuilder sb = new StringBuilder((arguments.Length - 1) * 16);
+                StringBuilder sb = new((arguments.Length - 1) * 16);
                 for (int argumentIndex = 1; argumentIndex < arguments.Length; argumentIndex++)
                 {
                     sb.Append($"\"{arguments[argumentIndex]}\" ");
@@ -1176,31 +1166,6 @@ public sealed partial class Application
         => ThreadContext.FromCurrent().RunMessageLoop(msoloop.ModalForm, new ModalApplicationContext(form));
 
     /// <summary>
-    /// Scale the default font (if it is set) as per the Settings display text scale settings.
-    /// </summary>
-    /// <param name="textScaleFactor">The scaling factor in the range [1.0, 2.25].</param>
-    internal static void ScaleDefaultFont(float textScaleFactor)
-    {
-        if (s_defaultFont is null || !OsVersion.IsWindows10_1507OrGreater())
-        {
-            return;
-        }
-
-        if (s_defaultFontScaled is not null)
-        {
-            s_defaultFontScaled.Dispose();
-            s_defaultFontScaled = null;
-        }
-
-        // Restore the text scale if it isn't the default value in the valid text scale factor value
-        textScaleFactor = Math.Min(DpiHelper.MaxTextScaleFactorValue, textScaleFactor);
-        if (textScaleFactor > DpiHelper.MinTextScaleFactorValue)
-        {
-            s_defaultFontScaled = s_defaultFont.WithSize(s_defaultFont.Size * textScaleFactor);
-        }
-    }
-
-    /// <summary>
     ///  Sets the static UseCompatibleTextRenderingDefault field on Control to the value passed in.
     ///  This switch determines the default text rendering engine to use by some controls that support
     ///  switching rendering engine.
@@ -1241,25 +1206,22 @@ public sealed partial class Application
             throw new InvalidOperationException(string.Format(SR.Win32WindowAlreadyCreated, nameof(SetDefaultFont)));
 
         // If user made a prior call to this API with a different custom fonts, we want to clean it up.
-        if (s_defaultFont is not null)
+        if (s_defaultFont is not null && !ReferenceEquals(s_defaultFont, font))
         {
-            s_defaultFont?.Dispose();
-            s_defaultFont = null;
-            s_defaultFontScaled?.Dispose();
-            s_defaultFontScaled = null;
+            s_defaultFont.Dispose();
         }
 
-        if (font.IsSystemFont)
-        {
-            // The system font is managed the .NET runtime, and it is already scaled to the current text scale factor.
-            // We need to clone it because our reference will no longer be scaled by the .NET runtime.
-            s_defaultFont = (Font)font.Clone();
-        }
-        else
-        {
-            s_defaultFont = font;
-            ScaleDefaultFont(DpiHelper.GetTextScaleFactor());
-        }
+        s_defaultFont = font;
+        ScaleDefaultFont();
+    }
+
+    internal static void ScaleDefaultFont()
+    {
+        // It is possible the existing scaled font will be identical after scaling the default font again. Figuring
+        // that out requires additional complexity that doesn't appear to be strictly necessary.
+        s_defaultFontScaled?.Dispose();
+        s_defaultFontScaled = null;
+        s_defaultFontScaled = ScaleHelper.ScaleToSystemTextSize(s_defaultFont);
     }
 
     /// <summary>
@@ -1270,8 +1232,7 @@ public sealed partial class Application
     public static bool SetHighDpiMode(HighDpiMode highDpiMode)
     {
         SourceGenerated.EnumValidator.Validate(highDpiMode, nameof(highDpiMode));
-
-        return !DpiHelper.FirstParkingWindowCreated && DpiHelper.SetWinformsApplicationDpiAwareness(highDpiMode);
+        return !s_parkingWindowCreated && ScaleHelper.SetProcessHighDpiMode(highDpiMode);
     }
 
     /// <summary>

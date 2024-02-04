@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using System.Reflection;
@@ -20,7 +19,7 @@ public class PropertyGridView_GridViewListBoxTests
 
         PropertyGridView propertyGridView = propertyGrid.TestAccessor().GridView;
 
-        using PropertyGridView.GridViewListBox gridViewListBox = new PropertyGridView.GridViewListBox(propertyGridView);
+        using PropertyGridView.GridViewListBox gridViewListBox = new(propertyGridView);
         AccessibleObject gridViewListBoxAccessibleObject = gridViewListBox.AccessibilityObject;
         Assert.NotNull(gridViewListBoxAccessibleObject);
 
@@ -30,7 +29,7 @@ public class PropertyGridView_GridViewListBoxTests
             Assert.Equal("GridViewListBoxAccessibleObject", gridViewListBoxAccessibleObjectType.Name);
             ConstructorInfo constructorInfo = gridViewListBoxAccessibleObjectType.GetConstructors()[0];
 
-            using PropertyGridView.GridViewListBox owningGridViewListBox = new PropertyGridView.GridViewListBox(null);
+            using PropertyGridView.GridViewListBox owningGridViewListBox = new(null);
             constructorInfo.Invoke(new object[] { owningGridViewListBox });
         });
     }

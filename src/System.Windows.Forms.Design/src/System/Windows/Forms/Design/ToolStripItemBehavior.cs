@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 #nullable disable
 
@@ -20,7 +19,7 @@ internal class ToolStripItemBehavior : Behavior.Behavior
 {
     private const int GLYPHBORDER = 1;
     private const int GLYPHINSET = 2;
-    //new privates for "Drag Drop"
+    // new privates for "Drag Drop"
     internal Rectangle _dragBoxFromMouseDown = Rectangle.Empty;
     private Timer _timer;
     private ToolStripItemGlyph _selectedGlyph;
@@ -78,7 +77,7 @@ internal class ToolStripItemBehavior : Behavior.Behavior
             {
                 Rectangle bounds = GetPaintingBounds(designerHost, item);
                 bounds.Inflate(GLYPHBORDER, GLYPHBORDER);
-                Region rgn = new Region(bounds);
+                Region rgn = new(bounds);
                 try
                 {
                     bounds.Inflate(-GLYPHINSET, -GLYPHINSET);
@@ -286,7 +285,7 @@ internal class ToolStripItemBehavior : Behavior.Behavior
         IDesignerHost designerHost = (IDesignerHost)glyphItem.Site.GetService(typeof(IDesignerHost));
         Debug.Assert(designerHost is not null, "Invalid DesignerHost");
 
-        //Cache original selection
+        // Cache original selection
         ICollection originalSelComps = null;
         if (selSvc is not null)
         {
@@ -294,7 +293,7 @@ internal class ToolStripItemBehavior : Behavior.Behavior
         }
 
         // Add the TemplateNode to the Selection if it is currently Selected as the GetSelectedComponents won't do it for us.
-        ArrayList origSel = new ArrayList(originalSelComps);
+        ArrayList origSel = new(originalSelComps);
         if (origSel.Count == 0)
         {
             if (keyService is not null && keyService.SelectedDesignerControl is not null)
@@ -349,7 +348,7 @@ internal class ToolStripItemBehavior : Behavior.Behavior
                     return false;
                 }
 
-                //start Double Click Timer
+                // start Double Click Timer
                 // This is required for the second down in selection which can be the first down of a Double click on the glyph confusing... hence this comment ...
                 // Heres the scenario ....
                 // DOWN 1 - selects the ITEM
@@ -373,10 +372,10 @@ internal class ToolStripItemBehavior : Behavior.Behavior
                 // We should process MouseDown only if we are not yet selected....
                 if (!selSvc.GetComponentSelected(glyphItem))
                 {
-                    //Reset the State... On the Glyphs .. we get MouseDown - Mouse UP (for single Click) And we get MouseDown - MouseUp - DoubleClick - Up (for double Click) Hence reset the state at start....
+                    // Reset the State... On the Glyphs .. we get MouseDown - Mouse UP (for single Click) And we get MouseDown - MouseUp - DoubleClick - Up (for double Click) Hence reset the state at start....
                     _mouseUpFired = false;
                     _doubleClickFired = false;
-                    //Implementing Shift + Click....
+                    // Implementing Shift + Click....
                     // we have 2 items, namely, selectedItem (current PrimarySelection) and glyphItem (item which has received mouseDown) FIRST check if they have common parent...  IF YES then get the indices of the two and SELECT all items from LOWER index to the HIGHER index.
                     if (shiftPressed && (selectedItem is not null && CommonParent(selectedItem, glyphItem)))
                     {
@@ -414,12 +413,12 @@ internal class ToolStripItemBehavior : Behavior.Behavior
                         }
                     }
 
-                    //End Implementation
+                    // End Implementation
                     else
                     {
                         if (glyphItem.IsOnDropDown && ToolStripDesigner.s_shiftState)
                         {
-                            //Invalidate glyph only if we are in ShiftState...
+                            // Invalidate glyph only if we are in ShiftState...
                             ToolStripDesigner.s_shiftState = false;
                             bSvc?.Invalidate(glyphItem.Owner.Bounds);
                         }
@@ -543,7 +542,7 @@ internal class ToolStripItemBehavior : Behavior.Behavior
             }
             else if (glyphItem.IsOnDropDown)
             {
-                //Get the OwnerItem's Designer and set the value...
+                // Get the OwnerItem's Designer and set the value...
                 if (glyphItem.Owner is ToolStripDropDown parentDropDown)
                 {
                     ToolStripItem ownerItem = parentDropDown.OwnerItem;
@@ -568,9 +567,9 @@ internal class ToolStripItemBehavior : Behavior.Behavior
                 // Proceed with the drag and drop, passing in the list item.
                 try
                 {
-                    ArrayList dragItems = new ArrayList();
+                    List<ToolStripItem> dragItems = new();
                     ICollection selComps = selSvc.GetSelectedComponents();
-                    //create our list of controls-to-drag
+                    // create our list of controls-to-drag
                     foreach (IComponent comp in selComps)
                     {
                         if (comp is ToolStripItem item)
@@ -579,11 +578,11 @@ internal class ToolStripItemBehavior : Behavior.Behavior
                         }
                     }
 
-                    //Start Drag-Drop only if ToolStripItem is the primary Selection
+                    // Start Drag-Drop only if ToolStripItem is the primary Selection
                     if (selSvc.PrimarySelection is ToolStripItem selectedItem)
                     {
                         ToolStrip owner = selectedItem.Owner;
-                        ToolStripItemDataObject data = new ToolStripItemDataObject(dragItems, selectedItem, owner);
+                        ToolStripItemDataObject data = new(dragItems, selectedItem, owner);
                         DropSource.QueryContinueDrag += new QueryContinueDragEventHandler(QueryContinueDrag);
                         if (glyphItem is ToolStripDropDownItem ddItem)
                         {
@@ -606,7 +605,7 @@ internal class ToolStripItemBehavior : Behavior.Behavior
                 finally
                 {
                     DropSource.QueryContinueDrag -= new QueryContinueDragEventHandler(QueryContinueDrag);
-                    //Reset all Drag-Variables
+                    // Reset all Drag-Variables
                     SetParentDesignerValuesForDragDrop(glyphItem, false, Point.Empty);
                     ToolStripDesigner.s_dragItem = null;
                     _dropSource = null;
@@ -619,7 +618,7 @@ internal class ToolStripItemBehavior : Behavior.Behavior
         return retVal;
     }
 
-    //  OLE DragDrop virtual methods
+    // OLE DragDrop virtual methods
     /// <summary>
     ///  OnDragDrop can be overridden so that a Behavior can specify its own Drag/Drop rules.
     /// </summary>
@@ -634,27 +633,27 @@ internal class ToolStripItemBehavior : Behavior.Behavior
             ToolStripItem selectedItem = data.PrimarySelection;
             IDesignerHost designerHost = (IDesignerHost)currentDropItem.Site.GetService(typeof(IDesignerHost));
             Debug.Assert(designerHost is not null, "Invalid DesignerHost");
-            //Do DragDrop only if currentDropItem has changed.
+            // Do DragDrop only if currentDropItem has changed.
             if (currentDropItem != selectedItem && designerHost is not null)
             {
-                ArrayList components = data.DragComponents;
+                List<ToolStripItem> dragComponents = data.DragComponents;
                 ToolStrip parentToolStrip = currentDropItem.GetCurrentParent();
                 int primaryIndex = -1;
                 string transDesc;
                 bool copy = (e.Effect == DragDropEffects.Copy);
-                if (components.Count == 1)
+                if (dragComponents.Count == 1)
                 {
-                    string name = TypeDescriptor.GetComponentName(components[0]);
+                    string name = TypeDescriptor.GetComponentName(dragComponents[0]);
                     if (name is null || name.Length == 0)
                     {
-                        name = components[0].GetType().Name;
+                        name = dragComponents[0].GetType().Name;
                     }
 
                     transDesc = string.Format(copy ? SR.BehaviorServiceCopyControl : SR.BehaviorServiceMoveControl, name);
                 }
                 else
                 {
-                    transDesc = string.Format(copy ? SR.BehaviorServiceCopyControls : SR.BehaviorServiceMoveControls, components.Count);
+                    transDesc = string.Format(copy ? SR.BehaviorServiceCopyControls : SR.BehaviorServiceMoveControls, dragComponents.Count);
                 }
 
                 DesignerTransaction designerTransaction = designerHost.CreateTransaction(transDesc);
@@ -673,13 +672,15 @@ internal class ToolStripItemBehavior : Behavior.Behavior
                         }
                     }
 
+                    IReadOnlyList<IComponent> components;
+
                     // If we are copying, then we want to make a copy of the components we are dragging
                     if (copy)
                     {
                         // Remember the primary selection if we had one
                         if (selectedItem is not null)
                         {
-                            primaryIndex = components.IndexOf(selectedItem);
+                            primaryIndex = dragComponents.IndexOf(selectedItem);
                         }
 
                         ToolStripKeyboardHandlingService keyboardHandlingService = GetKeyBoardHandlingService(selectedItem);
@@ -688,7 +689,7 @@ internal class ToolStripItemBehavior : Behavior.Behavior
                             keyboardHandlingService.CopyInProgress = true;
                         }
 
-                        components = DesignerUtils.CopyDragObjects(components, currentDropItem.Site) as ArrayList;
+                        components = DesignerUtils.CopyDragObjects(dragComponents, currentDropItem.Site);
                         if (keyboardHandlingService is not null)
                         {
                             keyboardHandlingService.CopyInProgress = false;
@@ -698,6 +699,10 @@ internal class ToolStripItemBehavior : Behavior.Behavior
                         {
                             selectedItem = components[primaryIndex] as ToolStripItem;
                         }
+                    }
+                    else
+                    {
+                        components = dragComponents;
                     }
 
                     if (e.Effect == DragDropEffects.Move || copy)
@@ -748,7 +753,7 @@ internal class ToolStripItemBehavior : Behavior.Behavior
                             changeService.OnComponentChanged(parentToolStrip, TypeDescriptor.GetProperties(parentToolStrip)["Items"]);
                         }
 
-                        //fire extra changing/changed events.
+                        // fire extra changing/changed events.
                         if (copy)
                         {
                             if (dropDown is not null)
@@ -765,7 +770,7 @@ internal class ToolStripItemBehavior : Behavior.Behavior
                         }
                     }
 
-                    //If Parent is DropDown... we have to manage the Glyphs ....
+                    // If Parent is DropDown... we have to manage the Glyphs ....
                     foreach (ToolStripItem item in components)
                     {
                         if (item is ToolStripDropDownItem)
@@ -887,7 +892,7 @@ internal class ToolStripItemBehavior : Behavior.Behavior
             return;
         }
 
-        //Start from fresh State...
+        // Start from fresh State...
         if (item is not null && item.Site is not null)
         {
             ToolStripDesigner.s_lastCursorPosition = Cursor.Position;
@@ -901,7 +906,7 @@ internal class ToolStripItemBehavior : Behavior.Behavior
                     Graphics g = bSvc.AdornerWindowGraphics;
                     try
                     {
-                        using Pen p = new Pen(new SolidBrush(Color.Black));
+                        using Pen p = new(new SolidBrush(Color.Black));
                         p.DashStyle = DashStyle.Dot;
                         g.DrawRectangle(p, bounds);
                     }
@@ -946,7 +951,7 @@ internal class ToolStripItemBehavior : Behavior.Behavior
         }
 
         // Remember the point where the mouse down occurred. The DragSize indicates the size that the mouse can move before a drag event should be started.
-        Size dragSize = new Size(1, 1);
+        Size dragSize = new(1, 1);
 
         IDesignerHost designerHost = (IDesignerHost)glyphItem.Site.GetService(typeof(IDesignerHost));
         Debug.Assert(designerHost is not null, "Invalid DesignerHost");
@@ -973,7 +978,7 @@ internal class ToolStripItemBehavior : Behavior.Behavior
         }
         else if (glyphItem.IsOnDropDown)
         {
-            //Get the OwnerItem's Designer and set the value...
+            // Get the OwnerItem's Designer and set the value...
             if (glyphItem.Owner is ToolStripDropDown parentDropDown)
             {
                 ToolStripItem ownerItem = parentDropDown.OwnerItem;

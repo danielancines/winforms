@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Reflection;
@@ -60,7 +59,7 @@ internal class WindowClass
 
         if (icon.IsNull)
         {
-            icon = PInvoke.LoadIcon((HINSTANCE)0, (PCWSTR)(char*)PInvoke.IDI_APPLICATION);
+            icon = PInvokeCore.LoadIcon((HINSTANCE)0, (PCWSTR)(char*)PInvokeCore.IDI_APPLICATION);
         }
         else if (icon == (-1))
         {

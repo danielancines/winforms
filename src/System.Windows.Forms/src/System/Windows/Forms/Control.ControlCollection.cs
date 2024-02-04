@@ -1,10 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 using System.ComponentModel;
-using System.Globalization;
 using System.Windows.Forms.Layout;
 
 namespace System.Windows.Forms;
@@ -149,7 +147,7 @@ public partial class Control
         }
 
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public virtual void AddRange(Control[] controls)
+        public virtual void AddRange(params Control[] controls)
         {
             ArgumentNullException.ThrowIfNull(controls);
 
@@ -365,13 +363,9 @@ public partial class Control
         {
             get
             {
-                //do some bounds checking here...
-                if (index < 0 || index >= Count)
-                {
-                    throw new ArgumentOutOfRangeException(
-                        nameof(index),
-                        string.Format(SR.IndexOutOfRange, index.ToString(CultureInfo.CurrentCulture)));
-                }
+                // do some bounds checking here...
+                ArgumentOutOfRangeException.ThrowIfNegative(index);
+                ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, Count);
 
                 Control control = (Control)InnerList[index]!;
                 Debug.Assert(control is not null, "Why are we returning null controls from a valid index?");

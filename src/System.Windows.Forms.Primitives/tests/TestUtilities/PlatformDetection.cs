@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -24,7 +23,6 @@ public static partial class PlatformDetection
     public static bool IsNotWindowsServerCore => !IsWindowsServerCore;
     public static bool IsNotWindowsIoTCore => !IsWindowsIoTCore;
     public static bool IsNotWindowsHomeEdition => !IsWindowsHomeEdition;
-    public static bool IsDrawingSupported => (IsNotWindowsNanoServer && IsNotWindowsIoTCore);
     public static bool IsArmProcess => RuntimeInformation.ProcessArchitecture == Architecture.Arm;
     public static bool IsNotArmProcess => !IsArmProcess;
     public static bool IsArm64Process => RuntimeInformation.ProcessArchitecture == Architecture.Arm64;
@@ -98,7 +96,7 @@ public static partial class PlatformDetection
     {
         try
         {
-            var tmp = new byte[int.MaxValue];
+            byte[] tmp = new byte[int.MaxValue];
             return tmp is null;
         }
         catch (OutOfMemoryException)

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -13,7 +12,7 @@ public class DataGridViewCellCancelEventArgsTests
     [InlineData(1, 2)]
     public void Ctor_Int_Int(int columnIndex, int rowIndex)
     {
-        var e = new DataGridViewCellCancelEventArgs(columnIndex, rowIndex);
+        DataGridViewCellCancelEventArgs e = new(columnIndex, rowIndex);
         Assert.Equal(columnIndex, e.ColumnIndex);
         Assert.Equal(rowIndex, e.RowIndex);
         Assert.False(e.Cancel);

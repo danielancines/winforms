@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -16,7 +15,7 @@ public class ToolStripSplitButtonTests
     [MemberData(nameof(ToolStripItem_Set_TestData))]
     public void ToolStripSplitButton_DefaultItem_Set_GetReturnsExpected(ToolStripItem value)
     {
-        using var button = new ToolStripSplitButton
+        using ToolStripSplitButton button = new()
         {
             DefaultItem = value
         };
@@ -30,7 +29,7 @@ public class ToolStripSplitButtonTests
     [WinFormsFact]
     public void ToolStripSplitButton_DefaultItem_SetWithHandler_CallsOnDefaultItemChanged()
     {
-        using var button = new ToolStripSplitButton();
+        using ToolStripSplitButton button = new();
 
         int callCount = 0;
         EventHandler handler = (sender, e) =>
@@ -42,7 +41,7 @@ public class ToolStripSplitButtonTests
         button.DefaultItemChanged += handler;
 
         // Set non-null.
-        using var item1 = new SubToolStripItem();
+        using SubToolStripItem item1 = new();
         button.DefaultItem = item1;
         Assert.Same(item1, button.DefaultItem);
         Assert.Equal(1, callCount);
@@ -53,7 +52,7 @@ public class ToolStripSplitButtonTests
         Assert.Equal(1, callCount);
 
         // Set different.
-        using var item2 = new SubToolStripItem();
+        using SubToolStripItem item2 = new();
         button.DefaultItem = item2;
         Assert.Same(item2, button.DefaultItem);
         Assert.Equal(2, callCount);

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -13,7 +12,7 @@ public class LabelEditEventArgsTests
     [InlineData(1)]
     public void Ctor_Int(int item)
     {
-        var e = new LabelEditEventArgs(item);
+        LabelEditEventArgs e = new(item);
         Assert.Equal(item, e.Item);
         Assert.Null(e.Label);
         Assert.False(e.CancelEdit);
@@ -25,7 +24,7 @@ public class LabelEditEventArgsTests
     [InlineData(1, "label")]
     public void Ctor_Int_String(int item, string label)
     {
-        var e = new LabelEditEventArgs(item, label);
+        LabelEditEventArgs e = new(item, label);
         Assert.Equal(item, e.Item);
         Assert.Equal(label, e.Label);
         Assert.False(e.CancelEdit);
@@ -36,7 +35,7 @@ public class LabelEditEventArgsTests
     [InlineData(false)]
     public void CancelEdit_Set_GetReturnsExpected(bool value)
     {
-        var e = new LabelEditEventArgs(1)
+        LabelEditEventArgs e = new(1)
         {
             CancelEdit = value
         };

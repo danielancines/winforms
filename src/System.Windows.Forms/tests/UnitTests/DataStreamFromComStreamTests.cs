@@ -1,8 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-using Windows.Win32.System.Com;
 
 namespace System.Windows.Forms.Tests;
 
@@ -15,7 +12,7 @@ public class DataStreamFromComStreamTests
     public unsafe void Write_ThrowsInvalidCount(int bufferSize, int index, int count)
     {
         using MemoryStream memoryStream = new();
-        using var stream = ComHelpers.GetComScope<IStream>(new Interop.Ole32.GPStream(memoryStream));
+        using var stream = memoryStream.ToIStream();
         using DataStreamFromComStream dataStream = new(stream);
         Assert.Throws<IOException>(() => dataStream.Write(new byte[bufferSize], index, count));
     }
@@ -28,7 +25,7 @@ public class DataStreamFromComStreamTests
     public unsafe void Write_DoesNotThrowCountZeroOrLess(int bufferSize, int index, int count)
     {
         using MemoryStream memoryStream = new();
-        using var stream = ComHelpers.GetComScope<IStream>(new Interop.Ole32.GPStream(memoryStream));
+        using var stream = memoryStream.ToIStream();
         using DataStreamFromComStream dataStream = new(stream);
         dataStream.Write(new byte[bufferSize], index, count);
     }

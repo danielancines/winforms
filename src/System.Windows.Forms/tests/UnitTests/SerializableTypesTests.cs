@@ -1,13 +1,12 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using System.Text;
+using Windows.Win32.System.Com;
 using static System.Windows.Forms.ImageList;
 using static System.Windows.Forms.ListViewItem;
 using static System.Windows.Forms.TableLayoutSettings;
-using static Interop;
 
 namespace System.Windows.Forms.Tests.Serialization;
 
@@ -17,16 +16,16 @@ public class SerializableTypesTests
     [Fact]
     public void AxHostState_RoundTripAndExchangeWithNet()
     {
-        using var formatterScope = new BinaryFormatterScope(enable: true);
+        using BinaryFormatterScope formatterScope = new(enable: true);
         string payload = "abc";
         string licenseKey = "licenseKey";
         string netBlob;
         AxHost.State state;
 
-        using (var stream = new MemoryStream(256))
+        using (MemoryStream stream = new(256))
         {
-            var bytes = Encoding.UTF8.GetBytes(payload);
-            using (var writer = new BinaryWriter(stream))
+            byte[] bytes = Encoding.UTF8.GetBytes(payload);
+            using (BinaryWriter writer = new(stream))
             {
                 writer.Write(bytes.Length);
                 writer.Write(bytes);
@@ -42,15 +41,16 @@ public class SerializableTypesTests
         // ensure we can deserialise NET Fx serialised data and continue to match the payload
         ValidateResult(ClassicAxHostState);
 
-        void ValidateResult(string blob)
+        unsafe void ValidateResult(string blob)
         {
             AxHost.State result = BinarySerialization.EnsureDeserialize<AxHost.State>(blob);
+            using var resultPropBag = result.GetPropBag();
+            Assert.True(resultPropBag.IsNull);
+            using var statePropBag = state.GetPropBag();
+            Assert.True(statePropBag.IsNull);
 
-            Assert.Null(result.GetPropBag());
-            Assert.Null(state.GetPropBag());
-
-            Assert.Equal(1, result.Type);
-            Assert.Equal(1, state.Type);
+            Assert.Equal(AxHost.StorageType.StreamInit, result.Type);
+            Assert.Equal(AxHost.StorageType.StreamInit, state.Type);
 
             Assert.True(result.ManualUpdate);
             Assert.True(state.ManualUpdate);
@@ -58,9 +58,10 @@ public class SerializableTypesTests
             Assert.Equal(licenseKey, result.LicenseKey);
             Assert.Equal(licenseKey, state.LicenseKey);
 
-            var streamOut = result.GetStream() as Ole32.GPStream;
-            Assert.NotNull(streamOut);
-            Stream bufferStream = streamOut.GetDataStream();
+            using var streamOut = result.GetStream();
+            Assert.False(streamOut.IsNull);
+            Assert.True(ComHelpers.TryGetObjectForIUnknown(streamOut.AsUnknown, takeOwnership: false, out ComManagedStream managedStream));
+            Stream bufferStream = managedStream.GetDataStream();
             byte[] buffer = new byte[3];
             bufferStream.Read(buffer, 0, buffer.Length);
             Assert.Equal(payload, Encoding.UTF8.GetString(buffer));
@@ -70,10 +71,10 @@ public class SerializableTypesTests
     [Fact]
     public void ImageListStreamer_RoundTripAndExchangeWithNet()
     {
-        using var formatterScope = new BinaryFormatterScope(enable: true);
+        using BinaryFormatterScope formatterScope = new(enable: true);
         string netBlob;
 
-        using (var imageList = new ImageList()
+        using (ImageList imageList = new()
             {
                 ImageSize = new Size(16, 16),
                 TransparentColor = Color.White
@@ -105,9 +106,9 @@ public class SerializableTypesTests
     [Fact]
     public void LinkArea_RoundTripAndExchangeWithNet()
     {
-        using var formatterScope = new BinaryFormatterScope(enable: true);
-        var linkArea = new LinkArea(5, 7);
-        var netBlob = BinarySerialization.ToBase64String(linkArea);
+        using BinaryFormatterScope formatterScope = new(enable: true);
+        LinkArea linkArea = new(5, 7);
+        string netBlob = BinarySerialization.ToBase64String(linkArea);
 
         // ensure we can deserialise NET serialised data and continue to match the payload
         ValidateResult(netBlob);
@@ -125,8 +126,8 @@ public class SerializableTypesTests
     [Fact]
     public void ListViewGroup_RoundTripAndExchangeWithNet()
     {
-        using var formatterScope = new BinaryFormatterScope(enable: true);
-        var listViewGroup = new ListViewGroup("Header", HorizontalAlignment.Center)
+        using BinaryFormatterScope formatterScope = new(enable: true);
+        ListViewGroup listViewGroup = new("Header", HorizontalAlignment.Center)
         {
             Tag = "Tag",
             Name = "GroupName",
@@ -134,7 +135,7 @@ public class SerializableTypesTests
 
         listViewGroup.Items.Add(new ListViewItem("Item"));
 
-        var netBlob = BinarySerialization.ToBase64String(listViewGroup);
+        string netBlob = BinarySerialization.ToBase64String(listViewGroup);
 
         // ensure we can deserialise NET serialised data and continue to match the payload
         ValidateResult(netBlob);
@@ -158,12 +159,12 @@ public class SerializableTypesTests
     [Fact]
     public void ListViewItem_RoundTripAndExchangeWithNet()
     {
-        using var formatterScope = new BinaryFormatterScope(enable: true);
+        using BinaryFormatterScope formatterScope = new(enable: true);
         string netBlob;
 
-        using (var font = new Font(FontFamily.GenericSansSerif, 9f))
+        using (Font font = new(FontFamily.GenericSansSerif, 9f))
         {
-            var listViewItem = new ListViewItem("Item1", 0)
+            ListViewItem listViewItem = new("Item1", 0)
             {
                 ForeColor = Color.White,
                 BackColor = Color.Black,
@@ -205,12 +206,12 @@ public class SerializableTypesTests
     [Fact]
     public void ListViewSubItemAndSubItemStyle_RoundTripAndExchangeWithNet()
     {
-        using var formatterScope = new BinaryFormatterScope(enable: true);
+        using BinaryFormatterScope formatterScope = new(enable: true);
         string netBlob;
 
-        using (var font = new Font(FontFamily.GenericSansSerif, 9f))
+        using (Font font = new(FontFamily.GenericSansSerif, 9f))
         {
-            var listViewSubItem = new ListViewSubItem(
+            ListViewSubItem listViewSubItem = new(
                 new ListViewItem(),
                 "SubItem1",
                 foreColor: Color.White,
@@ -247,9 +248,9 @@ public class SerializableTypesTests
     [Fact]
     public void Padding_RoundTripAndExchangeWithNet()
     {
-        using var formatterScope = new BinaryFormatterScope(enable: true);
-        var padding = new Padding(1, 2, 3, 4);
-        var netBlob = BinarySerialization.ToBase64String(padding);
+        using BinaryFormatterScope formatterScope = new(enable: true);
+        Padding padding = new(1, 2, 3, 4);
+        string netBlob = BinarySerialization.ToBase64String(padding);
 
         // ensure we can deserialise NET serialised data and continue to match the payload
         ValidateResult(netBlob);
@@ -267,11 +268,11 @@ public class SerializableTypesTests
     [Fact]
     public void TableLayoutSettings_RoundTripAndExchangeWithNet()
     {
-        using var formatterScope = new BinaryFormatterScope(enable: true);
+        using BinaryFormatterScope formatterScope = new(enable: true);
 
         string netBlob;
 
-        using (var tableLayoutPanel = new TableLayoutPanel
+        using (TableLayoutPanel tableLayoutPanel = new()
         {
             Name = "table",
             CellBorderStyle = TableLayoutPanelCellBorderStyle.OutsetDouble,
@@ -285,10 +286,10 @@ public class SerializableTypesTests
             tableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 20));
             tableLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 30));
 
-            var button00_10 = new Button() { Name = "button00_10" };
+            Button button00_10 = new() { Name = "button00_10" };
             tableLayoutPanel.Controls.Add(button00_10, 0, 0);
             tableLayoutPanel.SetColumnSpan(button00_10, 2);
-            var label20_21 = new Label() { Name = "label20_21" };
+            Label label20_21 = new() { Name = "label20_21" };
             tableLayoutPanel.Controls.Add(label20_21, 2, 0);
             tableLayoutPanel.SetRowSpan(label20_21, 2);
             tableLayoutPanel.Controls.Add(new RadioButton() { Name = "radioButton01" }, 0, 1);
@@ -344,9 +345,9 @@ public class SerializableTypesTests
     [Fact]
     public void TreeNodeAndPropertyBag_RoundTripAndExchangeWithNet()
     {
-        using var formatterScope = new BinaryFormatterScope(enable: true);
-        var children = new TreeNode[] { new TreeNode("node2"), new TreeNode("node3") };
-        TreeNode treeNodeIn = new TreeNode("node1", 1, 2, children)
+        using BinaryFormatterScope formatterScope = new(enable: true);
+        var children = new TreeNode[] { new("node2"), new("node3") };
+        TreeNode treeNodeIn = new("node1", 1, 2, children)
         {
             ToolTipText = "tool tip text",
             Name = "node1",
@@ -357,7 +358,7 @@ public class SerializableTypesTests
             NodeFont = new Font(FontFamily.GenericSansSerif, 9f)
         };
 
-        var netBlob = BinarySerialization.ToBase64String(treeNodeIn);
+        string netBlob = BinarySerialization.ToBase64String(treeNodeIn);
 
         // ensure we can deserialise NET serialised data and continue to match the payload
         ValidateResult(netBlob);
@@ -371,7 +372,7 @@ public class SerializableTypesTests
             Assert.Equal("node1", result.Text);
             Assert.Equal(-1, result.ImageIndex); // No image list
             Assert.Equal("key", result.SelectedImageKey);
-            Assert.Equal(2, result.childNodes.Count);
+            Assert.Equal(2, result._childNodes.Count);
             Assert.Equal("node2", result.FirstNode.Text);
             Assert.Equal("node3", result.LastNode.Text);
             Assert.Equal("tool tip text", result.ToolTipText);

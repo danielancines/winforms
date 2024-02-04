@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 
@@ -12,14 +11,14 @@ public class GridItemTests
     [Fact]
     public void GridItem_Expandable_Get_ReturnsFalse()
     {
-        var item = new SubGridItem();
+        SubGridItem item = new();
         Assert.False(item.Expandable);
     }
 
     [Fact]
     public void GridItem_Expanded_Get_ReturnsFalse()
     {
-        var item = new SubGridItem();
+        SubGridItem item = new();
         Assert.False(item.Expanded);
     }
 
@@ -27,7 +26,7 @@ public class GridItemTests
     [BoolData]
     public void GridItem_Expanded_Set_ThrowsNotSupportedException(bool value)
     {
-        var item = new SubGridItem();
+        SubGridItem item = new();
         Assert.Throws<NotSupportedException>(() => item.Expanded = value);
     }
 
@@ -35,7 +34,7 @@ public class GridItemTests
     [StringWithNullData]
     public void GridItem_Tag_Set_GetReturnsExpected(object value)
     {
-        var item = new SubGridItem
+        SubGridItem item = new()
         {
             Tag = value
         };

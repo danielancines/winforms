@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 
@@ -20,7 +19,7 @@ public class HelpEventArgsTests
     [MemberData(nameof(Ctor_Point_TestData))]
     public void Ctor_Point(Point mousePos)
     {
-        var e = new HelpEventArgs(mousePos);
+        HelpEventArgs e = new(mousePos);
         Assert.Equal(mousePos, e.MousePos);
         Assert.False(e.Handled);
     }
@@ -30,7 +29,7 @@ public class HelpEventArgsTests
     [InlineData(false)]
     public void Handled_Set_GetReturnsExpected(bool value)
     {
-        var e = new HelpEventArgs(new Point(1, 2))
+        HelpEventArgs e = new(new Point(1, 2))
         {
             Handled = value
         };

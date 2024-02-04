@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel.Design.Serialization;
 
@@ -213,7 +212,7 @@ internal sealed partial class DesignerHost
             set
             {
                 _disposed = value;
-                //We need to do the cleanup when the site is set as disposed by its user
+                // We need to do the cleanup when the site is set as disposed by its user
                 if (_disposed)
                 {
                     _dictionary = null;
@@ -241,7 +240,7 @@ internal sealed partial class DesignerHost
                         // allow renames that are just case changes of the current name.
                         if (namedComponent is not null && validateName)
                         {
-                            Exception ex = new Exception(string.Format(SR.DesignerHostDuplicateName, value))
+                            Exception ex = new(string.Format(SR.DesignerHostDuplicateName, value))
                             {
                                 HelpLink = SR.DesignerHostDuplicateName
                             };

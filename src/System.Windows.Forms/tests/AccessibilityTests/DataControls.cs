@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Data;
 using System.Windows.Forms;
@@ -16,7 +15,7 @@ public partial class DataControls : Form
 
     private void DataControls_Load(object sender, EventArgs e)
     {
-        DataTable dataTable = new DataTable();
+        DataTable dataTable = new();
         dataTable.Columns.Add("Name");
         dataTable.Columns.Add("Id");
         dataTable.Columns.Add("Desc");

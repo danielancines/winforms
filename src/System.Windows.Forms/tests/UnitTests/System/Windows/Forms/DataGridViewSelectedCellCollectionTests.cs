@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 
@@ -11,7 +10,7 @@ public class DataGridViewSelectedCellCollectionTests
     [WinFormsFact]
     public void DataGridViewSelectedCellCollection_Properties_GetEmpty_ReturnsExpected()
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
         Assert.Equal(0, collection.Count);
         Assert.False(collection.IsReadOnly);
@@ -22,7 +21,7 @@ public class DataGridViewSelectedCellCollectionTests
     [WinFormsFact]
     public void DataGridViewSelectedCellCollection_Properties_GetNotEmpty_ReturnsExpected()
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowCount = 3,
             ColumnCount = 1,
@@ -42,7 +41,7 @@ public class DataGridViewSelectedCellCollectionTests
     [WinFormsFact]
     public void DataGridViewSelectedCellCollection_Item_GetNotEmpty_ReturnsExpected()
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowCount = 3,
             ColumnCount = 1,
@@ -63,7 +62,7 @@ public class DataGridViewSelectedCellCollectionTests
     [InlineData(1)]
     public void DataGridViewSelectedCellCollection_Item_GetInvalidIndexEmpty_ThrowsArgumentOutOfRangeException(int index)
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
         Assert.Throws<ArgumentOutOfRangeException>("index", () => collection[index]);
     }
@@ -73,7 +72,7 @@ public class DataGridViewSelectedCellCollectionTests
     [InlineData(2)]
     public void DataGridViewSelectedCellCollection_Item_GetInvalidIndexNotEmpty_ThrowsArgumentOutOfRangeException(int index)
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowCount = 3,
             ColumnCount = 1,
@@ -90,7 +89,7 @@ public class DataGridViewSelectedCellCollectionTests
     [WinFormsFact]
     public void DataGridViewSelectedCellCollection_Clear_Invoke_ThrowsNotSupportedException()
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
         Assert.Throws<NotSupportedException>(() => collection.Clear());
     }
@@ -98,7 +97,7 @@ public class DataGridViewSelectedCellCollectionTests
     [WinFormsFact]
     public void DataGridViewSelectedCellCollection_Contains_InvokeNotEmpty_ReturnsExpected()
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowCount = 3,
             ColumnCount = 1,
@@ -126,7 +125,7 @@ public class DataGridViewSelectedCellCollectionTests
     [MemberData(nameof(Contains_TestData))]
     public void DataGridViewSelectedCellCollection_Contains_InvokeEmpty_ReturnsFalse(DataGridViewCell dataGridViewCell)
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
         Assert.False(collection.Contains(dataGridViewCell));
     }
@@ -134,17 +133,17 @@ public class DataGridViewSelectedCellCollectionTests
     [WinFormsFact]
     public void DataGridViewSelectedCellCollection_CopyTo_InvokeEmpty_Success()
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
-        var array = new object[] { 1, 2, 3 };
+        object[] array = [1, 2, 3];
         collection.CopyTo(array, 1);
-        Assert.Equal(new object[] { 1, 2, 3 }, array);
+        Assert.Equal([1, 2, 3], array);
     }
 
     [WinFormsFact]
     public void DataGridViewSelectedCellCollection_CopyTo_InvokeNotEmpty_ReturnsExpected()
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowCount = 3,
             ColumnCount = 1,
@@ -155,9 +154,9 @@ public class DataGridViewSelectedCellCollectionTests
         control.Rows[2].Cells[0].Selected = true;
 
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
-        var array = new object[] { 1, 2, 3 };
+        object[] array = [1, 2, 3];
         collection.CopyTo(array, 1);
-        Assert.Equal(new object[] { 1, control.Rows[2].Cells[0], control.Rows[0].Cells[0] }, array);
+        Assert.Equal([1, control.Rows[2].Cells[0], control.Rows[0].Cells[0]], array);
     }
 
     public static IEnumerable<object[]> Insert_TestData()
@@ -173,7 +172,7 @@ public class DataGridViewSelectedCellCollectionTests
     [MemberData(nameof(Insert_TestData))]
     public void DataGridViewSelectedCellCollection_Insert_Invoke_ThrowsNotSupportedException(int index, DataGridViewCell dataGridViewCell)
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
         Assert.Throws<NotSupportedException>(() => collection.Insert(index, dataGridViewCell));
     }
@@ -181,7 +180,7 @@ public class DataGridViewSelectedCellCollectionTests
     [WinFormsFact]
     public void DataGridViewSelectedCellCollection_IListProperties_GetEmpty_ReturnsExpected()
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
         IList iList = collection;
         Assert.Equal(0, iList.Count);
@@ -194,7 +193,7 @@ public class DataGridViewSelectedCellCollectionTests
     [WinFormsFact]
     public void DataGridViewSelectedCellCollection_IListProperties_GetNotEmpty_ReturnsExpected()
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowCount = 3,
             ColumnCount = 1,
@@ -216,7 +215,7 @@ public class DataGridViewSelectedCellCollectionTests
     [WinFormsFact]
     public void DataGridViewSelectedCellCollection_IListItem_GetNotEmpty_ReturnsExpected()
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowCount = 3,
             ColumnCount = 1,
@@ -238,7 +237,7 @@ public class DataGridViewSelectedCellCollectionTests
     [InlineData(1)]
     public void DataGridViewSelectedCellCollection_IListItem_GetInvalidIndexEmpty_ThrowsArgumentOutOfRangeException(int index)
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
         IList iList = collection;
         Assert.Throws<ArgumentOutOfRangeException>("index", () => iList[index]);
@@ -249,7 +248,7 @@ public class DataGridViewSelectedCellCollectionTests
     [InlineData(2)]
     public void DataGridViewSelectedCellCollection_IListItem_GetInvalidIndexNotEmpty_ThrowsArgumentOutOfRangeException(int index)
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowCount = 3,
             ColumnCount = 1,
@@ -267,7 +266,7 @@ public class DataGridViewSelectedCellCollectionTests
     public static IEnumerable<object[]> IListItem_SetTestData()
     {
         yield return new object[] { 0, null };
-        yield return new object[] { -1, new object() };
+        yield return new object[] { -1, new() };
         yield return new object[] { 1, new SubDataGridViewCell() };
     }
 
@@ -275,7 +274,7 @@ public class DataGridViewSelectedCellCollectionTests
     [MemberData(nameof(IListItem_SetTestData))]
     public void DataGridViewSelectedCellCollection_IListItem_Set_ThrowsNotSupportedException(int index, object value)
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
         IList iList = collection;
         Assert.Throws<NotSupportedException>(() => iList[index] = value);
@@ -284,7 +283,7 @@ public class DataGridViewSelectedCellCollectionTests
     public static IEnumerable<object[]> IListAdd_TestData()
     {
         yield return new object[] { null };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
         yield return new object[] { new SubDataGridViewCell() };
     }
 
@@ -292,7 +291,7 @@ public class DataGridViewSelectedCellCollectionTests
     [MemberData(nameof(IListAdd_TestData))]
     public void DataGridViewSelectedCellCollection_IListAdd_Invoke_ThrowsNotSupportedException(object value)
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
         IList iList = collection;
         Assert.Throws<NotSupportedException>(() => iList.Add(value));
@@ -301,7 +300,7 @@ public class DataGridViewSelectedCellCollectionTests
     [WinFormsFact]
     public void DataGridViewSelectedCellCollection_IListClear_Invoke_ThrowsNotSupportedException()
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
         IList iList = collection;
         Assert.Throws<NotSupportedException>(() => iList.Clear());
@@ -310,18 +309,18 @@ public class DataGridViewSelectedCellCollectionTests
     [WinFormsFact]
     public void DataGridViewSelectedCellCollection_IListCopyTo_InvokeEmpty_Success()
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
         IList iList = collection;
-        var array = new object[] { 1, 2, 3 };
+        object[] array = [1, 2, 3];
         iList.CopyTo(array, 1);
-        Assert.Equal(new object[] { 1, 2, 3 }, array);
+        Assert.Equal([1, 2, 3], array);
     }
 
     [WinFormsFact]
     public void DataGridViewSelectedCellCollection_IListCopyTo_InvokeNotEmpty_ReturnsExpected()
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowCount = 3,
             ColumnCount = 1,
@@ -333,15 +332,15 @@ public class DataGridViewSelectedCellCollectionTests
 
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
         IList iList = collection;
-        var array = new object[] { 1, 2, 3 };
+        object[] array = [1, 2, 3];
         iList.CopyTo(array, 1);
-        Assert.Equal(new object[] { 1, control.Rows[2].Cells[0], control.Rows[0].Cells[0] }, array);
+        Assert.Equal([1, control.Rows[2].Cells[0], control.Rows[0].Cells[0]], array);
     }
 
     public static IEnumerable<object[]> IListContains_TestData()
     {
         yield return new object[] { null };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
         yield return new object[] { new SubDataGridViewCell() };
     }
 
@@ -349,7 +348,7 @@ public class DataGridViewSelectedCellCollectionTests
     [MemberData(nameof(IListContains_TestData))]
     public void DataGridViewSelectedCellCollection_IListContains_InvokeEmpty_ReturnsFalse(object value)
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
         IList iList = collection;
         Assert.False(iList.Contains(value));
@@ -358,7 +357,7 @@ public class DataGridViewSelectedCellCollectionTests
     [WinFormsFact]
     public void DataGridViewSelectedCellCollection_IListContains_InvokeNotEmpty_ReturnsExpected()
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowCount = 3,
             ColumnCount = 1,
@@ -380,7 +379,7 @@ public class DataGridViewSelectedCellCollectionTests
     [WinFormsFact]
     public void DataGridViewSelectedCellCollection_IListGetEnumerator_InvokeEmpty_Success()
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
         IList iList = collection;
         IEnumerator enumerator = iList.GetEnumerator();
@@ -399,7 +398,7 @@ public class DataGridViewSelectedCellCollectionTests
     [WinFormsFact]
     public void DataGridViewSelectedCellCollection_IListGetEnumerator_InvokeNotEmpty_Success()
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowCount = 3,
             ColumnCount = 1,
@@ -433,7 +432,7 @@ public class DataGridViewSelectedCellCollectionTests
     public static IEnumerable<object[]> IListIndexOf_TestData()
     {
         yield return new object[] { null };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
         yield return new object[] { new SubDataGridViewCell() };
     }
 
@@ -441,7 +440,7 @@ public class DataGridViewSelectedCellCollectionTests
     [MemberData(nameof(IListIndexOf_TestData))]
     public void DataGridViewSelectedCellCollection_IListIndexOf_InvokeEmpty_ReturnsMinusOne(object value)
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
         IList iList = collection;
         Assert.Equal(-1, iList.IndexOf(value));
@@ -450,7 +449,7 @@ public class DataGridViewSelectedCellCollectionTests
     [WinFormsFact]
     public void DataGridViewSelectedCellCollection_IListIndexOf_InvokeNotEmpty_ReturnsExpected()
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowCount = 3,
             ColumnCount = 1,
@@ -474,7 +473,7 @@ public class DataGridViewSelectedCellCollectionTests
         foreach (int index in new int[] { -1, 0, 1 })
         {
             yield return new object[] { index, null };
-            yield return new object[] { index, new object() };
+            yield return new object[] { index, new() };
             yield return new object[] { index, new SubDataGridViewCell() };
         }
     }
@@ -483,7 +482,7 @@ public class DataGridViewSelectedCellCollectionTests
     [MemberData(nameof(IListInsert_TestData))]
     public void DataGridViewSelectedCellCollection_IListInsert_Invoke_ThrowsNotSupportedException(int index, object value)
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
         IList iList = collection;
         Assert.Throws<NotSupportedException>(() => iList.Insert(index, value));
@@ -492,7 +491,7 @@ public class DataGridViewSelectedCellCollectionTests
     public static IEnumerable<object[]> IListRemove_TestData()
     {
         yield return new object[] { null };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
         yield return new object[] { new SubDataGridViewCell() };
     }
 
@@ -500,7 +499,7 @@ public class DataGridViewSelectedCellCollectionTests
     [MemberData(nameof(IListRemove_TestData))]
     public void DataGridViewSelectedCellCollection_IListRemove_Invoke_ThrowsNotSupportedException(object value)
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
         IList iList = collection;
         Assert.Throws<NotSupportedException>(() => iList.Remove(value));
@@ -512,7 +511,7 @@ public class DataGridViewSelectedCellCollectionTests
     [InlineData(1)]
     public void DataGridViewSelectedCellCollection_IListRemoveAt_Invoke_ThrowsNotSupportedException(int index)
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         DataGridViewSelectedCellCollection collection = control.SelectedCells;
         IList iList = collection;
         Assert.Throws<NotSupportedException>(() => iList.RemoveAt(index));

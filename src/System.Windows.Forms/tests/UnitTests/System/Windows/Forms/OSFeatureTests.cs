@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -42,7 +41,7 @@ public class OSFeatureTests
     {
         yield return new object[] { OSFeature.LayeredWindows, new Version(0, 0, 0, 0) };
         yield return new object[] { OSFeature.Themes, new Version(0, 0, 0, 0) };
-        yield return new object[] { new object(), null };
+        yield return new object[] { new(), null };
         yield return new object[] { null, null };
     }
 

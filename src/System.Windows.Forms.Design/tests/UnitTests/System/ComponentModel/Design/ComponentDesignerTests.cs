@@ -1,12 +1,12 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 using System.Configuration;
 using Moq;
 using Moq.Protected;
 using System.Windows.Forms.TestUtilities;
+using System.Windows.Forms.Design.Tests.Mocks;
 
 namespace System.ComponentModel.Design.Tests;
 
@@ -19,11 +19,11 @@ public class ComponentDesignerTests
         Assert.Empty(designer.ActionLists);
         Assert.Same(designer.ActionLists, designer.ActionLists);
         Assert.Empty(designer.AssociatedComponents);
-        Assert.Null(designer.Component);
+        Assert.Throws<InvalidOperationException>(() => designer.Component);
         Assert.Same(InheritanceAttribute.Default, designer.InheritanceAttribute);
         Assert.Same(designer.InheritanceAttribute, designer.InheritanceAttribute);
         Assert.False(designer.Inherited);
-        Assert.Null(designer.ParentComponent);
+        Assert.Throws<InvalidOperationException>(() => designer.ParentComponent);
         Assert.NotNull(designer.ShadowProperties);
         Assert.Same(designer.ShadowProperties, designer.ShadowProperties);
         Assert.Empty(designer.Verbs);
@@ -56,7 +56,7 @@ public class ComponentDesignerTests
         mockDesignerHost
             .Setup(h => h.RootComponent)
             .Returns(component);
-        var mockSite = CreateMockSiteWithDesignerHost(mockDesignerHost.Object);
+        var mockSite = MockSite.CreateMockSiteWithDesignerHost(mockDesignerHost.Object);
         component.Site = mockSite.Object;
         designer.Initialize(component);
 
@@ -83,41 +83,13 @@ public class ComponentDesignerTests
         mockDesignerHost
             .Setup(h => h.RootComponent)
             .Returns(component);
-        var mockSite = CreateMockSiteWithDesignerHost(mockDesignerHost.Object);
+        var mockSite = MockSite.CreateMockSiteWithDesignerHost(mockDesignerHost.Object);
         component.Site = mockSite.Object;
         designer.Initialize(component);
 
         designer.PostFilterProperties(properties);
         result = (PropertyDescriptor)properties["SettingsKey"];
         Assert.NotSame(descriptor, result);
-    }
-
-    private static Mock<ISite> CreateMockSiteWithDesignerHost(object designerHost)
-    {
-        Mock<ISite> mockSite = new(MockBehavior.Strict);
-        mockSite
-            .Setup(s => s.GetService(typeof(IDesignerHost)))
-            .Returns(designerHost);
-        mockSite
-            .Setup(s => s.GetService(typeof(IComponentChangeService)))
-            .Returns(null);
-        mockSite
-            .Setup(s => s.GetService(typeof(IInheritanceService)))
-            .Returns(null);
-        mockSite
-            .Setup(s => s.GetService(typeof(IDictionaryService)))
-            .Returns(null);
-        mockSite
-            .Setup(s => s.GetService(typeof(IExtenderListService)))
-            .Returns(null);
-        mockSite
-            .Setup(s => s.GetService(typeof(ITypeDescriptorFilterService)))
-            .Returns(null);
-        mockSite
-            .SetupGet(s => s.Container)
-            .Returns((IContainer)null);
-
-        return mockSite;
     }
 
     [Fact]
@@ -145,7 +117,7 @@ public class ComponentDesignerTests
 
         using Component component = new()
         {
-            Site = CreateMockSiteWithDesignerHost(mockDesignerHost.Object).Object
+            Site = MockSite.CreateMockSiteWithDesignerHost(mockDesignerHost.Object).Object
         };
 
         designer.Initialize(component);
@@ -166,7 +138,7 @@ public class ComponentDesignerTests
         Mock<IComponent> mockComponent2 = new(MockBehavior.Strict);
         Mock<IDesigner> mockDesigner = new(MockBehavior.Strict);
         using CustomAssociatedComponentsComponentDesigner designer = new(
-            new object[] { new object(), null, mockComponent1.Object, mockComponent2.Object });
+            new object[] { new(), null, mockComponent1.Object, mockComponent2.Object });
         ITreeDesigner treeDesigner = designer;
         Mock<IDesignerHost> mockDesignerHost = new(MockBehavior.Strict);
         mockDesignerHost
@@ -183,7 +155,7 @@ public class ComponentDesignerTests
 
         using Component component = new()
         {
-            Site = CreateMockSiteWithDesignerHost(mockDesignerHost.Object).Object
+            Site = MockSite.CreateMockSiteWithDesignerHost(mockDesignerHost.Object).Object
         };
 
         designer.Initialize(component);
@@ -202,7 +174,7 @@ public class ComponentDesignerTests
         foreach (ICollection associatedComponents in new object[] { null, Array.Empty<object>(), new object[] { new Component() } })
         {
             yield return new object[] { associatedComponents, null };
-            yield return new object[] { associatedComponents, new object() };
+            yield return new object[] { associatedComponents, new() };
         }
     }
 
@@ -215,7 +187,7 @@ public class ComponentDesignerTests
 
         using Component component = new()
         {
-            Site = CreateMockSiteWithDesignerHost(host).Object
+            Site = MockSite.CreateMockSiteWithDesignerHost(host).Object
         };
 
         designer.Initialize(component);
@@ -224,7 +196,7 @@ public class ComponentDesignerTests
 
     public static IEnumerable<object[]> InheritanceAttribute_GetValidService_TestData()
     {
-        yield return new object[] { null, 3, 5 };
+        yield return new object[] { null, 2, 4 };
         yield return new object[] { new InheritanceAttribute(), 1, 1 };
     }
 
@@ -281,7 +253,7 @@ public class ComponentDesignerTests
     public static IEnumerable<object[]> InheritanceAttribute_GetInvalidService_TestData()
     {
         yield return new object[] { null };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
     }
 
     [Theory]
@@ -337,7 +309,7 @@ public class ComponentDesignerTests
         mockDesignerHost
             .Setup(h => h.RootComponent)
             .Returns(rootComponent);
-        var mockSite = CreateMockSiteWithDesignerHost(mockDesignerHost.Object);
+        var mockSite = MockSite.CreateMockSiteWithDesignerHost(mockDesignerHost.Object);
 
         using Component component = new()
         {
@@ -367,7 +339,7 @@ public class ComponentDesignerTests
         mockDesignerHost
             .Setup(h => h.RootComponent)
             .Returns(component);
-        var mockSite = CreateMockSiteWithDesignerHost(mockDesignerHost.Object);
+        var mockSite = MockSite.CreateMockSiteWithDesignerHost(mockDesignerHost.Object);
         component.Site = mockSite.Object;
         designer.Initialize(component);
         mockSite.Verify(s => s.GetService(typeof(IDesignerHost)), Times.Once());
@@ -386,7 +358,7 @@ public class ComponentDesignerTests
     public static IEnumerable<object[]> ParentComponent_InvalidService_TestData()
     {
         yield return new object[] { null };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
     }
 
     [Theory]
@@ -394,7 +366,7 @@ public class ComponentDesignerTests
     public void ComponentDesigner_ParentComponent_GetWithInvalidService_ReturnsNull(object host)
     {
         using SubComponentDesigner designer = new();
-        var mockSite = CreateMockSiteWithDesignerHost(host);
+        var mockSite = MockSite.CreateMockSiteWithDesignerHost(host);
 
         using Component component = new()
         {
@@ -426,7 +398,7 @@ public class ComponentDesignerTests
             .Setup(h => h.GetDesigner(rootComponent))
             .Returns(designer)
             .Verifiable();
-        var mockSite = CreateMockSiteWithDesignerHost(mockDesignerHost.Object);
+        var mockSite = MockSite.CreateMockSiteWithDesignerHost(mockDesignerHost.Object);
 
         using Component component = new()
         {
@@ -460,7 +432,7 @@ public class ComponentDesignerTests
         mockDesignerHost
             .Setup(h => h.RootComponent)
             .Returns(component);
-        var mockSite = CreateMockSiteWithDesignerHost(mockDesignerHost.Object);
+        var mockSite = MockSite.CreateMockSiteWithDesignerHost(mockDesignerHost.Object);
         component.Site = mockSite.Object;
         designer.Initialize(component);
         mockSite.Verify(s => s.GetService(typeof(IDesignerHost)), Times.Once());
@@ -482,7 +454,7 @@ public class ComponentDesignerTests
     {
         using SubComponentDesigner designer = new();
         ITreeDesigner treeDesigner = designer;
-        var mockSite = CreateMockSiteWithDesignerHost(host);
+        var mockSite = MockSite.CreateMockSiteWithDesignerHost(host);
 
         using Component component = new()
         {
@@ -577,19 +549,19 @@ public class ComponentDesignerTests
         Assert.Same(mockComponent.Object, designer.Component);
 
         designer.Dispose();
-        Assert.Null(designer.Component);
+        Assert.Throws<InvalidOperationException>(() => designer.Component);
         mockComponent.Verify(c => c.Dispose(), Times.Never());
 
         // Dispose again.
         designer.Dispose();
-        Assert.Null(designer.Component);
+        Assert.Throws<InvalidOperationException>(() => designer.Component);
         mockComponent.Verify(c => c.Dispose(), Times.Never());
     }
 
     public static IEnumerable<object[]> Dispose_InvokeWithComponentChangeService_TestData()
     {
         yield return new object[] { null };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
         yield return new object[] { new Mock<IComponentChangeService>(MockBehavior.Strict).Object };
     }
 
@@ -634,23 +606,23 @@ public class ComponentDesignerTests
         Assert.Same(component, designer.Component);
 
         designer.Dispose();
-        Assert.Null(designer.Component);
+        Assert.Throws<InvalidOperationException>(() => designer.Component);
 
         // Dispose again.
         designer.Dispose();
-        Assert.Null(designer.Component);
+        Assert.Throws<InvalidOperationException>(() => designer.Component);
     }
 
     [Fact]
-    public void ComponentDesigner_Dispose_InvokeWithoutComponent_Success()
+    public void ComponentDesigner_Dispose_InvokeWithoutComponent_Throws()
     {
         using ComponentDesigner designer = new();
         designer.Dispose();
-        Assert.Null(designer.Component);
+        Assert.Throws<InvalidOperationException>(() => designer.Component);
 
         // Dispose again.
         designer.Dispose();
-        Assert.Null(designer.Component);
+        Assert.Throws<InvalidOperationException>(() => designer.Component);
     }
 
     [Theory]
@@ -669,12 +641,28 @@ public class ComponentDesignerTests
         Assert.Same(mockComponent.Object, designer.Component);
 
         designer.Dispose(disposing);
-        Assert.Same(disposing ? null : mockComponent.Object, designer.Component);
+        if (disposing)
+        {
+            Assert.Throws<InvalidOperationException>(() => designer.Component);
+        }
+        else
+        {
+            Assert.Same(mockComponent.Object, designer.Component);
+        }
+
         mockComponent.Verify(c => c.Dispose(), Times.Never());
 
         // Dispose again.
         designer.Dispose(disposing);
-        Assert.Same(disposing ? null : mockComponent.Object, designer.Component);
+        if (disposing)
+        {
+            Assert.Throws<InvalidOperationException>(() => designer.Component);
+        }
+        else
+        {
+            Assert.Same(mockComponent.Object, designer.Component);
+        }
+
         mockComponent.Verify(c => c.Dispose(), Times.Never());
     }
 
@@ -683,7 +671,7 @@ public class ComponentDesignerTests
         foreach (bool disposing in new bool[] { true, false })
         {
             yield return new object[] { null, disposing };
-            yield return new object[] { new object(), disposing };
+            yield return new object[] { new(), disposing };
             yield return new object[] { new Mock<IComponentChangeService>(MockBehavior.Strict), disposing };
         }
     }
@@ -701,11 +689,25 @@ public class ComponentDesignerTests
         Assert.Same(component, designer.Component);
 
         designer.Dispose(disposing);
-        Assert.Same(disposing ? null : component, designer.Component);
+        if (disposing)
+        {
+            Assert.Throws<InvalidOperationException>(() => designer.Component);
+        }
+        else
+        {
+            Assert.Same(component, designer.Component);
+        }
 
         // Dispose again.
         designer.Dispose(disposing);
-        Assert.Same(disposing ? null : component, designer.Component);
+        if (disposing)
+        {
+            Assert.Throws<InvalidOperationException>(() => designer.Component);
+        }
+        else
+        {
+            Assert.Same(component, designer.Component);
+        }
     }
 
     [Theory]
@@ -714,11 +716,11 @@ public class ComponentDesignerTests
     {
         using SubComponentDesigner designer = new();
         designer.Dispose(disposing);
-        Assert.Null(designer.Component);
+        Assert.Throws<InvalidOperationException>(() => designer.Component);
 
         // Dispose again.
         designer.Dispose(disposing);
-        Assert.Null(designer.Component);
+        Assert.Throws<InvalidOperationException>(() => designer.Component);
     }
 
     [Fact]
@@ -743,9 +745,9 @@ public class ComponentDesignerTests
             yield return new object[] { property, Array.Empty<object>(), 1, string.Empty };
             yield return new object[] { property, Array.Empty<object>(), 1, "UniqueMethod" };
 
-            yield return new object[] { property, new object[] { null, new object(), "NoSuchStringValue" }, 1, null };
-            yield return new object[] { property, new object[] { null, new object(), "NoSuchStringValue" }, 1, string.Empty };
-            yield return new object[] { property, new object[] { null, new object(), "NoSuchStringValue" }, 1, "UniqueMethod" };
+            yield return new object[] { property, new object[] { null, new(), "NoSuchStringValue" }, 1, null };
+            yield return new object[] { property, new object[] { null, new(), "NoSuchStringValue" }, 1, string.Empty };
+            yield return new object[] { property, new object[] { null, new(), "NoSuchStringValue" }, 1, "UniqueMethod" };
 
             // Should not call if in the compatible methods list.
             yield return new object[] { property, new object[] { "StringValue" }, 0, null };
@@ -1011,7 +1013,7 @@ public class ComponentDesignerTests
         Mock<ISelectionService> mockSelectionService = new(MockBehavior.Strict);
         mockSelectionService
             .Setup(s => s.GetSelectedComponents())
-            .Returns(new object[] { null, new object(), component1, component2, component3 });
+            .Returns(new object[] { null, new(), component1, component2, component3 });
         Mock<IDesignerHost> mockDesignerHost = new(MockBehavior.Strict);
         mockDesignerHost
             .Setup(h => h.RootComponent)
@@ -1673,7 +1675,7 @@ public class ComponentDesignerTests
     {
         yield return new object[] { null };
         yield return new object[] { Array.Empty<object>() };
-        yield return new object[] { new object[] { null, new object() } };
+        yield return new object[] { new object[] { null, new() } };
     }
 
     [Theory]
@@ -1744,7 +1746,7 @@ public class ComponentDesignerTests
     public static IEnumerable<object[]> DoDefaultAction_InvalidEventBindingService_TestData()
     {
         yield return new object[] { null };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
     }
 
     [Theory]
@@ -1799,7 +1801,7 @@ public class ComponentDesignerTests
     public static IEnumerable<object[]> DoDefaultAction_InvalidSelectionService_TestData()
     {
         yield return new object[] { null };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
     }
 
     [Theory]
@@ -1859,7 +1861,7 @@ public class ComponentDesignerTests
     public static IEnumerable<object[]> DoDefaultAction_InvalidDesignerHost_TestData()
     {
         yield return new object[] { null };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
     }
 
     [Theory]
@@ -2003,11 +2005,13 @@ public class ComponentDesignerTests
         designer.Initialize(component);
         Assert.Same(component, designer.Component);
         Assert.Empty(designer.AssociatedComponents);
+    }
 
-        // Override with null.
-        designer.Initialize(null);
-        Assert.Null(designer.Component);
-        Assert.Empty(designer.AssociatedComponents);
+    [Fact]
+    public void ComponentDesigner_Uninitialized_Component_Throws()
+    {
+        using ComponentDesigner designer = new();
+        Assert.Throws<InvalidOperationException>(() => designer.Component);
     }
 
     [Fact]
@@ -2061,7 +2065,7 @@ public class ComponentDesignerTests
     public static IEnumerable<object[]> Initialize_NonRootComponent_TestData()
     {
         yield return new object[] { null, null };
-        yield return new object[] { new object(), new object() };
+        yield return new object[] { new(), new() };
 
         Mock<IDesignerHost> mockNullDesignerHost = new(MockBehavior.Strict);
         mockNullDesignerHost
@@ -2183,7 +2187,7 @@ public class ComponentDesignerTests
 
     public static IEnumerable<object[]> Initialize_NonNullDesignerCommandSet_TestData()
     {
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
         yield return new object[] { new DesignerCommandSet() };
     }
 
@@ -2365,10 +2369,10 @@ public class ComponentDesignerTests
 
     [Theory]
     [MemberData(nameof(IDictionary_TestData))]
-    public void ComponentDesigner_PreFilterProperties_WithoutComponent_Nop(IDictionary properties)
+    public void ComponentDesigner_PreFilterProperties_WithoutComponent_Throws(IDictionary properties)
     {
         using SubComponentDesigner designer = new();
-        designer.PreFilterProperties(properties);
+        Assert.Throws<InvalidOperationException>(() => designer.PreFilterProperties(properties));
     }
 
     public static IEnumerable<object[]> PostFilterAttributes_NoInheritanceAttribute_TestData()
@@ -2477,7 +2481,7 @@ public class ComponentDesignerTests
     public static IEnumerable<object[]> RaiseComponentChanged_TestData()
     {
         yield return new object[] { null, null, null };
-        yield return new object[] { TypeDescriptor.GetProperties(typeof(CustomComponent))[0], new object(), new object() };
+        yield return new object[] { TypeDescriptor.GetProperties(typeof(CustomComponent))[0], new(), new() };
     }
 
     [Theory]
@@ -2502,10 +2506,10 @@ public class ComponentDesignerTests
 
     public static IEnumerable<object[]> RaiseComponentChanged_InvalidService_TestData()
     {
-        foreach (object componentChangeService in new object[] { null, new object() })
+        foreach (object componentChangeService in new object[] { null, new() })
         {
             yield return new object[] { componentChangeService, null, null, null };
-            yield return new object[] { componentChangeService, TypeDescriptor.GetProperties(typeof(CustomComponent))[0], new object(), new object() };
+            yield return new object[] { componentChangeService, TypeDescriptor.GetProperties(typeof(CustomComponent))[0], new(), new() };
         }
     }
 
@@ -2560,7 +2564,7 @@ public class ComponentDesignerTests
 
     public static IEnumerable<object[]> RaiseComponentChanging_InvalidService_TestData()
     {
-        foreach (object componentChangeService in new object[] { null, new object() })
+        foreach (object componentChangeService in new object[] { null, new() })
         {
             yield return new object[] { componentChangeService, null };
             yield return new object[] { componentChangeService, TypeDescriptor.GetProperties(typeof(CustomComponent))[0] };
@@ -2801,6 +2805,8 @@ public class ComponentDesignerTests
     public void ComponentDesigner_IDesignerFilterPreFilterProperties_WithoutComponent_Nop(IDictionary properties)
     {
         using ComponentDesigner designer = new();
+        using Button button = new();
+        designer.Initialize(button);
         IDesignerFilter filter = designer;
         filter.PreFilterProperties(properties);
     }

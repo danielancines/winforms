@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Drawing;
@@ -12,7 +11,7 @@ public class HelpProviderTests
     [WinFormsFact]
     public void HelpProvider_Ctor_Default()
     {
-        using var provider = new SubHelpProvider();
+        using SubHelpProvider provider = new();
         Assert.True(provider.CanRaiseEvents);
         Assert.Null(provider.Container);
         Assert.False(provider.DesignMode);
@@ -27,7 +26,7 @@ public class HelpProviderTests
     [StringWithNullData]
     public void HelpProvider_HelpNamespace_Set_GetReturnsExpected(string value)
     {
-        using var provider = new HelpProvider
+        using HelpProvider provider = new()
         {
             HelpNamespace = value
         };
@@ -42,13 +41,13 @@ public class HelpProviderTests
     [StringWithNullData]
     public void HelpProvider_HelpNamespace_SetWithBoundControls_GetReturnsExpected(string value)
     {
-        using var provider = new HelpProvider
+        using HelpProvider provider = new()
         {
             HelpNamespace = value
         };
         Assert.Equal(value, provider.HelpNamespace);
 
-        using var control = new Control();
+        using Control control = new();
         provider.SetShowHelp(control, true);
         Assert.Equal(0, control.AccessibilityObject.GetHelpTopic(out string fileName));
         Assert.Equal(value, fileName);
@@ -58,7 +57,7 @@ public class HelpProviderTests
     [StringWithNullData]
     public void HelpProvider_Tag_Set_GetReturnsExpected(string value)
     {
-        using var provider = new HelpProvider
+        using HelpProvider provider = new()
         {
             Tag = value
         };
@@ -72,7 +71,7 @@ public class HelpProviderTests
     public static IEnumerable<object[]> CanExtend_TestData()
     {
         yield return new object[] { null, false };
-        yield return new object[] { new object(), false };
+        yield return new object[] { new(), false };
         yield return new object[] { new Control(), true };
     }
 
@@ -80,63 +79,63 @@ public class HelpProviderTests
     [MemberData(nameof(CanExtend_TestData))]
     public void HelpProvider_CanExtend_Invoke_ReturnsExpected(object target, bool expected)
     {
-        using var provider = new HelpProvider();
+        using HelpProvider provider = new();
         Assert.Equal(expected, provider.CanExtend(target));
     }
 
     [WinFormsFact]
     public void HelpProvider_GetHelpKeyword_NoSuchControl_ReturnsNull()
     {
-        using var provider = new HelpProvider();
+        using HelpProvider provider = new();
         Assert.Null(provider.GetHelpKeyword(new Control()));
     }
 
     [WinFormsFact]
     public void HelpProvider_GetHelpKeyword_NullCtl_ThrowsArgumentNullException()
     {
-        using var provider = new HelpProvider();
+        using HelpProvider provider = new();
         Assert.Throws<ArgumentNullException>("ctl", () => provider.GetHelpKeyword(null));
     }
 
     [WinFormsFact]
     public void HelpProvider_GetHelpNavigator_NoSuchControl_ReturnsAssociateIndex()
     {
-        using var provider = new HelpProvider();
+        using HelpProvider provider = new();
         Assert.Equal(HelpNavigator.AssociateIndex, provider.GetHelpNavigator(new Control()));
     }
 
     [WinFormsFact]
     public void HelpProvider_GetHelpNavigator_NullCtl_ThrowsArgumentNullException()
     {
-        using var provider = new HelpProvider();
+        using HelpProvider provider = new();
         Assert.Throws<ArgumentNullException>("ctl", () => provider.GetHelpNavigator(null));
     }
 
     [WinFormsFact]
     public void HelpProvider_GetHelpString_NoSuchControl_ReturnsNull()
     {
-        using var provider = new HelpProvider();
+        using HelpProvider provider = new();
         Assert.Null(provider.GetHelpString(new Control()));
     }
 
     [WinFormsFact]
     public void HelpProvider_GetHelpString_NullCtl_ThrowsArgumentNullException()
     {
-        using var provider = new HelpProvider();
+        using HelpProvider provider = new();
         Assert.Throws<ArgumentNullException>("ctl", () => provider.GetHelpString(null));
     }
 
     [WinFormsFact]
     public void HelpProvider_GetShowHelp_NoSuchControl_ReturnsFalse()
     {
-        using var provider = new HelpProvider();
+        using HelpProvider provider = new();
         Assert.False(provider.GetShowHelp(new Control()));
     }
 
     [WinFormsFact]
     public void HelpProvider_GetShowHelp_NullCtl_ThrowsArgumentNullException()
     {
-        using var provider = new HelpProvider();
+        using HelpProvider provider = new();
         Assert.Throws<ArgumentNullException>("ctl", () => provider.GetShowHelp(null));
     }
 
@@ -144,8 +143,8 @@ public class HelpProviderTests
     [BoolData]
     public void HelpProvider_ResetShowHelp_WithShowHelp_Success(bool showHelp)
     {
-        using var provider = new HelpProvider();
-        using var control = new Control();
+        using HelpProvider provider = new();
+        using Control control = new();
         provider.SetShowHelp(control, showHelp);
         provider.ResetShowHelp(control);
         Assert.False(provider.GetShowHelp(control));
@@ -155,8 +154,8 @@ public class HelpProviderTests
     [WinFormsFact]
     public void HelpProvider_ResetShowHelp_NoSuchControl_Success()
     {
-        using var provider = new HelpProvider();
-        using var control = new Control();
+        using HelpProvider provider = new();
+        using Control control = new();
         provider.ResetShowHelp(control);
         Assert.False(provider.GetShowHelp(control));
         Assert.False(provider.ShouldSerializeShowHelp(control));
@@ -165,7 +164,7 @@ public class HelpProviderTests
     [WinFormsFact]
     public void HelpProvider_ResetShowHelp_NullCtl_ThrowsArgumentNullException()
     {
-        using var provider = new HelpProvider();
+        using HelpProvider provider = new();
         Assert.Throws<ArgumentNullException>("ctl", () => provider.ResetShowHelp(null));
     }
 
@@ -180,12 +179,12 @@ public class HelpProviderTests
     [InlineData("1", 1, "HelpNamespace", false)]
     public void HelpProvider_SetHelpKeyword_GetHelpKeyword_ReturnsExpected(string keyword, int expectedHelpTopic, string expectedFileName, bool createControl)
     {
-        using var provider = new HelpProvider
+        using HelpProvider provider = new()
         {
             HelpNamespace = "HelpNamespace"
         };
 
-        using var control = new Control();
+        using Control control = new();
         if (createControl)
         {
             control.CreateControl();
@@ -215,11 +214,11 @@ public class HelpProviderTests
     [InlineData("1", 1)]
     public void HelpProvider_SetHelpKeyword_WithShowHelpTrue_ReturnsExpected(string keyword, int expectedHelpTopic)
     {
-        using var provider = new HelpProvider
+        using HelpProvider provider = new()
         {
             HelpNamespace = "HelpNamespace"
         };
-        using var control = new Control();
+        using Control control = new();
         provider.SetShowHelp(control, true);
 
         provider.SetHelpKeyword(control, keyword);
@@ -247,11 +246,11 @@ public class HelpProviderTests
     [InlineData("1", 1, "HelpNamespace", false)]
     public void HelpProvider_SetHelpKeyword_WithShowHelpFalse_ReturnsExpected(string keyword, int expectedHelpTopic, string expectedFileName, bool createControl)
     {
-        using var provider = new HelpProvider
+        using HelpProvider provider = new()
         {
             HelpNamespace = "HelpNamespace"
         };
-        using var control = new Control();
+        using Control control = new();
         if (createControl)
         {
             control.CreateControl();
@@ -277,7 +276,7 @@ public class HelpProviderTests
     [WinFormsFact]
     public void HelpProvider_SetHelpKeyword_NullCtl_ThrowsArgumentNullException()
     {
-        using var provider = new HelpProvider();
+        using HelpProvider provider = new();
         Assert.Throws<ArgumentNullException>("ctl", () => provider.SetHelpKeyword(null, "keyword"));
     }
 
@@ -285,8 +284,8 @@ public class HelpProviderTests
     [EnumData<HelpNavigator>]
     public void HelpProvider_SetHelpNavigator_GetHelpNavigator_ReturnsExpected(HelpNavigator navigator)
     {
-        using var provider = new HelpProvider();
-        using var control = new Control();
+        using HelpProvider provider = new();
+        using Control control = new();
 
         provider.SetHelpNavigator(control, navigator);
         Assert.Equal(navigator, provider.GetHelpNavigator(control));
@@ -302,8 +301,8 @@ public class HelpProviderTests
     [EnumData<HelpNavigator>]
     public void HelpProvider_SetHelpNavigator_WithShowHelpTrue_ReturnsExpected(HelpNavigator navigator)
     {
-        using var provider = new HelpProvider();
-        using var control = new Control();
+        using HelpProvider provider = new();
+        using Control control = new();
         provider.SetShowHelp(control, true);
 
         provider.SetHelpNavigator(control, navigator);
@@ -320,8 +319,8 @@ public class HelpProviderTests
     [EnumData<HelpNavigator>]
     public void HelpProvider_SetHelpNavigator_WithShowHelpFalse_ReturnsExpected(HelpNavigator navigator)
     {
-        using var provider = new HelpProvider();
-        using var control = new Control();
+        using HelpProvider provider = new();
+        using Control control = new();
         provider.SetShowHelp(control, false);
 
         provider.SetHelpNavigator(control, navigator);
@@ -339,7 +338,7 @@ public class HelpProviderTests
     [InvalidEnumData<HelpNavigator>]
     public void HelpProvider_SetHelpNavigator_NullCtl_ThrowsArgumentNullException(HelpNavigator navigator)
     {
-        using var provider = new HelpProvider();
+        using HelpProvider provider = new();
         Assert.Throws<ArgumentNullException>("ctl", () => provider.SetHelpNavigator(null, navigator));
     }
 
@@ -347,7 +346,7 @@ public class HelpProviderTests
     [InvalidEnumData<HelpNavigator>]
     public void HelpProvider_SetHelpNavigator_InvalidNavigator_ThrowsInvalidEnumArgumentException(HelpNavigator navigator)
     {
-        using var provider = new HelpProvider();
+        using HelpProvider provider = new();
         Assert.Throws<InvalidEnumArgumentException>("navigator", () => provider.SetHelpNavigator(new Control(), navigator));
     }
 
@@ -355,8 +354,8 @@ public class HelpProviderTests
     [StringWithNullData]
     public void HelpProvider_SetHelpString_GetHelpString_ReturnsExpected(string helpString)
     {
-        using var provider = new HelpProvider();
-        using var control = new Control();
+        using HelpProvider provider = new();
+        using Control control = new();
 
         provider.SetHelpString(control, helpString);
         Assert.Same(helpString, provider.GetHelpString(control));
@@ -374,8 +373,8 @@ public class HelpProviderTests
     [StringWithNullData]
     public void HelpProvider_SetHelpString_WithShowHelpTrue_ReturnsExpected(string helpString)
     {
-        using var provider = new HelpProvider();
-        using var control = new Control();
+        using HelpProvider provider = new();
+        using Control control = new();
         provider.SetShowHelp(control, true);
 
         provider.SetHelpString(control, helpString);
@@ -394,8 +393,8 @@ public class HelpProviderTests
     [StringWithNullData]
     public void HelpProvider_SetHelpString_WithShowHelpFalse_ReturnsExpected(string helpString)
     {
-        using var provider = new HelpProvider();
-        using var control = new Control();
+        using HelpProvider provider = new();
+        using Control control = new();
         provider.SetShowHelp(control, false);
 
         provider.SetHelpString(control, helpString);
@@ -413,7 +412,7 @@ public class HelpProviderTests
     [WinFormsFact]
     public void HelpProvider_SetHelpString_NullCtl_ThrowsArgumentNullException()
     {
-        using var provider = new HelpProvider();
+        using HelpProvider provider = new();
         Assert.Throws<ArgumentNullException>("ctl", () => provider.SetHelpString(null, "keyword"));
     }
 
@@ -421,8 +420,8 @@ public class HelpProviderTests
     [BoolData]
     public void HelpProvider_SetShowHelp_GetShowHelp_ReturnsExpected(bool value)
     {
-        using var provider = new HelpProvider();
-        using var control = new Control();
+        using HelpProvider provider = new();
+        using Control control = new();
         provider.SetShowHelp(control, value);
 
         Assert.Equal(value, provider.GetShowHelp(control));
@@ -444,11 +443,11 @@ public class HelpProviderTests
     [InlineData(false, -1)]
     public void HelpProvider_SetShowHelp_SetFalseThenTrue_UnbindsAndBindsControl(bool createControl, int expectedHelpTopic)
     {
-        using var provider = new HelpProvider
+        using HelpProvider provider = new()
         {
             HelpNamespace = "HelpNamespace"
         };
-        using var control = new Control();
+        using Control control = new();
         if (createControl)
         {
             control.CreateControl();
@@ -480,21 +479,21 @@ public class HelpProviderTests
     [WinFormsFact]
     public void HelpProvider_SetShowHelp_NullCtl_ThrowsArgumentNullException()
     {
-        using var provider = new HelpProvider();
+        using HelpProvider provider = new();
         Assert.Throws<ArgumentNullException>("ctl", () => provider.SetShowHelp(null, true));
     }
 
     [WinFormsFact]
     public void HelpProvider_ShouldSerializeShowHelp_NoSuchControl_ReturnsFalse()
     {
-        using var provider = new HelpProvider();
+        using HelpProvider provider = new();
         Assert.False(provider.ShouldSerializeShowHelp(new Control()));
     }
 
     [WinFormsFact]
     public void HelpProvider_ShouldSerializeShowHelp_NullCtl_ThrowsArgumentNullException()
     {
-        using var provider = new HelpProvider();
+        using HelpProvider provider = new();
         Assert.Throws<ArgumentNullException>("ctl", () => provider.ShouldSerializeShowHelp(null));
     }
 
@@ -504,7 +503,7 @@ public class HelpProviderTests
     [InlineData("helpNamespace", "System.Windows.Forms.HelpProvider, HelpNamespace: helpNamespace")]
     public void HelpProvider_ToString_Invoke_ReturnsExpected(string helpNamespace, string expected)
     {
-        using var provider = new HelpProvider
+        using HelpProvider provider = new()
         {
             HelpNamespace = helpNamespace
         };
@@ -514,8 +513,8 @@ public class HelpProviderTests
     [WinFormsFact]
     public void HelpProvider_BoundControl_ValidEventArgs_Nop()
     {
-        using var provider = new HelpProvider();
-        using var control = new SubControl();
+        using HelpProvider provider = new();
+        using SubControl control = new();
         provider.SetShowHelp(control, true);
 
         control.OnHelpRequested(new HelpEventArgs(new Point(1, 2)));
@@ -524,11 +523,11 @@ public class HelpProviderTests
     [WinFormsFact]
     public void HelpProvider_BoundControl_NoInformation_Nop()
     {
-        using var provider = new HelpProvider();
-        using var control = new SubControl();
+        using HelpProvider provider = new();
+        using SubControl control = new();
         provider.SetShowHelp(control, true);
 
-        var e = new HelpEventArgs(new Point(1, 2));
+        HelpEventArgs e = new(new Point(1, 2));
         control.OnHelpRequested(e);
         Assert.True(e.Handled);
     }
@@ -540,14 +539,14 @@ public class HelpProviderTests
     [InlineData("file://C:/NoSuchFile")]
     public void HelpProvider_BoundControl_InvalidNamespace_ThrowsArgumentException(string helpNamespace)
     {
-        using var provider = new HelpProvider
+        using HelpProvider provider = new()
         {
             HelpNamespace = helpNamespace
         };
-        using var control = new SubControl();
+        using SubControl control = new();
         provider.SetShowHelp(control, true);
 
-        var e = new HelpEventArgs(new Point(1, 2));
+        HelpEventArgs e = new(new Point(1, 2));
         Assert.Throws<ArgumentException>("url", () => control.OnHelpRequested(e));
         Assert.False(e.Handled);
     }
@@ -555,8 +554,8 @@ public class HelpProviderTests
     [WinFormsFact]
     public void HelpProvider_BoundControl_NullEventEventArgs_Nop()
     {
-        using var provider = new HelpProvider();
-        using var control = new SubControl();
+        using HelpProvider provider = new();
+        using SubControl control = new();
         provider.SetShowHelp(control, true);
 
         control.OnHelpRequested(null);

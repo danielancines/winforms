@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Drawing;
@@ -13,7 +12,7 @@ public class PaddingTests
     [Fact]
     public void Padding_Ctor_Default()
     {
-        var padding = new Padding();
+        Padding padding = new();
         Assert.Equal(-1, padding.All);
         Assert.Equal(0, padding.Left);
         Assert.Equal(0, padding.Top);
@@ -28,7 +27,7 @@ public class PaddingTests
     [IntegerData<int>]
     public void Padding_Ctor_Int(int all)
     {
-        var padding = new Padding(all);
+        Padding padding = new(all);
         Assert.Equal(all, padding.All);
         Assert.Equal(all, padding.Left);
         Assert.Equal(all, padding.Top);
@@ -50,7 +49,7 @@ public class PaddingTests
     [InlineData(1, 2, 3, 4, -1)]
     public void Padding_Ctor_Int_Int_Int_Int(int left, int top, int right, int bottom, int expectedAll)
     {
-        var padding = new Padding(left, top, right, bottom);
+        Padding padding = new(left, top, right, bottom);
         Assert.Equal(expectedAll, padding.All);
         Assert.Equal(left, padding.Left);
         Assert.Equal(top, padding.Top);
@@ -79,7 +78,7 @@ public class PaddingTests
     [IntegerData<int>]
     public void Padding_All_Set_GetReturnsExpected(int value)
     {
-        var padding = new Padding(1, 2, 3, 4)
+        Padding padding = new(1, 2, 3, 4)
         {
             All = value
         };
@@ -93,7 +92,7 @@ public class PaddingTests
     [Fact]
     public void Padding_AllPropertyDescriptor_ResetValue_SetsToZero()
     {
-        var padding = new Padding(1, 2, 3, 4);
+        Padding padding = new(1, 2, 3, 4);
         object boxedPadding = padding;
         PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(padding);
         PropertyDescriptor property = properties[nameof(Padding.All)];
@@ -113,7 +112,7 @@ public class PaddingTests
     [Fact]
     public void Padding_AllPropertyDescriptor_ResetValueOnAll_SetsToZero()
     {
-        var padding = new Padding(1);
+        Padding padding = new(1);
         object boxedPadding = padding;
         PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(padding);
         PropertyDescriptor property = properties[nameof(Padding.All)];
@@ -134,7 +133,7 @@ public class PaddingTests
     [IntegerData<int>]
     public void Padding_All_SetOnAll_GetReturnsExpected(int value)
     {
-        var padding = new Padding(2)
+        Padding padding = new(2)
         {
             All = value
         };
@@ -149,7 +148,7 @@ public class PaddingTests
     [IntegerData<int>]
     public void Padding_Left_Set_GetReturnsExpected(int value)
     {
-        var padding = new Padding(1, 2, 3, 4)
+        Padding padding = new(1, 2, 3, 4)
         {
             Left = value
         };
@@ -163,7 +162,7 @@ public class PaddingTests
     [Fact]
     public void Padding_LeftPropertyDescriptor_ResetValue_SetsToZero()
     {
-        var padding = new Padding(1, 2, 3, 4);
+        Padding padding = new(1, 2, 3, 4);
         object boxedPadding = padding;
         PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(padding);
         PropertyDescriptor property = properties[nameof(Padding.Left)];
@@ -184,7 +183,7 @@ public class PaddingTests
     [IntegerData<int>]
     public void Padding_Left_SetOnAll_GetReturnsExpected(int value)
     {
-        var padding = new Padding(5)
+        Padding padding = new(5)
         {
             Left = value
         };
@@ -199,7 +198,7 @@ public class PaddingTests
     [IntegerData<int>]
     public void Padding_Top_Set_GetReturnsExpected(int value)
     {
-        var padding = new Padding(1, 2, 3, 4)
+        Padding padding = new(1, 2, 3, 4)
         {
             Top = value
         };
@@ -213,7 +212,7 @@ public class PaddingTests
     [Fact]
     public void Padding_TopPropertyDescriptor_ResetValue_SetsToZero()
     {
-        var padding = new Padding(1, 2, 3, 4);
+        Padding padding = new(1, 2, 3, 4);
         object boxedPadding = padding;
         PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(padding);
         PropertyDescriptor property = properties[nameof(Padding.Top)];
@@ -234,7 +233,7 @@ public class PaddingTests
     [IntegerData<int>]
     public void Padding_Top_SetOnAll_GetReturnsExpected(int value)
     {
-        var padding = new Padding(5)
+        Padding padding = new(5)
         {
             Top = value
         };
@@ -249,7 +248,7 @@ public class PaddingTests
     [IntegerData<int>]
     public void Padding_Right_Set_GetReturnsExpected(int value)
     {
-        var padding = new Padding(1, 2, 3, 4)
+        Padding padding = new(1, 2, 3, 4)
         {
             Right = value
         };
@@ -263,7 +262,7 @@ public class PaddingTests
     [Fact]
     public void Padding_RightPropertyDescriptor_ResetValue_SetsToZero()
     {
-        var padding = new Padding(1, 2, 3, 4);
+        Padding padding = new(1, 2, 3, 4);
         object boxedPadding = padding;
         PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(padding);
         PropertyDescriptor property = properties[nameof(Padding.Right)];
@@ -284,7 +283,7 @@ public class PaddingTests
     [IntegerData<int>]
     public void Padding_Right_SetOnAll_GetReturnsExpected(int value)
     {
-        var padding = new Padding(5)
+        Padding padding = new(5)
         {
             Right = value
         };
@@ -299,7 +298,7 @@ public class PaddingTests
     [IntegerData<int>]
     public void Padding_Bottom_Set_GetReturnsExpected(int value)
     {
-        var padding = new Padding(1, 2, 3, 4)
+        Padding padding = new(1, 2, 3, 4)
         {
             Bottom = value
         };
@@ -313,7 +312,7 @@ public class PaddingTests
     [Fact]
     public void Padding_BottomPropertyDescriptor_ResetValue_SetsToZero()
     {
-        var padding = new Padding(1, 2, 3, 4);
+        Padding padding = new(1, 2, 3, 4);
         object boxedPadding = padding;
         PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(padding);
         PropertyDescriptor property = properties[nameof(Padding.Bottom)];
@@ -334,7 +333,7 @@ public class PaddingTests
     [IntegerData<int>]
     public void Padding_Bottom_SetOnAll_GetReturnsExpected(int value)
     {
-        var padding = new Padding(5)
+        Padding padding = new(5)
         {
             Bottom = value
         };
@@ -385,7 +384,7 @@ public class PaddingTests
         yield return new object[] { new Padding(1, 2, 3, 4), new Padding(1, 2, 3, 3), false };
         yield return new object[] { new Padding(1, 2, 3, 4), new Padding(1), false };
 
-        yield return new object[] { new Padding(1, 2, 3, 4), new object(), false };
+        yield return new object[] { new Padding(1, 2, 3, 4), new(), false };
         yield return new object[] { new Padding(1, 2, 3, 4), null, false };
     }
 
@@ -406,21 +405,21 @@ public class PaddingTests
     [Fact]
     public void Padding_ToString_Invoke_ReturnsExpected()
     {
-        var padding = new Padding(1, 2, 3, 4);
+        Padding padding = new(1, 2, 3, 4);
         Assert.Equal("{Left=1,Top=2,Right=3,Bottom=4}", padding.ToString());
     }
 
     [Fact]
     public void Padding_ToString_InvokeAll_ReturnsExpected()
     {
-        var padding = new Padding(1);
+        Padding padding = new(1);
         Assert.Equal("{Left=1,Top=1,Right=1,Bottom=1}", padding.ToString());
     }
 
     [Fact]
     public void Padding_TypeConverter_Get_ReturnsPaddingConverter()
     {
-        var padding = new Padding(1);
+        Padding padding = new(1);
         Assert.IsType<PaddingConverter>(TypeDescriptor.GetConverter(padding));
     }
 }

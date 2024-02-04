@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 
@@ -11,7 +10,7 @@ public class RefCacheTests
     [Fact]
     public void RefCountTests()
     {
-        var cache = new ObjectCache<object>(5, 10);
+        ObjectCache<object> cache = new(5, 10);
         var firstScope = cache.GetEntry(1);
         Assert.Equal(1, firstScope.RefCount);
         object first = firstScope.Object;
@@ -32,7 +31,7 @@ public class RefCacheTests
     [Fact]
     public void LimitTests()
     {
-        var cache = new ObjectCache<DisposalCounter>(2, 4);
+        ObjectCache<DisposalCounter> cache = new(2, 4);
 
         // Fill to the hard limit
         var firstScope = cache.GetEntry(1);

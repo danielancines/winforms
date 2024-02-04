@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Drawing;
@@ -12,13 +11,15 @@ namespace System.Windows.Forms;
 [Runtime.CompilerServices.TypeForwardedFrom("System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")]
 public struct Padding : IEquatable<Padding>
 {
-    private bool _all; // Do NOT rename (binary serialization).
-    private int _top; // Do NOT rename (binary serialization).
-    private int _left; // Do NOT rename (binary serialization).
-    private int _right; // Do NOT rename (binary serialization).
-    private int _bottom; // Do NOT rename (binary serialization).
+    private bool _all;      // Do NOT rename (binary serialization).
+    private int _top;       // Do NOT rename (binary serialization).
+    private int _left;      // Do NOT rename (binary serialization).
+    private int _right;     // Do NOT rename (binary serialization).
+    private int _bottom;    // Do NOT rename (binary serialization).
 
+#pragma warning disable IDE1006 // Naming Styles: Shipped API
     public static readonly Padding Empty = new(0);
+#pragma warning restore IDE1006
 
     public Padding(int all)
     {
@@ -40,7 +41,7 @@ public struct Padding : IEquatable<Padding>
     [RefreshProperties(RefreshProperties.All)]
     public int All
     {
-        get => _all ? _top : -1;
+        readonly get => _all ? _top : -1;
         set
         {
             if (_all != true || _top != value)
@@ -56,7 +57,7 @@ public struct Padding : IEquatable<Padding>
     [RefreshProperties(RefreshProperties.All)]
     public int Bottom
     {
-        get => _all ? _top : _bottom;
+        readonly get => _all ? _top : _bottom;
         set
         {
             if (_all || _bottom != value)
@@ -72,7 +73,7 @@ public struct Padding : IEquatable<Padding>
     [RefreshProperties(RefreshProperties.All)]
     public int Left
     {
-        get => _all ? _top : _left;
+        readonly get => _all ? _top : _left;
         set
         {
             if (_all || _left != value)
@@ -88,7 +89,7 @@ public struct Padding : IEquatable<Padding>
     [RefreshProperties(RefreshProperties.All)]
     public int Right
     {
-        get => _all ? _top : _right;
+        readonly get => _all ? _top : _right;
         set
         {
             if (_all || _right != value)
@@ -104,7 +105,7 @@ public struct Padding : IEquatable<Padding>
     [RefreshProperties(RefreshProperties.All)]
     public int Top
     {
-        get => _top;
+        readonly get => _top;
         set
         {
             if (_all || _top != value)
@@ -118,30 +119,24 @@ public struct Padding : IEquatable<Padding>
     }
 
     [Browsable(false)]
-    public int Horizontal => Left + Right;
+    public readonly int Horizontal => Left + Right;
 
     [Browsable(false)]
-    public int Vertical => Top + Bottom;
+    public readonly int Vertical => Top + Bottom;
 
     [Browsable(false)]
-    public Size Size => new(Horizontal, Vertical);
+    public readonly Size Size => new(Horizontal, Vertical);
 
     public static Padding Add(Padding p1, Padding p2) => p1 + p2;
 
     public static Padding Subtract(Padding p1, Padding p2) => p1 - p2;
 
-    public override bool Equals(object? other)
-    {
-        if (other is not Padding otherPadding)
-        {
-            return false;
-        }
+#pragma warning disable CA1725 // Parameter names should match base declaration. Shipped API.
+    public override readonly bool Equals(object? other) => other is not Padding otherPadding ? false : Equals(otherPadding);
+#pragma warning restore CA1725
 
-        return Equals(otherPadding);
-    }
-
-    public bool Equals(Padding other)
-        => Left == other.Left
+    public readonly bool Equals(Padding other) =>
+        Left == other.Left
             && Top == other.Top
             && Right == other.Right
             && Bottom == other.Bottom;
@@ -149,35 +144,29 @@ public struct Padding : IEquatable<Padding>
     /// <summary>
     ///  Performs vector addition of two <see cref="Padding"/> objects.
     /// </summary>
-    public static Padding operator +(Padding p1, Padding p2)
-    {
-        return new Padding(p1.Left + p2.Left, p1.Top + p2.Top, p1.Right + p2.Right, p1.Bottom + p2.Bottom);
-    }
+    public static Padding operator +(Padding p1, Padding p2) =>
+        new(p1.Left + p2.Left, p1.Top + p2.Top, p1.Right + p2.Right, p1.Bottom + p2.Bottom);
 
     /// <summary>
     ///  Contracts a <see cref="Drawing.Size"/> by another <see cref="Drawing.Size"/>.
     /// </summary>
-    public static Padding operator -(Padding p1, Padding p2)
-    {
-        return new Padding(p1.Left - p2.Left, p1.Top - p2.Top, p1.Right - p2.Right, p1.Bottom - p2.Bottom);
-    }
+    public static Padding operator -(Padding p1, Padding p2) =>
+        new(p1.Left - p2.Left, p1.Top - p2.Top, p1.Right - p2.Right, p1.Bottom - p2.Bottom);
 
     /// <summary>
     ///  Tests whether two <see cref="Padding"/> objects are identical.
     /// </summary>
-    public static bool operator ==(Padding p1, Padding p2)
-    {
-        return p1.Left == p2.Left && p1.Top == p2.Top && p1.Right == p2.Right && p1.Bottom == p2.Bottom;
-    }
+    public static bool operator ==(Padding p1, Padding p2) =>
+        p1.Left == p2.Left && p1.Top == p2.Top && p1.Right == p2.Right && p1.Bottom == p2.Bottom;
 
     /// <summary>
     ///  Tests whether two <see cref="Padding"/> objects are different.
     /// </summary>
     public static bool operator !=(Padding p1, Padding p2) => !(p1 == p2);
 
-    public override int GetHashCode() => HashCode.Combine(Left, Top, Right, Bottom);
+    public override readonly int GetHashCode() => HashCode.Combine(Left, Top, Right, Bottom);
 
-    public override string ToString() => $"{{Left={Left},Top={Top},Right={Right},Bottom={Bottom}}}";
+    public override readonly string ToString() => $"{{Left={Left},Top={Top},Right={Right},Bottom={Bottom}}}";
 
     private void ResetAll() => All = 0;
 
@@ -191,16 +180,16 @@ public struct Padding : IEquatable<Padding>
 
     internal void Scale(float dx, float dy)
     {
-        _top = (int)((float)_top * dy);
-        _left = (int)((float)_left * dx);
-        _right = (int)((float)_right * dx);
-        _bottom = (int)((float)_bottom * dy);
+        _top = (int)(_top * dy);
+        _left = (int)(_left * dx);
+        _right = (int)(_right * dx);
+        _bottom = (int)(_bottom * dy);
     }
 
-    internal bool ShouldSerializeAll() => _all;
+    internal readonly bool ShouldSerializeAll() => _all;
 
     [Conditional("DEBUG")]
-    private void Debug_SanityCheck()
+    private readonly void Debug_SanityCheck()
     {
         if (_all)
         {

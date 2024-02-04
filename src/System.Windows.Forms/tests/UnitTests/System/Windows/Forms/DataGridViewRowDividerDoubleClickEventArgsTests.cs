@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -18,7 +17,7 @@ public class DataGridViewRowDividerDoubleClickEventArgsTests
     [MemberData(nameof(Ctor_Int_HandledMouseEventArgs_TestData))]
     public void DataGridViewRowDividerDoubleClickEventArgs_Ctor_Int_HandledMouseEventArgs(int rowIndex, HandledMouseEventArgs mouseE)
     {
-        var e = new DataGridViewRowDividerDoubleClickEventArgs(rowIndex, mouseE);
+        DataGridViewRowDividerDoubleClickEventArgs e = new(rowIndex, mouseE);
         Assert.Equal(rowIndex, e.RowIndex);
         Assert.Equal(mouseE.Button, e.Button);
         Assert.Equal(mouseE.Clicks, e.Clicks);

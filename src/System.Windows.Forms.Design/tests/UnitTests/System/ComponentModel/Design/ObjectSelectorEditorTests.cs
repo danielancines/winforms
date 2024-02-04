@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing.Design;
 using System.Windows.Forms.Design;
@@ -32,7 +31,7 @@ public class ObjectSelectorEditorTests
     {
         yield return new object[] { null };
         yield return new object[] { "value" };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
     }
 
     [Theory]
@@ -105,7 +104,7 @@ public class ObjectSelectorEditorTests
     [Fact]
     public void ObjectSelectorEditor_Selector()
     {
-        ObjectSelectorEditor.Selector underTest = new ObjectSelectorEditor.Selector(new SubObjectSelectorEditor());
+        ObjectSelectorEditor.Selector underTest = new(new SubObjectSelectorEditor());
 
         Assert.NotNull(underTest);
         underTest.AddNode("node", "value", null);

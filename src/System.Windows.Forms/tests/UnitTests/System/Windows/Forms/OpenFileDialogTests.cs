@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -9,7 +8,7 @@ public class OpenFileDialogTests
     [WinFormsFact]
     public void OpenFileDialog_Ctor_Default()
     {
-        using var dialog = new OpenFileDialog();
+        using OpenFileDialog dialog = new();
         Assert.True(dialog.CheckFileExists);
         Assert.False(dialog.Multiselect);
         Assert.False(dialog.ReadOnlyChecked);
@@ -22,7 +21,7 @@ public class OpenFileDialogTests
     [BoolData]
     public void OpenFileDialog_CheckFileExists_Set_GetReturnsExpected(bool value)
     {
-        using var dialog = new OpenFileDialog
+        using OpenFileDialog dialog = new()
         {
             CheckFileExists = value
         };
@@ -41,7 +40,7 @@ public class OpenFileDialogTests
     [BoolData]
     public void OpenFileDialog_Multiselect_Set_GetReturnsExpected(bool value)
     {
-        using var dialog = new OpenFileDialog
+        using OpenFileDialog dialog = new()
         {
             Multiselect = value
         };
@@ -60,7 +59,7 @@ public class OpenFileDialogTests
     [BoolData]
     public void OpenFileDialog_ReadOnlyChecked_Set_GetReturnsExpected(bool value)
     {
-        using var dialog = new OpenFileDialog
+        using OpenFileDialog dialog = new()
         {
             ReadOnlyChecked = value
         };
@@ -79,7 +78,7 @@ public class OpenFileDialogTests
     [BoolData]
     public void OpenFileDialog_SelectReadOnly_Set_GetReturnsExpected(bool value)
     {
-        using var dialog = new OpenFileDialog
+        using OpenFileDialog dialog = new()
         {
             SelectReadOnly = value
         };
@@ -98,7 +97,7 @@ public class OpenFileDialogTests
     [BoolData]
     public void OpenFileDialog_ShowPreview_Set_GetReturnsExpected(bool value)
     {
-        using var dialog = new OpenFileDialog
+        using OpenFileDialog dialog = new()
         {
             ShowPreview = value
         };
@@ -117,7 +116,7 @@ public class OpenFileDialogTests
     [BoolData]
     public void OpenFileDialog_ShowReadOnly_Set_GetReturnsExpected(bool value)
     {
-        using var dialog = new OpenFileDialog
+        using OpenFileDialog dialog = new()
         {
             ShowReadOnly = value
         };
@@ -135,7 +134,7 @@ public class OpenFileDialogTests
     [WinFormsFact]
     public void OpenFileDialog_Reset_Invoke_Success()
     {
-        using var dialog = new OpenFileDialog
+        using OpenFileDialog dialog = new()
         {
             CheckFileExists = false,
             Multiselect = true,

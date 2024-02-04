@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 #nullable disable
 
@@ -80,7 +79,7 @@ internal class TemplateNodeCustomMenuItemCollection : CustomMenuItemCollection
                 ((ComponentDesigner)designer).InitializeNewComponent(null);
             }
 
-            //Set the Image property and DisplayStyle...
+            // Set the Image property and DisplayStyle...
             if (component is ToolStripButton || component is ToolStripSplitButton || component is ToolStripDropDownButton)
             {
                 Image image = null;

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 
@@ -8,15 +7,14 @@ namespace System.Windows.Forms;
 
 public partial class Control
 {
-    // Fonts can be a pain to track, so we wrap Hfonts in this class to get a Finalize method.
+    /// <summary>
+    ///  Wrapper for a <see cref="Drawing.Font"/>'s <see cref="HFONT"/>.
+    /// </summary>
     internal sealed class FontHandleWrapper : IDisposable
     {
         private HFONT _handle;
 
-        internal FontHandleWrapper(Font font)
-        {
-            _handle = (HFONT)font.ToHfont();
-        }
+        internal FontHandleWrapper(Font font) => _handle = (HFONT)font.ToHfont();
 
         internal HFONT Handle
         {
@@ -37,14 +35,11 @@ public partial class Control
         {
             if (!_handle.IsNull)
             {
-                PInvoke.DeleteObject(_handle);
+                PInvokeCore.DeleteObject(_handle);
                 _handle = default;
             }
         }
 
-        ~FontHandleWrapper()
-        {
-            Dispose(false);
-        }
+        ~FontHandleWrapper() => Dispose(disposing: false);
     }
 }

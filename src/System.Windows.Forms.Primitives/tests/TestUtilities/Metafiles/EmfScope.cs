@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 #nullable enable
 
@@ -80,7 +79,7 @@ internal class EmfScope :
         GCHandle enumeratorHandle = GCHandle.Alloc(enumerator);
         try
         {
-            var callback = Marshal.GetFunctionPointerForDelegate(CallBack);
+            IntPtr callback = Marshal.GetFunctionPointerForDelegate(CallBack);
             PInvoke.EnumEnhMetaFile(
                 default,
                 HENHMETAFILE,
@@ -208,7 +207,7 @@ internal class EmfScope :
 
     public string RecordsToString()
     {
-        StringBuilder sb = new StringBuilder(1024);
+        StringBuilder sb = new(1024);
         Enumerate((ref EmfRecord record) =>
         {
             sb.AppendLine(record.ToString());
@@ -220,7 +219,7 @@ internal class EmfScope :
 
     public string RecordsToStringWithState(DeviceContextState state)
     {
-        StringBuilder sb = new StringBuilder(1024);
+        StringBuilder sb = new(1024);
         EnumerateWithState((ref EmfRecord record, DeviceContextState state) =>
         {
             sb.AppendLine(record.ToString(state));
@@ -241,7 +240,7 @@ internal class EmfScope :
         // Note that the record pointer is *only* valid during the callback.
         GCHandle enumeratorHandle = GCHandle.FromIntPtr(data);
         ProcessRecordDelegate enumerator = (ProcessRecordDelegate)enumeratorHandle.Target!;
-        var record = new EmfRecord(hdc, lpht, lpmr, nHandles, data);
+        EmfRecord record = new(hdc, lpht, lpmr, nHandles, data);
         return enumerator(ref record);
     }
 

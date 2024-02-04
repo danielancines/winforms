@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 using System.ComponentModel;
@@ -50,12 +49,12 @@ public sealed partial class BehaviorService : IDisposable
     private static readonly TraceSwitch s_dragDropSwitch
         = new("BSDRAGDROP", "Behavior service drag & drop messages");
 
-    //test hooks for SnapLines
+    // test hooks for SnapLines
     private static MessageId WM_GETALLSNAPLINES;
     private static MessageId WM_GETRECENTSNAPLINES;
     private const string ToolboxFormat = ".NET Toolbox Item"; // used to detect if a drag is coming from the toolbox.
 
-    internal BehaviorService(IServiceProvider serviceProvider, Control windowFrame)
+    internal BehaviorService(IServiceProvider serviceProvider, DesignerFrame windowFrame)
     {
         _serviceProvider = serviceProvider;
         _adornerWindow = new AdornerWindow(this, windowFrame);
@@ -85,8 +84,8 @@ public sealed partial class BehaviorService : IDisposable
         if (menuCommandService is not null && host is not null)
         {
             MenuCommandHandler menuCommandHandler = new(this, menuCommandService);
-            host.RemoveService(typeof(IMenuCommandService));
-            host.AddService(typeof(IMenuCommandService), menuCommandHandler);
+            host.RemoveService<IMenuCommandService>();
+            host.AddService<IMenuCommandService>(menuCommandHandler);
         }
 
         // Default layoutmode is SnapToGrid.
@@ -177,8 +176,8 @@ public sealed partial class BehaviorService : IDisposable
             _serviceProvider.GetService(typeof(IDesignerHost)) is IDesignerHost host)
         {
             IMenuCommandService oldMenuCommandService = menuCommandHandler.MenuService;
-            host.RemoveService(typeof(IMenuCommandService));
-            host.AddService(typeof(IMenuCommandService), oldMenuCommandService);
+            host.RemoveService<IMenuCommandService>();
+            host.AddService(oldMenuCommandService);
         }
 
         _adornerWindow.Dispose();
@@ -198,7 +197,7 @@ public sealed partial class BehaviorService : IDisposable
 
         // Build up the eventargs for firing our dragbegin/end events
         ICollection dragComponents = ((DropSourceBehavior.BehaviorDataObject)dropSourceBehavior.DataObject).DragComponents;
-        BehaviorDragDropEventArgs eventArgs = new BehaviorDragDropEventArgs(dragComponents);
+        BehaviorDragDropEventArgs eventArgs = new(dragComponents);
 
         try
         {
@@ -275,7 +274,7 @@ public sealed partial class BehaviorService : IDisposable
             return Point.Empty;
         }
 
-        var pt = new Point(c.Left, c.Top);
+        Point pt = new(c.Left, c.Top);
         PInvoke.MapWindowPoints(c.Parent, _adornerWindow, ref pt);
         if (c.Parent.IsMirrored)
         {
@@ -503,16 +502,16 @@ public sealed partial class BehaviorService : IDisposable
                     // InvokeMouseEnterGlyph will cause the selection to change, which might change the number of glyphs, so we need to remember the new glyph before calling InvokeMouseEnterLeave. VSWhidbey #396611
                     Glyph newGlyph = Adorners[i].Glyphs[j];
 
-                    //with a valid hit test, fire enter/leave events
+                    // with a valid hit test, fire enter/leave events
                     InvokeMouseEnterLeave(_hitTestedGlyph, newGlyph);
                     if (_validDragArgs is null)
                     {
-                        //if we're not dragging, set the appropriate cursor
+                        // if we're not dragging, set the appropriate cursor
                         SetAppropriateCursor(hitTestCursor);
                     }
 
                     _hitTestedGlyph = newGlyph;
-                    //return true if we hit on a transparentBehavior, otherwise false
+                    // return true if we hit on a transparentBehavior, otherwise false
                     return (_hitTestedGlyph.Behavior is ControlDesigner.TransparentBehavior);
                 }
             }
@@ -817,7 +816,7 @@ public sealed partial class BehaviorService : IDisposable
 
             if (host.GetDesigner(comp) is ControlDesigner designer)
             {
-                foreach (SnapLine line in designer.SnapLines)
+                foreach (SnapLine line in designer.SnapLinesInternal)
                 {
                     snapLineInfo.Append($"{line}\tAssociated Control = {designer.Control.Name}:::");
                 }

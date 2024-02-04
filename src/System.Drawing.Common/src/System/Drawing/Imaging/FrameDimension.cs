@@ -10,7 +10,7 @@ public sealed class FrameDimension
     private static readonly FrameDimension s_resolution = new(new Guid("{84236f7b-3bd3-428f-8dab-4ea1439ca315}"));
     private static readonly FrameDimension s_page = new(new Guid("{7462dc86-6180-4c7e-8e3f-ee7333a7a483}"));
 
-    private Guid _guid;
+    private readonly Guid _guid;
 
     /// <summary>
     /// Initializes a new instance of the <see cref='FrameDimension'/> class with the specified GUID.
@@ -51,6 +51,7 @@ public sealed class FrameDimension
     {
         get { return s_page; }
     }
+
     /// <summary>
     /// Returns a value indicating whether the specified object is an <see cref='FrameDimension'/> equivalent to
     /// this <see cref='FrameDimension'/>.
@@ -58,7 +59,7 @@ public sealed class FrameDimension
     public override bool Equals([NotNullWhen(true)] object? o)
     {
         FrameDimension? format = o as FrameDimension;
-        if (format == null)
+        if (format is null)
             return false;
         return _guid == format._guid;
     }

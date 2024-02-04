@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 
@@ -11,7 +10,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_Ctor_ListBox()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
         Assert.Equal(0, collection.Count);
     }
@@ -19,14 +18,14 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_Ctor_NullOwner_ThrowsArgumentNullException()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         Assert.Throws<ArgumentNullException>("owner", () => new ListBox.IntegerCollection(null));
     }
 
     [WinFormsFact]
     public void ListBoxIntegerCollection_ICollection_Properties_GetReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         ICollection collection = new ListBox.IntegerCollection(owner);
         Assert.Equal(0, collection.Count);
         Assert.True(collection.IsSynchronized);
@@ -36,7 +35,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IList_Properties_GetReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         Assert.Equal(0, collection.Count);
         Assert.False(collection.IsFixedSize);
@@ -48,7 +47,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_Item_Get_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
         collection.AddRange(new int[] { 2, 1, 1, 3 });
 
@@ -63,7 +62,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(1)]
     public void ListBoxIntegerCollection_Item_GetInvalidIndexEmpty_ThrowsArgumentOutOfRangeException(int index)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
         Assert.Throws<ArgumentOutOfRangeException>("index", () => collection[index]);
     }
@@ -74,7 +73,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(2)]
     public void ListBoxIntegerCollection_Item_GetInvalidIndexNotEmpty_ThrowsArgumentOutOfRangeException(int index)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
         collection.Add(1);
         Assert.Throws<ArgumentOutOfRangeException>("index", () => collection[index]);
@@ -83,7 +82,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_Item_Set_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
         collection.AddRange(new int[] { 2, 1, 1, 3 });
 
@@ -109,7 +108,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_Item_SetCustomTabOffsets_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         ListBox.IntegerCollection collection = owner.CustomTabOffsets;
         collection.AddRange(new int[] { 2, 1, 1, 3 });
 
@@ -135,7 +134,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_Item_SetWithHandle_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
         collection.AddRange(new int[] { 2, 1, 1, 3 });
         Assert.NotEqual(IntPtr.Zero, owner.Handle);
@@ -177,7 +176,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_Item_SetCustomTabOffsetsWithHandle_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         ListBox.IntegerCollection collection = owner.CustomTabOffsets;
         collection.AddRange(new int[] { 2, 1, 1, 3 });
         Assert.NotEqual(IntPtr.Zero, owner.Handle);
@@ -222,7 +221,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(1)]
     public void ListBoxIntegerCollection_Item_SetInvalidIndexEmpty_ThrowsArgumentOutOfRangeException(int index)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
         Assert.Throws<ArgumentOutOfRangeException>("index", () => collection[index] = 2);
     }
@@ -233,7 +232,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(2)]
     public void ListBoxIntegerCollection_Item_SetInvalidIndexNotEmpty_ThrowsArgumentOutOfRangeException(int index)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
         collection.Add(1);
         Assert.Throws<ArgumentOutOfRangeException>("index", () => collection[index] = 2);
@@ -246,7 +245,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_Add_Invoke_Success(bool sorted, bool useCustomTabOffsets)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffsets
@@ -289,7 +288,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_Add_InvokeCustomTabOffsets_Success(bool sorted, bool useCustomTabOffsets)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffsets
@@ -332,7 +331,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false, 0)]
     public void ListBoxIntegerCollection_Add_InvokeWithHandle_Success(bool sorted, bool useCustomTabOffset, int expectedInvalidatedCallCount)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffset
@@ -394,7 +393,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false, 0)]
     public void ListBoxIntegerCollection_Add_InvokeCustomTabOffsetsWithHandle_Success(bool sorted, bool useCustomTabOffset, int expectedInvalidatedCallCount)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffset
@@ -456,7 +455,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_AddRange_InvokeIntArray_Success(bool sorted, bool useCustomTabOffsets)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffsets
@@ -484,7 +483,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_AddRange_InvokeIntArrayCustomTabOffsets_Success(bool sorted, bool useCustomTabOffsets)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffsets
@@ -512,7 +511,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false, 1)]
     public void ListBoxIntegerCollection_AddRange_InvokeIntArrayWithHandle_Success(bool sorted, bool useCustomTabOffset, int expectedInvalidatedCallCount)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffset
@@ -553,7 +552,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false, 1)]
     public void ListBoxIntegerCollection_AddRange_InvokeIntArrayCustomTabOffsetsWithHandle_Success(bool sorted, bool useCustomTabOffset, int expectedInvalidatedCallCount)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffset
@@ -594,14 +593,14 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_AddRange_InvokeIntegerCollection_Success(bool sorted, bool useCustomTabOffsets)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffsets
         };
         var collection = new ListBox.IntegerCollection(owner);
 
-        using var otherOwner = new ListBox();
+        using ListBox otherOwner = new();
         var otherCollection = new ListBox.IntegerCollection(otherOwner);
         otherCollection.AddRange(new int[] { 2, 1, 1, 3 });
         collection.AddRange(otherCollection);
@@ -625,14 +624,14 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_AddRange_InvokeIntegerCollectionCustomTabOffsets_Success(bool sorted, bool useCustomTabOffsets)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffsets
         };
         ListBox.IntegerCollection collection = owner.CustomTabOffsets;
 
-        using var otherOwner = new ListBox();
+        using ListBox otherOwner = new();
         var otherCollection = new ListBox.IntegerCollection(otherOwner);
         otherCollection.AddRange(new int[] { 2, 1, 1, 3 });
         collection.AddRange(otherCollection);
@@ -656,7 +655,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false, 1)]
     public void ListBoxIntegerCollection_AddRange_InvokeIntegerCollectionWithHandle_Success(bool sorted, bool useCustomTabOffset, int expectedInvalidatedCallCount)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffset
@@ -670,7 +669,7 @@ public class ListBoxIntegerCollectionTests
         int createdCallCount = 0;
         owner.HandleCreated += (sender, e) => createdCallCount++;
 
-        using var otherOwner = new ListBox();
+        using ListBox otherOwner = new();
         var otherCollection = new ListBox.IntegerCollection(otherOwner);
         otherCollection.AddRange(new int[] { 2, 1, 1, 3 });
         collection.AddRange(otherCollection);
@@ -700,7 +699,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false, 1)]
     public void ListBoxIntegerCollection_AddRange_InvokeIntegerCollectionCustomTabOffsetsWithHandle_Success(bool sorted, bool useCustomTabOffset, int expectedInvalidatedCallCount)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffset
@@ -714,7 +713,7 @@ public class ListBoxIntegerCollectionTests
         int createdCallCount = 0;
         owner.HandleCreated += (sender, e) => createdCallCount++;
 
-        using var otherOwner = new ListBox();
+        using ListBox otherOwner = new();
         var otherCollection = new ListBox.IntegerCollection(otherOwner);
         otherCollection.AddRange(new int[] { 2, 1, 1, 3 });
         collection.AddRange(otherCollection);
@@ -740,7 +739,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_AddRange_NullItems_ThrowsArgumentNullException()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
         Assert.Throws<ArgumentNullException>("items", () => collection.AddRange((int[])null));
         Assert.Throws<ArgumentNullException>("items", () => collection.AddRange((ListBox.IntegerCollection)null));
@@ -749,7 +748,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_Contains_InvokeEmpty_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
         Assert.False(collection.Contains(0));
         Assert.False(collection.Contains(1));
@@ -759,7 +758,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_Contains_InvokeWithValues_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
 
         // Add one.
@@ -780,7 +779,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_Clear_InvokeEmpty_Success()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
         collection.Clear();
         Assert.Equal(0, collection.Count);
@@ -801,7 +800,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_Clear_InvokeCustomTabOffsetsEmpty_Success()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         ListBox.IntegerCollection collection = owner.CustomTabOffsets;
         collection.Clear();
         Assert.Equal(0, collection.Count);
@@ -822,7 +821,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_Clear_InvokeNotEmpty_Success()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
         collection.Add(1);
 
@@ -845,7 +844,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_Clear_InvokeCustomTabOffsetNotEmpty_Success()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         ListBox.IntegerCollection collection = owner.CustomTabOffsets;
         collection.Add(1);
 
@@ -868,7 +867,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_Clear_InvokeEmptyWithHandle_Success()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
         Assert.NotEqual(IntPtr.Zero, owner.Handle);
         int invalidatedCallCount = 0;
@@ -903,7 +902,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_Clear_InvokeCustomTabOffsetsEmptyWithHandle_Success()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         ListBox.IntegerCollection collection = owner.CustomTabOffsets;
         Assert.NotEqual(IntPtr.Zero, owner.Handle);
         int invalidatedCallCount = 0;
@@ -938,7 +937,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_Clear_InvokeNotEmptyWithHandle_Success()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
         Assert.NotEqual(IntPtr.Zero, owner.Handle);
         int invalidatedCallCount = 0;
@@ -974,7 +973,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_Clear_InvokeCustomTabOffsetNotEmptyWithHandle_Success()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         ListBox.IntegerCollection collection = owner.CustomTabOffsets;
         Assert.NotEqual(IntPtr.Zero, owner.Handle);
         int invalidatedCallCount = 0;
@@ -1010,29 +1009,31 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_CopyTo_InvokeEmpty_Success()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
-        var array = new object[] { "1", "2", "3" };
+        object[] array = ["1", "2", "3"];
         collection.CopyTo(array, 1);
-        Assert.Equal(new object[] { "1", "2", "3" }, array);
+        Assert.Equal(["1", "2", "3"], array);
     }
 
     [WinFormsFact]
     public void ListBoxIntegerCollection_CopyTo_InvokeNotEmpty_ReturnsExpected()
     {
-        using var owner = new ListBox();
-        var collection = new ListBox.IntegerCollection(owner);
-        collection.Add(1);
-        collection.Add(2);
-        var array = new object[] { "1", "2", "3" };
+        using ListBox owner = new();
+        var collection = new ListBox.IntegerCollection(owner)
+        {
+            1,
+            2
+        };
+        object[] array = ["1", "2", "3"];
         collection.CopyTo(array, 1);
-        Assert.Equal(new object[] { "1", 1, 2 }, array);
+        Assert.Equal(["1", 1, 2], array);
     }
 
     [WinFormsFact]
     public void ListBoxIntegerCollection_CopyTo_NullArrayEmpty_ThrowsArgumentNullException()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
         Assert.Throws<ArgumentNullException>("destination", () => collection.CopyTo(null, 0));
     }
@@ -1040,7 +1041,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_CopyTo_NullArrayNotEmpty_ThrowsArgumentNullException()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
         collection.Add(1);
         Assert.Throws<ArgumentNullException>("destination", () => collection.CopyTo(null, 0));
@@ -1049,7 +1050,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IndexOf_InvokeEmpty_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
         Assert.Equal(-1, collection.IndexOf(0));
         Assert.Equal(-1, collection.IndexOf(1));
@@ -1059,7 +1060,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IndexOf_InvokeWithValues_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
 
         // Add one.
@@ -1084,7 +1085,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_Remove_Invoke_Success(bool sorted, bool useCustomTabOffsets)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffsets
@@ -1128,7 +1129,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_Remove_InvokeCustomTabOffsets_Success(bool sorted, bool useCustomTabOffsets)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffsets
@@ -1172,7 +1173,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_Remove_InvokeWithHandle_Success(bool sorted, bool useCustomTabOffset)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffset
@@ -1235,7 +1236,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_Remove_InvokeCustomTabOffsetsWithHandle_Success(bool sorted, bool useCustomTabOffset)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffset
@@ -1298,7 +1299,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_RemoveAt_Invoke_Success(bool sorted, bool useCustomTabOffsets)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffsets
@@ -1335,7 +1336,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_RemoveAt_InvokeCustomTabOffsets_Success(bool sorted, bool useCustomTabOffsets)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffsets
@@ -1372,7 +1373,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_RemoveAt_InvokeWithHandle_Success(bool sorted, bool useCustomTabOffset)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffset
@@ -1425,7 +1426,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_RemoveAt_InvokeCustomTabOffsetsWithHandle_Success(bool sorted, bool useCustomTabOffset)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffset
@@ -1477,7 +1478,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(1)]
     public void ListBoxIntegerCollection_RemoveAt_InvalidIndexEmpty_ThrowsArgumentOutOfRangeException(int index)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
         Assert.Throws<ArgumentOutOfRangeException>("index", () => collection.RemoveAt(index));
     }
@@ -1488,7 +1489,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(2)]
     public void ListBoxIntegerCollection_RemoveAt_InvalidIndexNotEmpty_ThrowsArgumentOutOfRangeException(int index)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.IntegerCollection(owner);
         collection.Add(1);
         Assert.Throws<ArgumentOutOfRangeException>("index", () => collection.RemoveAt(index));
@@ -1497,7 +1498,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IListItem_Get_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         collection.Add(2);
         collection.Add(1);
@@ -1515,7 +1516,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(1)]
     public void ListBoxIntegerCollection_IListItem_GetInvalidIndexEmpty_ThrowsArgumentOutOfRangeException(int index)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         Assert.Throws<ArgumentOutOfRangeException>("index", () => collection[index]);
     }
@@ -1526,7 +1527,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(2)]
     public void ListBoxIntegerCollection_IListItem_GetInvalidIndexNotEmpty_ThrowsArgumentOutOfRangeException(int index)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         collection.Add(1);
         Assert.Throws<ArgumentOutOfRangeException>("index", () => collection[index]);
@@ -1535,7 +1536,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IListItem_Set_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         collection.Add(2);
         collection.Add(1);
@@ -1564,7 +1565,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IListItem_SetCustomTabOffsets_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = owner.CustomTabOffsets;
         collection.Add(2);
         collection.Add(1);
@@ -1593,7 +1594,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IListItem_SetWithHandle_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         collection.Add(2);
         collection.Add(1);
@@ -1638,7 +1639,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IListItem_SetCustomTabOffsetsWithHandle_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = owner.CustomTabOffsets;
         collection.Add(2);
         collection.Add(1);
@@ -1686,7 +1687,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(1)]
     public void ListBoxIntegerCollection_IListItem_SetInvalidIndexEmpty_ThrowsArgumentOutOfRangeException(int index)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         Assert.Throws<ArgumentOutOfRangeException>("index", () => collection[index] = 2);
     }
@@ -1697,7 +1698,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(2)]
     public void ListBoxIntegerCollection_IListItem_SetInvalidIndexNotEmpty_ThrowsArgumentOutOfRangeException(int index)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         collection.Add(1);
         Assert.Throws<ArgumentOutOfRangeException>("index", () => collection[index] = 2);
@@ -1712,7 +1713,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(1, "1")]
     public void ListBoxIntegerCollection_IListItem_SetValueNotInt_ThrowsArgumentException(int index, object item)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         Assert.Throws<ArgumentException>(() => collection[index] = item);
     }
@@ -1724,7 +1725,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_IListAdd_Invoke_Success(bool sorted, bool useCustomTabOffsets)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffsets
@@ -1767,7 +1768,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_IListAdd_InvokeCustomTabOffsets_Success(bool sorted, bool useCustomTabOffsets)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffsets
@@ -1810,7 +1811,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false, 0)]
     public void ListBoxIntegerCollection_IListAdd_InvokeWithHandle_Success(bool sorted, bool useCustomTabOffset, int expectedInvalidatedCallCount)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffset
@@ -1872,7 +1873,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false, 0)]
     public void ListBoxIntegerCollection_IListAdd_InvokeCustomTabOffsetsWithHandle_Success(bool sorted, bool useCustomTabOffset, int expectedInvalidatedCallCount)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffset
@@ -1932,7 +1933,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData("1")]
     public void ListBoxIntegerCollection_IListAdd_ValueNotInt_ThrowsArgumentException(object item)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         Assert.Throws<ArgumentException>(() => collection.Add(item));
     }
@@ -1940,7 +1941,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IListContains_InvokeEmpty_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         Assert.False(collection.Contains(0));
         Assert.False(collection.Contains(1));
@@ -1952,7 +1953,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IListContains_InvokeWithValues_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
 
         // Add one.
@@ -1977,7 +1978,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IListClear_InvokeEmpty_Success()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         collection.Clear();
         Assert.Equal(0, collection.Count);
@@ -1998,7 +1999,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IListClear_InvokeCustomTabOffsetsEmpty_Success()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = owner.CustomTabOffsets;
         collection.Clear();
         Assert.Equal(0, collection.Count);
@@ -2019,7 +2020,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IListClear_InvokeNotEmpty_Success()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         collection.Add(1);
 
@@ -2042,7 +2043,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IListClear_InvokeCustomTabOffsetNotEmpty_Success()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = owner.CustomTabOffsets;
         collection.Add(1);
 
@@ -2065,7 +2066,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IListClear_InvokeEmptyWithHandle_Success()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         Assert.NotEqual(IntPtr.Zero, owner.Handle);
         int invalidatedCallCount = 0;
@@ -2100,7 +2101,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IListClear_InvokeCustomTabOffsetsEmptyWithHandle_Success()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = owner.CustomTabOffsets;
         Assert.NotEqual(IntPtr.Zero, owner.Handle);
         int invalidatedCallCount = 0;
@@ -2135,7 +2136,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IListClear_InvokeNotEmptyWithHandle_Success()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         Assert.NotEqual(IntPtr.Zero, owner.Handle);
         int invalidatedCallCount = 0;
@@ -2171,7 +2172,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IListClear_InvokeCustomTabOffsetNotEmptyWithHandle_Success()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = owner.CustomTabOffsets;
         Assert.NotEqual(IntPtr.Zero, owner.Handle);
         int invalidatedCallCount = 0;
@@ -2207,7 +2208,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IListGetEnumerator_InvokeEmpty_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
 
         IEnumerator enumerator = collection.GetEnumerator();
@@ -2230,7 +2231,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IListGetEnumerator_InvokeNotEmpty_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         collection.Add(2);
 
@@ -2257,7 +2258,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IListIndexOf_InvokeEmpty_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         Assert.Equal(-1, collection.IndexOf(0));
         Assert.Equal(-1, collection.IndexOf(1));
@@ -2269,7 +2270,7 @@ public class ListBoxIntegerCollectionTests
     [WinFormsFact]
     public void ListBoxIntegerCollection_IListIndexOf_InvokeWithValues_ReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
 
         // Add one.
@@ -2298,7 +2299,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_IListRemove_Invoke_Success(bool sorted, bool useCustomTabOffsets)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffsets
@@ -2345,7 +2346,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_IListRemove_InvokeCustomTabOffsets_Success(bool sorted, bool useCustomTabOffsets)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffsets
@@ -2392,7 +2393,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_IListRemove_InvokeWithHandle_Success(bool sorted, bool useCustomTabOffset)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffset
@@ -2458,7 +2459,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_IListRemove_InvokeCustomTabOffsetsWithHandle_Success(bool sorted, bool useCustomTabOffset)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffset
@@ -2522,7 +2523,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData("1")]
     public void ListBoxIntegerCollection_IListRemove_ValueNotInt_ThrowsArgumentException(object item)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         Assert.Throws<ArgumentException>(() => collection.Remove(item));
     }
@@ -2534,7 +2535,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_IListRemoveAt_Invoke_Success(bool sorted, bool useCustomTabOffsets)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffsets
@@ -2574,7 +2575,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_IListRemoveAt_InvokeCustomTabOffsets_Success(bool sorted, bool useCustomTabOffsets)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffsets
@@ -2614,7 +2615,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_IListRemoveAt_InvokeWithHandle_Success(bool sorted, bool useCustomTabOffset)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffset
@@ -2670,7 +2671,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(false, false)]
     public void ListBoxIntegerCollection_IListRemoveAt_InvokeCustomTabOffsetsWithHandle_Success(bool sorted, bool useCustomTabOffset)
     {
-        using var owner = new ListBox
+        using ListBox owner = new()
         {
             Sorted = sorted,
             UseCustomTabOffsets = useCustomTabOffset
@@ -2725,7 +2726,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(1)]
     public void ListBoxIntegerCollection_IListRemoveAt_InvalidIndexEmpty_ThrowsArgumentOutOfRangeException(int index)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         Assert.Throws<ArgumentOutOfRangeException>("index", () => collection.RemoveAt(index));
     }
@@ -2736,7 +2737,7 @@ public class ListBoxIntegerCollectionTests
     [InlineData(2)]
     public void ListBoxIntegerCollection_IListRemoveAt_InvalidIndexNotEmpty_ThrowsArgumentOutOfRangeException(int index)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.IntegerCollection(owner);
         collection.Add(1);
         Assert.Throws<ArgumentOutOfRangeException>("index", () => collection.RemoveAt(index));

@@ -1,10 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using Microsoft.Win32;
-using static Interop;
 
 namespace System.Windows.Forms;
 
@@ -37,11 +35,11 @@ public partial class Screen
 
     private readonly int _bitDepth;
 
-    private static readonly object s_syncLock = new(); //used to lock this class before syncing to SystemEvents
+    private static readonly object s_syncLock = new(); // used to lock this class before syncing to SystemEvents
 
-    private static int s_desktopChangedCount = -1; //static counter of desktop size changes
+    private static int s_desktopChangedCount = -1; // static counter of desktop size changes
 
-    private int _currentDesktopChangedCount = -1; //instance-based counter used to invalidate WorkingArea
+    private int _currentDesktopChangedCount = -1; // instance-based counter used to invalidate WorkingArea
 
     // This identifier is just for us, so that we don't try to call the multimon functions if we just need the
     // primary monitor. This is safer for non-multimon OSes.
@@ -73,26 +71,26 @@ public partial class Screen
             };
 
             // API takes EX, determines which one you pass by size.
-            PInvoke.GetMonitorInfo(monitor, (MONITORINFO*)&info);
+            PInvokeCore.GetMonitorInfo(monitor, (MONITORINFO*)&info);
             _bounds = info.monitorInfo.rcMonitor;
-            _primary = ((info.monitorInfo.dwFlags & PInvoke.MONITORINFOF_PRIMARY) != 0);
+            _primary = ((info.monitorInfo.dwFlags & PInvokeCore.MONITORINFOF_PRIMARY) != 0);
 
             _deviceName = new string(info.szDevice.ToString());
 
             if (hdc.IsNull)
             {
-                screenDC = PInvoke.CreateDCW(_deviceName, pwszDevice: null, pszPort: null, pdm: null);
+                screenDC = PInvokeCore.CreateDCW(_deviceName, pwszDevice: null, pszPort: null, pdm: null);
             }
         }
 
         _hmonitor = monitor;
 
-        _bitDepth = PInvoke.GetDeviceCaps(screenDC, GET_DEVICE_CAPS_INDEX.BITSPIXEL);
-        _bitDepth *= PInvoke.GetDeviceCaps(screenDC, GET_DEVICE_CAPS_INDEX.PLANES);
+        _bitDepth = PInvokeCore.GetDeviceCaps(screenDC, GET_DEVICE_CAPS_INDEX.BITSPIXEL);
+        _bitDepth *= PInvokeCore.GetDeviceCaps(screenDC, GET_DEVICE_CAPS_INDEX.PLANES);
 
         if (hdc != screenDC)
         {
-            PInvoke.DeleteDC(screenDC);
+            PInvokeCore.DeleteDC(screenDC);
         }
     }
 
@@ -184,8 +182,8 @@ public partial class Screen
     {
         get
         {
-            //if the static Screen class has a different desktop change count
-            //than this instance then update the count and recalculate our working area
+            // if the static Screen class has a different desktop change count
+            // than this instance then update the count and recalculate our working area
             if (_currentDesktopChangedCount != DesktopChangedCount)
             {
                 Interlocked.Exchange(ref _currentDesktopChangedCount, DesktopChangedCount);
@@ -204,7 +202,7 @@ public partial class Screen
                     };
 
                     // API takes EX, determines which one you pass by size.
-                    PInvoke.GetMonitorInfo(_hmonitor, (MONITORINFO*)&info);
+                    PInvokeCore.GetMonitorInfo(_hmonitor, (MONITORINFO*)&info);
                     _workingArea = info.monitorInfo.rcWork;
                 }
             }
@@ -250,7 +248,7 @@ public partial class Screen
     /// </summary>
     public static Screen FromPoint(Point point)
         => SystemInformation.MultiMonitorSupport
-        ? new Screen(PInvoke.MonitorFromPoint(point, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST))
+        ? new Screen(PInvokeCore.MonitorFromPoint(point, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST))
         : new Screen(PRIMARY_MONITOR);
 
     /// <summary>
@@ -258,7 +256,7 @@ public partial class Screen
     /// </summary>
     public static Screen FromRectangle(Rectangle rect)
         => SystemInformation.MultiMonitorSupport
-        ? new Screen(PInvoke.MonitorFromRect(rect, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST))
+        ? new Screen(PInvokeCore.MonitorFromRect(rect, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST))
         : new Screen(PRIMARY_MONITOR, default);
 
     /// <summary>
@@ -276,7 +274,7 @@ public partial class Screen
     /// </summary>
     public static Screen FromHandle(IntPtr hwnd)
         => SystemInformation.MultiMonitorSupport
-        ? new Screen(PInvoke.MonitorFromWindow((HWND)hwnd, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST))
+        ? new Screen(PInvokeCore.MonitorFromWindow((HWND)hwnd, MONITOR_FROM_FLAGS.MONITOR_DEFAULTTONEAREST))
         : new Screen(PRIMARY_MONITOR, default);
 
     /// <summary>

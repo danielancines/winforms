@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 #nullable disable
 
@@ -28,7 +27,7 @@ internal class ToolStripDropDownDesigner : ComponentDesigner
     private uint _editingCollection; // non-zero if the collection editor is up for this ToolStrip or a child of it.
     private FormDocumentDesigner parentFormDesigner;
     internal ToolStripMenuItem currentParent;
-    private INestedContainer _nestedContainer; //NestedContainer for our DesignTime MenuItem.
+    private INestedContainer _nestedContainer; // NestedContainer for our DesignTime MenuItem.
     private UndoEngine _undoEngine;
 
     /// <summary>
@@ -53,9 +52,9 @@ internal class ToolStripDropDownDesigner : ComponentDesigner
     {
         get
         {
-            DesignerActionListCollection actionLists = new DesignerActionListCollection();
+            DesignerActionListCollection actionLists = new();
             actionLists.AddRange(base.ActionLists);
-            ContextMenuStripActionList cmActionList = new ContextMenuStripActionList(this);
+            ContextMenuStripActionList cmActionList = new(this);
             if (cmActionList is not null)
             {
                 actionLists.Add(cmActionList);
@@ -198,9 +197,9 @@ internal class ToolStripDropDownDesigner : ComponentDesigner
     // We have to add the glyphs ourselves.
     private void AddSelectionGlyphs(SelectionManager selectionManager, ISelectionService selectionService)
     {
-        //If one or many of our items are selected then Add Selection Glyphs ourselves since this is a ComponentDesigner which won't get called on the "GetGlyphs"
+        // If one or many of our items are selected then Add Selection Glyphs ourselves since this is a ComponentDesigner which won't get called on the "GetGlyphs"
         ICollection selComponents = selectionService.GetSelectedComponents();
-        GlyphCollection glyphs = new GlyphCollection();
+        GlyphCollection glyphs = new();
         foreach (object selComp in selComponents)
         {
             if (selComp is ToolStripItem item)
@@ -383,10 +382,8 @@ internal class ToolStripDropDownDesigner : ComponentDesigner
             AutoSize = false,
             Dock = DockStyle.Top
         };
-        if (DpiHelper.IsScalingRequired)
-        {
-            designMenu.Height = DpiHelper.LogicalToDeviceUnitsY(designMenu.Height);
-        }
+
+        designMenu.Height = ScaleHelper.ScaleToInitialSystemDpi(designMenu.Height);
 
         // Add MenuItem
         if (host.RootComponent is Control form)
@@ -452,7 +449,7 @@ internal class ToolStripDropDownDesigner : ComponentDesigner
                 }
             }
         }
-        else if (comp is ToolStripItem) //case (c)
+        else if (comp is ToolStripItem) // case (c)
         {
             if (!(((ToolStripItem)comp).GetCurrentParent() is ToolStripDropDown parent))
             {
@@ -557,7 +554,7 @@ internal class ToolStripDropDownDesigner : ComponentDesigner
     {
         base.PreFilterProperties(properties);
         PropertyDescriptor prop;
-        string[] shadowProps = new string[] { "AutoClose", SettingsKeyName, "RightToLeft", "AllowDrop" };
+        string[] shadowProps = ["AutoClose", SettingsKeyName, "RightToLeft", "AllowDrop"];
         Attribute[] empty = Array.Empty<Attribute>();
         for (int i = 0; i < shadowProps.Length; i++)
         {

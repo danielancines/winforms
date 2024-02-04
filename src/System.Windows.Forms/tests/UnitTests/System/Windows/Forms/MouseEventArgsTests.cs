@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 
@@ -15,7 +14,7 @@ public class MouseEventArgsTests
     [InlineData((MouseButtons)3, -1, -1, -1, -2)]
     public void Ctor_MouseButtons_Int_Int_Int_Int(MouseButtons button, int clicks, int x, int y, int delta)
     {
-        var e = new MouseEventArgs(button, clicks, x, y, delta);
+        MouseEventArgs e = new(button, clicks, x, y, delta);
         Assert.Equal(button, e.Button);
         Assert.Equal(clicks, e.Clicks);
         Assert.Equal(x, e.X);

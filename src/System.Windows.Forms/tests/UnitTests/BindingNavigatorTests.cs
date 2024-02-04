@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Data;
@@ -13,7 +12,7 @@ public class BindingNavigatorTests
     [WinFormsFact]
     public void BindingNavigator_Constructor()
     {
-        using var bn = new BindingNavigator();
+        using BindingNavigator bn = new();
 
         Assert.NotNull(bn);
     }
@@ -21,11 +20,11 @@ public class BindingNavigatorTests
     [WinFormsFact]
     public void BindingNavigator_ConstructorBindingSource()
     {
-        using var bindingSource = new BindingSource();
-        var data = new List<string>() { "Foo", "Bar" };
+        using BindingSource bindingSource = new();
+        List<string> data = new() { "Foo", "Bar" };
         bindingSource.DataSource = data;
 
-        using var bn = new BindingNavigator(bindingSource);
+        using BindingNavigator bn = new(bindingSource);
 
         Assert.NotNull(bn);
         Assert.Equal(bindingSource, bn.BindingSource);
@@ -37,14 +36,14 @@ public class BindingNavigatorTests
     public void BindingNavigator_ConstructorIContainer()
     {
         IContainer nullContainer = null;
-        var mockContainer = new Mock<IContainer>(MockBehavior.Strict);
+        Mock<IContainer> mockContainer = new(MockBehavior.Strict);
         mockContainer.Setup(x => x.Add(It.IsAny<BindingNavigator>())).Verifiable();
 
         // act & assert
         ArgumentNullException ex = Assert.Throws<ArgumentNullException>(() => new BindingNavigator(nullContainer));
         Assert.Equal("container", ex.ParamName);
 
-        using var bn = new BindingNavigator(mockContainer.Object);
+        using BindingNavigator bn = new(mockContainer.Object);
         Assert.NotNull(bn);
         mockContainer.Verify(x => x.Add(bn));
     }
@@ -52,7 +51,7 @@ public class BindingNavigatorTests
     [WinFormsFact]
     public void BindingNavigator_ConstructorBool()
     {
-        using var bn = new BindingNavigator(true);
+        using BindingNavigator bn = new(true);
 
         Assert.NotNull(bn);
 
@@ -66,7 +65,7 @@ public class BindingNavigatorTests
         Assert.False(bn.PositionItem.AutoToolTip);
         Assert.Equal(SR.BindingNavigatorPositionAccessibleName, bn.PositionItem.AccessibleName);
 
-        var items = new List<ToolStripItem>()
+        List<ToolStripItem> items = new()
         {
             bn.MoveFirstItem,
             bn.MovePreviousItem,
@@ -76,7 +75,7 @@ public class BindingNavigatorTests
             bn.DeleteItem
         };
 
-        var itemNames = new List<string>()
+        List<string> itemNames = new()
         {
             "bindingNavigatorMoveFirstItem",
             "bindingNavigatorMovePreviousItem",
@@ -86,7 +85,7 @@ public class BindingNavigatorTests
             "bindingNavigatorDeleteItem"
         };
 
-        var itemTexts = new List<string>()
+        List<string> itemTexts = new()
         {
             SR.BindingNavigatorMoveFirstItemText,
             SR.BindingNavigatorMovePreviousItemText,
@@ -96,7 +95,7 @@ public class BindingNavigatorTests
             SR.BindingNavigatorDeleteItemText
         };
 
-        for (var i = 0; i < items.Count; i++)
+        for (int i = 0; i < items.Count; i++)
         {
             ToolStripItem item = items[i];
             Assert.NotNull(item);
@@ -110,7 +109,7 @@ public class BindingNavigatorTests
         Assert.False(bn.PositionItem.AutoSize);
         Assert.Equal(50, bn.PositionItem.Width);
 
-        var index = 0;
+        int index = 0;
         Assert.Equal(11, bn.Items.Count);
         Assert.Equal(bn.MoveFirstItem, bn.Items[index++]);
         Assert.Equal(bn.MovePreviousItem, bn.Items[index++]);
@@ -131,7 +130,7 @@ public class BindingNavigatorTests
     [WinFormsFact]
     public void BindingNavigator_UpdatesItsItems_AfterDataSourceDisposing()
     {
-        using BindingNavigator control = new BindingNavigator(true);
+        using BindingNavigator control = new(true);
         int rowsCount = 5;
         BindingSource bindingSource = GetTestBindingSource(rowsCount);
         control.BindingSource = bindingSource;
@@ -150,7 +149,7 @@ public class BindingNavigatorTests
     [WinFormsFact]
     public void BindingNavigator_BindingSource_IsNull_AfterDisposing()
     {
-        using BindingNavigator control = new BindingNavigator();
+        using BindingNavigator control = new();
         BindingSource bindingSource = GetTestBindingSource(5);
         control.BindingSource = bindingSource;
 
@@ -164,7 +163,7 @@ public class BindingNavigatorTests
     [WinFormsFact]
     public void BindingNavigator_BindingSource_IsActual_AfterOldOneIsDisposed()
     {
-        using BindingNavigator control = new BindingNavigator(true);
+        using BindingNavigator control = new(true);
         int rowsCount1 = 3;
         BindingSource bindingSource1 = GetTestBindingSource(rowsCount1);
         int rowsCount2 = 5;
@@ -194,7 +193,7 @@ public class BindingNavigatorTests
 
     private BindingSource GetTestBindingSource(int rowsCount)
     {
-        DataTable dt = new DataTable();
+        DataTable dt = new();
         dt.Columns.Add("Name");
         dt.Columns.Add("Age");
 

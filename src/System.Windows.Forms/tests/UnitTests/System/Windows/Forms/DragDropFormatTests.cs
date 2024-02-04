@@ -1,12 +1,14 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
+using Windows.Win32.System.Com;
 using Windows.Win32.System.Ole;
-using static Interop;
+using DVASPECT = System.Runtime.InteropServices.ComTypes.DVASPECT;
+using FORMATETC = System.Runtime.InteropServices.ComTypes.FORMATETC;
 using IStream = Windows.Win32.System.Com.IStream;
+using STGMEDIUM = System.Runtime.InteropServices.ComTypes.STGMEDIUM;
+using TYMED = System.Runtime.InteropServices.ComTypes.TYMED;
 
 namespace System.Windows.Forms.Tests;
 
@@ -27,7 +29,7 @@ public class DragDropFormatTests
         {
             pUnkForRelease = null,
             tymed = TYMED.TYMED_HGLOBAL,
-            unionmember = PInvoke.GlobalAlloc(
+            unionmember = PInvokeCore.GlobalAlloc(
                 GLOBAL_ALLOC_FLAGS.GMEM_MOVEABLE | GLOBAL_ALLOC_FLAGS.GMEM_ZEROINIT,
                 BOOL.Size)
         };
@@ -36,7 +38,7 @@ public class DragDropFormatTests
         yield return new object[] { formatEtc, medium };
 
         MemoryStream memoryStream = new();
-        IStream.Interface iStream = new Ole32.GPStream(memoryStream);
+        IStream.Interface iStream = new ComManagedStream(memoryStream);
         formatEtc = new()
         {
             cfFormat = (short)PInvoke.RegisterClipboardFormat("DragContext"),
@@ -66,7 +68,7 @@ public class DragDropFormatTests
         {
             dragDropFormat = new DragDropFormat(formatEtc.cfFormat, medium, copyData: false);
             dragDropFormat.Dispose();
-            int handleSize = (int)PInvoke.GlobalSize((HGLOBAL)dragDropFormat.Medium.unionmember);
+            int handleSize = (int)PInvokeCore.GlobalSize((HGLOBAL)dragDropFormat.Medium.unionmember);
             Assert.Equal(0, handleSize);
             Assert.Null(dragDropFormat.Medium.pUnkForRelease);
             Assert.Equal(TYMED.TYMED_NULL, dragDropFormat.Medium.tymed);
@@ -174,12 +176,12 @@ public class DragDropFormatTests
     {
         try
         {
-            void* basePtr = PInvoke.GlobalLock(handle);
+            void* basePtr = PInvokeCore.GlobalLock(handle);
             *(BOOL*)basePtr = (BOOL)inDragLoop;
         }
         finally
         {
-            PInvoke.GlobalUnlock(handle);
+            PInvokeCore.GlobalUnlock(handle);
         }
     }
 }

@@ -1,15 +1,12 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Drawing;
-using System.Runtime.Versioning;
 using System.Windows.Forms.DataBinding.TestUtilities;
 using System.Windows.Forms.TestUtilities;
 using Moq;
-using static Interop;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
@@ -20,7 +17,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_Ctor_Default()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.Null(control.AccessibleDefaultActionDescription);
         Assert.Null(control.AccessibleDescription);
         Assert.Null(control.AccessibleName);
@@ -128,7 +125,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_CreateParams_GetDefault_ReturnsExpected()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         CreateParams createParams = control.CreateParams;
         Assert.Null(createParams.Caption);
         Assert.Null(createParams.ClassName);
@@ -156,7 +153,7 @@ public class ButtonBaseTests
     [InlineData(FlatStyle.System, false, 0x56012F00)]
     public void ButtonBase_CreateParams_GetIsDefault_ReturnsExpected(FlatStyle flatStyle, bool isDefault, int expectedStyle)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             IsDefault = isDefault
@@ -225,7 +222,7 @@ public class ButtonBaseTests
     [MemberData(nameof(CreateParams_GetIsDefault_TestData))]
     public void ButtonBase_CreateParams_GetTextAlign_ReturnsExpected(FlatStyle flatStyle, RightToLeft rightToLeft, ContentAlignment textAlign, int expectedStyle, int expectedExStyle)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             RightToLeft = rightToLeft,
@@ -252,7 +249,7 @@ public class ButtonBaseTests
     [BoolData]
     public void ButtonBase_AutoEllipsis_Set_GetReturnsExpected(bool value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoEllipsis = value
         };
@@ -275,7 +272,7 @@ public class ButtonBaseTests
     [InlineData(false, 0)]
     public void ButtonBase_AutoEllipsis_SetWithHandle_GetReturnsExpected(bool value, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -312,7 +309,7 @@ public class ButtonBaseTests
     [BoolData]
     public void ButtonBase_AutoSize_Set_GetReturnsExpected(bool value)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         int layoutCallCount = 0;
         control.Layout += (sender, e) => layoutCallCount++;
 
@@ -341,7 +338,7 @@ public class ButtonBaseTests
     [BoolData]
     public void ButtonBase_AutoSize_SetAutoEllipsis_GetReturnsExpected(bool value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoEllipsis = true
         };
@@ -373,7 +370,7 @@ public class ButtonBaseTests
     [BoolData]
     public void ButtonBase_AutoSize_SetWithHandle_GetReturnsExpected(bool value)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -419,7 +416,7 @@ public class ButtonBaseTests
     [InlineData(false, 0)]
     public void ButtonBase_AutoSize_SetAutoEllipsisWithHandle_GetReturnsExpected(bool value, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoEllipsis = true
         };
@@ -466,7 +463,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_AutoSize_SetWithHandler_CallsAutoSizeChanged()
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = true
         };
@@ -505,7 +502,7 @@ public class ButtonBaseTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetBackColorTheoryData))]
     public void ButtonBase_BackColor_Set_GetReturnsExpected(Color value, Color expected)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             BackColor = value
         };
@@ -522,7 +519,7 @@ public class ButtonBaseTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetBackColorTheoryData))]
     public void ButtonBase_BackColor_SetWithUseVisualStyleBackColor_GetReturnsExpected(Color value, Color expected)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             UseVisualStyleBackColor = true,
             BackColor = value
@@ -542,7 +539,7 @@ public class ButtonBaseTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetBackColorTheoryData))]
     public void ButtonBase_BackColor_SetDesignMode_GetReturnsExpected(Color value, Color expected)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -567,7 +564,7 @@ public class ButtonBaseTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Site = mockSite.Object,
             UseVisualStyleBackColor = false,
@@ -588,7 +585,7 @@ public class ButtonBaseTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetBackColorTheoryData))]
     public void ButtonBase_BackColor_SetDesignModeWithUseVisualStyleBackColor_GetReturnsExpected(Color value, Color expected)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -613,7 +610,7 @@ public class ButtonBaseTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Site = mockSite.Object,
             UseVisualStyleBackColor = true,
@@ -634,7 +631,7 @@ public class ButtonBaseTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetBackColorTheoryData))]
     public void ButtonBase_BackColor_SetDesignModeWithInvalidDescriptor_GetReturnsExpected(Color value, Color expected)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -659,16 +656,16 @@ public class ButtonBaseTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Site = mockSite.Object,
             UseVisualStyleBackColor = true
         };
-        var mockCustomTypeDescriptor = new Mock<ICustomTypeDescriptor>(MockBehavior.Strict);
+        Mock<ICustomTypeDescriptor> mockCustomTypeDescriptor = new(MockBehavior.Strict);
         mockCustomTypeDescriptor
             .Setup(d => d.GetProperties())
             .Returns(PropertyDescriptorCollection.Empty);
-        var mockProvider = new Mock<TypeDescriptionProvider>(MockBehavior.Strict);
+        Mock<TypeDescriptionProvider> mockProvider = new(MockBehavior.Strict);
         mockProvider
             .Setup(p => p.GetCache(control))
             .CallBase();
@@ -702,7 +699,7 @@ public class ButtonBaseTests
     [MemberData(nameof(BackColor_SetWithHandle_TestData))]
     public void ButtonBase_BackColor_SetWithHandle_GetReturnsExpected(Color value, Color expected, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -730,7 +727,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_BackColor_SetWithHandler_CallsBackColorChanged()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -763,7 +760,6 @@ public class ButtonBaseTests
     }
 
     [WinFormsFact]
-    [RequiresPreviewFeatures]
     public void ButtonBase_BasicCommandBinding()
     {
         const string CommandParameter = nameof(CommandParameter);
@@ -828,7 +824,7 @@ public class ButtonBaseTests
     [MemberData(nameof(Enabled_Set_TestData))]
     public void ButtonBase_Enabled_Set_GetReturnsExpected(bool visible, Image image, bool value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Visible = visible,
             Image = image,
@@ -852,7 +848,7 @@ public class ButtonBaseTests
     [MemberData(nameof(Enabled_Set_TestData))]
     public void ButtonBase_Enabled_SetDesignMode_GetReturnsExpected(bool visible, Image image, bool value)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -865,7 +861,7 @@ public class ButtonBaseTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Visible = visible,
             Image = image,
@@ -902,7 +898,7 @@ public class ButtonBaseTests
     [MemberData(nameof(Enabled_SetWithHandle_TestData))]
     public void ButtonBase_Enabled_SetWithHandle_GetReturnsExpected(bool visible, Image image, bool value, int expectedInvalidatedCallCount1, int expectedInvalidatedCallCount2)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Visible = visible,
             Image = image
@@ -943,7 +939,7 @@ public class ButtonBaseTests
     [MemberData(nameof(Enabled_SetWithHandle_TestData))]
     public void ButtonBase_Enabled_SetDesignModeWithHandle_GetReturnsExpected(bool visible, Image image, bool value, int expectedInvalidatedCallCount1, int expectedInvalidatedCallCount2)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -956,7 +952,7 @@ public class ButtonBaseTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Visible = visible,
             Image = image,
@@ -997,7 +993,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_Enabled_SetWithHandler_CallsEnabledChanged()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -1031,7 +1027,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_FlatAppearance_Get_ReturnsExpected()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         FlatButtonAppearance appearance = control.FlatAppearance;
         Assert.Equal(Color.Empty, appearance.BorderColor);
         Assert.Equal(1, appearance.BorderSize);
@@ -1056,7 +1052,7 @@ public class ButtonBaseTests
     [MemberData(nameof(FlatStyle_Set_TestData))]
     public void ButtonBase_FlatStyle_Set_GetReturnsExpected(bool autoSize, FlatStyle value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize
         };
@@ -1097,7 +1093,7 @@ public class ButtonBaseTests
     [MemberData(nameof(FlatStyle_SetWithCustomOldValue_TestData))]
     public void ButtonBase_FlatStyle_SetWithCustomOldValue_GetReturnsExpected(bool autoSize, FlatStyle oldValue, FlatStyle value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize,
             FlatStyle = oldValue
@@ -1138,8 +1134,8 @@ public class ButtonBaseTests
     [MemberData(nameof(FlatStyle_SetWithParent_TestData))]
     public void ButtonBase_FlatStyle_SetWithParent_GetReturnsExpected(bool autoSize, FlatStyle value, int expectedParentLayoutCallCount)
     {
-        using var parent = new Control();
-        using var control = new SubButton
+        using Control parent = new();
+        using SubButton control = new()
         {
             Parent = parent,
             AutoSize = autoSize
@@ -1199,7 +1195,7 @@ public class ButtonBaseTests
     [MemberData(nameof(FlatStyle_SetWithHandle_TestData))]
     public void ButtonBase_FlatStyle_SetWithHandle_GetReturnsExpected(bool autoSize, FlatStyle value, int expectedInvalidatedCallCount, int expectedCreatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize
         };
@@ -1260,7 +1256,7 @@ public class ButtonBaseTests
     [MemberData(nameof(FlatStyle_SetWithCustomOldValueWithHandle_TestData))]
     public void ButtonBase_FlatStyle_SetWithCustomOldValueWithHandle_GetReturnsExpected(FlatStyle oldValue, FlatStyle value, int expectedInvalidatedCallCount, int expectedCreatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = oldValue
         };
@@ -1309,8 +1305,8 @@ public class ButtonBaseTests
     [MemberData(nameof(FlatStyle_SetWithParentWithHandle_TestData))]
     public void ButtonBase_FlatStyle_SetWithParentWithHandle_GetReturnsExpected(bool autoSize, FlatStyle value, int expectedParentLayoutCallCount, int expectedInvalidatedCallCount, int expectedCreatedCallCount)
     {
-        using var parent = new Control();
-        using var control = new SubButton
+        using Control parent = new();
+        using SubButton control = new()
         {
             Parent = parent,
             AutoSize = autoSize
@@ -1373,7 +1369,7 @@ public class ButtonBaseTests
     [InvalidEnumData<FlatStyle>]
     public void ButtonBase_FlatStyle_SetInvalidValue_ThrowsInvalidEnumArgumentException(FlatStyle value)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.Throws<InvalidEnumArgumentException>("value", () => control.FlatStyle = value);
     }
 
@@ -1396,7 +1392,7 @@ public class ButtonBaseTests
     [MemberData(nameof(Image_Set_TestData))]
     public void ButtonBase_Image_Set_GetReturnsExpected(bool autoSize, bool enabled, bool visible, Image value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize,
             Enabled = enabled,
@@ -1420,7 +1416,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_Image_SetWithImageIndex_GetReturnsExpected()
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             ImageIndex = 1
         };
@@ -1433,7 +1429,7 @@ public class ButtonBaseTests
         Assert.False(control.IsHandleCreated);
 
         // Set different.
-        using var value = new Bitmap(10, 10);
+        using Bitmap value = new(10, 10);
         control.Image = value;
         Assert.Empty(control.ImageKey);
         Assert.Equal(-1, control.ImageIndex);
@@ -1444,7 +1440,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_Image_SetWithImageKey_GetReturnsExpected()
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             ImageKey = "ImageKey"
         };
@@ -1457,7 +1453,7 @@ public class ButtonBaseTests
         Assert.False(control.IsHandleCreated);
 
         // Set different.
-        using var value = new Bitmap(10, 10);
+        using Bitmap value = new(10, 10);
         control.Image = value;
         Assert.Equal(ImageList.Indexer.DefaultKey, control.ImageKey);
         Assert.Equal(ImageList.Indexer.DefaultIndex, control.ImageIndex);
@@ -1468,8 +1464,8 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_Image_SetWithImageList_GetReturnsExpected()
     {
-        using var imageList = new ImageList();
-        using var control = new SubButtonBase
+        using ImageList imageList = new();
+        using SubButtonBase control = new()
         {
             ImageList = imageList
         };
@@ -1483,7 +1479,7 @@ public class ButtonBaseTests
         Assert.False(control.IsHandleCreated);
 
         // Set different.
-        using var value = new Bitmap(10, 10);
+        using Bitmap value = new(10, 10);
         control.Image = value;
         Assert.Empty(control.ImageKey);
         Assert.Equal(-1, control.ImageIndex);
@@ -1496,7 +1492,7 @@ public class ButtonBaseTests
     [MemberData(nameof(Image_Set_TestData))]
     public void ButtonBase_Image_SetDesignMode_GetReturnsExpected(bool autoSize, bool enabled, bool visible, Image value)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -1509,7 +1505,7 @@ public class ButtonBaseTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize,
             Enabled = enabled,
@@ -1549,8 +1545,8 @@ public class ButtonBaseTests
     [MemberData(nameof(Image_SetWithParent_TestData))]
     public void ButtonBase_Image_SetWithParent_GetReturnsExpected(bool autoSize, bool enabled, bool visible, Image value, int expectedParentLayoutCallCount)
     {
-        using var parent = new Control();
-        using var control = new Button
+        using Control parent = new();
+        using Button control = new()
         {
             AutoSize = autoSize,
             Enabled = enabled,
@@ -1612,7 +1608,7 @@ public class ButtonBaseTests
     [MemberData(nameof(Image_SetWithHandle_TestData))]
     public void ButtonBase_Image_SetWithHandle_GetReturnsExpected(bool autoSize, bool enabled, bool visible, Image value, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize,
             Enabled = enabled,
@@ -1650,7 +1646,7 @@ public class ButtonBaseTests
     [MemberData(nameof(Image_SetWithHandle_TestData))]
     public void ButtonBase_Image_SetDesignModeWithHandle_GetReturnsExpected(bool autoSize, bool enabled, bool visible, Image value, int expectedInvalidatedCallCount)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -1663,7 +1659,7 @@ public class ButtonBaseTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize,
             Enabled = enabled,
@@ -1716,8 +1712,8 @@ public class ButtonBaseTests
     [MemberData(nameof(Image_SetWithParentWithHandle_TestData))]
     public void ButtonBase_Image_SetWithParentWithHandle_GetReturnsExpected(bool autoSize, bool enabled, bool visible, Image value, int expectedParentLayoutCallCount, int expectedInvalidatedCallCount)
     {
-        using var parent = new Control();
-        using var control = new Button
+        using Control parent = new();
+        using Button control = new()
         {
             AutoSize = autoSize,
             Enabled = enabled,
@@ -1778,10 +1774,10 @@ public class ButtonBaseTests
     public void ButtonBase_Image_ResetValue_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(ButtonBase))[nameof(ButtonBase.Image)];
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.False(property.CanResetValue(control));
 
-        using var image = new Bitmap(10, 10);
+        using Bitmap image = new(10, 10);
         control.Image = image;
         Assert.Same(image, control.Image);
         Assert.True(property.CanResetValue(control));
@@ -1797,10 +1793,10 @@ public class ButtonBaseTests
     public void ButtonBase_Image_ResetValueWithHandle_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(ButtonBase))[nameof(ButtonBase.Image)];
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.False(property.CanResetValue(control));
 
-        using var image = new Bitmap(10, 10);
+        using Bitmap image = new(10, 10);
         control.Image = image;
         Assert.Same(image, control.Image);
         Assert.True(property.CanResetValue(control));
@@ -1825,10 +1821,10 @@ public class ButtonBaseTests
     public void ButtonBase_Image_ShouldSerializeValue_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(ButtonBase))[nameof(ButtonBase.Image)];
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.False(property.ShouldSerializeValue(control));
 
-        using var image = new Bitmap(10, 10);
+        using Bitmap image = new(10, 10);
         control.Image = image;
         Assert.Same(image, control.Image);
         Assert.True(property.ShouldSerializeValue(control));
@@ -1853,7 +1849,7 @@ public class ButtonBaseTests
     [MemberData(nameof(ImageAlign_Set_TestData))]
     public void ButtonBase_ImageAlign_Set_GetReturnsExpected(bool autoSize, ContentAlignment value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize
         };
@@ -1886,8 +1882,8 @@ public class ButtonBaseTests
     [MemberData(nameof(ImageAlign_SetWithParent_TestData))]
     public void ButtonBase_ImageAlign_SetWithParent_GetReturnsExpected(bool autoSize, ContentAlignment value, int expectedParentLayoutCallCount)
     {
-        using var parent = new Control();
-        using var control = new Button
+        using Control parent = new();
+        using Button control = new()
         {
             Parent = parent,
             AutoSize = autoSize
@@ -1944,7 +1940,7 @@ public class ButtonBaseTests
     [MemberData(nameof(ImageAlign_SetWithHandle_TestData))]
     public void ButtonBase_ImageAlign_SetWithHandle_GetReturnsExpected(bool autoSize, ContentAlignment value, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize
         };
@@ -1990,8 +1986,8 @@ public class ButtonBaseTests
     [MemberData(nameof(ImageAlign_SetWithParentWithHandle_TestData))]
     public void ButtonBase_ImageAlign_SetWithParentWithHandle_GetReturnsExpected(bool autoSize, ContentAlignment value, int expectedParentLayoutCallCount, int expectedInvalidatedCallCount)
     {
-        using var parent = new Control();
-        using var control = new Button
+        using Control parent = new();
+        using Button control = new()
         {
             Parent = parent,
             AutoSize = autoSize
@@ -2050,7 +2046,7 @@ public class ButtonBaseTests
     [InvalidEnumData<ContentAlignment>]
     public void ButtonBase_ImageAlign_SetInvalid_ThrowsInvalidEnumArgumentException(ContentAlignment value)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.Throws<InvalidEnumArgumentException>("value", () => control.ImageAlign = value);
     }
 
@@ -2060,7 +2056,7 @@ public class ButtonBaseTests
     [InlineData(1)]
     public void ButtonBase_ImageIndex_Set_GetReturnsExpected(int value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             ImageIndex = value
         };
@@ -2078,8 +2074,8 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_ImageIndex_SetWithImage_GetReturnsExpected()
     {
-        using var image = new Bitmap(10, 10);
-        using var control = new SubButtonBase
+        using Bitmap image = new(10, 10);
+        using SubButtonBase control = new()
         {
             Image = image
         };
@@ -2105,7 +2101,7 @@ public class ButtonBaseTests
     [InlineData(1)]
     public void ButtonBase_ImageIndex_SetWithImageKey_GetReturnsExpected(int value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             ImageKey = "ImageKey",
             ImageIndex = value
@@ -2127,8 +2123,8 @@ public class ButtonBaseTests
     [InlineData(1)]
     public void ButtonBase_ImageIndex_SetWithEmptyList_GetReturnsExpected(int value)
     {
-        using var imageList = new ImageList();
-        using var control = new SubButtonBase
+        using ImageList imageList = new();
+        using SubButtonBase control = new()
         {
             ImageList = imageList
         };
@@ -2152,12 +2148,12 @@ public class ButtonBaseTests
     [InlineData(2, 1)]
     public void ButtonBase_ImageIndex_SetWithNotEmptyList_GetReturnsExpected(int value, int expected)
     {
-        using var image1 = new Bitmap(10, 10);
-        using var image2 = new Bitmap(10, 10);
-        using var imageList = new ImageList();
+        using Bitmap image1 = new(10, 10);
+        using Bitmap image2 = new(10, 10);
+        using ImageList imageList = new();
         imageList.Images.Add(image1);
         imageList.Images.Add(image2);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             ImageList = imageList
         };
@@ -2180,7 +2176,7 @@ public class ButtonBaseTests
     [InlineData(1, 1, 1)]
     public void ButtonBase_ImageIndex_SetWithHandle_GetReturnsExpected(int value, int expectedInvalidatedCallCount1, int expectedInvalidatedCallCount2)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -2211,7 +2207,7 @@ public class ButtonBaseTests
     [InlineData(-2)]
     public void ButtonBase_ImageIndex_SetInvalid_ThrowsArgumentOutOfRangeException(int value)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.Throws<ArgumentOutOfRangeException>("value", () => control.ImageIndex = value);
     }
 
@@ -2219,7 +2215,7 @@ public class ButtonBaseTests
     [NormalizedStringData]
     public void ButtonBase_ImageKey_Set_GetReturnsExpected(string value, string expected)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             ImageKey = value
         };
@@ -2237,8 +2233,8 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_ImageKey_SetWithImage_GetReturnsExpected()
     {
-        using var image = new Bitmap(10, 10);
-        using var control = new SubButtonBase
+        using Bitmap image = new(10, 10);
+        using SubButtonBase control = new()
         {
             Image = image
         };
@@ -2256,7 +2252,7 @@ public class ButtonBaseTests
     [InlineData("ImageKey", "ImageKey")]
     public void ButtonBase_ImageKey_SetWithImageIndex_GetReturnsExpected(string value, string expectedImageKey)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             ImageIndex = 0,
             ImageKey = value
@@ -2276,8 +2272,8 @@ public class ButtonBaseTests
     [NormalizedStringData]
     public void ButtonBase_ImageKey_SetWithEmptyList_GetReturnsExpected(string value, string expected)
     {
-        using var imageList = new ImageList();
-        using var control = new SubButtonBase
+        using ImageList imageList = new();
+        using SubButtonBase control = new()
         {
             ImageList = imageList
         };
@@ -2303,12 +2299,12 @@ public class ButtonBaseTests
     [InlineData("NoSuchImage", "NoSuchImage")]
     public void ButtonBase_ImageKey_SetWithNotEmptyList_GetReturnsExpected(string value, string expected)
     {
-        using var image1 = new Bitmap(10, 10);
-        using var image2 = new Bitmap(10, 10);
-        using var imageList = new ImageList();
+        using Bitmap image1 = new(10, 10);
+        using Bitmap image2 = new(10, 10);
+        using ImageList imageList = new();
         imageList.Images.Add("Image1", image1);
         imageList.Images.Add("Image2", image2);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             ImageList = imageList
         };
@@ -2331,7 +2327,7 @@ public class ButtonBaseTests
     [InlineData("ImageKey", "ImageKey", 1, 1)]
     public void ButtonBase_ImageKey_SetWithHandle_GetReturnsExpected(string value, string expected, int expectedInvalidatedCallCount1, int expectedInvalidatedCallCount2)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -2368,7 +2364,7 @@ public class ButtonBaseTests
     [MemberData(nameof(ImageList_Set_TestData))]
     public void ButtonBase_ImageList_Set_GetReturnsExpected(ImageList value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             ImageList = value
         };
@@ -2386,8 +2382,8 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_ImageList_SetWithImage_GetReturnsExpected()
     {
-        using var image = new Bitmap(10, 10);
-        using var control = new SubButtonBase
+        using Bitmap image = new(10, 10);
+        using SubButtonBase control = new()
         {
             Image = image
         };
@@ -2399,7 +2395,7 @@ public class ButtonBaseTests
         Assert.False(control.IsHandleCreated);
 
         // Set different.
-        using var imageList = new ImageList();
+        using ImageList imageList = new();
         control.ImageList = imageList;
         Assert.Same(imageList, control.ImageList);
         Assert.Null(control.Image);
@@ -2410,8 +2406,8 @@ public class ButtonBaseTests
     [MemberData(nameof(ImageList_Set_TestData))]
     public void ButtonBase_ImageList_SetWithNonNullOldValue_GetReturnsExpected(ImageList value)
     {
-        using var oldValue = new ImageList();
-        using var control = new SubButtonBase
+        using ImageList oldValue = new();
+        using SubButtonBase control = new()
         {
             ImageList = oldValue
         };
@@ -2438,7 +2434,7 @@ public class ButtonBaseTests
     [MemberData(nameof(ImageList_SetWithHandle_TestData))]
     public void ButtonBase_ImageList_SetWithHandle_GetReturnsExpected(ImageList value, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -2475,8 +2471,8 @@ public class ButtonBaseTests
     [MemberData(nameof(ImageList_SetWithNonNullOldValueWithHandle_TestData))]
     public void ButtonBase_ImageList_SetWithNonNullOldValueWithHandle_GetReturnsExpected(ImageList value, int expectedInvalidatedCallCount)
     {
-        using var oldValue = new ImageList();
-        using var control = new SubButtonBase
+        using ImageList oldValue = new();
+        using SubButtonBase control = new()
         {
             ImageList = oldValue
         };
@@ -2509,8 +2505,8 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_ImageList_Set_DoesNotCreateImageHandle()
     {
-        using var control = new SubButtonBase();
-        using var imageList = new ImageList();
+        using SubButtonBase control = new();
+        using ImageList imageList = new();
         control.ImageList = imageList;
         Assert.False(imageList.HandleCreated);
         Assert.False(control.IsHandleCreated);
@@ -2519,9 +2515,9 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_ImageList_Dispose_DetachesFromButtonBase()
     {
-        using var imageList1 = new ImageList();
-        using var imageList2 = new ImageList();
-        using var control = new SubButtonBase
+        using ImageList imageList1 = new();
+        using ImageList imageList2 = new();
+        using SubButtonBase control = new()
         {
             ImageList = imageList1
         };
@@ -2541,9 +2537,9 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_ImageList_DisposeWithHandle_DetachesFromButtonBase()
     {
-        using var imageList1 = new ImageList();
-        using var imageList2 = new ImageList();
-        using var control = new SubButtonBase();
+        using ImageList imageList1 = new();
+        using ImageList imageList2 = new();
+        using SubButtonBase control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -2579,11 +2575,11 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_ImageList_RecreateHandle_Nop()
     {
-        using var imageList1 = new ImageList();
+        using ImageList imageList1 = new();
         int recreateCallCount1 = 0;
         imageList1.RecreateHandle += (sender, e) => recreateCallCount1++;
-        using var imageList2 = new ImageList();
-        using var control = new SubButtonBase
+        using ImageList imageList2 = new();
+        using SubButtonBase control = new()
         {
             ImageList = imageList1
         };
@@ -2607,11 +2603,11 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_ImageList_RecreateHandleWithHandle_Success()
     {
-        using var imageList1 = new ImageList();
+        using ImageList imageList1 = new();
         int recreateCallCount1 = 0;
         imageList1.RecreateHandle += (sender, e) => recreateCallCount1++;
-        using var imageList2 = new ImageList();
-        using var control = new SubButtonBase();
+        using ImageList imageList2 = new();
+        using SubButtonBase control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -2652,7 +2648,7 @@ public class ButtonBaseTests
     [EnumData<ImageLayout>]
     public void ButtonBase_ImeMode_Set_GetReturnsExpected(ImeMode value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             ImeMode = value
         };
@@ -2668,7 +2664,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_ImeMode_SetWithHandler_CallsImeModeChanged()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -2704,7 +2700,7 @@ public class ButtonBaseTests
     [InvalidEnumData<ImeMode>]
     public void ButtonBase_ImeMode_SetInvalid_ThrowsInvalidEnumArgumentException(ImeMode value)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.Throws<InvalidEnumArgumentException>("value", () => control.ImeMode = value);
     }
 
@@ -2721,7 +2717,7 @@ public class ButtonBaseTests
     [MemberData(nameof(IsDefault_Set_TestData))]
     public void ButtonBase_IsDefault_Set_GetReturnsExpected(FlatStyle flatStyle, bool value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             IsDefault = value
@@ -2757,7 +2753,7 @@ public class ButtonBaseTests
     [MemberData(nameof(IsDefault_SetWithHandle_TestData))]
     public void ButtonBase_IsDefault_SetWithHandle_GetReturnsExpected(FlatStyle flatStyle, bool value, int expectedInvalidatedCallCount1, int expectedStyleChangeCallCount1, int expectedInvalidatedCallCount2, int expectedStyleChangeCallCount2)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -2812,7 +2808,7 @@ public class ButtonBaseTests
     [MemberData(nameof(Parent_Set_TestData))]
     public void ButtonBase_Parent_Set_GetReturnsExpected(bool enabled, bool visible, Image image, Control value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Visible = visible,
@@ -2832,7 +2828,7 @@ public class ButtonBaseTests
     [MemberData(nameof(Parent_Set_TestData))]
     public void ButtonBase_Parent_SetDesignMode_GetReturnsExpected(bool enabled, bool visible, Image image, Control value)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -2845,7 +2841,7 @@ public class ButtonBaseTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Visible = visible,
@@ -2866,8 +2862,8 @@ public class ButtonBaseTests
     [MemberData(nameof(Parent_Set_TestData))]
     public void ButtonBase_Parent_SetWithNonNullOldParent_GetReturnsExpected(bool enabled, bool visible, Image image, Control value)
     {
-        using var oldParent = new Control();
-        using var control = new SubButtonBase
+        using Control oldParent = new();
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Visible = visible,
@@ -2890,8 +2886,8 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_Parent_SetNonNull_AddsToControls()
     {
-        using var parent = new Control();
-        using var control = new SubButtonBase
+        using Control parent = new();
+        using SubButtonBase control = new()
         {
             Parent = parent
         };
@@ -2910,7 +2906,7 @@ public class ButtonBaseTests
     [MemberData(nameof(Parent_Set_TestData))]
     public void ButtonBase_Parent_SetWithHandle_GetReturnsExpected(bool enabled, bool visible, Image image, Control value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Visible = visible,
@@ -2944,7 +2940,7 @@ public class ButtonBaseTests
     [MemberData(nameof(Parent_Set_TestData))]
     public void ButtonBase_Parent_SetDesignModeWithHandle_GetReturnsExpected(bool enabled, bool visible, Image image, Control value)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -2957,7 +2953,7 @@ public class ButtonBaseTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Visible = visible,
@@ -2991,8 +2987,8 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_Parent_SetWithHandler_CallsParentChanged()
     {
-        using var parent = new Control();
-        using var control = new SubButtonBase();
+        using Control parent = new();
+        using SubButtonBase control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -3027,7 +3023,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_Parent_SetSame_ThrowsArgumentException()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.Throws<ArgumentException>(() => control.Parent = control);
         Assert.Null(control.Parent);
     }
@@ -3046,7 +3042,7 @@ public class ButtonBaseTests
     [MemberData(nameof(Text_Set_TestData))]
     public void ButtonBase_Text_Set_GetReturnsExpected(bool autoSize, string value, string expected)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize
         };
@@ -3076,8 +3072,8 @@ public class ButtonBaseTests
     [MemberData(nameof(Text_SetWithParent_TestData))]
     public void ButtonBase_Text_SetWithParent_GetReturnsExpected(bool autoSize, string value, string expected, int expectedParentLayoutCallCount)
     {
-        using var parent = new Control();
-        using var control = new Button
+        using Control parent = new();
+        using Button control = new()
         {
             AutoSize = autoSize,
             Parent = parent
@@ -3132,7 +3128,7 @@ public class ButtonBaseTests
     [MemberData(nameof(Text_SetWithHandle_TestData))]
     public void ButtonBase_Text_SetWithHandle_GetReturnsExpected(bool autoSize, string value, string expected, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize
         };
@@ -3171,8 +3167,8 @@ public class ButtonBaseTests
     [MemberData(nameof(Text_SetWithParentWithHandle_TestData))]
     public void ButtonBase_Text_SetWithParentWithHandle_GetReturnsExpected(bool autoSize, string value, string expected, int expectedParentLayoutCallCount)
     {
-        using var parent = new Control();
-        using var control = new Button
+        using Control parent = new();
+        using Button control = new()
         {
             AutoSize = autoSize,
             Parent = parent
@@ -3229,7 +3225,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_Text_SetWithHandler_CallsTextChanged()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -3279,7 +3275,7 @@ public class ButtonBaseTests
     [MemberData(nameof(TextAlign_Set_TestData))]
     public void ButtonBase_TextAlign_Set_GetReturnsExpected(bool autoSize, FlatStyle flatStyle, ContentAlignment value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize,
             FlatStyle = flatStyle
@@ -3316,8 +3312,8 @@ public class ButtonBaseTests
     [MemberData(nameof(TextAlign_SetWithParent_TestData))]
     public void ButtonBase_TextAlign_SetWithParent_GetReturnsExpected(bool autoSize, FlatStyle flatStyle, ContentAlignment value, int expectedParentLayoutCallCount)
     {
-        using var parent = new Control();
-        using var control = new Button
+        using Control parent = new();
+        using Button control = new()
         {
             AutoSize = autoSize,
             FlatStyle = flatStyle,
@@ -3378,7 +3374,7 @@ public class ButtonBaseTests
     [MemberData(nameof(TextAlign_SetWithHandle_TestData))]
     public void ButtonBase_TextAlign_SetWithHandle_GetReturnsExpected(bool autoSize, FlatStyle flatStyle, ContentAlignment value, int expectedInvalidatedCallCount, int expectedStyleChangedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize,
             FlatStyle = flatStyle
@@ -3432,8 +3428,8 @@ public class ButtonBaseTests
     [MemberData(nameof(TextAlign_SetWithParentWithHandle_TestData))]
     public void ButtonBase_TextAlign_SetWithParentWithHandle_GetReturnsExpected(bool autoSize, FlatStyle flatStyle, ContentAlignment value, int expectedParentLayoutCallCount, int expectedInvalidatedCallCount, int expectedStyleChangedCallCount)
     {
-        using var parent = new Control();
-        using var control = new Button
+        using Control parent = new();
+        using Button control = new()
         {
             AutoSize = autoSize,
             FlatStyle = flatStyle,
@@ -3493,7 +3489,7 @@ public class ButtonBaseTests
     [InvalidEnumData<ContentAlignment>]
     public void ButtonBase_TextAlign_SetInvalidValue_ThrowsInvalidEnumArgumentException(ContentAlignment value)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.Throws<InvalidEnumArgumentException>("value", () => control.TextAlign = value);
     }
 
@@ -3512,7 +3508,7 @@ public class ButtonBaseTests
     [MemberData(nameof(TextImageRelation_Set_TestData))]
     public void ButtonBase_TextImageRelation_Set_GetReturnsExpected(bool autoSize, TextImageRelation value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize
         };
@@ -3550,8 +3546,8 @@ public class ButtonBaseTests
     [MemberData(nameof(TextImageRelation_SetWithParent_TestData))]
     public void ButtonBase_TextImageRelation_SetWithParent_GetReturnsExpected(bool autoSize, TextImageRelation value, int expectedParentLayoutCallCount)
     {
-        using var parent = new Control();
-        using var control = new Button
+        using Control parent = new();
+        using Button control = new()
         {
             Parent = parent,
             AutoSize = autoSize
@@ -3608,7 +3604,7 @@ public class ButtonBaseTests
     [MemberData(nameof(TextImageRelation_SetWithHandle_TestData))]
     public void ButtonBase_TextImageRelation_SetWithHandle_GetReturnsExpected(bool autoSize, TextImageRelation value, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize
         };
@@ -3659,8 +3655,8 @@ public class ButtonBaseTests
     [MemberData(nameof(TextImageRelation_SetWithParentWithHandle_TestData))]
     public void ButtonBase_TextImageRelation_SetWithParentWithHandle_GetReturnsExpected(bool autoSize, TextImageRelation value, int expectedParentLayoutCallCount, int expectedInvalidatedCallCount)
     {
-        using var parent = new Control();
-        using var control = new Button
+        using Control parent = new();
+        using Button control = new()
         {
             Parent = parent,
             AutoSize = autoSize
@@ -3723,7 +3719,7 @@ public class ButtonBaseTests
     [InlineData((TextImageRelation)7)]
     public void ButtonBase_TextImageRelation_SetInvalid_ThrowsInvalidEnumArgumentException(TextImageRelation value)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.Throws<InvalidEnumArgumentException>("value", () => control.TextImageRelation = value);
     }
 
@@ -3734,7 +3730,7 @@ public class ButtonBaseTests
     [InlineData(false, false)]
     public void ButtonBase_UseCompatibleTextRendering_Set_GetReturnsExpected(bool autoSize, bool value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize,
             UseCompatibleTextRendering = value
@@ -3760,8 +3756,8 @@ public class ButtonBaseTests
     [InlineData(false, false, 0, 0)]
     public void ButtonBase_UseCompatibleTextRendering_SetWithParent_GetReturnsExpected(bool autoSize, bool value, int expectedParentLayoutCallCount1, int expectedParentLayoutCallCount2)
     {
-        using var parent = new Control();
-        using var control = new Button
+        using Control parent = new();
+        using Button control = new()
         {
             AutoSize = autoSize,
             Parent = parent
@@ -3814,7 +3810,7 @@ public class ButtonBaseTests
     [InlineData(false, false, 1)]
     public void ButtonBase_UseCompatibleTextRendering_SetWithHandle_GetReturnsExpected(bool autoSize, bool value, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize
         };
@@ -3857,8 +3853,8 @@ public class ButtonBaseTests
     [InlineData(false, false, 1, 0, 2, 0)]
     public void ButtonBase_UseCompatibleTextRendering_SetWithParentWithHandle_GetReturnsExpected(bool autoSize, bool value, int expectedInvalidatedCallCount1, int expectedParentLayoutCallCount1, int expectedInvalidatedCallCount2, int expectedParentLayoutCallCount2)
     {
-        using var parent = new Control();
-        using var control = new Button
+        using Control parent = new();
+        using Button control = new()
         {
             AutoSize = autoSize,
             Parent = parent
@@ -3933,7 +3929,7 @@ public class ButtonBaseTests
     [MemberData(nameof(UseMnemonic_Set_TestData))]
     public void ButtonBase_UseMnemonic_Set_GetReturnsExpected(bool autoSize, bool value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize
         };
@@ -3970,8 +3966,8 @@ public class ButtonBaseTests
     [MemberData(nameof(UseMnemonic_SetWithParent_TestData))]
     public void ButtonBase_UseMnemonic_SetWithParent_GetReturnsExpected(bool autoSize, bool value, int expectedParentLayoutCallCount1, int expectedParentLayoutCallCount2)
     {
-        using var parent = new Control();
-        using var control = new Button
+        using Control parent = new();
+        using Button control = new()
         {
             Parent = parent,
             AutoSize = autoSize
@@ -4033,7 +4029,7 @@ public class ButtonBaseTests
     [MemberData(nameof(UseMnemonic_SetWithHandle_TestData))]
     public void ButtonBase_UseMnemonic_SetWithHandle_GetReturnsExpected(bool autoSize, bool value, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize
         };
@@ -4086,8 +4082,8 @@ public class ButtonBaseTests
     [MemberData(nameof(UseMnemonic_SetWithParentWithHandle_TestData))]
     public void ButtonBase_UseMnemonic_SetWithParentWithHandle_GetReturnsExpected(bool autoSize, bool value, int expectedParentLayoutCallCount1, int expectedParentLayoutCallCount2, int expectedInvalidatedCallCount1, int expectedInvalidatedCallCount2)
     {
-        using var parent = new Control();
-        using var control = new Button
+        using Control parent = new();
+        using Button control = new()
         {
             Parent = parent,
             AutoSize = autoSize
@@ -4157,7 +4153,7 @@ public class ButtonBaseTests
     [BoolData]
     public void ButtonBase_UseVisualStyleBackColor_Set_GetReturnsExpected(bool value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             UseVisualStyleBackColor = value
         };
@@ -4179,7 +4175,7 @@ public class ButtonBaseTests
     [BoolData]
     public void ButtonBase_UseVisualStyleBackColor_SetWithCustomOldValue_GetReturnsExpected(bool value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             UseVisualStyleBackColor = true
         };
@@ -4204,7 +4200,7 @@ public class ButtonBaseTests
     [InlineData(false, 1)]
     public void ButtonBase_UseVisualStyleBackColor_SetWithHandle_GetReturnsExpected(bool value, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -4242,7 +4238,7 @@ public class ButtonBaseTests
     [InlineData(false, 1)]
     public void ButtonBase_UseVisualStyleBackColor_SetWithCustomOldValueWithHandle_GetReturnsExpected(bool value, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             UseVisualStyleBackColor = true
         };
@@ -4282,7 +4278,7 @@ public class ButtonBaseTests
     public void ButtonBase_UseVisualStyleBackColor_ResetValue_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(ButtonBase))[nameof(ButtonBase.UseVisualStyleBackColor)];
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.False(property.CanResetValue(control));
 
         control.UseVisualStyleBackColor = false;
@@ -4300,7 +4296,7 @@ public class ButtonBaseTests
     public void ButtonBase_UseVisualStyleBackColor_ResetValueWithHandle_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(ButtonBase))[nameof(ButtonBase.UseVisualStyleBackColor)];
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.False(property.CanResetValue(control));
 
         control.UseVisualStyleBackColor = false;
@@ -4327,7 +4323,7 @@ public class ButtonBaseTests
     public void ButtonBase_UseVisualStyleBackColor_ShouldSerializeValue_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(ButtonBase))[nameof(ButtonBase.UseVisualStyleBackColor)];
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.False(property.ShouldSerializeValue(control));
 
         control.UseVisualStyleBackColor = false;
@@ -4355,7 +4351,7 @@ public class ButtonBaseTests
     [MemberData(nameof(Visible_Set_TestData))]
     public void ButtonBase_Visible_Set_GetReturnsExpected(bool enabled, Image image, bool value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Image = image,
@@ -4379,7 +4375,7 @@ public class ButtonBaseTests
     [MemberData(nameof(Visible_Set_TestData))]
     public void ButtonBase_Visible_SetDesignMode_GetReturnsExpected(bool enabled, Image image, bool value)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -4392,7 +4388,7 @@ public class ButtonBaseTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Image = image,
@@ -4429,7 +4425,7 @@ public class ButtonBaseTests
     [MemberData(nameof(Visible_SetWithHandle_TestData))]
     public void ButtonBase_Visible_SetWithHandle_GetReturnsExpected(bool enabled, Image image, bool value)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Image = image
@@ -4470,7 +4466,7 @@ public class ButtonBaseTests
     [MemberData(nameof(Visible_SetWithHandle_TestData))]
     public void ButtonBase_Visible_SetDesignModeWithHandle_GetReturnsExpected(bool enabled, Image image, bool value)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -4483,7 +4479,7 @@ public class ButtonBaseTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Image = image,
@@ -4524,7 +4520,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_Visible_SetWithHandler_CallsVisibleChanged()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -4558,7 +4554,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_Dispose_Invoke_Success()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         int callCount = 0;
         void handler(object sender, EventArgs e)
         {
@@ -4606,8 +4602,8 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_Dispose_InvokeWithImageList_Success()
     {
-        using var imageList = new ImageList();
-        using var control = new SubButtonBase
+        using ImageList imageList = new();
+        using SubButtonBase control = new()
         {
             ImageList = imageList
         };
@@ -4662,7 +4658,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_Dispose_InvokeWithToolTip_Success()
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoEllipsis = true
         };
@@ -4713,7 +4709,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_Dispose_InvokeDisposing_Success()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         int callCount = 0;
         void handler(object sender, EventArgs e)
         {
@@ -4761,8 +4757,8 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_Dispose_InvokeDisposingWithImageList_Success()
     {
-        using var imageList = new ImageList();
-        using var control = new SubButtonBase
+        using ImageList imageList = new();
+        using SubButtonBase control = new()
         {
             ImageList = imageList
         };
@@ -4817,7 +4813,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_Dispose_InvokeDisposingWithToolTip_Success()
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoEllipsis = true
         };
@@ -4868,7 +4864,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_Dispose_InvokeNotDisposing_Success()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         int callCount = 0;
         void handler(object sender, EventArgs e) => callCount++;
         control.Disposed += handler;
@@ -4905,8 +4901,8 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_Dispose_InvokeNotDisposingWithImageList_Success()
     {
-        using var imageList = new ImageList();
-        using var control = new SubButtonBase
+        using ImageList imageList = new();
+        using SubButtonBase control = new()
         {
             ImageList = imageList
         };
@@ -4950,7 +4946,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_Dispose_InvokeNotDisposingWithToolTip_Success()
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoEllipsis = true
         };
@@ -4990,7 +4986,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_GetAutoSizeMode_Invoke_ReturnsExpected()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.Equal(AutoSizeMode.GrowOnly, control.GetAutoSizeMode());
     }
 
@@ -5015,7 +5011,7 @@ public class ButtonBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubButtonBase
+            using SubButtonBase control = new()
             {
                 FlatStyle = flatStyle
             };
@@ -5034,7 +5030,7 @@ public class ButtonBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubButtonBase
+            using SubButtonBase control = new()
             {
                 FlatStyle = flatStyle
             };
@@ -5084,7 +5080,7 @@ public class ButtonBaseTests
     [InlineData((ControlStyles)(-1), false)]
     public void ButtonBase_GetStyle_Invoke_ReturnsExpected(ControlStyles flag, bool expected)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.Equal(expected, control.GetStyle(flag));
 
         // Call again to test caching.
@@ -5094,7 +5090,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_GetTopLevel_Invoke_ReturnsExpected()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.False(control.GetTopLevel());
     }
 
@@ -5117,7 +5113,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnEnabledChanged_TestData))]
     public void ButtonBase_OnEnabledChanged_Invoke_CallsEnabledChanged(bool enabled, bool visible, Image image, EventArgs eventArgs)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Visible = visible,
@@ -5148,7 +5144,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnEnabledChanged_TestData))]
     public void ButtonBase_OnEnabledChanged_InvokeDesignMode_CallsEnabledChanged(bool enabled, bool visible, Image image, EventArgs eventArgs)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -5161,7 +5157,7 @@ public class ButtonBaseTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Visible = visible,
@@ -5208,7 +5204,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnEnabledChanged_WithHandle_TestData))]
     public void ButtonBase_OnEnabledChanged_InvokeWithHandle_CallsEnabledChanged(bool enabled, bool visible, Image image, EventArgs eventArgs, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Visible = visible,
@@ -5252,7 +5248,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnEnabledChanged_WithHandle_TestData))]
     public void ButtonBase_OnEnabledChanged_InvokeDesignModeWithHandle_CallsEnabledChanged(bool enabled, bool visible, Image image, EventArgs eventArgs, int expectedInvalidatedCallCount)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -5265,7 +5261,7 @@ public class ButtonBaseTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Visible = visible,
@@ -5310,7 +5306,7 @@ public class ButtonBaseTests
     [NewAndDefaultData<EventArgs>]
     public void ButtonBase_OnGotFocus_Invoke_CallsGotFocus(EventArgs eventArgs)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -5336,7 +5332,7 @@ public class ButtonBaseTests
     [NewAndDefaultData<EventArgs>]
     public void ButtonBase_OnGotFocus_InvokeWithHandle_CallsGotFocus(EventArgs eventArgs)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -5375,7 +5371,7 @@ public class ButtonBaseTests
     [NewAndDefaultData<EventArgs>]
     public void ButtonBase_OnHandleCreated_Invoke_CallsHandleCreated(EventArgs eventArgs)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -5401,7 +5397,7 @@ public class ButtonBaseTests
     [NewAndDefaultData<EventArgs>]
     public void ButtonBase_OnHandleCreated_InvokeWithHandle_CallsHandleCreated(EventArgs eventArgs)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
@@ -5428,7 +5424,7 @@ public class ButtonBaseTests
     [NewAndDefaultData<EventArgs>]
     public void ButtonBase_OnHandleDestroyed_Invoke_CallsHandleDestroyed(EventArgs eventArgs)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -5454,7 +5450,7 @@ public class ButtonBaseTests
     [NewAndDefaultData<EventArgs>]
     public void ButtonBase_OnHandleDestroyed_InvokeWithHandle_CallsHandleDestroyed(EventArgs eventArgs)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
@@ -5495,7 +5491,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnKeyDown_TestData))]
     public void ButtonBase_OnKeyDown_Invoke_CallsKeyDown(FlatStyle flatStyle, bool enabled, KeyEventArgs eventArgs, bool expectedHandled, bool expectedIsHandleCreated)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled
@@ -5540,7 +5536,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnKeyDown_MouseDown_TestData))]
     public void ButtonBase_OnKeyDown_InvokeMouseDown_CallsKeyDown(FlatStyle flatStyle, bool enabled, KeyEventArgs eventArgs, bool expectedHandled)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled
@@ -5586,7 +5582,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnKeyDown_WithHandle_TestData))]
     public void ButtonBase_OnKeyDown_InvokeWithHandle_CallsKeyDown(FlatStyle flatStyle, bool enabled, KeyEventArgs eventArgs, bool expectedHandled, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled
@@ -5644,7 +5640,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnKeyDown_MouseDownWithHandle_TestData))]
     public void ButtonBase_OnKeyDown_InvokeMouseDownWithHandle_CallsKeyDown(FlatStyle flatStyle, bool enabled, KeyEventArgs eventArgs, bool expectedHandled)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled
@@ -5701,7 +5697,7 @@ public class ButtonBaseTests
     [InlineData(FlatStyle.System, Keys.Space, 0)]
     public void ButtonBase_OnKeyDown_GetState_ReturnsExpected(FlatStyle flatStyle, Keys key, int expected)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -5725,7 +5721,7 @@ public class ButtonBaseTests
     [InlineData(FlatStyle.System, Keys.Space, 0)]
     public void ButtonBase_OnKeyDown_MouseDownGetState_ReturnsExpected(FlatStyle flatStyle, Keys key, int expected)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -5738,7 +5734,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_OnKeyDown_NullE_ThrowsNullReferenceException()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.Throws<NullReferenceException>(() => control.OnKeyDown(null));
     }
 
@@ -5760,7 +5756,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnKeyUp_TestData))]
     public void ButtonBase_OnKeyUp_Invoke_CallsKeyUp(FlatStyle flatStyle, bool enabled, KeyEventArgs eventArgs)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled
@@ -5809,7 +5805,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnKeyUp_MouseDown_TestData))]
     public void ButtonBase_OnKeyUp_InvokeMouseDown_CallsKeyUp(FlatStyle flatStyle, bool enabled, KeyEventArgs eventArgs, int expectedClickCallCount, bool expectedIsHandleCreated)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled
@@ -5851,7 +5847,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnKeyUp_TestData))]
     public void ButtonBase_OnKeyUp_InvokeWithHandle_CallsKeyUp(FlatStyle flatStyle, bool enabled, KeyEventArgs eventArgs)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled
@@ -5914,7 +5910,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnKeyUp_MouseDownWithHandle_TestData))]
     public void ButtonBase_OnKeyUp_InvokeMouseDownWithHandle_CallsKeyUp(FlatStyle flatStyle, bool enabled, KeyEventArgs eventArgs, int expectedClickCallCount, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled
@@ -5980,7 +5976,7 @@ public class ButtonBaseTests
     [InlineData(FlatStyle.System, Keys.Space, 0)]
     public void ButtonBase_OnKeyUp_GetState_ReturnsExpected(FlatStyle flatStyle, Keys key, int expected)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -6004,7 +6000,7 @@ public class ButtonBaseTests
     [InlineData(FlatStyle.System, Keys.Space, 0)]
     public void ButtonBase_OnKeyUp_MouseDownGetState_ReturnsExpected(FlatStyle flatStyle, Keys key, int expected)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -6017,7 +6013,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_OnKeyUp_NullE_ThrowsNullReferenceException()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         control.OnMouseDown(new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
         Assert.Throws<NullReferenceException>(() => control.OnKeyUp(null));
     }
@@ -6026,7 +6022,7 @@ public class ButtonBaseTests
     [NewAndDefaultData<EventArgs>]
     public void ButtonBase_OnLostFocus_Invoke_CallsLostFocus(EventArgs eventArgs)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -6054,7 +6050,7 @@ public class ButtonBaseTests
     [NewAndDefaultData<EventArgs>]
     public void ButtonBase_OnLostFocus_InvokeWithHandle_CallsLostFocus(EventArgs eventArgs)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -6114,7 +6110,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnMouseDown_TestData))]
     public void ButtonBase_OnMouseDown_Invoke_CallsMouseDown(FlatStyle flatStyle, bool enabled, MouseEventArgs eventArgs)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled
@@ -6163,7 +6159,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnMouseDown_WithHandle_TestData))]
     public void ButtonBase_OnMouseDown_InvokeWithHandle_CallsMouseDown(FlatStyle flatStyle, bool enabled, MouseEventArgs eventArgs, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled
@@ -6205,7 +6201,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_OnMouseDown_NullE_ThrowsNullReferenceException()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.Throws<NullReferenceException>(() => control.OnMouseDown(null));
     }
 
@@ -6231,7 +6227,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnMouseEnter_TestData))]
     public void ButtonBase_OnMouseEnter_Invoke_CallsMouseEnter(FlatStyle flatStyle, bool enabled, bool autoEllipsis, string text, EventArgs eventArgs)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled,
@@ -6263,7 +6259,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnMouseEnter_TestData))]
     public void ButtonBase_OnMouseEnter_InvokeDesignMode_CallsMouseEnter(FlatStyle flatStyle, bool enabled, bool autoEllipsis, string text, EventArgs eventArgs)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -6276,7 +6272,7 @@ public class ButtonBaseTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled,
@@ -6309,7 +6305,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnMouseEnter_TestData))]
     public void ButtonBase_OnMouseEnter_InvokeWithHandle_CallsMouseEnter(FlatStyle flatStyle, bool enabled, bool autoEllipsis, string text, EventArgs eventArgs)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled,
@@ -6354,7 +6350,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnMouseEnter_TestData))]
     public void ButtonBase_OnMouseEnter_InvokeDesignModeWithHandle_CallsMouseEnter(FlatStyle flatStyle, bool enabled, bool autoEllipsis, string text, EventArgs eventArgs)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -6367,7 +6363,7 @@ public class ButtonBaseTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled,
@@ -6431,7 +6427,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnMouseLeave_TestData))]
     public void ButtonBase_OnMouseLeave_Invoke_CallsMouseLeave(FlatStyle flatStyle, bool enabled, bool autoEllipsis, string text, EventArgs eventArgs)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled,
@@ -6463,7 +6459,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnMouseLeave_TestData))]
     public void ButtonBase_OnMouseLeave_InvokeWithHandle_CallsMouseLeave(FlatStyle flatStyle, bool enabled, bool autoEllipsis, string text, EventArgs eventArgs)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled,
@@ -6529,7 +6525,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnMouseMove_TestData))]
     public void ButtonBase_OnMouseMove_Invoke_CallsMouseMove(FlatStyle flatStyle, bool enabled, MouseEventArgs eventArgs)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled
@@ -6559,7 +6555,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnMouseMove_TestData))]
     public void ButtonBase_OnMouseMove_InvokeMousePressed_CallsMouseMove(FlatStyle flatStyle, bool enabled, MouseEventArgs eventArgs)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled
@@ -6590,7 +6586,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnMouseMove_TestData))]
     public void ButtonBase_OnMouseMove_InvokeMousePressedLeave_CallsMouseMove(FlatStyle flatStyle, bool enabled, MouseEventArgs eventArgs)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled
@@ -6643,7 +6639,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnMouseMove_WithHandle_TestData))]
     public void ButtonBase_OnMouseMove_InvokeWithHandle_CallsMouseMove(FlatStyle flatStyle, bool enabled, MouseEventArgs eventArgs, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled
@@ -6709,7 +6705,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnMouseMove_MousePressedWithHandle_TestData))]
     public void ButtonBase_OnMouseMove_InvokeMousePressedWithHandle_CallsMouseMove(FlatStyle flatStyle, bool enabled, MouseEventArgs eventArgs, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled
@@ -6776,7 +6772,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnMouseMove_MousePressedLeaveWithHandle_TestData))]
     public void ButtonBase_OnMouseMove_InvokeMousePressedLeaveWithHandle_CallsMouseMove(FlatStyle flatStyle, bool enabled, MouseEventArgs eventArgs, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle,
             Enabled = enabled
@@ -6820,7 +6816,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_OnMouseMove_NullE_ThrowsNullReferenceException()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.Throws<NullReferenceException>(() => control.OnMouseMove(null));
     }
 
@@ -6844,7 +6840,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnMouseUp_TestData))]
     public void ButtonBase_OnMouseUp_Invoke_CallsMouseUp(FlatStyle flatStyle, MouseEventArgs eventArgs)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -6881,7 +6877,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnMouseUp_TestData))]
     public void ButtonBase_OnMouseUp_InvokeWithHandle_CallsMouseUp(FlatStyle flatStyle, MouseEventArgs eventArgs)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -6946,7 +6942,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnParentChanged_TestData))]
     public void ButtonBase_OnParentChanged_Invoke_CallsParentChanged(bool enabled, bool visible, Image image, EventArgs eventArgs)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Visible = visible,
@@ -6977,7 +6973,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnParentChanged_TestData))]
     public void ButtonBase_OnParentChanged_InvokeDesignMode_CallsParentChanged(bool enabled, bool visible, Image image, EventArgs eventArgs)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -6990,7 +6986,7 @@ public class ButtonBaseTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Visible = visible,
@@ -7037,7 +7033,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnParentChanged_WithHandle_TestData))]
     public void ButtonBase_OnParentChanged_InvokeWithHandle_CallsParentChanged(bool enabled, bool visible, Image image, EventArgs eventArgs)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Visible = visible,
@@ -7081,7 +7077,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnParentChanged_WithHandle_TestData))]
     public void ButtonBase_OnParentChanged_InvokeDesignModeWithHandle_CallsParentChanged(bool enabled, bool visible, Image image, EventArgs eventArgs)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -7094,7 +7090,7 @@ public class ButtonBaseTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Visible = visible,
@@ -7148,7 +7144,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnTextChanged_TestData))]
     public void ButtonBase_OnTextChanged_Invoke_CallsTextChanged(bool autoSize, EventArgs eventArgs)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize
         };
@@ -7189,8 +7185,8 @@ public class ButtonBaseTests
     [MemberData(nameof(OnTextChanged_WithParent_TestData))]
     public void ButtonBase_OnTextChanged_InvokeWithParent_CallsTextChanged(bool autoSize, EventArgs eventArgs, int expectedParentLayoutCallCount)
     {
-        using var parent = new Control();
-        using var control = new SubButton
+        using Control parent = new();
+        using SubButton control = new()
         {
             AutoSize = autoSize,
             Parent = parent
@@ -7245,7 +7241,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnTextChanged_TestData))]
     public void ButtonBase_OnTextChanged_InvokeWithHandle_CallsTextChanged(bool autoSize, EventArgs eventArgs)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             AutoSize = autoSize
         };
@@ -7291,8 +7287,8 @@ public class ButtonBaseTests
     [MemberData(nameof(OnTextChanged_WithParent_TestData))]
     public void ButtonBase_OnTextChanged_InvokeWithParentWithHandle_CallsTextChanged(bool autoSize, EventArgs eventArgs, int expectedParentLayoutCallCount)
     {
-        using var parent = new Control();
-        using var control = new SubButton
+        using Control parent = new();
+        using SubButton control = new()
         {
             AutoSize = autoSize,
             Parent = parent
@@ -7376,7 +7372,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnVisibleChanged_TestData))]
     public void ButtonBase_OnVisibleChanged_Invoke_CallsVisibleChanged(bool enabled, bool visible, Image image, EventArgs eventArgs)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Visible = visible,
@@ -7407,7 +7403,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnVisibleChanged_TestData))]
     public void ButtonBase_OnVisibleChanged_InvokeDesignMode_CallsVisibleChanged(bool enabled, bool visible, Image image, EventArgs eventArgs)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -7420,7 +7416,7 @@ public class ButtonBaseTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Visible = visible,
@@ -7467,7 +7463,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnVisibleChanged_WithHandle_TestData))]
     public void ButtonBase_OnVisibleChanged_InvokeWithHandle_CallsVisibleChanged(bool enabled, bool visible, Image image, EventArgs eventArgs)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Visible = visible,
@@ -7511,7 +7507,7 @@ public class ButtonBaseTests
     [MemberData(nameof(OnVisibleChanged_WithHandle_TestData))]
     public void ButtonBase_OnVisibleChanged_InvokeDesignModeWithHandle_CallsVisibleChanged(bool enabled, bool visible, Image image, EventArgs eventArgs)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -7524,7 +7520,7 @@ public class ButtonBaseTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = enabled,
             Visible = visible,
@@ -7568,7 +7564,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_ResetFlagsandPaint_Invoke_Success()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         control.ResetFlagsandPaint();
         Assert.False(control.IsHandleCreated);
 
@@ -7580,7 +7576,7 @@ public class ButtonBaseTests
     [WinFormsFact]
     public void ButtonBase_ResetFlagsandPaint_InvokeWithHandle_Success()
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -7609,13 +7605,13 @@ public class ButtonBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubButtonBase
+            using SubButtonBase control = new()
             {
                 FlatStyle = flatStyle
             };
             int callCount = 0;
             control.LostFocus += (sender, e) => callCount++;
-            var m = new Message
+            Message m = new()
             {
                 Msg = (int)PInvoke.WM_CANCELMODE,
                 Result = (IntPtr)250
@@ -7639,14 +7635,14 @@ public class ButtonBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubButtonBase
+            using SubButtonBase control = new()
             {
                 FlatStyle = flatStyle
             };
             control.OnMouseDown(new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
             int callCount = 0;
             control.LostFocus += (sender, e) => callCount++;
-            var m = new Message
+            Message m = new()
             {
                 Msg = (int)PInvoke.WM_CANCELMODE,
                 Result = (IntPtr)250
@@ -7670,7 +7666,7 @@ public class ButtonBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubButtonBase
+            using SubButtonBase control = new()
             {
                 FlatStyle = flatStyle
             };
@@ -7678,7 +7674,7 @@ public class ButtonBaseTests
             control.OnLostFocus(new EventArgs());
             int callCount = 0;
             control.LostFocus += (sender, e) => callCount++;
-            var m = new Message
+            Message m = new()
             {
                 Msg = (int)PInvoke.WM_CANCELMODE,
                 Result = (IntPtr)250
@@ -7702,13 +7698,13 @@ public class ButtonBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubButtonBase
+            using SubButtonBase control = new()
             {
                 FlatStyle = flatStyle
             };
             control.OnMouseDown(new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
 
-            var buttonM = new Message
+            Message buttonM = new()
             {
                 Msg = (int)PInvoke.WM_LBUTTONUP
             };
@@ -7717,7 +7713,7 @@ public class ButtonBaseTests
             {
                 int callCount = 0;
                 control.LostFocus += (sender, e) => callCount++;
-                var m = new Message
+                Message m = new()
                 {
                     Msg = (int)PInvoke.WM_CANCELMODE,
                     Result = (IntPtr)250
@@ -7744,7 +7740,7 @@ public class ButtonBaseTests
     [EnumData<FlatStyle>]
     public void ButtonBase_WndProc_InvokeCancelModeWithHandle_Success(FlatStyle flatStyle)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -7758,7 +7754,7 @@ public class ButtonBaseTests
 
         int callCount = 0;
         control.LostFocus += (sender, e) => callCount++;
-        var m = new Message
+        Message m = new()
         {
             Msg = (int)PInvoke.WM_CANCELMODE,
             Result = (IntPtr)250
@@ -7788,7 +7784,7 @@ public class ButtonBaseTests
     [InlineData(FlatStyle.System, 0)]
     public void ButtonBase_WndProc_InvokeCancelModeMousePressedWithHandle_Success(FlatStyle flatStyle, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -7803,7 +7799,7 @@ public class ButtonBaseTests
 
         int callCount = 0;
         control.LostFocus += (sender, e) => callCount++;
-        var m = new Message
+        Message m = new()
         {
             Msg = (int)PInvoke.WM_CANCELMODE,
             Result = (IntPtr)250
@@ -7830,7 +7826,7 @@ public class ButtonBaseTests
     [EnumData<FlatStyle>]
     public void ButtonBase_WndProc_InvokeCancelModeMousePressedLostFocusWithHandle_Success(FlatStyle flatStyle)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -7846,7 +7842,7 @@ public class ButtonBaseTests
 
         int callCount = 0;
         control.LostFocus += (sender, e) => callCount++;
-        var m = new Message
+        Message m = new()
         {
             Msg = (int)PInvoke.WM_CANCELMODE,
             Result = (IntPtr)250
@@ -7873,7 +7869,7 @@ public class ButtonBaseTests
     [EnumData<FlatStyle>]
     public void ButtonBase_WndProc_InvokeCancelModeMousePressedInButtonUpWithHandle_Success(FlatStyle flatStyle)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -7886,7 +7882,7 @@ public class ButtonBaseTests
         int createdCallCount = 0;
         control.HandleCreated += (sender, e) => createdCallCount++;
 
-        var buttonM = new Message
+        Message buttonM = new()
         {
             Msg = (int)PInvoke.WM_LBUTTONUP
         };
@@ -7895,7 +7891,7 @@ public class ButtonBaseTests
         {
             int callCount = 0;
             control.LostFocus += (sender, e) => callCount++;
-            var m = new Message
+            Message m = new()
             {
                 Msg = (int)PInvoke.WM_CANCELMODE,
                 Result = (IntPtr)250
@@ -7929,7 +7925,7 @@ public class ButtonBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubButtonBase
+            using SubButtonBase control = new()
             {
                 FlatStyle = flatStyle
             };
@@ -7940,7 +7936,7 @@ public class ButtonBaseTests
                 Assert.Same(EventArgs.Empty, e);
                 callCount++;
             };
-            var m = new Message
+            Message m = new()
             {
                 Msg = (int)PInvoke.WM_CAPTURECHANGED,
                 Result = (IntPtr)250
@@ -7964,7 +7960,7 @@ public class ButtonBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubButtonBase
+            using SubButtonBase control = new()
             {
                 FlatStyle = flatStyle
             };
@@ -7976,7 +7972,7 @@ public class ButtonBaseTests
                 Assert.Same(EventArgs.Empty, e);
                 callCount++;
             };
-            var m = new Message
+            Message m = new()
             {
                 Msg = (int)PInvoke.WM_CAPTURECHANGED,
                 Result = (IntPtr)250
@@ -8000,7 +7996,7 @@ public class ButtonBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubButtonBase
+            using SubButtonBase control = new()
             {
                 FlatStyle = flatStyle
             };
@@ -8013,7 +8009,7 @@ public class ButtonBaseTests
                 Assert.Same(EventArgs.Empty, e);
                 callCount++;
             };
-            var m = new Message
+            Message m = new()
             {
                 Msg = (int)PInvoke.WM_CAPTURECHANGED,
                 Result = (IntPtr)250
@@ -8037,13 +8033,13 @@ public class ButtonBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubButtonBase
+            using SubButtonBase control = new()
             {
                 FlatStyle = flatStyle
             };
             control.OnMouseDown(new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
 
-            var buttonM = new Message
+            Message buttonM = new()
             {
                 Msg = (int)PInvoke.WM_LBUTTONUP
             };
@@ -8057,7 +8053,7 @@ public class ButtonBaseTests
                     Assert.Same(EventArgs.Empty, e);
                     callCount++;
                 };
-                var m = new Message
+                Message m = new()
                 {
                     Msg = (int)PInvoke.WM_CAPTURECHANGED,
                     Result = (IntPtr)250
@@ -8084,7 +8080,7 @@ public class ButtonBaseTests
     [EnumData<FlatStyle>]
     public void ButtonBase_WndProc_InvokeCaptureChangedWithHandle_Success(FlatStyle flatStyle)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -8103,7 +8099,7 @@ public class ButtonBaseTests
             Assert.Same(EventArgs.Empty, e);
             callCount++;
         };
-        var m = new Message
+        Message m = new()
         {
             Msg = (int)PInvoke.WM_CAPTURECHANGED,
             Result = (IntPtr)250
@@ -8133,7 +8129,7 @@ public class ButtonBaseTests
     [InlineData(FlatStyle.System, 0)]
     public void ButtonBase_WndProc_InvokeCaptureChangedMousePressedWithHandle_Success(FlatStyle flatStyle, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -8153,7 +8149,7 @@ public class ButtonBaseTests
             Assert.Same(EventArgs.Empty, e);
             callCount++;
         };
-        var m = new Message
+        Message m = new()
         {
             Msg = (int)PInvoke.WM_CAPTURECHANGED,
             Result = (IntPtr)250
@@ -8180,7 +8176,7 @@ public class ButtonBaseTests
     [EnumData<FlatStyle>]
     public void ButtonBase_WndProc_InvokeCaptureChangedMousePressedLostFocusWithHandle_Success(FlatStyle flatStyle)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -8201,7 +8197,7 @@ public class ButtonBaseTests
             Assert.Same(EventArgs.Empty, e);
             callCount++;
         };
-        var m = new Message
+        Message m = new()
         {
             Msg = (int)PInvoke.WM_CAPTURECHANGED,
             Result = (IntPtr)250
@@ -8228,7 +8224,7 @@ public class ButtonBaseTests
     [EnumData<FlatStyle>]
     public void ButtonBase_WndProc_InvokeCaptureChangedMousePressedInButtonUpWithHandle_Success(FlatStyle flatStyle)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -8241,7 +8237,7 @@ public class ButtonBaseTests
         int createdCallCount = 0;
         control.HandleCreated += (sender, e) => createdCallCount++;
 
-        var buttonM = new Message
+        Message buttonM = new()
         {
             Msg = (int)PInvoke.WM_LBUTTONUP
         };
@@ -8255,7 +8251,7 @@ public class ButtonBaseTests
                 Assert.Same(EventArgs.Empty, e);
                 callCount++;
             };
-            var m = new Message
+            Message m = new()
             {
                 Msg = (int)PInvoke.WM_CAPTURECHANGED,
                 Result = (IntPtr)250
@@ -8434,7 +8430,7 @@ public class ButtonBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubButtonBase
+            using SubButtonBase control = new()
             {
                 FlatStyle = flatStyle
             };
@@ -8445,7 +8441,7 @@ public class ButtonBaseTests
                 Assert.Same(EventArgs.Empty, e);
                 callCount++;
             };
-            var m = new Message
+            Message m = new()
             {
                 Msg = (int)PInvoke.WM_KILLFOCUS,
                 Result = (IntPtr)250
@@ -8469,7 +8465,7 @@ public class ButtonBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubButtonBase
+            using SubButtonBase control = new()
             {
                 FlatStyle = flatStyle
             };
@@ -8481,7 +8477,7 @@ public class ButtonBaseTests
                 Assert.Same(EventArgs.Empty, e);
                 callCount++;
             };
-            var m = new Message
+            Message m = new()
             {
                 Msg = (int)PInvoke.WM_KILLFOCUS,
                 Result = (IntPtr)250
@@ -8505,7 +8501,7 @@ public class ButtonBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubButtonBase
+            using SubButtonBase control = new()
             {
                 FlatStyle = flatStyle
             };
@@ -8518,7 +8514,7 @@ public class ButtonBaseTests
                 Assert.Same(EventArgs.Empty, e);
                 callCount++;
             };
-            var m = new Message
+            Message m = new()
             {
                 Msg = (int)PInvoke.WM_KILLFOCUS,
                 Result = (IntPtr)250
@@ -8542,13 +8538,13 @@ public class ButtonBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubButtonBase
+            using SubButtonBase control = new()
             {
                 FlatStyle = flatStyle
             };
             control.OnMouseDown(new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
 
-            var buttonM = new Message
+            Message buttonM = new()
             {
                 Msg = (int)PInvoke.WM_LBUTTONUP
             };
@@ -8562,7 +8558,7 @@ public class ButtonBaseTests
                     Assert.Same(EventArgs.Empty, e);
                     callCount++;
                 };
-                var m = new Message
+                Message m = new()
                 {
                     Msg = (int)PInvoke.WM_KILLFOCUS,
                     Result = (IntPtr)250
@@ -8589,7 +8585,7 @@ public class ButtonBaseTests
     [EnumData<FlatStyle>]
     public void ButtonBase_WndProc_InvokeKillFocusWithHandle_Success(FlatStyle flatStyle)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -8608,7 +8604,7 @@ public class ButtonBaseTests
             Assert.Same(EventArgs.Empty, e);
             callCount++;
         };
-        var m = new Message
+        Message m = new()
         {
             Msg = (int)PInvoke.WM_KILLFOCUS,
             Result = (IntPtr)250
@@ -8638,7 +8634,7 @@ public class ButtonBaseTests
     [InlineData(FlatStyle.System, 1)]
     public void ButtonBase_WndProc_InvokeKillFocusMousePressedWithHandle_Success(FlatStyle flatStyle, int expectedInvalidatedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -8658,7 +8654,7 @@ public class ButtonBaseTests
             Assert.Same(EventArgs.Empty, e);
             callCount++;
         };
-        var m = new Message
+        Message m = new()
         {
             Msg = (int)PInvoke.WM_KILLFOCUS,
             Result = (IntPtr)250
@@ -8685,7 +8681,7 @@ public class ButtonBaseTests
     [EnumData<FlatStyle>]
     public void ButtonBase_WndProc_InvokeKillFocusMousePressedLostFocusWithHandle_Success(FlatStyle flatStyle)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -8706,7 +8702,7 @@ public class ButtonBaseTests
             Assert.Same(EventArgs.Empty, e);
             callCount++;
         };
-        var m = new Message
+        Message m = new()
         {
             Msg = (int)PInvoke.WM_KILLFOCUS,
             Result = (IntPtr)250
@@ -8733,7 +8729,7 @@ public class ButtonBaseTests
     [EnumData<FlatStyle>]
     public void ButtonBase_WndProc_InvokeKillFocusMousePressedInButtonUpWithHandle_Success(FlatStyle flatStyle)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -8746,7 +8742,7 @@ public class ButtonBaseTests
         int createdCallCount = 0;
         control.HandleCreated += (sender, e) => createdCallCount++;
 
-        var buttonM = new Message
+        Message buttonM = new()
         {
             Msg = (int)PInvoke.WM_LBUTTONUP
         };
@@ -8760,7 +8756,7 @@ public class ButtonBaseTests
                 Assert.Same(EventArgs.Empty, e);
                 callCount++;
             };
-            var m = new Message
+            Message m = new()
             {
                 Msg = (int)PInvoke.WM_KILLFOCUS,
                 Result = (IntPtr)250
@@ -8792,7 +8788,7 @@ public class ButtonBaseTests
     [EnumData<FlatStyle>]
     public void ButtonBase_WndProc_InvokeMouseHoverWithHandle_Success(FlatStyle flatStyle)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -8811,7 +8807,7 @@ public class ButtonBaseTests
             Assert.Same(EventArgs.Empty, e);
             callCount++;
         };
-        var m = new Message
+        Message m = new()
         {
             Msg = (int)PInvoke.WM_MOUSEHOVER,
             Result = (IntPtr)250
@@ -8876,7 +8872,7 @@ public class ButtonBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubButtonBase();
+            using SubButtonBase control = new();
             control.SetStyle(ControlStyles.UserMouse, userMouse);
             int callCount = 0;
             control.MouseUp += (sender, e) =>
@@ -8889,7 +8885,7 @@ public class ButtonBaseTests
                 Assert.Equal(0, e.Delta);
                 callCount++;
             };
-            var m = new Message
+            Message m = new()
             {
                 Msg = msg,
                 LParam = lParam,
@@ -8911,7 +8907,7 @@ public class ButtonBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubButtonBase();
+            using SubButtonBase control = new();
             control.SetStyle(ControlStyles.UserMouse, userMouse);
             control.SetStyle(ControlStyles.Selectable, false);
             int callCount = 0;
@@ -8925,7 +8921,7 @@ public class ButtonBaseTests
                 Assert.Equal(0, e.Delta);
                 callCount++;
             };
-            var m = new Message
+            Message m = new()
             {
                 Msg = msg,
                 LParam = lParam,
@@ -8950,13 +8946,13 @@ public class ButtonBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubButtonBase
+            using SubButtonBase control = new()
             {
                 Enabled = false
             };
             int callCount = 0;
             control.MouseUp += (sender, e) => callCount++;
-            var m = new Message
+            Message m = new()
             {
                 Msg = msg,
                 Result = (IntPtr)250
@@ -8974,7 +8970,7 @@ public class ButtonBaseTests
     [MemberData(nameof(WndProc_MouseUp_TestData))]
     public void ButtonBase_WndProc_InvokeMouseUpWithHandle_Success(bool userMouse, int msg, IntPtr lParam, IntPtr wParam, IntPtr expectedResult, MouseButtons expectedButton, int expectedClicks, int expectedX, int expectedY)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         control.SetStyle(ControlStyles.UserMouse, userMouse);
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
@@ -8995,7 +8991,7 @@ public class ButtonBaseTests
             Assert.Equal(0, e.Delta);
             callCount++;
         };
-        var m = new Message
+        Message m = new()
         {
             Msg = msg,
             LParam = lParam,
@@ -9017,7 +9013,7 @@ public class ButtonBaseTests
     [MemberData(nameof(WndProc_MouseUp_TestData))]
     public void ButtonBase_WndProc_InvokeMouseUpWithHandleNotSelectable_DoesNotCallMouseUp(bool userMouse, int msg, IntPtr lParam, IntPtr wParam, IntPtr expectedResult, MouseButtons expectedButton, int expectedClicks, int expectedX, int expectedY)
     {
-        using var control = new SubButtonBase();
+        using SubButtonBase control = new();
         control.SetStyle(ControlStyles.UserMouse, userMouse);
         control.SetStyle(ControlStyles.Selectable, false);
         Assert.NotEqual(IntPtr.Zero, control.Handle);
@@ -9039,7 +9035,7 @@ public class ButtonBaseTests
             Assert.Equal(0, e.Delta);
             callCount++;
         };
-        var m = new Message
+        Message m = new()
         {
             Msg = msg,
             LParam = lParam,
@@ -9064,7 +9060,7 @@ public class ButtonBaseTests
     [InlineData((int)PInvoke.WM_XBUTTONUP)]
     public void ButtonBase_WndProc_InvokeMouseUpWithHandleNotEnabled_CallsMouseUp(int msg)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             Enabled = false
         };
@@ -9078,7 +9074,7 @@ public class ButtonBaseTests
 
         int callCount = 0;
         control.MouseUp += (sender, e) => callCount++;
-        var m = new Message
+        Message m = new()
         {
             Msg = msg,
             Result = (IntPtr)250
@@ -9123,7 +9119,7 @@ public class ButtonBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubButtonBase
+            using SubButtonBase control = new()
             {
                 FlatStyle = flatStyle
             };
@@ -9135,7 +9131,7 @@ public class ButtonBaseTests
                 callCount++;
             };
 
-            var m = new Message
+            Message m = new()
             {
                 Msg = (int)(MessageId.WM_REFLECT_COMMAND),
                 WParam = wParam,
@@ -9152,7 +9148,7 @@ public class ButtonBaseTests
     [MemberData(nameof(WndProc_ReflectCommandWithoutHandle_TestData))]
     public void ButtonBase_WndProc_InvokeReflectCommandWithHandle_Success(FlatStyle flatStyle, IntPtr wParam, IntPtr expectedResult, int expectedCallCount)
     {
-        using var control = new SubButtonBase
+        using SubButtonBase control = new()
         {
             FlatStyle = flatStyle
         };
@@ -9171,7 +9167,7 @@ public class ButtonBaseTests
             callCount++;
         };
 
-        var m = new Message
+        Message m = new()
         {
             Msg = (int)(MessageId.WM_REFLECT_COMMAND),
             WParam = wParam,

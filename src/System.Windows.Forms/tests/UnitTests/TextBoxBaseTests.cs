@@ -1,13 +1,11 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using Moq;
 using System.Windows.Forms.TestUtilities;
-using static Interop;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
@@ -20,7 +18,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_CreateParams_GetDefault_ReturnsExpected()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         CreateParams createParams = control.CreateParams;
         Assert.Null(createParams.Caption);
         Assert.Equal("Edit", createParams.ClassName);
@@ -42,7 +40,7 @@ public partial class TextBoxBaseTests
     [InlineData(false, 0x560101C0)]
     public void TextBoxBase_CreateParams_GetHideSelection_ReturnsExpected(bool hideSelection, int expectedStyle)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             HideSelection = hideSelection
         };
@@ -68,7 +66,7 @@ public partial class TextBoxBaseTests
     [InlineData(false, 0x560100C0)]
     public void TextBoxBase_CreateParams_GetReadOnly_ReturnsExpected(bool readOnly, int expectedStyle)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             ReadOnly = readOnly
         };
@@ -95,7 +93,7 @@ public partial class TextBoxBaseTests
     [InlineData(BorderStyle.FixedSingle, 0x568100C0, 0)]
     public void TextBoxBase_CreateParams_GetBorderStyle_ReturnsExpected(BorderStyle borderStyle, int expectedStyle, int expectedExStyle)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             BorderStyle = borderStyle
         };
@@ -122,7 +120,7 @@ public partial class TextBoxBaseTests
     [InlineData(false, false, 0x560100C0)]
     public void TextBoxBase_CreateParams_GetMultiline_ReturnsExpected(bool multiline, bool wordWrap, int expectedStyle)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Multiline = multiline,
             WordWrap = wordWrap
@@ -148,7 +146,7 @@ public partial class TextBoxBaseTests
     [BoolData]
     public void TextBoxBase_AcceptsTab_Set_GetReturnsExpected(bool value)
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             AcceptsTab = value
         };
@@ -169,7 +167,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_AcceptsTab_SetWithHandler_CallsAcceptsTabChanged()
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             AcceptsTab = true
         };
@@ -208,7 +206,7 @@ public partial class TextBoxBaseTests
     [BoolData]
     public void TextBoxBase_AutoSize_Set_GetReturnsExpected(bool value)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int layoutCallCount = 0;
         control.Layout += (sender, e) => layoutCallCount++;
 
@@ -243,7 +241,7 @@ public partial class TextBoxBaseTests
     [BoolData]
     public void TextBoxBase_AutoSize_SetMultiline_GetReturnsExpected(bool value)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Multiline = true
         };
@@ -284,8 +282,8 @@ public partial class TextBoxBaseTests
     [BoolData]
     public void TextBoxBase_AutoSize_SetWithParent_GetReturnsExpected(bool value)
     {
-        using var parent = new Control();
-        using var control = new SubTextBox
+        using Control parent = new();
+        using SubTextBox control = new()
         {
             Parent = parent
         };
@@ -335,7 +333,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_AutoSize_SetWithHandler_CallsAutoSizeChanged()
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             AutoSize = true
         };
@@ -373,7 +371,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_BackColor_GetReadOnly_ReturnsExpected()
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             ReadOnly = true
         };
@@ -390,7 +388,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(BackColor_Set_TestData))]
     public void TextBoxBase_BackColor_Set_GetReturnsExpected(Color value, Color expected)
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             BackColor = value
         };
@@ -406,7 +404,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_BackColor_SetWithHandler_CallsBackColorChanged()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -442,7 +440,7 @@ public partial class TextBoxBaseTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetImageTheoryData))]
     public void TextBoxBase_BackgroundImage_Set_GetReturnsExpected(Image value)
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             BackgroundImage = value
         };
@@ -458,7 +456,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_BackgroundImage_SetWithHandler_CallsBackgroundImageChanged()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -469,7 +467,7 @@ public partial class TextBoxBaseTests
         control.BackgroundImageChanged += handler;
 
         // Set different.
-        using var image1 = new Bitmap(10, 10);
+        using Bitmap image1 = new(10, 10);
         control.BackgroundImage = image1;
         Assert.Same(image1, control.BackgroundImage);
         Assert.Equal(1, callCount);
@@ -480,7 +478,7 @@ public partial class TextBoxBaseTests
         Assert.Equal(1, callCount);
 
         // Set different.
-        using var image2 = new Bitmap(10, 10);
+        using Bitmap image2 = new(10, 10);
         control.BackgroundImage = image2;
         Assert.Same(image2, control.BackgroundImage);
         Assert.Equal(2, callCount);
@@ -501,7 +499,7 @@ public partial class TextBoxBaseTests
     [EnumData<ImageLayout>]
     public void TextBoxBase_BackgroundImageLayout_Set_GetReturnsExpected(ImageLayout value)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             BackgroundImageLayout = value
         };
@@ -519,7 +517,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_BackgroundImageLayout_SetWithHandler_CallsBackgroundImageLayoutChanged()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         int callCount = 0;
         void handler(object sender, EventArgs e)
         {
@@ -556,7 +554,7 @@ public partial class TextBoxBaseTests
     [EnumData<BorderStyle>]
     public void TextBoxBase_BorderStyle_Set_GetReturnsExpected(BorderStyle value)
     {
-        using var control = new TextBox()
+        using TextBox control = new()
         {
             BorderStyle = value
         };
@@ -578,8 +576,8 @@ public partial class TextBoxBaseTests
     [InlineData(false, BorderStyle.None, 0)]
     public void TextBoxBase_BorderStyle_SetWithParent_GetReturnsExpected(bool autoSize, BorderStyle value, int expectedParentLayoutCallCount)
     {
-        using var parent = new Control();
-        using var control = new TextBox()
+        using Control parent = new();
+        using TextBox control = new()
         {
             AutoSize = autoSize,
             Parent = parent
@@ -622,7 +620,7 @@ public partial class TextBoxBaseTests
     [InlineData(BorderStyle.None, 1)]
     public void TextBoxBase_BorderStyle_SetWithHandle_GetReturnsExpected(BorderStyle value, int expectedStyleChangedCallCount)
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -650,7 +648,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_BorderStyle_SetWithHandler_CallsBorderStyleChanged()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -686,14 +684,14 @@ public partial class TextBoxBaseTests
     [InvalidEnumData<BorderStyle>]
     public void TextBoxBase_BorderStyle_SetInvalid_ThrowsInvalidEnumArgumentException(BorderStyle value)
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         Assert.Throws<InvalidEnumArgumentException>("value", () => control.BorderStyle = value);
     }
 
     [WinFormsFact]
     public void TextBoxBase_CanUndo_GetWithHandle_ReturnsExpected()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -719,7 +717,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(CanUndo_CustomCanUndo_TestData))]
     public void TextBoxBase_CanUndo_CustomCanUndo_ReturnsExpected(IntPtr result, bool expected)
     {
-        using var control = new CustomCanUndoTextBoxBase
+        using CustomCanUndoTextBoxBase control = new()
         {
             Result = result
         };
@@ -746,7 +744,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_CanUndo_GetCantCreateHandle_GetReturnsExpected()
     {
-        using var control = new CantCreateHandleTextBox();
+        using CantCreateHandleTextBox control = new();
         Assert.False(control.CanUndo);
         Assert.False(control.IsHandleCreated);
     }
@@ -787,7 +785,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_CanUndo_GetDisposed_ThrowsObjectDisposedException()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         control.Dispose();
         Assert.False(control.CanUndo);
     }
@@ -796,7 +794,7 @@ public partial class TextBoxBaseTests
     [BoolData]
     public void TextBoxBase_DoubleBuffered_Get_ReturnsExpected(bool value)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         control.SetStyle(ControlStyles.OptimizedDoubleBuffer, value);
         Assert.Equal(value, control.DoubleBuffered);
     }
@@ -805,7 +803,7 @@ public partial class TextBoxBaseTests
     [BoolData]
     public void TextBoxBase_DoubleBuffered_Set_GetReturnsExpected(bool value)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             DoubleBuffered = value
         };
@@ -830,7 +828,7 @@ public partial class TextBoxBaseTests
     [BoolData]
     public void TextBoxBase_DoubleBuffered_SetWithHandle_GetReturnsExpected(bool value)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -870,7 +868,7 @@ public partial class TextBoxBaseTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetFontTheoryData))]
     public void TextBoxBase_Font_Set_GetReturnsExpected(Font value)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Font = value
         };
@@ -889,7 +887,7 @@ public partial class TextBoxBaseTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetFontTheoryData))]
     public void TextBoxBase_Font_SetWithText_GetReturnsExpected(Font value)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "text",
             Font = value
@@ -909,8 +907,8 @@ public partial class TextBoxBaseTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetFontTheoryData))]
     public void TextBoxBase_Font_SetWithNonNullOldValue_GetReturnsExpected(Font value)
     {
-        using var oldValue = new Font("Arial", 1);
-        using var control = new SubTextBox
+        using Font oldValue = new("Arial", 1);
+        using SubTextBox control = new()
         {
             Font = oldValue
         };
@@ -931,8 +929,8 @@ public partial class TextBoxBaseTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetFontTheoryData))]
     public void TextBoxBase_Font_SetWithNonNullOldValueWithText_GetReturnsExpected(Font value)
     {
-        using var oldValue = new Font("Arial", 1);
-        using var control = new SubTextBox
+        using Font oldValue = new("Arial", 1);
+        using SubTextBox control = new()
         {
             Font = oldValue,
             Text = "text"
@@ -963,7 +961,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(Font_SetWithHandle_TestData))]
     public void TextBoxBase_Font_SetWithHandle_GetReturnsExpected(bool userPaint, Font value, int expectedInvalidatedCallCount)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         control.SetStyle(ControlStyles.UserPaint, userPaint);
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         Assert.Equal(userPaint, control.GetStyle(ControlStyles.UserPaint));
@@ -997,7 +995,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(Font_SetWithHandle_TestData))]
     public void TextBoxBase_Font_SetWithTextWithHandle_GetReturnsExpected(bool userPaint, Font value, int expectedInvalidatedCallCount)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "text"
         };
@@ -1043,8 +1041,8 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(Font_SetWithNonNullOldValueWithHandle_TestData))]
     public void TextBoxBase_Font_SetWithNonNullOldValueWithHandle_GetReturnsExpected(bool userPaint, Font value)
     {
-        using var oldValue = new Font("Arial", 1);
-        using var control = new SubTextBox
+        using Font oldValue = new("Arial", 1);
+        using SubTextBox control = new()
         {
             Font = oldValue
         };
@@ -1081,8 +1079,8 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(Font_SetWithNonNullOldValueWithHandle_TestData))]
     public void TextBoxBase_Font_SetWithNonNullOldValueWithTextWithHandle_GetReturnsExpected(bool userPaint, Font value)
     {
-        using var oldValue = new Font("Arial", 1);
-        using var control = new SubTextBox
+        using Font oldValue = new("Arial", 1);
+        using SubTextBox control = new()
         {
             Font = oldValue,
             Text = "text"
@@ -1119,7 +1117,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Font_SetWithHandler_CallsFontChanged()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -1130,7 +1128,7 @@ public partial class TextBoxBaseTests
         control.FontChanged += handler;
 
         // Set different.
-        using var font1 = new Font("Arial", 8.25f);
+        using Font font1 = new("Arial", 8.25f);
         control.Font = font1;
         Assert.Same(font1, control.Font);
         Assert.Equal(1, callCount);
@@ -1171,7 +1169,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(ForeColor_Set_TestData))]
     public void TextBoxBase_ForeColor_Set_GetReturnsExpected(Color value, Color expected)
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             ForeColor = value
         };
@@ -1197,7 +1195,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(ForeColor_SetWithHandle_TestData))]
     public void TextBoxBase_ForeColor_SetWithHandle_GetReturnsExpected(Color value, Color expected, int expectedInvalidatedCallCount)
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -1225,7 +1223,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_ForeColor_SetWithHandler_CallsForeColorChanged()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -1262,7 +1260,7 @@ public partial class TextBoxBaseTests
     [InlineData(false, 0)]
     public void TextBoxBase_Handle_GetMargins_Success(bool multiline, int expected)
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             Multiline = multiline
         };
@@ -1277,8 +1275,8 @@ public partial class TextBoxBaseTests
     [InlineData(false, 0)]
     public void TextBoxBase_Handle_GetMarginsWithFont_Success(bool multiline, int expected)
     {
-        using var font = new Font("Arial", 8.25f);
-        using var control = new TextBox
+        using Font font = new("Arial", 8.25f);
+        using TextBox control = new()
         {
             Multiline = multiline,
             Font = font
@@ -1295,7 +1293,7 @@ public partial class TextBoxBaseTests
     [InlineData(false, 0)]
     public void TextBoxBase_Handle_GetModify_Success(bool value, int expected)
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             Modified = value
         };
@@ -1308,7 +1306,7 @@ public partial class TextBoxBaseTests
     [BoolData]
     public void TextBoxBase_HideSelection_Set_GetReturnsExpected(bool value)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             HideSelection = value
         };
@@ -1331,7 +1329,7 @@ public partial class TextBoxBaseTests
     [InlineData(false, 1)]
     public void TextBoxBase_HideSelection_SetWithHandle_GetReturnsExpected(bool value, int expectedCreatedCallCount)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -1367,7 +1365,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_HideSelection_SetWithHandler_CallsHideSelectionChanged()
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             HideSelection = true
         };
@@ -1424,7 +1422,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(ImeModeBase_Set_TestData))]
     public void TextBoxBase_ImeModeBase_Set_GetReturnsExpected(ImeMode value, ImeMode expected)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             ImeModeBase = value
         };
@@ -1441,7 +1439,7 @@ public partial class TextBoxBaseTests
     [EnumData<ImeMode>]
     public void TextBoxBase_ImeModeBase_SetReadOnly_GetReturnsExpected(ImeMode value)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             ReadOnly = true,
             ImeModeBase = value
@@ -1459,7 +1457,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(ImeModeBase_Set_TestData))]
     public void TextBoxBase_ImeModeBase_SetDesignMode_GetReturnsExpected(ImeMode value, ImeMode expected)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
@@ -1472,7 +1470,7 @@ public partial class TextBoxBaseTests
         mockSite
             .Setup(s => s.Name)
             .Returns((string)null);
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Site = mockSite.Object,
             ImeModeBase = value
@@ -1490,7 +1488,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(ImeModeBase_Set_TestData))]
     public void TextBoxBase_ImeModeBase_SetReadOnlyDesignMode_GetReturnsExpected(ImeMode value, ImeMode expected)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
@@ -1503,7 +1501,7 @@ public partial class TextBoxBaseTests
         mockSite
             .Setup(s => s.Name)
             .Returns((string)null);
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Site = mockSite.Object,
             ReadOnly = true,
@@ -1522,7 +1520,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(ImeModeBase_Set_TestData))]
     public void TextBoxBase_ImeModeBase_SetWithHandle_GetReturnsExpected(ImeMode value, ImeMode expected)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -1550,7 +1548,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_ImeModeBase_SetWithHandler_CallsImeModeChanged()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -1586,7 +1584,7 @@ public partial class TextBoxBaseTests
     [InvalidEnumData<ImeMode>]
     public void TextBoxBase_ImeModeBase_SetInvalid_ThrowsInvalidEnumArgumentException(ImeMode value)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.Throws<InvalidEnumArgumentException>("value", () => control.ImeModeBase = value);
     }
 
@@ -1616,7 +1614,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(Lines_Get_TestData))]
     public void TextBoxBase_Lines_Get_ReturnsExpected(string text, string[] expected)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.Empty(control.Lines);
 
         control.Text = text;
@@ -1636,7 +1634,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(Lines_Set_TestData))]
     public void TextBoxBase_Lines_Set_GetReturnsExpected(string[] lines, string[] expected, string expectedText)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Lines = lines
         };
@@ -1655,7 +1653,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_MaxLength_GetWithHandle_ReturnsExpected()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -1687,7 +1685,7 @@ public partial class TextBoxBaseTests
     [InlineData(int.MaxValue)]
     public void TextBoxBase_MaxLength_Set_GetReturnsExpected(int value)
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             MaxLength = value
         };
@@ -1703,7 +1701,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_MaxLength_SetWithLongText_Success()
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             Text = "Text",
             MaxLength = 2
@@ -1721,7 +1719,7 @@ public partial class TextBoxBaseTests
     [InlineData(int.MaxValue)]
     public void TextBoxBase_MaxLength_SetWithHandle_GetReturnsExpected(int value)
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -1749,7 +1747,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_MaxLength_SetWithLongTextWithHandle_Success()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -1776,7 +1774,7 @@ public partial class TextBoxBaseTests
     [InlineData(int.MaxValue, 0x7FFFFFFE)]
     public void TextBoxBase_MaxLength_GetLimitText_Success(int value, int expected)
     {
-        using var control = new TextBox();
+        using TextBox control = new();
 
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         control.MaxLength = value;
@@ -1786,14 +1784,14 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_MaxLength_SetNegative_ThrowsArgumentOutOfRangeException()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         Assert.Throws<ArgumentOutOfRangeException>("value", () => control.MaxLength = -1);
     }
 
     [WinFormsFact]
     public void TextBoxBase_Modified_GetWithHandle_ReturnsExpected()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -1833,7 +1831,7 @@ public partial class TextBoxBaseTests
     [BoolData]
     public void TextBoxBase_Modified_Set_GetReturnsExpected(bool value)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
 
         control.Modified = value;
         Assert.Equal(value, control.Modified);
@@ -1854,7 +1852,7 @@ public partial class TextBoxBaseTests
     [BoolData]
     public void TextBoxBase_Modified_SetWithHandle_GetReturnsExpected(bool value)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -1892,7 +1890,7 @@ public partial class TextBoxBaseTests
     [InlineData(false, 0)]
     public void TextBoxBase_Modified_GetModify_Success(bool value, int expected)
     {
-        using var control = new TextBox();
+        using TextBox control = new();
 
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         control.Modified = value;
@@ -1902,7 +1900,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Modified_SetWithHandler_CallsModifiedChanged()
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             Modified = true
         };
@@ -1941,7 +1939,7 @@ public partial class TextBoxBaseTests
     [BoolData]
     public void TextBoxBase_Multiline_Set_GetReturnsExpected(bool value)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Multiline = value
         };
@@ -1972,7 +1970,7 @@ public partial class TextBoxBaseTests
     [BoolData]
     public void TextBoxBase_Multiline_SetNotAutoSize_GetReturnsExpected(bool value)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             AutoSize = false,
             Multiline = value
@@ -2005,8 +2003,8 @@ public partial class TextBoxBaseTests
     [InlineData(false, 0)]
     public void TextBoxBase_Multiline_SetWithParent_GetReturnsExpected(bool value, int expectedParentLayoutCallCount)
     {
-        using var parent = new Control();
-        using var control = new SubTextBox
+        using Control parent = new();
+        using SubTextBox control = new()
         {
             Parent = parent
         };
@@ -2015,8 +2013,8 @@ public partial class TextBoxBaseTests
         {
             Assert.Same(parent, sender);
             Assert.Same(control, e.AffectedControl);
-            //TODO
-            //Assert.Equal("Bounds", e.AffectedProperty);
+            // TODO
+            // Assert.Equal("Bounds", e.AffectedProperty);
             parentLayoutCallCount++;
         }
 
@@ -2064,8 +2062,8 @@ public partial class TextBoxBaseTests
     [InlineData(false, 0)]
     public void TextBoxBase_Multiline_SetNotAutoSizeWithParent_GetReturnsExpected(bool value, int expectedParentLayoutCallCount)
     {
-        using var parent = new Control();
-        using var control = new SubTextBox
+        using Control parent = new();
+        using SubTextBox control = new()
         {
             Parent = parent,
             AutoSize = false
@@ -2116,7 +2114,7 @@ public partial class TextBoxBaseTests
     [InlineData(false, 0)]
     public void TextBoxBase_Multiline_SetWithHandle_GetReturnsExpected(bool value, int expectedCreatedCallCount)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -2152,7 +2150,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Multiline_SetWithHandler_CallsMultilineChanged()
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             Multiline = true
         };
@@ -2191,7 +2189,7 @@ public partial class TextBoxBaseTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetPaddingNormalizedTheoryData))]
     public void TextBoxBase_Padding_Set_GetReturnsExpected(Padding value, Padding expected)
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             Padding = value
         };
@@ -2210,7 +2208,7 @@ public partial class TextBoxBaseTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetPaddingNormalizedTheoryData))]
     public void TextBoxBase_Padding_SetWithHandle_GetReturnsExpected(Padding value, Padding expected)
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -2240,7 +2238,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Padding_SetWithHandler_CallsPaddingChanged()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -2251,7 +2249,7 @@ public partial class TextBoxBaseTests
         control.PaddingChanged += handler;
 
         // Set different.
-        var padding1 = new Padding(1);
+        Padding padding1 = new(1);
         control.Padding = padding1;
         Assert.Equal(padding1, control.Padding);
         Assert.Equal(1, callCount);
@@ -2262,7 +2260,7 @@ public partial class TextBoxBaseTests
         Assert.Equal(1, callCount);
 
         // Set different.
-        var padding2 = new Padding(2);
+        Padding padding2 = new(2);
         control.Padding = padding2;
         Assert.Equal(padding2, control.Padding);
         Assert.Equal(2, callCount);
@@ -2285,7 +2283,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(PreferredHeight_Get_TestData))]
     public void TextBoxBase_PreferredHeight_Get_ReturnsExpected(BorderStyle borderStyle, int expected)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             BorderStyle = borderStyle
         };
@@ -2295,7 +2293,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_ReadOnly_GetWithHandle_ReturnsExpected()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -2335,7 +2333,7 @@ public partial class TextBoxBaseTests
     [BoolData]
     public void TextBoxBase_ReadOnly_Set_GetReturnsExpected(bool value)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
 
         control.ReadOnly = value;
         Assert.Equal(value, control.ReadOnly);
@@ -2361,7 +2359,7 @@ public partial class TextBoxBaseTests
     [BoolData]
     public void TextBoxBase_ReadOnly_SetWithHandle_GetReturnsExpected(bool value)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -2410,7 +2408,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_ReadOnly_SetWithHandler_CallsReadOnlyChanged()
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             ReadOnly = true
         };
@@ -2450,7 +2448,7 @@ public partial class TextBoxBaseTests
     [InlineData(ImeMode.Katakana, 1)]
     public void TextBoxBase_ReadOnly_SetWithHandler_CallsImeModeChanged(ImeMode imeMode, int expectedCallCount)
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             ReadOnly = true,
             ImeMode = imeMode
@@ -2495,7 +2493,7 @@ public partial class TextBoxBaseTests
     [InlineData(ImeMode.Katakana)]
     public void TextBoxBase_ReadOnly_SetWithHandlerImeNotSupported_DoesNotCallImeModeChanged(ImeMode imeMode)
     {
-        using var control = new ImeNotSupportedTextBox
+        using ImeNotSupportedTextBox control = new()
         {
             ReadOnly = true,
             ImeMode = imeMode
@@ -2538,7 +2536,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_SelectedText_GetWithHandle_ReturnsExpected()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -2564,7 +2562,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_SelectedText_GetCantCreateHandle_ReturnsExpected()
     {
-        using var control = new CantCreateHandleTextBox();
+        using CantCreateHandleTextBox control = new();
         Assert.Empty(control.SelectedText);
         Assert.False(control.IsHandleCreated);
     }
@@ -2572,7 +2570,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_SelectedText_GetDisposed_ReturnsExpected()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         control.Dispose();
         Assert.Empty(control.SelectedText);
     }
@@ -2586,7 +2584,7 @@ public partial class TextBoxBaseTests
     [InlineData("text", "abc", "abctext", 3)]
     public void TextBoxBase_SelectedText_Set_GetReturnsExpected(string text, string value, string expected, int expectedSelectionStart)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = text,
             SelectedText = value
@@ -2638,7 +2636,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(SelectedText_Set_TestData))]
     public void TextBoxBase_SelectedText_SetWithSelectionStartAndLength_GetReturnsExpected(string text, int selectionStart, int selectionLength, string value, string expected, int expectedSelectionStart)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = text,
             SelectionStart = selectionStart,
@@ -2659,7 +2657,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(SelectedText_Set_TestData))]
     public void TextBoxBase_SelectedText_SetModified_GetReturnsExpected(string text, int selectionStart, int selectionLength, string value, string expected, int expectedSelectionStart)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = text,
             SelectionStart = selectionStart,
@@ -2681,7 +2679,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(SelectedText_Set_TestData))]
     public void TextBoxBase_SelectedText_SetWithSelectionStartAndLengthWithMaxLength_GetReturnsExpected(string text, int selectionStart, int selectionLength, string value, string expected, int expectedSelectionStart)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = text,
             SelectionStart = selectionStart,
@@ -2703,7 +2701,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(SelectedText_Set_TestData))]
     public void TextBoxBase_SelectedText_SetWithHandle_GetReturnsExpected(string text, int selectionStart, int selectionLength, string value, string expected, int expectedSelectionStart)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = text,
             SelectionStart = selectionStart,
@@ -2735,7 +2733,7 @@ public partial class TextBoxBaseTests
     [StringWithNullData]
     public void TextBoxBase_SelectedText_SetCantCreateHandle_GetReturnsExpected(string value)
     {
-        using var control = new CantCreateHandleTextBox();
+        using CantCreateHandleTextBox control = new();
         control.SelectedText = value;
         Assert.Empty(control.SelectedText);
         Assert.False(control.IsHandleCreated);
@@ -2750,7 +2748,7 @@ public partial class TextBoxBaseTests
     [StringWithNullData]
     public void TextBoxBase_SelectedText_SetDisposed_ThrowsObjectDisposedException(string value)
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         control.Dispose();
         Assert.Throws<ObjectDisposedException>(() => control.SelectedText = value);
     }
@@ -2758,7 +2756,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_SelectionLength_GetWithHandle_ReturnsExpected()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -2784,7 +2782,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_SelectionLength_GetCantCreateHandle_ReturnsExpected()
     {
-        using var control = new CantCreateHandleTextBox();
+        using CantCreateHandleTextBox control = new();
         Assert.Equal(0, control.SelectionLength);
         Assert.False(control.IsHandleCreated);
     }
@@ -2792,7 +2790,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_SelectionLength_GetDisposed_ReturnsExpected()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         control.Dispose();
         Assert.Equal(0, control.SelectionLength);
     }
@@ -2808,7 +2806,7 @@ public partial class TextBoxBaseTests
     [InlineData("text", 5, 4, "text")]
     public void TextBoxBase_SelectionLength_Set_GetReturnsExpected(string text, int value, int expected, string expectedSelectedText)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = text,
             SelectionLength = value
@@ -2836,7 +2834,7 @@ public partial class TextBoxBaseTests
     [InlineData("text", 5, 3, "ext")]
     public void TextBoxBase_SelectionLength_SetWithSelectionStart_Success(string text, int value, int expected, string expectedSelectedText)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = text,
             SelectionStart = 1,
@@ -2863,7 +2861,7 @@ public partial class TextBoxBaseTests
     [InlineData("text", 5, 4, "text")]
     public void TextBoxBase_SelectionLength_SetWithHandle_Success(string text, int value, int expected, string expectedSelectedText)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = text
         };
@@ -2903,7 +2901,7 @@ public partial class TextBoxBaseTests
     [InlineData(5, 4)]
     public unsafe void TextBoxBase_SelectionLength_GetSel_Success(int value, int expected)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "Text",
             SelectionStart = 1
@@ -2927,14 +2925,14 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_SelectionLength_SetNegative_ThrowArgumentOutOfRangeException()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.Throws<ArgumentOutOfRangeException>("value", () => control.SelectionLength = -1);
     }
 
     [WinFormsFact]
     public void TextBoxBase_SelectionStart_GetWithHandle_ReturnsExpected()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -2960,7 +2958,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_SelectionStart_GetCantCreateHandle_ReturnsExpected()
     {
-        using var control = new CantCreateHandleTextBox();
+        using CantCreateHandleTextBox control = new();
         Assert.Equal(0, control.SelectionStart);
         Assert.False(control.IsHandleCreated);
     }
@@ -2968,7 +2966,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_SelectionStart_GetDisposed_ReturnsExpected()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         control.Dispose();
         Assert.Equal(0, control.SelectionStart);
     }
@@ -2984,7 +2982,7 @@ public partial class TextBoxBaseTests
     [InlineData("text", 5, 4)]
     public void TextBoxBase_SelectionStart_Set_GetReturnsExpected(string text, int value, int expected)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = text,
             SelectionStart = value
@@ -3012,7 +3010,7 @@ public partial class TextBoxBaseTests
     [InlineData("text", 5, 4, "")]
     public void TextBoxBase_SelectionStart_SetWithSelectionLength_Success(string text, int value, int expected, string expectedSelectedText)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = text,
             SelectionLength = 2,
@@ -3040,7 +3038,7 @@ public partial class TextBoxBaseTests
     [InlineData("text", 5, 4)]
     public void TextBoxBase_SelectionStart_SetWithHandle_Success(string text, int value, int expected)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = text
         };
@@ -3080,7 +3078,7 @@ public partial class TextBoxBaseTests
     [InlineData(5, 4, 4)]
     public unsafe void TextBoxBase_SelectionStart_GetSel_Success(int value, int expectedSelectionStart, int expectedEnd)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "Text",
             SelectionLength = 1
@@ -3104,7 +3102,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_SelectionStart_SetNegative_ThrowArgumentOutOfRangeException()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.Throws<ArgumentOutOfRangeException>("value", () => control.SelectionStart = -1);
     }
 
@@ -3113,7 +3111,7 @@ public partial class TextBoxBaseTests
     [InlineData(1)]
     public void TextBoxBase_SelectionStart_SetCantCreateHandle_GetReturnsExpected(int value)
     {
-        using var control = new CantCreateHandleTextBox();
+        using CantCreateHandleTextBox control = new();
         control.SelectionStart = value;
         Assert.Equal(0, control.SelectionStart);
         Assert.False(control.IsHandleCreated);
@@ -3129,7 +3127,7 @@ public partial class TextBoxBaseTests
     [InlineData(1)]
     public void TextBoxBase_SelectionStart_SetDisposed_ReturnsExpected(int value)
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         control.Dispose();
 
         control.SelectionStart = value;
@@ -3151,7 +3149,7 @@ public partial class TextBoxBaseTests
     [BoolData]
     public void TextBoxBase_ShortcutsEnabled_Set_GetReturnsExpected(bool value)
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             ShortcutsEnabled = value
         };
@@ -3172,7 +3170,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Text_GetWithHandle_ReturnsExpected()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -3198,7 +3196,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Text_GetCantCreateHandle_ReturnsExpected()
     {
-        using var control = new CantCreateHandleTextBox();
+        using CantCreateHandleTextBox control = new();
         Assert.Empty(control.Text);
         Assert.False(control.IsHandleCreated);
     }
@@ -3206,7 +3204,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Text_GetDisposed_ReturnsExpected()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         control.Dispose();
         Assert.Empty(control.Text);
     }
@@ -3215,7 +3213,7 @@ public partial class TextBoxBaseTests
     [NormalizedStringData]
     public void TextBoxBase_Text_Set_GetReturnsExpected(string value, string expected)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = value
         };
@@ -3265,7 +3263,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(Text_SetWithSelection_TestData))]
     public void TextBoxBase_Text_SetWithSelection_GetReturnsExpected(string oldValue, int selectionStart, int selectionLength, string value, string expected, int expectedSelectionStart, int expectedSelectionLength, string expectedSelectedText)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = oldValue,
             SelectionStart = selectionStart,
@@ -3298,7 +3296,7 @@ public partial class TextBoxBaseTests
     [NormalizedStringData]
     public void TextBoxBase_Text_SetModified_GetReturnsExpected(string value, string expected)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Modified = true,
             Text = value
@@ -3328,7 +3326,7 @@ public partial class TextBoxBaseTests
     [NormalizedStringData]
     public void TextBoxBase_Text_SetWithHandle_GetReturnsExpected(string value, string expected)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -3369,7 +3367,7 @@ public partial class TextBoxBaseTests
     [InlineData("text", "text", false)]
     public void TextBoxBase_Text_SetModifiedWithHandle_GetReturnsExpected(string value, string expected, bool expectedModified)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Modified = true
         };
@@ -3432,7 +3430,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(Text_SetWithSelectionWithHandle_TestData))]
     public void TextBoxBase_Text_SetWithSelectionWith_GetReturnsExpected(string oldValue, int selectionStart, int selectionLength, string value, string expected)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = oldValue,
             SelectionStart = selectionStart,
@@ -3477,7 +3475,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Text_SetWithHandler_CallsTextChanged()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -3512,7 +3510,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Text_SetWithHandlerWithHandle_CallsTextChanged()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -3572,7 +3570,7 @@ public partial class TextBoxBaseTests
     [NormalizedStringData]
     public void TextBoxBase_Text_SetCantCreateHandle_GetReturnsExpected(string value, string expected)
     {
-        using var control = new CantCreateHandleTextBox();
+        using CantCreateHandleTextBox control = new();
         control.Text = value;
         Assert.Equal(expected, control.Text);
         Assert.False(control.IsHandleCreated);
@@ -3587,7 +3585,7 @@ public partial class TextBoxBaseTests
     [NormalizedStringData]
     public void TextBoxBase_Text_SetDisposed_ThrowsObjectDisposedException(string value, string expected)
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         control.Dispose();
 
         control.Text = value;
@@ -3603,7 +3601,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_TextLength_GetDefaultWithoutHandle_Success()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.Equal(0, control.TextLength);
         Assert.False(control.IsHandleCreated);
 
@@ -3615,7 +3613,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_TextLength_GetDefaultWithHandle_ReturnsExpected()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -3645,7 +3643,7 @@ public partial class TextBoxBaseTests
     [InlineData("\ud83c\udf09", 2)]
     public void TextBoxBase_TextLength_GetSetWithHandle_Success(string text, int expected)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = text
         };
@@ -3660,7 +3658,7 @@ public partial class TextBoxBaseTests
     [InlineData("\ud83c\udf09", 2)]
     public void TextBoxBase_TextLength_GetWithHandle_ReturnsExpected(string text, int expected)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -3680,7 +3678,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_TextLength_GetCantCreateHandle_GetReturnsExpected()
     {
-        using var control = new CantCreateHandleTextBox();
+        using CantCreateHandleTextBox control = new();
         Assert.Equal(0, control.TextLength);
         Assert.False(control.IsHandleCreated);
     }
@@ -3688,7 +3686,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_TextLength_GetDisposed_ReturnsExpected()
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         control.Dispose();
         Assert.Equal(0, control.TextLength);
     }
@@ -3697,7 +3695,7 @@ public partial class TextBoxBaseTests
     [BoolData]
     public void TextBoxBase_WordWrap_Set_GetReturnsExpected(bool value)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int layoutCallCount = 0;
         control.Layout += (sender, e) => layoutCallCount++;
 
@@ -3724,8 +3722,8 @@ public partial class TextBoxBaseTests
     [InlineData(false, 1)]
     public void TextBoxBase_WordWrap_SetWithParent_GetReturnsExpected(bool value, int expectedParentLayoutCallCount)
     {
-        using var parent = new Control();
-        using var control = new SubTextBox
+        using Control parent = new();
+        using SubTextBox control = new()
         {
             Parent = parent
         };
@@ -3774,8 +3772,8 @@ public partial class TextBoxBaseTests
     [BoolData]
     public void TextBoxBase_WordWrap_SetNotAutoSizeWithParent_GetReturnsExpected(bool value)
     {
-        using var parent = new Control();
-        using var control = new SubTextBox
+        using Control parent = new();
+        using SubTextBox control = new()
         {
             Parent = parent,
             AutoSize = false
@@ -3822,7 +3820,7 @@ public partial class TextBoxBaseTests
     [InlineData(false, 1)]
     public void TextBoxBase_WordWrap_SetWithHandle_GetReturnsExpected(bool value, int expectedCreatedCallCount)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -3861,7 +3859,7 @@ public partial class TextBoxBaseTests
     [InlineData("text", "text", true)]
     public void TextBoxBase_AppendText_InvokeEmpty_Success(string text, string expected, bool expectedHandleCreated)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         control.AppendText(text);
         Assert.Equal(expected, control.Text);
         Assert.Equal(expected.Length, control.SelectionStart);
@@ -3876,7 +3874,7 @@ public partial class TextBoxBaseTests
     [InlineData("text", 7, true)]
     public void TextBoxBase_AppendText_InvokeNotEmpty_Success(string text, int expectedSelectionStart, bool expectedHandleCreated)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "abc"
         };
@@ -3894,7 +3892,7 @@ public partial class TextBoxBaseTests
     [InlineData("text", 7, 0, "", true)]
     public void TextBoxBase_AppendText_InvokeNotEmptyWithSelectionStart_Success(string text, int expectedSelectionStart, int expectedSelectionLength, string expectedSelectedText, bool expectedHandleCreated)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "abc",
             SelectionStart = 1,
@@ -3914,7 +3912,7 @@ public partial class TextBoxBaseTests
     [InlineData("text", 1, 2, "bc", true)]
     public void TextBoxBase_AppendText_InvokeNotEmptyWithSelectionStartZeroWidth_Success(string text, int expectedSelectionStart, int expectedSelectionLength, string expectedSelectedText, bool expectedHandleCreated)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "abc",
             SelectionStart = 1,
@@ -3935,7 +3933,7 @@ public partial class TextBoxBaseTests
     [InlineData("text", 1, 2, "bc", true)]
     public void TextBoxBase_AppendText_InvokeNotEmptyWithSelectionStartZeroHeight_Success(string text, int expectedSelectionStart, int expectedSelectionLength, string expectedSelectedText, bool expectedHandleCreated)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "abc",
             SelectionStart = 1,
@@ -3957,7 +3955,7 @@ public partial class TextBoxBaseTests
     [InlineData("text", "text")]
     public void TextBoxBase_AppendText_InvokeEmptyWithHandle_Success(string text, string expected)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -3983,7 +3981,7 @@ public partial class TextBoxBaseTests
     [InlineData("text", 7)]
     public void TextBoxBase_AppendText_InvokeNotEmptyWithHandle_Success(string text, int expectedSelectionStart)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "abc"
         };
@@ -4009,7 +4007,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Clear_InvokeEmpty_Success()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         control.Clear();
         Assert.Empty(control.Text);
         Assert.False(control.IsHandleCreated);
@@ -4022,7 +4020,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Clear_InvokeNotEmpty_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "Text"
         };
@@ -4039,7 +4037,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Clear_InvokeEmptyWithHandle_Success()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -4066,7 +4064,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Clear_InvokeNotEmptyWithHandle_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "Text"
         };
@@ -4096,7 +4094,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_ClearUndo_Invoke_Nop()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         control.ClearUndo();
         Assert.False(control.CanUndo);
         Assert.False(control.IsHandleCreated);
@@ -4109,7 +4107,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_ClearUndo_InvokeWithHandle_Success()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -4136,7 +4134,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_ClearUndo_CanUndo_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "abc",
             SelectionStart = 1,
@@ -4157,7 +4155,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Copy_PasteEmpty_Success()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         control.Copy();
         Assert.Empty(control.Text);
         Assert.True(control.IsHandleCreated);
@@ -4171,7 +4169,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Copy_PasteNotEmpty_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "abc",
             SelectionStart = 1,
@@ -4193,7 +4191,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Copy_PasteEmptyWithHandle_Success()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -4221,7 +4219,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Copy_PasteNotEmptyWithHandle_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "abc",
             SelectionStart = 1,
@@ -4257,7 +4255,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_CreateHandle_Invoke_Success()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         control.CreateHandle();
         Assert.True(control.Created);
         Assert.True(control.IsHandleCreated);
@@ -4267,7 +4265,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public unsafe void TextBoxBase_CreateHandle_GetSel_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "Text",
             SelectionStart = 1,
@@ -4291,7 +4289,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Cut_PasteEmpty_Success()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         control.Cut();
         Assert.Empty(control.Text);
         Assert.True(control.IsHandleCreated);
@@ -4305,7 +4303,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Cut_PasteNotEmpty_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "abc",
             SelectionStart = 1,
@@ -4327,7 +4325,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Cut_PasteEmptyWithHandle_Success()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -4355,7 +4353,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Cut_PasteNotEmptyWithHandle_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "abc",
             SelectionStart = 1,
@@ -4391,7 +4389,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_DeselectAll_InvokeEmpty_Success()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         control.DeselectAll();
         Assert.Equal(0, control.SelectionStart);
         Assert.Equal(0, control.SelectionLength);
@@ -4402,7 +4400,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_DeselectAll_InvokeNotEmpty_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "text",
             SelectionStart = 1,
@@ -4418,7 +4416,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_GetAutoSizeMode_Invoke_ReturnsExpected()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.Equal(AutoSizeMode.GrowOnly, control.GetAutoSizeMode());
     }
 
@@ -4433,7 +4431,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(GetCharFromPosition_TestData))]
     public void TextBoxBase_GetCharFromPosition_InvokeEmpty_Success(Point pt)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.Equal('\0', control.GetCharFromPosition(pt));
         Assert.True(control.IsHandleCreated);
     }
@@ -4441,7 +4439,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_GetCharFromPosition_InvokeNotEmptyValid_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "Text"
         };
@@ -4462,7 +4460,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(GetCharFromPosition_NotEmptyInvalid_TestData))]
     public void TextBoxBase_GetCharFromPosition_InvokeNotEmptyInvalid_Success(Point pt, char expected)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "Text"
         };
@@ -4474,7 +4472,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(GetCharFromPosition_TestData))]
     public void TextBoxBase_GetCharFromPosition_InvokeEmptyWithHandle_Success(Point pt)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -4493,7 +4491,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_GetCharFromPosition_InvokeNotEmptyValidWithHandle_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "Text"
         };
@@ -4516,7 +4514,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(GetCharFromPosition_NotEmptyInvalid_TestData))]
     public void TextBoxBase_GetCharFromPosition_InvokeNotEmptyInvalidWithHandle_Success(Point pt, char expected)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "Text"
         };
@@ -4546,7 +4544,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(GetCharIndexFromPosition_TestData))]
     public void TextBoxBase_GetCharIndexFromPosition_InvokeEmpty_Success(Point pt)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.Equal(0, control.GetCharIndexFromPosition(pt));
         Assert.True(control.IsHandleCreated);
     }
@@ -4554,7 +4552,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_GetCharIndexFromPosition_InvokeNotEmptyValid_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "Text"
         };
@@ -4576,7 +4574,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(GetCharIndexFromPosition_NotEmptyInvalid_TestData))]
     public void TextBoxBase_GetCharIndexFromPosition_InvokeNotEmptyInvalid_Success(Point pt, int expected)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "Text"
         };
@@ -4588,7 +4586,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(GetCharIndexFromPosition_TestData))]
     public void TextBoxBase_GetCharIndexFromPosition_InvokeEmptyWithHandle_Success(Point pt)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -4607,7 +4605,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_GetCharIndexFromPosition_InvokeNotEmptyValidWithHandle_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "Text"
         };
@@ -4631,7 +4629,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(GetCharIndexFromPosition_NotEmptyInvalid_TestData))]
     public void TextBoxBase_GetCharIndexFromPosition_InvokeNotEmptyInvalidWithHandle_Success(Point pt, int expected)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "Text"
         };
@@ -4672,7 +4670,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(GetCharIndexFromPosition_CustomCharFromPos_TestData))]
     public void TextBoxBase_GetCharIndexFromPosition_CustomCharFromPos_Success(string text, IntPtr result, int expected)
     {
-        using var control = new CustomCharFromPosTextBox
+        using CustomCharFromPosTextBox control = new()
         {
             Text = text,
             CharFromPosResult = (IntPtr)result
@@ -4705,7 +4703,7 @@ public partial class TextBoxBaseTests
     [InlineData(1)]
     public void TextBoxBase_GetFirstCharIndexFromLine_InvokeEmpty_ReturnsExpected(int lineNumber)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.Equal(0, control.GetFirstCharIndexFromLine(lineNumber));
         Assert.True(control.IsHandleCreated);
     }
@@ -4715,7 +4713,7 @@ public partial class TextBoxBaseTests
     [InlineData(1)]
     public void TextBoxBase_GetFirstCharIndexFromLine_InvokeNotEmpty_ReturnsExpected(int lineNumber)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.Equal(0, control.GetFirstCharIndexFromLine(lineNumber));
         Assert.True(control.IsHandleCreated);
     }
@@ -4725,7 +4723,7 @@ public partial class TextBoxBaseTests
     [InlineData(1)]
     public void TextBoxBase_GetFirstCharIndexFromLine_InvokeEmptyWithHandle_ReturnsExpected(int lineNumber)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -4746,7 +4744,7 @@ public partial class TextBoxBaseTests
     [InlineData(1)]
     public void TextBoxBase_GetFirstCharIndexFromLine_InvokeNotEmptyWithHandle_ReturnsExpected(int lineNumber)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -4776,7 +4774,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(GetFirstCharIndexFromLine_CustomLineFromChar_TestData))]
     public void TextBoxBase_GetFirstCharIndexFromLine_CustomLineIndex_Success(IntPtr result, int expected)
     {
-        using var control = new CustomLineIndexTextBox
+        using CustomLineIndexTextBox control = new()
         {
             ExpectedWParam = (IntPtr)1,
             LineIndexResult = (IntPtr)result
@@ -4788,14 +4786,14 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_GetFirstCharIndexFromLine_NegativeLineNumber_ThrowsArgumentOutOfRangeException()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.Throws<ArgumentOutOfRangeException>("lineNumber", () => control.GetFirstCharIndexFromLine(-1));
     }
 
     [WinFormsFact]
     public void TextBoxBase_GetFirstCharIndexOfCurrentLine_InvokeEmpty_ReturnsExpected()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.Equal(0, control.GetFirstCharIndexOfCurrentLine());
         Assert.True(control.IsHandleCreated);
     }
@@ -4803,7 +4801,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_GetFirstCharIndexOfCurrentLine_InvokeNotEmpty_ReturnsExpected()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "text"
         };
@@ -4814,7 +4812,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_GetFirstCharIndexOfCurrentLine_InvokeEmptyWithHandle_ReturnsExpected()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -4833,7 +4831,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_GetFirstCharIndexOfCurrentLine_InvokeNotEmptyWithHandle_ReturnsExpected()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "text"
         };
@@ -4866,7 +4864,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(GetFirstCharIndexOfCurrentLine_CustomLineFromChar_TestData))]
     public void TextBoxBase_GetFirstCharIndexOfCurrentLine_CustomLineIndex_Success(IntPtr result, int expected)
     {
-        using var control = new CustomLineIndexTextBox
+        using CustomLineIndexTextBox control = new()
         {
             ExpectedWParam = (IntPtr)(-1),
             LineIndexResult = (IntPtr)result
@@ -4900,7 +4898,7 @@ public partial class TextBoxBaseTests
     [InlineData(1)]
     public void TextBoxBase_GetLineFromCharIndex_InvokeEmpty_Success(int index)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.Equal(0, control.GetLineFromCharIndex(index));
         Assert.True(control.IsHandleCreated);
     }
@@ -4913,7 +4911,7 @@ public partial class TextBoxBaseTests
     [InlineData(5)]
     public void TextBoxBase_GetLineFromCharIndex_InvokeNotEmpty_Success(int index)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "text"
         };
@@ -4928,7 +4926,7 @@ public partial class TextBoxBaseTests
     [InlineData(1)]
     public void TextBoxBase_GetLineFromCharIndex_InvokeEmptyWithHandle_Success(int index)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         control.CreateControl();
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -4952,7 +4950,7 @@ public partial class TextBoxBaseTests
     [InlineData(5)]
     public void TextBoxBase_GetLineFromCharIndex_InvokeNotEmptyWithHandle_Success(int index)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "text"
         };
@@ -4985,7 +4983,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(GetLineFromCharIndex_CustomLineFromChar_TestData))]
     public void TextBoxBase_GetLineFromCharIndex_CustomLineFromChar_Success(IntPtr result, int expected)
     {
-        using var control = new CustomLineFromCharTextBox
+        using CustomLineFromCharTextBox control = new()
         {
             LineFromCharResult = (IntPtr)result
         };
@@ -5017,7 +5015,7 @@ public partial class TextBoxBaseTests
     [InlineData(1)]
     public void TextBoxBase_GetPositionFromCharIndex_InvokeEmpty_ReturnsEmpty(int index)
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         Assert.Equal(Point.Empty, control.GetPositionFromCharIndex(index));
         Assert.False(control.IsHandleCreated);
     }
@@ -5029,7 +5027,7 @@ public partial class TextBoxBaseTests
     [InlineData(3)]
     public void TextBoxBase_GetPositionFromCharIndex_InvokeValidIndexNotEmpty_ReturnsExpected(int index)
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             Text = "text"
         };
@@ -5045,7 +5043,7 @@ public partial class TextBoxBaseTests
     [InlineData(5)]
     public void TextBoxBase_GetPositionFromCharIndex_InvokeInvalidIndexNotEmpty_ReturnsEmpty(int index)
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             Text = "text"
         };
@@ -5059,7 +5057,7 @@ public partial class TextBoxBaseTests
     [InlineData(1)]
     public void TextBoxBase_GetPositionFromCharIndex_InvokeEmptyWithHandle_ReturnsEmpty(int index)
     {
-        using var control = new TextBox();
+        using TextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -5082,7 +5080,7 @@ public partial class TextBoxBaseTests
     [InlineData(3)]
     public void TextBoxBase_GetPositionFromCharIndex_InvokeValidIndexNotEmptyWithHandle_ReturnsExpected(int index)
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             Text = "text"
         };
@@ -5109,7 +5107,7 @@ public partial class TextBoxBaseTests
     [InlineData(5)]
     public void TextBoxBase_GetPositionFromCharIndex_InvokeInvalidIndexNotEmptyWithHandle_ReturnsEmpty(int index)
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             Text = "text"
         };
@@ -5141,7 +5139,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(GetPositionFromCharIndex_CustomPosFromChar_TestData))]
     public void TextBoxBase_GetPositionFromCharIndex_CustomPosFromChar_Success(IntPtr result, Point expected)
     {
-        using var control = new CustomPosFromCharTextBox
+        using CustomPosFromCharTextBox control = new()
         {
             Text = "text",
             PosFromCharResult = (IntPtr)result
@@ -5199,7 +5197,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(GetPreferredSize_TestData))]
     public void TextBox_GetPreferredSize_Invoke_ReturnsExpected(bool multiline, bool wordWrap, BorderStyle borderStyle, Size proposedSize, Size expected)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Multiline = multiline,
             WordWrap = wordWrap,
@@ -5217,8 +5215,8 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(GetPreferredSize_TestData))]
     public void TextBox_GetPreferredSize_InvokeWithPadding_ReturnsExpected(bool multiline, bool wordWrap, BorderStyle borderStyle, Size proposedSize, Size expected)
     {
-        var padding = new Padding(1, 2, 3, 4);
-        using var control = new SubTextBox
+        Padding padding = new(1, 2, 3, 4);
+        using SubTextBox control = new()
         {
             Padding = padding,
             Multiline = multiline,
@@ -5258,7 +5256,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(GetPreferredSize_WithText_TestData))]
     public void TextBox_GetPreferredSize_InvokeWithText_ReturnsExpected(BorderStyle borderStyle, Size proposedSize, int expectedAdditionalWidth, int expectedHeight)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "Text",
             BorderStyle = borderStyle
@@ -5277,7 +5275,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(GetPreferredSize_WithText_TestData))]
     public void TextBox_GetPreferredSize_InvokeWithNewLineMultiline_ReturnsExpected(BorderStyle borderStyle, Size proposedSize, int expectedAdditionalWidth, int expectedMinimumHeight)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "a\rn\nb",
             Multiline = true,
@@ -5301,7 +5299,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(GetPreferredSize_WithText_TestData))]
     public void TextBox_GetPreferredSize_InvokeWithNewLineNotMultiline_ReturnsExpected(BorderStyle borderStyle, Size proposedSize, int expectedAdditionalWidth, int expectedHeight)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "a\rn\nb",
             BorderStyle = borderStyle
@@ -5341,7 +5339,7 @@ public partial class TextBoxBaseTests
     [InlineData((ControlStyles)(-1), false)]
     public void TextBoxBase_GetStyle_Invoke_ReturnsExpected(ControlStyles flag, bool expected)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.Equal(expected, control.GetStyle(flag));
 
         // Call again to test caching.
@@ -5351,7 +5349,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_GetTopLevel_Invoke_ReturnsExpected()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.False(control.GetTopLevel());
     }
 
@@ -5403,7 +5401,7 @@ public partial class TextBoxBaseTests
     [InlineData(false, true, false, Keys.Down | Keys.Alt, false)]
     public void TextBoxBase_IsInputKey_Invoke_ReturnsExpected(bool multiline, bool acceptsTab, bool readOnly, Keys keyData, bool expected)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Multiline = multiline,
             AcceptsTab = acceptsTab,
@@ -5434,7 +5432,7 @@ public partial class TextBoxBaseTests
     [InlineData(false, true, false, Keys.Down | Keys.Alt, false)]
     public void TextBoxBase_IsInputKey_InvokeWithHandle_ReturnsExpected(bool multiline, bool acceptsTab, bool readOnly, Keys keyData, bool expected)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Multiline = multiline,
             AcceptsTab = acceptsTab,
@@ -5449,7 +5447,7 @@ public partial class TextBoxBaseTests
     [NewAndDefaultData<EventArgs>]
     public void TextBoxBase_OnAcceptsTabChanged_Invoke_CallsAcceptsTabChanged(EventArgs eventArgs)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -5473,7 +5471,7 @@ public partial class TextBoxBaseTests
     [NewAndDefaultData<EventArgs>]
     public void TextBoxBase_OnBorderStyleChanged_Invoke_CallsBorderStyleChanged(EventArgs eventArgs)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -5497,7 +5495,7 @@ public partial class TextBoxBaseTests
     [NewAndDefaultData<EventArgs>]
     public void TextBoxBase_OnClick_Invoke_CallsClick(EventArgs eventArgs)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -5521,7 +5519,7 @@ public partial class TextBoxBaseTests
     [NewAndDefaultData<EventArgs>]
     public void TextBoxBase_OnFontChanged_Invoke_CallsFontChanged(EventArgs eventArgs)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -5547,7 +5545,7 @@ public partial class TextBoxBaseTests
     [NewAndDefaultData<EventArgs>]
     public void TextBoxBase_OnHandleCreated_Invoke_CallsHandleCreated(EventArgs eventArgs)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -5575,7 +5573,7 @@ public partial class TextBoxBaseTests
     [NewAndDefaultData<EventArgs>]
     public void TextBoxBase_OnHandleCreated_InvokeWithHandle_CallsHandleCreated(EventArgs eventArgs)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
@@ -5604,7 +5602,7 @@ public partial class TextBoxBaseTests
     [NewAndDefaultData<EventArgs>]
     public void TextBoxBase_OnHandleDestroyed_Invoke_CallsHandleDestroyed(EventArgs eventArgs)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -5639,7 +5637,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(OnHandleDestroyed_TestData))]
     public void TextBoxBase_OnHandleDestroyed_InvokeWithHandle_CallsHandleDestroyed(bool modified, EventArgs eventArgs)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "Text",
             SelectionStart = 1,
@@ -5692,7 +5690,7 @@ public partial class TextBoxBaseTests
     [NewAndDefaultData<EventArgs>]
     public void TextBoxBase_OnHideSelectionChanged_Invoke_CallsHideSelectionChanged(EventArgs eventArgs)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -5716,7 +5714,7 @@ public partial class TextBoxBaseTests
     [NewAndDefaultData<EventArgs>]
     public void TextBoxBase_OnModifiedChanged_Invoke_CallsModifiedChanged(EventArgs eventArgs)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -5740,7 +5738,7 @@ public partial class TextBoxBaseTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetMouseEventArgsTheoryData))]
     public void TextBoxBase_OnMouseClick_Invoke_CallsMouseClick(MouseEventArgs eventArgs)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int callCount = 0;
         MouseEventHandler handler = (sender, e) =>
         {
@@ -5778,7 +5776,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(OnMouseUp_TestData))]
     public void TextBoxBase_OnMouseUp_Invoke_CallsMouseUp(MouseEventArgs eventArgs)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int clickCallCount = 0;
         control.Click += (sender, e) => clickCallCount++;
         int mouseClickCallCount = 0;
@@ -5812,7 +5810,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(OnMouseUp_TestData))]
     public void TextBoxBase_OnMouseUp_InvokeWithHandle_CallsMouseUp(MouseEventArgs eventArgs)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -5860,7 +5858,7 @@ public partial class TextBoxBaseTests
     [NewAndDefaultData<EventArgs>]
     public void TextBoxBase_OnMultilineChanged_Invoke_CallsMultilineChanged(EventArgs eventArgs)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -5884,7 +5882,7 @@ public partial class TextBoxBaseTests
     [NewAndDefaultData<EventArgs>]
     public void TextBoxBase_OnPaddingChanged_Invoke_CallsPaddingChanged(EventArgs eventArgs)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -5910,7 +5908,7 @@ public partial class TextBoxBaseTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetPaintEventArgsTheoryData))]
     public void TextBoxBase_OnPaint_Invoke_CallsPaint(PaintEventArgs eventArgs)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int callCount = 0;
         PaintEventHandler handler = (sender, e) =>
         {
@@ -5934,7 +5932,7 @@ public partial class TextBoxBaseTests
     [NewAndDefaultData<EventArgs>]
     public void TextBoxBase_OnReadOnlyChanged_Invoke_CallsReadOnlyChanged(EventArgs eventArgs)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -5958,7 +5956,7 @@ public partial class TextBoxBaseTests
     [NewAndDefaultData<EventArgs>]
     public void TextBoxBase_OnTextChanged_Invoke_CallsTextChanged(EventArgs eventArgs)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -5983,7 +5981,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Paste_InvokeEmpty_Success()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         control.Paste();
         Assert.NotNull(control.Text);
         Assert.True(control.IsHandleCreated);
@@ -5992,7 +5990,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Paste_InvokeNotEmpty_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "abc",
             SelectionStart = 1,
@@ -6016,7 +6014,7 @@ public partial class TextBoxBaseTests
                 yield return new object[] { shortcutsEnabled, readOnly, (Keys)Shortcut.CtrlC, !shortcutsEnabled };
                 yield return new object[] { shortcutsEnabled, readOnly, (Keys)Shortcut.CtrlX, !shortcutsEnabled };
                 yield return new object[] { shortcutsEnabled, readOnly, (Keys)Shortcut.CtrlV, !shortcutsEnabled };
-                yield return new object[] { shortcutsEnabled, readOnly, (Keys)Shortcut.CtrlA, !shortcutsEnabled };
+                yield return new object[] { shortcutsEnabled, readOnly, (Keys)Shortcut.CtrlA, true };
                 yield return new object[] { shortcutsEnabled, readOnly, (Keys)Shortcut.CtrlL, !shortcutsEnabled || readOnly };
                 yield return new object[] { shortcutsEnabled, readOnly, (Keys)Shortcut.CtrlR, !shortcutsEnabled || readOnly };
                 yield return new object[] { shortcutsEnabled, readOnly, (Keys)Shortcut.CtrlE, !shortcutsEnabled || readOnly };
@@ -6048,12 +6046,12 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(ProcessCmdKey_TestData))]
     public void TextBoxBase_ProcessCmdKey_Invoke_ReturnsExpected(bool shortcutsEnabled, bool readOnly, Keys keyData, bool expected)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             ShortcutsEnabled = shortcutsEnabled,
             ReadOnly = readOnly
         };
-        var m = new Message();
+        Message m = new();
         Assert.Equal(expected, control.ProcessCmdKey(ref m, keyData));
         Assert.False(control.IsHandleCreated);
     }
@@ -6062,14 +6060,14 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(ProcessCmdKey_TestData))]
     public void TextBoxBase_ProcessCmdKey_InvokeWithParent_ReturnsFalse(bool shortcutsEnabled, bool readOnly, Keys keyData, bool expected)
     {
-        using var parent = new Control();
-        using var control = new SubTextBox
+        using Control parent = new();
+        using SubTextBox control = new()
         {
             Parent = parent,
             ShortcutsEnabled = shortcutsEnabled,
             ReadOnly = readOnly
         };
-        var msg = new Message();
+        Message msg = new();
         Assert.Equal(expected, control.ProcessCmdKey(ref msg, keyData));
         Assert.False(control.IsHandleCreated);
     }
@@ -6078,15 +6076,15 @@ public partial class TextBoxBaseTests
     [InlineData(Keys.A)]
     public void TextBoxBase_ProcessCmdKey_InvokeWithoutParent_ReturnsFalse(Keys keyData)
     {
-        using var control = new SubTextBox();
-        var m = new Message();
+        using SubTextBox control = new();
+        Message m = new();
         Assert.False(control.ProcessCmdKey(ref m, keyData));
         Assert.False(control.IsHandleCreated);
     }
 
     [WinFormsTheory]
     [InlineData(true, false, (Keys)Shortcut.CtrlA, true, true)]
-    [InlineData(true, false, (Keys)Shortcut.CtrlA, false, false)]
+    [InlineData(true, false, (Keys)Shortcut.CtrlA, false, true)]
     [InlineData(false, false, (Keys)Shortcut.CtrlA, true, true)]
     [InlineData(false, false, (Keys)Shortcut.CtrlA, false, true)]
     [InlineData(true, true, (Keys)Shortcut.CtrlL, true, true)]
@@ -6097,12 +6095,12 @@ public partial class TextBoxBaseTests
     [InlineData(true, false, Keys.A, false, false)]
     public void TextBoxBase_ProcessCmdKey_InvokeWithCustomParent_ReturnsExpected(bool shortcutsEnabled, bool readOnly, Keys keyData, bool result, bool expected)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             ShortcutsEnabled = shortcutsEnabled,
             ReadOnly = readOnly
         };
-        var msg = new Message
+        Message msg = new()
         {
             Msg = 1
         };
@@ -6115,7 +6113,7 @@ public partial class TextBoxBaseTests
             return result;
         }
 
-        using var parent = new CustomProcessControl
+        using CustomProcessControl parent = new()
         {
             ProcessCmdKeyAction = action
         };
@@ -6140,9 +6138,9 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_ProcessCmdKey_CtrlBackspaceTextEmpty_RemainsEmpty()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
 
-        var message = new Message();
+        Message message = new();
         Assert.True(control.ProcessCmdKey(ref message, Keys.Control | Keys.Back));
         Assert.Empty(control.Text);
     }
@@ -6150,13 +6148,13 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_ProcessCmdKey_CtrlBackspaceReadOnly_Nop()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "text",
             ReadOnly = true
         };
 
-        var message = new Message();
+        Message message = new();
         Assert.False(control.ProcessCmdKey(ref message, Keys.Control | Keys.Back));
         Assert.Equal("text", control.Text);
     }
@@ -6165,13 +6163,13 @@ public partial class TextBoxBaseTests
     [CommonMemberData(typeof(CommonTestHelper), nameof(CommonTestHelper.GetCtrlBackspaceData))]
     public void TextBoxBase_ProcessCmdKey_CtrlBackspace_ClearsSelection(string text, string expected, int cursorRelativeToEnd)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = text,
             SelectionStart = text.Length + cursorRelativeToEnd
         };
 
-        var message = new Message();
+        Message message = new();
         Assert.True(control.ProcessCmdKey(ref message, Keys.Control | Keys.Back));
         Assert.Equal(expected, control.Text);
     }
@@ -6180,7 +6178,7 @@ public partial class TextBoxBaseTests
     [CommonMemberData(typeof(CommonTestHelper), nameof(CommonTestHelper.GetCtrlBackspaceRepeatedData))]
     public void TextBoxBase_ProcessCmdKey_CtrlBackspaceRepeated_ClearsSelection(string text, string expected, int repeats)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = text,
             SelectionStart = text.Length,
@@ -6189,7 +6187,7 @@ public partial class TextBoxBaseTests
 
         for (int i = 0; i < repeats; i++)
         {
-            var message = new Message();
+            Message message = new();
             Assert.True(control.ProcessCmdKey(ref message, Keys.Control | Keys.Back));
         }
 
@@ -6199,14 +6197,14 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_ProcessCmdKey_CtrlBackspaceWithSelection_ClearsSelection()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "123-5-7-9",
             SelectionStart = 2,
             SelectionLength = 5
         };
 
-        var message = new Message();
+        Message message = new();
         Assert.True(control.ProcessCmdKey(ref message, Keys.Control | Keys.Back));
         Assert.Equal("12-9", control.Text);
     }
@@ -6222,7 +6220,7 @@ public partial class TextBoxBaseTests
     [InlineData(false, Keys.Control | Keys.A)]
     public void TextBox_ProcessDialogKey_InvokeWithoutParent_ReturnsFalse(bool acceptsTab, Keys keyData)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             AcceptsTab = acceptsTab
         };
@@ -6241,8 +6239,8 @@ public partial class TextBoxBaseTests
     [InlineData(false, Keys.Control | Keys.A)]
     public void TextBox_ProcessDialogKey_InvokeWithParent_ReturnsFalse(bool acceptsTab, Keys keyData)
     {
-        using var parent = new Control();
-        using var control = new SubTextBox
+        using Control parent = new();
+        using SubTextBox control = new()
         {
             Parent = parent,
             AcceptsTab = acceptsTab
@@ -6270,11 +6268,11 @@ public partial class TextBoxBaseTests
             return result;
         }
 
-        using var parent = new CustomProcessControl
+        using CustomProcessControl parent = new()
         {
             ProcessDialogKeyAction = action
         };
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Parent = parent,
             AcceptsTab = acceptsTab
@@ -6293,7 +6291,7 @@ public partial class TextBoxBaseTests
     [InlineData(false, "Text\r\nMoreText")]
     public void TextBoxBase_ScrollToCaret_InvokeWithoutHandleRecreate_Success(bool multiline, string text)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Multiline = multiline,
             Text = text
@@ -6319,7 +6317,7 @@ public partial class TextBoxBaseTests
     [InlineData(false, "Text\r\nMoreText")]
     public void TextBoxBase_ScrollToCaret_InvokeWithHandle_Success(bool multiline, string text)
     {
-        using var control = new TextBox
+        using TextBox control = new()
         {
             Multiline = multiline,
             Text = text
@@ -6349,7 +6347,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(ScrollToCaret_NoGetOleInterface_TestData))]
     public void TextBoxBase_ScrollToCaret_InvokeWithHandleCustomGetOleInterfaceTextBox_Success(IntPtr lParam)
     {
-        using var control = new CustomGetOleInterfaceTextBox
+        using CustomGetOleInterfaceTextBox control = new()
         {
             GetOleInterfaceResult = IntPtr.Zero,
             GetOleInterfaceLParam = lParam,
@@ -6371,53 +6369,18 @@ public partial class TextBoxBaseTests
     }
 
     [WinFormsFact]
-    public void TextBoxBase_ScrollToCaret_InvokeWithHandleNoSuchGetOleInterfaceTextBox_ThrowsArgumentNullException()
-    {
-        IntPtr pUnk = Marshal.GetIUnknownForObject(new CustomTextDocument());
-        using var control = new CustomGetOleInterfaceTextBox
-        {
-            GetOleInterfaceResult = (IntPtr)1,
-            GetOleInterfaceLParam = pUnk,
-            Text = "Text"
-        };
-        Assert.NotEqual(IntPtr.Zero, control.Handle);
-        int invalidatedCallCount = 0;
-        control.Invalidated += (sender, e) => invalidatedCallCount++;
-        int styleChangedCallCount = 0;
-        control.StyleChanged += (sender, e) => styleChangedCallCount++;
-        int createdCallCount = 0;
-        control.HandleCreated += (sender, e) => createdCallCount++;
-
-        control.ScrollToCaret();
-        Assert.True(control.IsHandleCreated);
-        Assert.Equal(0, invalidatedCallCount);
-        Assert.Equal(0, styleChangedCallCount);
-        Assert.Equal(0, createdCallCount);
-    }
-
-    [ComImport]
-    [Guid("8CC497C0-A1DF-11ce-8098-00AA0047BE5D")]
-    private interface ITextDocument
-    {
-    }
-
-    private class CustomTextDocument : ITextDocument
-    {
-    }
-
-    [WinFormsFact]
-    public void TextBoxBase_ScrollToCaret_InvokeWithHandleInvalidGetOleInterfaceTextBox_ThrowsArgumentNullException()
+    public void TextBoxBase_ScrollToCaret_InvokeWithHandleInvalidGetOleInterfaceTextBox_DoesNotThrow()
     {
         IntPtr pUnk = Marshal.GetIUnknownForObject(new object());
-        using var control = new CustomGetOleInterfaceTextBox
+        using CustomGetOleInterfaceTextBox control = new()
         {
-            GetOleInterfaceResult = (IntPtr)1,
+            GetOleInterfaceResult = 1,
             GetOleInterfaceLParam = pUnk,
             Text = "Text"
         };
-        Assert.NotEqual(IntPtr.Zero, control.Handle);
 
-        Assert.Throws<ArgumentNullException>("pUnk", () => control.ScrollToCaret());
+        Assert.NotEqual(IntPtr.Zero, control.Handle);
+        control.ScrollToCaret();
     }
 
     private class CustomGetOleInterfaceTextBox : TextBox
@@ -6463,7 +6426,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(Select_TestData))]
     public void TextBoxBase_Select_Invoke_Success(string text, int start, int length, int expectedSelectionStart, int expectedSelectionLength, string expectedSelectedText)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = text
         };
@@ -6485,7 +6448,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(Select_TestData))]
     public void TextBoxBase_Select_InvokeWithHandle_Success(string text, int start, int length, int expectedSelectionStart, int expectedSelectionLength, string expectedSelectedText)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = text
         };
@@ -6526,7 +6489,7 @@ public partial class TextBoxBaseTests
     [InlineData(0, 5, 0, 4)]
     public unsafe void TextBoxBase_Select_GetSel_Success(int start, int length, int expectedSelectionStart, int expectedEnd)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "Text"
         };
@@ -6549,14 +6512,14 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Select_NegativeStart_ThrowsArgumentOutOfRangeException()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.Throws<ArgumentOutOfRangeException>("start", () => control.Select(-1, 0));
     }
 
     [WinFormsFact]
     public void TextBoxBase_SelectAll_InvokeEmpty_Success()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         control.SelectAll();
         Assert.Equal(0, control.SelectionStart);
         Assert.Equal(0, control.SelectionLength);
@@ -6574,7 +6537,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_SelectAll_InvokeNotEmpty_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "text"
         };
@@ -6595,7 +6558,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_SelectAll_InvokeEmptyWithHandle_Success()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -6627,7 +6590,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_SelectAll_InvokeNotEmptyWithHandle_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "text"
         };
@@ -6662,7 +6625,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public unsafe void TextBoxBase_SelectAll_GetSel_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "Text"
         };
@@ -6704,7 +6667,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(SetBoundsCore_TestData))]
     public void TextBoxBase_SetBoundsCore_InvokeAutoSize_Success(int x, int y, int width, int height, BoundsSpecified specified, int expectedLocationChangedCallCount, int expectedLayoutCallCount)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         int moveCallCount = 0;
         int locationChangedCallCount = 0;
         int layoutCallCount = 0;
@@ -6835,7 +6798,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(SetBoundsCore_TestData))]
     public void TextBoxBase_SetBoundsCore_InvokeMultiline_Success(int x, int y, int width, int height, BoundsSpecified specified, int expectedLocationChangedCallCount, int expectedLayoutCallCount)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Multiline = true
         };
@@ -6951,7 +6914,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(SetBoundsCore_TestData))]
     public void TextBoxBase_SetBoundsCore_InvokeNotAutoSize_Success(int x, int y, int width, int height, BoundsSpecified specified, int expectedLocationChangedCallCount, int expectedLayoutCallCount)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             AutoSize = false
         };
@@ -7066,14 +7029,14 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_ToString_Invoke_ReturnsExpected()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.Equal("System.Windows.Forms.Tests.TextBoxBaseTests+SubTextBox, Text: ", control.ToString());
     }
 
     [WinFormsFact]
     public void TextBoxBase_ToString_InvokeShortText_ReturnsExpected()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "Text"
         };
@@ -7083,7 +7046,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_ToString_InvokeLongText_ReturnsExpected()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = new string('a', 41)
         };
@@ -7093,7 +7056,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Undo_InvokeEmpty_Success()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         control.Undo();
         Assert.Empty(control.Text);
         Assert.False(control.CanUndo);
@@ -7104,7 +7067,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Undo_InvokeNotEmpty_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "abc",
             SelectionStart = 1,
@@ -7120,7 +7083,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Undo_InvokeEmptyWithHandle_Success()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -7142,7 +7105,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Undo_InvokeNotEmptyWithHandle_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "abc",
             SelectionStart = 1,
@@ -7169,7 +7132,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_Undo_CanUndo_Success()
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Text = "abc",
             SelectionStart = 1,
@@ -7209,12 +7172,12 @@ public partial class TextBoxBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubTextBox
+            using SubTextBox control = new()
             {
                 Size = size,
                 ShortcutsEnabled = shortcutsEnabled
             };
-            var m = new Message
+            Message m = new()
             {
                 Msg = (int)PInvoke.WM_CONTEXTMENU,
                 LParam = lParam,
@@ -7228,7 +7191,7 @@ public partial class TextBoxBaseTests
 
     public static IEnumerable<object[]> WndProc_ContextMenuWithContextMenuStripWithoutHandle_TestData()
     {
-        using var control = new Control();
+        using Control control = new();
         Point p = control.PointToScreen(new Point(5, 5));
 
         foreach (bool shortcutsEnabled in new bool[] { true, false })
@@ -7255,14 +7218,14 @@ public partial class TextBoxBaseTests
     {
         using (new NoAssertContext())
         {
-            using var menu = new ContextMenuStrip();
-            using var control = new SubTextBox
+            using ContextMenuStrip menu = new();
+            using SubTextBox control = new()
             {
                 ContextMenuStrip = menu,
                 Size = size,
                 ShortcutsEnabled = shortcutsEnabled
             };
-            var m = new Message
+            Message m = new()
             {
                 Msg = (int)PInvoke.WM_CONTEXTMENU,
                 LParam = lParam,
@@ -7280,7 +7243,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(WndProc_ContextMenuWithoutContextMenuStrip_TestData))]
     public void TextBoxBase_WndProc_InvokeContextMenuWithoutContextMenuStripWithHandle_Success(Size size, bool shortcutsEnabled, IntPtr lParam, IntPtr expectedResult)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Size = size,
             ShortcutsEnabled = shortcutsEnabled
@@ -7293,7 +7256,7 @@ public partial class TextBoxBaseTests
         int createdCallCount = 0;
         control.HandleCreated += (sender, e) => createdCallCount++;
 
-        var m = new Message
+        Message m = new()
         {
             Msg = (int)PInvoke.WM_CONTEXTMENU,
             LParam = lParam,
@@ -7309,7 +7272,7 @@ public partial class TextBoxBaseTests
 
     public static IEnumerable<object[]> WndProc_ContextMenuWithContextMenuStripWithHandle_TestData()
     {
-        using var control = new Control();
+        using Control control = new();
         Point p = control.PointToScreen(new Point(5, 5));
 
         foreach (bool shortcutsEnabled in new bool[] { true, false })
@@ -7334,8 +7297,8 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(WndProc_ContextMenuWithContextMenuStripWithHandle_TestData))]
     public void TextBoxBase_WndProc_InvokeContextMenuWithContextMenuStripWithHandle_Success(Size size, bool shortcutsEnabled, IntPtr lParam, IntPtr expectedResult, bool expectedHasSourceControl)
     {
-        using var menu = new ContextMenuStrip();
-        using var control = new SubTextBox
+        using ContextMenuStrip menu = new();
+        using SubTextBox control = new()
         {
             ContextMenuStrip = menu,
             Size = size,
@@ -7349,7 +7312,7 @@ public partial class TextBoxBaseTests
         int createdCallCount = 0;
         control.HandleCreated += (sender, e) => createdCallCount++;
 
-        var m = new Message
+        Message m = new()
         {
             Msg = (int)PInvoke.WM_CONTEXTMENU,
             LParam = lParam,
@@ -7377,11 +7340,11 @@ public partial class TextBoxBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubTextBox
+            using SubTextBox control = new()
             {
                 AcceptsTab = acceptsTabs
             };
-            var m = new Message
+            Message m = new()
             {
                 Msg = (int)PInvoke.WM_GETDLGCODE,
                 Result = (IntPtr)250
@@ -7396,7 +7359,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(WndProc_GetDlgCode_TestData))]
     public void TextBoxBase_WndProc_InvokeGetDlgCodeWithHandle_ReturnsExpected(bool acceptsTabs, IntPtr expectedResult)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             AcceptsTab = acceptsTabs
         };
@@ -7408,7 +7371,7 @@ public partial class TextBoxBaseTests
         int createdCallCount = 0;
         control.HandleCreated += (sender, e) => createdCallCount++;
 
-        var m = new Message
+        Message m = new()
         {
             Msg = (int)PInvoke.WM_GETDLGCODE,
             Result = (IntPtr)250
@@ -7514,7 +7477,7 @@ public partial class TextBoxBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubTextBox();
+            using SubTextBox control = new();
             control.SetStyle(ControlStyles.UserMouse, userMouse);
             int callCount = 0;
             control.MouseDown += (sender, e) =>
@@ -7527,7 +7490,7 @@ public partial class TextBoxBaseTests
                 Assert.Equal(0, e.Delta);
                 callCount++;
             };
-            var m = new Message
+            Message m = new()
             {
                 Msg = msg,
                 LParam = lParam,
@@ -7549,7 +7512,7 @@ public partial class TextBoxBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubTextBox();
+            using SubTextBox control = new();
             control.SetStyle(ControlStyles.UserMouse, userMouse);
             control.SetStyle(ControlStyles.Selectable, false);
             int callCount = 0;
@@ -7563,7 +7526,7 @@ public partial class TextBoxBaseTests
                 Assert.Equal(0, e.Delta);
                 callCount++;
             };
-            var m = new Message
+            Message m = new()
             {
                 Msg = msg,
                 LParam = lParam,
@@ -7592,13 +7555,13 @@ public partial class TextBoxBaseTests
     {
         using (new NoAssertContext())
         {
-            using var control = new SubTextBox
+            using SubTextBox control = new()
             {
                 Enabled = false
             };
             int callCount = 0;
             control.MouseDown += (sender, e) => callCount++;
-            var m = new Message
+            Message m = new()
             {
                 Msg = msg,
                 Result = (IntPtr)250
@@ -7616,7 +7579,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(WndProc_MouseDown_TestData))]
     public void TextBoxBase_WndProc_InvokeMouseDownWithHandle_Success(bool userMouse, int msg, IntPtr lParam, IntPtr wParam, IntPtr expectedResult, MouseButtons expectedButton, int expectedClicks, int expectedX, int expectedY)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         control.SetStyle(ControlStyles.UserMouse, userMouse);
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
@@ -7637,7 +7600,7 @@ public partial class TextBoxBaseTests
             Assert.Equal(0, e.Delta);
             callCount++;
         };
-        var m = new Message
+        Message m = new()
         {
             Msg = msg,
             LParam = lParam,
@@ -7659,7 +7622,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(WndProc_MouseDown_TestData))]
     public void TextBoxBase_WndProc_InvokeMouseDownWithHandleNotSelectable_DoesNotCallMouseDown(bool userMouse, int msg, IntPtr lParam, IntPtr wParam, IntPtr expectedResult, MouseButtons expectedButton, int expectedClicks, int expectedX, int expectedY)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         control.SetStyle(ControlStyles.UserMouse, userMouse);
         control.SetStyle(ControlStyles.Selectable, false);
         Assert.NotEqual(IntPtr.Zero, control.Handle);
@@ -7681,7 +7644,7 @@ public partial class TextBoxBaseTests
             Assert.Equal(0, e.Delta);
             callCount++;
         };
-        var m = new Message
+        Message m = new()
         {
             Msg = msg,
             LParam = lParam,
@@ -7710,7 +7673,7 @@ public partial class TextBoxBaseTests
     [InlineData((int)PInvoke.WM_XBUTTONDBLCLK)]
     public void TextBoxBase_WndProc_InvokeMouseDownWithHandleNotEnabled_DoesNotCallMouseDown(int msg)
     {
-        using var control = new SubTextBox
+        using SubTextBox control = new()
         {
             Enabled = false
         };
@@ -7724,7 +7687,7 @@ public partial class TextBoxBaseTests
 
         int callCount = 0;
         control.MouseDown += (sender, e) => callCount++;
-        var m = new Message
+        Message m = new()
         {
             Msg = msg,
             Result = (IntPtr)250
@@ -7743,7 +7706,7 @@ public partial class TextBoxBaseTests
     [WinFormsFact]
     public void TextBoxBase_WndProc_InvokeMouseHoverWithHandle_Success()
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -7759,7 +7722,7 @@ public partial class TextBoxBaseTests
             Assert.Same(EventArgs.Empty, e);
             callCount++;
         };
-        var m = new Message
+        Message m = new()
         {
             Msg = (int)PInvoke.WM_MOUSEHOVER,
             Result = (IntPtr)250
@@ -7791,7 +7754,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(WndProc_ReflectCommand_TestData))]
     public void TextBoxBase_WndProc_InvokeReflectCommandWithoutHandle_Success(IntPtr wParam, IntPtr lParam, int expectedTextChangedCallCount)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
 
         int textChangedCallCount = 0;
         control.TextChanged += (sender, e) =>
@@ -7802,7 +7765,7 @@ public partial class TextBoxBaseTests
         };
         int modifiedCallCount = 0;
         control.ModifiedChanged += (sender, e) => modifiedCallCount++;
-        var m = new Message
+        Message m = new()
         {
             Msg = (int)(MessageId.WM_REFLECT | PInvoke.WM_COMMAND),
             WParam = wParam,
@@ -7820,7 +7783,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(WndProc_ReflectCommand_TestData))]
     public void TextBoxBase_WndProc_InvokeReflectCommandWithHandle_Success(IntPtr wParam, IntPtr lParam, int expectedTextChangedCallCount)
     {
-        using var control = new SubTextBox();
+        using SubTextBox control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -7838,7 +7801,7 @@ public partial class TextBoxBaseTests
         };
         int modifiedCallCount = 0;
         control.ModifiedChanged += (sender, e) => modifiedCallCount++;
-        var m = new Message
+        Message m = new()
         {
             Msg = (int)(MessageId.WM_REFLECT | PInvoke.WM_COMMAND),
             WParam = wParam,
@@ -8060,7 +8023,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(TextBoxBase_GetLineFromCharIndex_TestData))]
     public void TextBoxBase_GetLineFromCharIndex_ReturnsCorrectValue(Size size, bool multiline, int charIndex, int expectedLine)
     {
-        using var textBoxBase = new SubTextBoxBase() { Size = size, Multiline = multiline };
+        using SubTextBoxBase textBoxBase = new() { Size = size, Multiline = multiline };
         textBoxBase.Text = "Some test text for testing GetLineFromCharIndex method";
         int actualLine = textBoxBase.GetLineFromCharIndex(charIndex);
         Assert.Equal(expectedLine, actualLine);
@@ -8080,7 +8043,7 @@ public partial class TextBoxBaseTests
     [MemberData(nameof(TextBoxBase_GetPositionFromCharIndex_TestData))]
     public void TextBoxBase_GetPositionFromCharIndex_ReturnsCorrectValue(Size size, bool multiline, int charIndex, Point expectedPoint)
     {
-        using var textBoxBase = new SubTextBoxBase() { Size = size, Multiline = multiline };
+        using SubTextBoxBase textBoxBase = new() { Size = size, Multiline = multiline };
         textBoxBase.Text = "Some test text for testing GetPositionFromCharIndex method";
         Point actualPoint = textBoxBase.GetPositionFromCharIndex(charIndex);
         Assert.True(actualPoint.X >= expectedPoint.X - 1 || actualPoint.X <= expectedPoint.X + 1);

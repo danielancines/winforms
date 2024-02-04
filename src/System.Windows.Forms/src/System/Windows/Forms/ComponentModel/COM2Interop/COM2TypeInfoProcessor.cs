@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Globalization;
@@ -85,7 +84,7 @@ internal static unsafe partial class Com2TypeInfoProcessor
                 if (hr.Succeeded)
                 {
                     // If this fails typeInfo will be null and we'll loop again if we haven't already.
-                    dispatch.Value->GetTypeInfo(0, PInvoke.GetThreadLocale(), &typeInfo);
+                    dispatch.Value->GetTypeInfo(0, PInvokeCore.GetThreadLocale(), &typeInfo);
                 }
             }
         }
@@ -145,7 +144,7 @@ internal static unsafe partial class Com2TypeInfoProcessor
     /// </summary>
     public static int GetNameDispId(IDispatch* dispatch)
     {
-        int dispid = PInvoke.DISPID_UNKNOWN;
+        int dispid = PInvokeCore.DISPID_UNKNOWN;
         string? name = null;
 
         // First try to find one with a valid value.
@@ -157,10 +156,10 @@ internal static unsafe partial class Com2TypeInfoProcessor
         }
         else
         {
-            hr = ComNativeDescriptor.GetPropertyValue(dispatch, PInvoke.DISPID_Name, out _);
+            hr = ComNativeDescriptor.GetPropertyValue(dispatch, PInvokeCore.DISPID_Name, out _);
             if (hr.Succeeded)
             {
-                dispid = PInvoke.DISPID_Name;
+                dispid = PInvokeCore.DISPID_Name;
             }
             else
             {
@@ -175,12 +174,12 @@ internal static unsafe partial class Com2TypeInfoProcessor
         // Now get the dispid of the one that worked.
         if (name is not null)
         {
-            int pDispid = PInvoke.DISPID_UNKNOWN;
+            int pDispid = PInvokeCore.DISPID_UNKNOWN;
             Guid guid = Guid.Empty;
 
             fixed (char* n = name)
             {
-                hr = dispatch->GetIDsOfNames(&guid, (PWSTR*)&n, 1, PInvoke.GetThreadLocale(), &pDispid);
+                hr = dispatch->GetIDsOfNames(&guid, (PWSTR*)&n, 1, PInvokeCore.GetThreadLocale(), &pDispid);
                 if (hr.Succeeded)
                 {
                     dispid = pDispid;
@@ -583,7 +582,7 @@ internal static unsafe partial class Com2TypeInfoProcessor
         if (flags.HasFlag(VARFLAG_FHIDDEN)
             || flags.HasFlag(VARFLAG_FNONBROWSABLE)
             || info.Name[0] == '_'
-            || dispid == PInvoke.DISPID_HWND)
+            || dispid == PInvokeCore.DISPID_HWND)
         {
             info.Attributes.Add(new BrowsableAttribute(false));
             info.NonBrowsable = true;
@@ -646,7 +645,7 @@ internal static unsafe partial class Com2TypeInfoProcessor
                     if (functionDescription->invkind == INVOKEKIND.INVOKE_FUNC
                         || (dispidToGet != PInvoke.MEMBERID_NIL && functionDescription->memid != dispidToGet))
                     {
-                        if (functionDescription->memid == PInvoke.DISPID_ABOUTBOX)
+                        if (functionDescription->memid == PInvokeCore.DISPID_ABOUTBOX)
                         {
                             addAboutBox = true;
                         }
@@ -783,7 +782,7 @@ internal static unsafe partial class Com2TypeInfoProcessor
                         // Get the value.
                         try
                         {
-                            varValue = Marshal.GetObjectForNativeVariant((nint)(void*)pVarDesc->Anonymous.lpvarValue);
+                            varValue = (*pVarDesc->Anonymous.lpvarValue).ToObject();
                         }
                         catch (Exception ex)
                         {

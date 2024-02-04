@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.BinaryFormat;
 
@@ -9,7 +8,7 @@ namespace System.Windows.Forms.BinaryFormat;
 /// </summary>
 internal class RecordMap
 {
-    private readonly Dictionary<int, IRecord> _records = new();
+    private readonly Dictionary<int, IRecord> _records = [];
 
     public IRecord this[Id id]
     {

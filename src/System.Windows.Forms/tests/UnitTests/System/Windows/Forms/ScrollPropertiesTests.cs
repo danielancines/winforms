@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -16,7 +15,7 @@ public class ScrollPropertiesTests
     [MemberData(nameof(Ctor_ScrollableControl_TestData))]
     public void ScrollProperties_Ctor_Control(ScrollableControl container)
     {
-        var properties = new SubScrollProperties(container);
+        SubScrollProperties properties = new(container);
         Assert.Same(container, properties.ParentControl);
         Assert.True(properties.Enabled);
         Assert.Equal(10, properties.LargeChange);
@@ -31,8 +30,8 @@ public class ScrollPropertiesTests
     [BoolData]
     public void ScrollProperties_Enabled_Set_GetReturnsExpected(bool value)
     {
-        using var container = new ScrollableControl();
-        var properties = new SubScrollProperties(container)
+        using ScrollableControl container = new();
+        SubScrollProperties properties = new(container)
         {
             Enabled = value
         };
@@ -51,11 +50,11 @@ public class ScrollPropertiesTests
     [BoolData]
     public void ScrollProperties_Enabled_SetAutoScrollContainer_Nop(bool value)
     {
-        using var container = new ScrollableControl()
+        using ScrollableControl container = new()
         {
             AutoScroll = true
         };
-        var properties = new SubScrollProperties(container)
+        SubScrollProperties properties = new(container)
         {
             Enabled = value
         };
@@ -74,7 +73,7 @@ public class ScrollPropertiesTests
     [BoolData]
     public void ScrollProperties_Enabled_SetNullContainer_GetReturnsExpected(bool value)
     {
-        var properties = new SubScrollProperties(null)
+        SubScrollProperties properties = new(null)
         {
             Enabled = value
         };
@@ -99,8 +98,8 @@ public class ScrollPropertiesTests
     [MemberData(nameof(LargeChange_Set_TestData))]
     public void ScrollProperties_LargeChange_Set_GetReturnsExpected(int value)
     {
-        using var container = new ScrollableControl();
-        var properties = new SubScrollProperties(container)
+        using ScrollableControl container = new();
+        SubScrollProperties properties = new(container)
         {
             LargeChange = value
         };
@@ -115,11 +114,11 @@ public class ScrollPropertiesTests
     [MemberData(nameof(LargeChange_Set_TestData))]
     public void ScrollProperties_LargeChange_SetAutoScrollContainer_GetReturnsExpected(int value)
     {
-        using var container = new ScrollableControl
+        using ScrollableControl container = new()
         {
             AutoScroll = true
         };
-        var properties = new SubScrollProperties(container)
+        SubScrollProperties properties = new(container)
         {
             LargeChange = value
         };
@@ -134,7 +133,7 @@ public class ScrollPropertiesTests
     [MemberData(nameof(LargeChange_Set_TestData))]
     public void ScrollProperties_LargeChange_SetNullContainer_GetReturnsExpected(int value)
     {
-        var properties = new SubScrollProperties(null)
+        SubScrollProperties properties = new(null)
         {
             LargeChange = value
         };
@@ -148,8 +147,8 @@ public class ScrollPropertiesTests
     [WinFormsFact]
     public void ScrollProperties_LargeChange_SetNegative_ThrowsArgumentOutOfRangeException()
     {
-        using var container = new ScrollableControl();
-        var properties = new SubScrollProperties(container);
+        using ScrollableControl container = new();
+        SubScrollProperties properties = new(container);
         Assert.Throws<ArgumentOutOfRangeException>("value", () => properties.LargeChange = -1);
         Assert.Equal(10, properties.LargeChange);
     }
@@ -166,8 +165,8 @@ public class ScrollPropertiesTests
     [MemberData(nameof(SmallChange_Set_TestData))]
     public void ScrollProperties_SmallChange_Set_GetReturnsExpected(int value, int expectedValue)
     {
-        using var container = new ScrollableControl();
-        var properties = new SubScrollProperties(container)
+        using ScrollableControl container = new();
+        SubScrollProperties properties = new(container)
         {
             SmallChange = value
         };
@@ -182,11 +181,11 @@ public class ScrollPropertiesTests
     [MemberData(nameof(SmallChange_Set_TestData))]
     public void ScrollProperties_SmallChange_SetAutoScrollContainer_GetReturnsExpected(int value, int expectedValue)
     {
-        using var container = new ScrollableControl
+        using ScrollableControl container = new()
         {
             AutoScroll = true
         };
-        var properties = new SubScrollProperties(container)
+        SubScrollProperties properties = new(container)
         {
             SmallChange = value
         };
@@ -201,7 +200,7 @@ public class ScrollPropertiesTests
     [MemberData(nameof(SmallChange_Set_TestData))]
     public void ScrollProperties_SmallChange_SetNullContainer_ReturnsExpected(int value, int expectedValue)
     {
-        var properties = new SubScrollProperties(null)
+        SubScrollProperties properties = new(null)
         {
             SmallChange = value
         };
@@ -215,8 +214,8 @@ public class ScrollPropertiesTests
     [WinFormsFact]
     public void ScrollProperties_SmallChange_SetNegative_ThrowsArgumentOutOfRangeException()
     {
-        using var container = new ScrollableControl();
-        var properties = new SubScrollProperties(container);
+        using ScrollableControl container = new();
+        SubScrollProperties properties = new(container);
         Assert.Throws<ArgumentOutOfRangeException>("value", () => properties.SmallChange = -1);
         Assert.Equal(1, properties.SmallChange);
     }
@@ -233,8 +232,8 @@ public class ScrollPropertiesTests
     [MemberData(nameof(Maximum_Set_TestData))]
     public void ScrollProperties_Maximum_Set_GetReturnsExpected(int value, int expectedLargeChange)
     {
-        using var container = new ScrollableControl();
-        var properties = new SubScrollProperties(container)
+        using ScrollableControl container = new();
+        SubScrollProperties properties = new(container)
         {
             Maximum = value
         };
@@ -257,7 +256,7 @@ public class ScrollPropertiesTests
     [MemberData(nameof(Maximum_Set_TestData))]
     public void ScrollProperties_Maximum_SetNullContainer_GetReturnsExpected(int value, int expectedLargeChange)
     {
-        var properties = new SubScrollProperties(null)
+        SubScrollProperties properties = new(null)
         {
             Maximum = value
         };
@@ -279,8 +278,8 @@ public class ScrollPropertiesTests
     [WinFormsFact]
     public void ScrollProperties_Maximum_SetLessThanValueAndMinimum_SetsValueAndMinimum()
     {
-        using var container = new ScrollableControl();
-        var properties = new SubScrollProperties(container)
+        using ScrollableControl container = new();
+        SubScrollProperties properties = new(container)
         {
             Value = 10,
             Minimum = 8,
@@ -296,8 +295,8 @@ public class ScrollPropertiesTests
     [WinFormsFact]
     public void ScrollProperties_Maximum_SetNegative_SetsValueAndMinimum()
     {
-        using var container = new ScrollableControl();
-        var properties = new SubScrollProperties(container)
+        using ScrollableControl container = new();
+        SubScrollProperties properties = new(container)
         {
             Maximum = -1
         };
@@ -313,11 +312,11 @@ public class ScrollPropertiesTests
     [InlineData(8)]
     public void ScrollProperties_Maximum_SetAutoScrollContainer_Nop(int value)
     {
-        using var container = new ScrollableControl()
+        using ScrollableControl container = new()
         {
             AutoScroll = true
         };
-        var properties = new SubScrollProperties(container)
+        SubScrollProperties properties = new(container)
         {
             Maximum = value
         };
@@ -338,8 +337,8 @@ public class ScrollPropertiesTests
     [MemberData(nameof(Minimum_Set_TestData))]
     public void ScrollProperties_Minimum_Set_GetReturnsExpected(int value)
     {
-        using var container = new ScrollableControl();
-        var properties = new SubScrollProperties(container)
+        using ScrollableControl container = new();
+        SubScrollProperties properties = new(container)
         {
             Value = 5,
             Minimum = value
@@ -362,8 +361,8 @@ public class ScrollPropertiesTests
     [WinFormsFact]
     public void ScrollProperties_Minimum_SetGreaterThanValueAndMaximum_SetsValueAndMinimum()
     {
-        using var container = new ScrollableControl();
-        var properties = new SubScrollProperties(container)
+        using ScrollableControl container = new();
+        SubScrollProperties properties = new(container)
         {
             Value = 10,
             Maximum = 8,
@@ -381,11 +380,11 @@ public class ScrollPropertiesTests
     [InlineData(8)]
     public void ScrollProperties_Minimum_SetAutoScrollContainer_Nop(int value)
     {
-        using var container = new ScrollableControl
+        using ScrollableControl container = new()
         {
             AutoScroll = true
         };
-        var properties = new SubScrollProperties(container)
+        SubScrollProperties properties = new(container)
         {
             Minimum = value
         };
@@ -400,7 +399,7 @@ public class ScrollPropertiesTests
     [MemberData(nameof(Minimum_Set_TestData))]
     public void ScrollProperties_Minimum_SetNullContainer_GetReturnsExpected(int value)
     {
-        var properties = new SubScrollProperties(null)
+        SubScrollProperties properties = new(null)
         {
             Value = 5,
             Minimum = value
@@ -423,8 +422,8 @@ public class ScrollPropertiesTests
     [WinFormsFact]
     public void ScrollProperties_Minimum_SetNegative_ThrowsArgumentOutOfRangeException()
     {
-        using var container = new ScrollableControl();
-        var properties = new SubScrollProperties(container);
+        using ScrollableControl container = new();
+        SubScrollProperties properties = new(container);
         Assert.Throws<ArgumentOutOfRangeException>("value", () => properties.Minimum = -1);
         Assert.Equal(0, properties.Minimum);
     }
@@ -440,8 +439,8 @@ public class ScrollPropertiesTests
     [MemberData(nameof(Value_Set_TestData))]
     public void ScrollProperties_Value_Set_GetReturnsExpected(int value)
     {
-        using var container = new ScrollableControl();
-        var properties = new SubScrollProperties(container)
+        using ScrollableControl container = new();
+        SubScrollProperties properties = new(container)
         {
             Value = value
         };
@@ -466,11 +465,11 @@ public class ScrollPropertiesTests
     [InlineData(100)]
     public void ScrollProperties_Value_SetAutoScrollContainer_GetReturnsExpected(int value)
     {
-        using var container = new ScrollableControl
+        using ScrollableControl container = new()
         {
             AutoScroll = true
         };
-        var properties = new SubScrollProperties(container)
+        SubScrollProperties properties = new(container)
         {
             Value = value
         };
@@ -485,7 +484,7 @@ public class ScrollPropertiesTests
     [MemberData(nameof(Value_Set_TestData))]
     public void ScrollProperties_Value_SetNullContainer_GetReturnsExpected(int value)
     {
-        var properties = new SubScrollProperties(null)
+        SubScrollProperties properties = new(null)
         {
             Value = value
         };
@@ -509,8 +508,8 @@ public class ScrollPropertiesTests
     [InlineData(101)]
     public void ScrollProperties_Value_SetOutOfRange_ThrowsArgumentOutOfRangeException(int value)
     {
-        using var container = new ScrollableControl();
-        var properties = new SubScrollProperties(container);
+        using ScrollableControl container = new();
+        SubScrollProperties properties = new(container);
         Assert.Throws<ArgumentOutOfRangeException>("value", () => properties.Value = value);
         Assert.Equal(0, properties.Value);
     }
@@ -519,8 +518,8 @@ public class ScrollPropertiesTests
     [BoolData]
     public void ScrollProperties_Visible_Set_GetReturnsExpected(bool value)
     {
-        using var container = new ScrollableControl();
-        var properties = new SubScrollProperties(container)
+        using ScrollableControl container = new();
+        SubScrollProperties properties = new(container)
         {
             Visible = value
         };
@@ -539,11 +538,11 @@ public class ScrollPropertiesTests
     [BoolData]
     public void ScrollProperties_Visible_SetAutoScrollContainer_Nop(bool value)
     {
-        using var container = new ScrollableControl()
+        using ScrollableControl container = new()
         {
             AutoScroll = true
         };
-        var properties = new SubScrollProperties(container)
+        SubScrollProperties properties = new(container)
         {
             Visible = value
         };
@@ -562,7 +561,7 @@ public class ScrollPropertiesTests
     [BoolData]
     public void ScrollProperties_Visible_SetNullContainer_GetReturnsExpected(bool value)
     {
-        var properties = new SubScrollProperties(null)
+        SubScrollProperties properties = new(null)
         {
             Visible = value
         };

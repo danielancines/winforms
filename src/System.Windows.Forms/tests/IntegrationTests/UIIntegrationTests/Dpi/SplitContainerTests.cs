@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using Windows.Win32.UI.HiDpi;
@@ -18,7 +17,7 @@ public class SplitContainerTests : ControlTestBase
     [WinFormsFact]
     public void SplitContainer_Constructor()
     {
-        using var sc = new SplitContainer();
+        using SplitContainer sc = new();
 
         Assert.NotNull(sc);
         Assert.NotNull(sc.Panel1);
@@ -40,10 +39,10 @@ public class SplitContainerTests : ControlTestBase
 
         DPI_AWARENESS_CONTEXT originalAwarenessContext = PInvoke.SetThreadDpiAwarenessContextInternal(DPI_AWARENESS_CONTEXT.DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
-        typeof(DpiHelper).TestAccessor().Dynamic.Initialize();
+        typeof(ScaleHelper).TestAccessor().Dynamic.InitializeStatics();
         try
         {
-            using var form = new Form();
+            using Form form = new();
             using SplitContainer splitContainer = new()
             {
                 FixedPanel = FixedPanel.Panel1,

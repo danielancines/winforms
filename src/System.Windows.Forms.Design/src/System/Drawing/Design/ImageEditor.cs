@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Reflection;
@@ -30,7 +29,7 @@ public class ImageEditor : UITypeEditor
             return null;
         }
 
-        var text = new StringBuilder();
+        StringBuilder text = new();
         for (int i = 0; i < extensions.Length; i++)
         {
             // Skip empty extensions.
@@ -164,7 +163,7 @@ public class ImageEditor : UITypeEditor
 
         // Copy the original stream to a new memory stream to avoid locking the file.
         // The created image will take over ownership of the stream.
-        var memoryStream = new MemoryStream();
+        MemoryStream memoryStream = new();
         stream.CopyTo(memoryStream);
         return Image.FromStream(memoryStream);
     }

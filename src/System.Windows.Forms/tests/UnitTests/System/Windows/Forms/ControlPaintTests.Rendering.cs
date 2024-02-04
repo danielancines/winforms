@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using System.Numerics;
@@ -14,12 +13,12 @@ public partial class ControlPaintTests
     [WinFormsFact]
     public void ControlPaint_DrawBorder_Solid_Rendering()
     {
-        using var emf = new EmfScope();
-        DeviceContextState state = new DeviceContextState(emf);
+        using EmfScope emf = new();
+        DeviceContextState state = new(emf);
 
         using Graphics graphics = Graphics.FromHdc((IntPtr)emf.HDC);
 
-        Rectangle bounds = new Rectangle(10, 10, 10, 10);
+        Rectangle bounds = new(10, 10, 10, 10);
         ControlPaint.DrawBorder(graphics, bounds, Color.Blue, ButtonBorderStyle.Solid);
 
         emf.Validate(
@@ -33,12 +32,12 @@ public partial class ControlPaintTests
     [WinFormsFact]
     public void ControlPaint_DrawBorder_Inset_Rendering()
     {
-        using var emf = new EmfScope();
-        DeviceContextState state = new DeviceContextState(emf);
+        using EmfScope emf = new();
+        DeviceContextState state = new(emf);
 
         using Graphics graphics = Graphics.FromHdc((IntPtr)emf.HDC);
 
-        Rectangle bounds = new Rectangle(10, 10, 10, 10);
+        Rectangle bounds = new(10, 10, 10, 10);
         ControlPaint.DrawBorder(graphics, bounds, Color.Gray, ButtonBorderStyle.Inset);
 
         // For whatever reason GDI+ renders as polylines scaled 16x with a 1/16th world transform applied.
@@ -93,12 +92,12 @@ public partial class ControlPaintTests
     [WinFormsFact]
     public void ControlPaint_DrawBorder_Inset_ControlColor_Rendering()
     {
-        using var emf = new EmfScope();
-        DeviceContextState state = new DeviceContextState(emf);
+        using EmfScope emf = new();
+        DeviceContextState state = new(emf);
 
         using Graphics graphics = Graphics.FromHdc((IntPtr)emf.HDC);
 
-        Rectangle bounds = new Rectangle(10, 10, 10, 10);
+        Rectangle bounds = new(10, 10, 10, 10);
         ControlPaint.DrawBorder(graphics, bounds, SystemColors.Control, ButtonBorderStyle.Inset);
 
         // For whatever reason GDI+ renders as polylines scaled 16x with a 1/16th world transform applied.
@@ -168,12 +167,12 @@ public partial class ControlPaintTests
     [WinFormsFact]
     public void ControlPaint_DrawBorder_OutSet_Rendering()
     {
-        using var emf = new EmfScope();
-        DeviceContextState state = new DeviceContextState(emf);
+        using EmfScope emf = new();
+        DeviceContextState state = new(emf);
 
         using Graphics graphics = Graphics.FromHdc((IntPtr)emf.HDC);
 
-        Rectangle bounds = new Rectangle(10, 10, 10, 10);
+        Rectangle bounds = new(10, 10, 10, 10);
         ControlPaint.DrawBorder(graphics, bounds, Color.PeachPuff, ButtonBorderStyle.Outset);
 
         string dump = emf.RecordsToStringWithState(state);
@@ -242,12 +241,12 @@ public partial class ControlPaintTests
     [WinFormsFact]
     public void ControlPaint_DrawBorder_OutSet_ControlColor_Rendering()
     {
-        using var emf = new EmfScope();
-        DeviceContextState state = new DeviceContextState(emf);
+        using EmfScope emf = new();
+        DeviceContextState state = new(emf);
 
         using Graphics graphics = Graphics.FromHdc((IntPtr)emf.HDC);
 
-        Rectangle bounds = new Rectangle(10, 10, 10, 10);
+        Rectangle bounds = new(10, 10, 10, 10);
         ControlPaint.DrawBorder(graphics, bounds, SystemColors.Control, ButtonBorderStyle.Outset);
 
         string dump = emf.RecordsToStringWithState(state);
@@ -316,12 +315,12 @@ public partial class ControlPaintTests
     [WinFormsFact]
     public void ControlPaint_DrawBorder_Dotted_Rendering()
     {
-        using var emf = new EmfScope();
-        DeviceContextState state = new DeviceContextState(emf);
+        using EmfScope emf = new();
+        DeviceContextState state = new(emf);
 
         using Graphics graphics = Graphics.FromHdc((IntPtr)emf.HDC);
 
-        Rectangle bounds = new Rectangle(10, 10, 10, 10);
+        Rectangle bounds = new(10, 10, 10, 10);
         ControlPaint.DrawBorder(graphics, bounds, Color.Green, ButtonBorderStyle.Dotted);
 
         // For whatever reason GDI+ renders as polygons scaled 16x with a 1/16th world transform applied.
@@ -344,12 +343,12 @@ public partial class ControlPaintTests
     [WinFormsFact]
     public void ControlPaint_DrawBorder_Dashed_Rendering()
     {
-        using var emf = new EmfScope();
-        DeviceContextState state = new DeviceContextState(emf);
+        using EmfScope emf = new();
+        DeviceContextState state = new(emf);
 
         using Graphics graphics = Graphics.FromHdc((IntPtr)emf.HDC);
 
-        Rectangle bounds = new Rectangle(10, 10, 10, 10);
+        Rectangle bounds = new(10, 10, 10, 10);
         ControlPaint.DrawBorder(graphics, bounds, Color.Pink, ButtonBorderStyle.Dashed);
 
         // For whatever reason GDI+ renders as polygons scaled 16x with a 1/16th world transform applied.

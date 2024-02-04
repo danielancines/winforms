@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -17,7 +16,7 @@ public class DateRangeEventArgsTests
     [MemberData(nameof(Ctor_DateTime_DateTime_TestData))]
     public void Ctor_DateTime_DateTime(DateTime start, DateTime end)
     {
-        var e = new DateRangeEventArgs(start, end);
+        DateRangeEventArgs e = new(start, end);
         Assert.Equal(start, e.Start);
         Assert.Equal(end, e.End);
     }

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.ComponentModel.Design;
@@ -26,7 +25,7 @@ public class EventsTab : PropertyTab
 
     public override string HelpKeyword => "Events";
 
-    public override bool CanExtend(object extendee) => extendee is null || !Marshal.IsComObject(extendee);
+    public override bool CanExtend(object? extendee) => extendee is null || !Marshal.IsComObject(extendee);
 
     private void OnActiveDesignerChanged(object? sender, ActiveDesignerEventArgs e)
         => _currentHost = e.NewDesigner;

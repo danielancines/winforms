@@ -1,10 +1,10 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 #nullable enable
 
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
@@ -18,7 +18,8 @@ public class SubPropertyGrid<TSelected> : PropertyGrid where TSelected : new()
 
     internal PropertyGridView GridView => this.TestAccessor().Dynamic._gridView;
 
-    internal GridEntry SelectedEntry
+    [DisallowNull]
+    internal GridEntry? SelectedEntry
     {
         get => GridView.SelectedGridEntry;
         set => SelectedGridItem = value;
@@ -28,10 +29,12 @@ public class SubPropertyGrid<TSelected> : PropertyGrid where TSelected : new()
     {
         get
         {
-            string categoryName = SelectedObject.GetType().GetProperty(propertyName)!
+            string categoryName = SelectedObject!.GetType().GetProperty(propertyName)!
                 .GetCustomAttribute<CategoryAttribute>()!.Category;
-            return GetCurrentEntries().Single(entry => entry.PropertyName == categoryName)
-                .Children.Single(entry => entry.PropertyName == propertyName);
+            return GetCurrentEntries()!
+                .Single(entry => entry.PropertyName == categoryName)
+                .Children
+                .Single(entry => entry.PropertyName == propertyName);
         }
     }
 
@@ -78,7 +81,7 @@ public class SubPropertyGrid<TSelected> : PropertyGrid where TSelected : new()
 
     protected override void Dispose(bool disposing)
     {
-        object selectedObject = SelectedObject;
+        object? selectedObject = SelectedObject;
 
         base.Dispose(disposing);
 

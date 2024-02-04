@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 
@@ -34,7 +33,7 @@ public class ScreenTests
 
     public static IEnumerable<object[]> Equals_Screen_TestData()
     {
-        var screen = new Screen((HMONITOR)1);
+        Screen screen = new((HMONITOR)1);
         yield return new object[] { screen, screen, true };
         yield return new object[] { screen, new Screen((HMONITOR)1), true };
         yield return new object[] { screen, new Screen((HMONITOR)2), false };
@@ -42,8 +41,8 @@ public class ScreenTests
 
     public static IEnumerable<object[]> Equals_Object_TestData()
     {
-        var screen = new Screen((HMONITOR)1);
-        yield return new object[] { screen, new object(), false };
+        Screen screen = new((HMONITOR)1);
+        yield return new object[] { screen, new(), false };
         yield return new object[] { screen, null, false };
     }
 
@@ -66,7 +65,7 @@ public class ScreenTests
     {
         yield return new object[] { new Control() };
 
-        var createdControl = new Control();
+        Control createdControl = new();
         Assert.NotEqual(IntPtr.Zero, createdControl.Handle);
         yield return new object[] { createdControl };
     }

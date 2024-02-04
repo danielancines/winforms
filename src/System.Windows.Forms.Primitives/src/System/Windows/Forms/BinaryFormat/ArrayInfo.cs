@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.BinaryFormat;
 
@@ -25,11 +24,11 @@ internal readonly struct ArrayInfo : IBinaryWriteable
         ObjectId = objectId;
     }
 
-    public static ArrayInfo Parse(BinaryReader reader, out Count length)
+    public static Id Parse(BinaryReader reader, out Count length)
     {
-        ArrayInfo arrayInfo = new(reader.ReadInt32(), reader.ReadInt32());
-        length = arrayInfo.Length;
-        return arrayInfo;
+        Id id = reader.ReadInt32();
+        length = reader.ReadInt32();
+        return id;
     }
 
     public readonly void Write(BinaryWriter writer)

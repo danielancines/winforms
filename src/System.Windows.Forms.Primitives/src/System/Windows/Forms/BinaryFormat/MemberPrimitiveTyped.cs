@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.BinaryFormat;
 
@@ -14,7 +13,7 @@ namespace System.Windows.Forms.BinaryFormat;
 ///   </see>
 ///  </para>
 /// </remarks>
-internal sealed class MemberPrimitiveTyped : Record, IRecord<MemberPrimitiveTyped>
+internal sealed class MemberPrimitiveTyped : Record, IRecord<MemberPrimitiveTyped>, IPrimitiveTypeRecord
 {
     public PrimitiveType PrimitiveType { get; }
     public object Value { get; }

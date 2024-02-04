@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Primitives.Tests.Interop.User32;
 
@@ -35,8 +34,8 @@ public class LOGFONTWTests
     public unsafe void CreateFontIndirect()
     {
         LOGFONTW logFont = default;
-        HFONT handle = PInvoke.CreateFontIndirect(&logFont);
+        HFONT handle = PInvokeCore.CreateFontIndirect(&logFont);
         Assert.False(handle.IsNull);
-        Assert.True(PInvoke.DeleteObject(handle));
+        Assert.True(PInvokeCore.DeleteObject(handle));
     }
 }

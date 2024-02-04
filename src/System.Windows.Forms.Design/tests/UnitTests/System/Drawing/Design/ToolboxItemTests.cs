@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 using System.ComponentModel;
@@ -155,7 +154,7 @@ public class ToolboxItemTests
         yield return new object[] { null };
         yield return new object[] { Array.Empty<AssemblyName>() };
         yield return new object[] { new AssemblyName[] { null } };
-        yield return new object[] { new AssemblyName[] { new AssemblyName() } };
+        yield return new object[] { new AssemblyName[] { new() } };
     }
 
     [Theory]
@@ -255,7 +254,7 @@ public class ToolboxItemTests
         yield return new object[] { null, Array.Empty<object>() };
         yield return new object[] { Array.Empty<object>(), Array.Empty<object>() };
         yield return new object[] { new object[] { null }, Array.Empty<object>() };
-        yield return new object[] { new object[] { new object(), new ToolboxItemFilterAttribute("filterString") }, new object[] { new ToolboxItemFilterAttribute("filterString") } };
+        yield return new object[] { new object[] { new(), new ToolboxItemFilterAttribute("filterString") }, new object[] { new ToolboxItemFilterAttribute("filterString") } };
     }
 
     [Theory]
@@ -992,7 +991,7 @@ public class ToolboxItemTests
                 Company = "Company",
                 DependentAssemblies = new AssemblyName[] { null },
                 Description = "Description",
-                Filter = new ToolboxItemFilterAttribute[] { new ToolboxItemFilterAttribute("Filter") },
+                Filter = new ToolboxItemFilterAttribute[] { new("Filter") },
                 IsTransient = true
             },
             true
@@ -1109,7 +1108,7 @@ public class ToolboxItemTests
             false
         };
 
-        yield return new object[] { new ToolboxItem(), new object(), false };
+        yield return new object[] { new ToolboxItem(), new(), false };
         yield return new object[] { new ToolboxItem(), null, false };
     }
 
@@ -1338,7 +1337,7 @@ public class ToolboxItemTests
         using Bitmap bitmap = new(10, 10);
         using Bitmap originalBitmap = new(10, 10);
 
-        var filter = new ToolboxItemFilterAttribute[] { new ToolboxItemFilterAttribute("Filter") };
+        var filter = new ToolboxItemFilterAttribute[] { new("Filter") };
         ToolboxItem item = new()
         {
             AssemblyName = new AssemblyName("AssemblyName"),
@@ -1384,7 +1383,7 @@ public class ToolboxItemTests
         using (Bitmap bitmap = new(10, 10))
         using (Bitmap originalBitmap = new(10, 10))
         {
-            var filter = new ToolboxItemFilterAttribute[] { new ToolboxItemFilterAttribute("Filter") };
+            var filter = new ToolboxItemFilterAttribute[] { new("Filter") };
             ToolboxItem item = new()
             {
                 AssemblyName = new AssemblyName("AssemblyName"),
@@ -1415,7 +1414,7 @@ public class ToolboxItemTests
         using (Bitmap bitmap = new(10, 10))
         using (Bitmap originalBitmap = new(10, 10))
         {
-            var filter = new ToolboxItemFilterAttribute[] { new ToolboxItemFilterAttribute("Filter") };
+            var filter = new ToolboxItemFilterAttribute[] { new("Filter") };
             ToolboxItem item = new()
             {
                 AssemblyName = new AssemblyName("AssemblyName"),
@@ -1720,7 +1719,7 @@ public class ToolboxItemTests
             throw new NotImplementedException();
         }
 
-        public List<AssemblyName> ReferenceAssemblies { get; } = new List<AssemblyName>();
+        public List<AssemblyName> ReferenceAssemblies { get; } = new();
 
         public void ReferenceAssembly(AssemblyName name)
         {

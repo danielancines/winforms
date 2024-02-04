@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 #nullable enable
 
@@ -15,7 +14,7 @@ namespace System.Windows.Forms.Analyzers.Tests;
 [ExcludeFromCodeCoverage]
 internal sealed class CompilerAnalyzerConfigOptions : AnalyzerConfigOptions
 {
-    public static CompilerAnalyzerConfigOptions Empty { get; } = new CompilerAnalyzerConfigOptions(ImmutableDictionary.Create<string, string>());
+    public static CompilerAnalyzerConfigOptions Empty { get; } = new(ImmutableDictionary.Create<string, string>());
 
     private readonly ImmutableDictionary<string, string> _backing;
 

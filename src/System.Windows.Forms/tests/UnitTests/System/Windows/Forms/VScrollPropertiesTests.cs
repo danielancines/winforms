@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -17,7 +16,7 @@ public class VScrollPropertiesTests
     [MemberData(nameof(Ctor_ScrollableControl_TestData))]
     public void VScrollProperties_Ctor_Control(ScrollableControl container)
     {
-        var properties = new SubVScrollProperties(container);
+        SubVScrollProperties properties = new(container);
         Assert.Equal(container, properties.ParentControlEntry);
         Assert.True(properties.Enabled);
         Assert.Equal(10, properties.LargeChange);

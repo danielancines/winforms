@@ -1,9 +1,9 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing.Design;
 using System.Reflection;
+using Windows.Win32.UI.Accessibility;
 
 namespace System.Windows.Forms.Design.Tests;
 
@@ -28,9 +28,9 @@ public class ContentAlignmentEditorTests
         var item = (Control)contentUI.GetType()
             .GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance).GetValue(contentUI);
 
-        object actual = item.AccessibilityObject.TestAccessor().Dynamic
-            .GetPropertyValue(Interop.UiaCore.UIA.ControlTypePropertyId);
+        var actual = (UIA_CONTROLTYPE_ID)(int)item.AccessibilityObject.TestAccessor().Dynamic
+            .GetPropertyValue(UIA_PROPERTY_ID.UIA_ControlTypePropertyId);
 
-        Assert.Equal(Interop.UiaCore.UIA.RadioButtonControlTypeId, actual);
+        Assert.Equal(UIA_CONTROLTYPE_ID.UIA_RadioButtonControlTypeId, actual);
     }
 }

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Drawing.Design;
@@ -23,7 +22,7 @@ public class DockEditorTests
         yield return new object[] { null };
         yield return new object[] { "value" };
         yield return new object[] { DockStyle.Top };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
     }
 
     [Theory]

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Runtime.Serialization;
@@ -21,7 +20,7 @@ internal static class BinaryFormatTestExtensions
     public static Stream Serialize(this object source)
     {
         MemoryStream stream = new();
-        using var formatterScope = new BinaryFormatterScope(enable: true);
+        using BinaryFormatterScope formatterScope = new(enable: true);
 #pragma warning disable SYSLIB0011 // Type or member is obsolete
         BinaryFormatter formatter = new();
 #pragma warning restore SYSLIB0011

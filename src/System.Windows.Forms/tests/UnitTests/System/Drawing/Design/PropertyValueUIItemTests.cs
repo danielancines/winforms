@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 
@@ -20,7 +19,7 @@ public class PropertyValueUIItemTests
     [MemberData(nameof(Ctor_Image_PropertyValueUIItemInvokeHandler_String_TestData))]
     public void PropertyValueUIItem_Ctor_Image_PropertyValueUIItemInvokeHandler_String(Image uiItemImage, PropertyValueUIItemInvokeHandler handler, string tooltip)
     {
-        var item = new PropertyValueUIItem(uiItemImage, handler, tooltip);
+        PropertyValueUIItem item = new(uiItemImage, handler, tooltip);
         Assert.Same(uiItemImage, item.Image);
         Assert.Same(handler, item.InvokeHandler);
         Assert.Same(tooltip, item.ToolTip);
@@ -35,7 +34,7 @@ public class PropertyValueUIItemTests
     [Fact]
     public void PropertyValueUIItem_Ctor_NullHandler_ThrowsArgumentNullException()
     {
-        using (var uiItemImage = new Bitmap(10, 10))
+        using (Bitmap uiItemImage = new(10, 10))
         {
             Assert.Throws<ArgumentNullException>("handler", () => new PropertyValueUIItem(uiItemImage, null, "tooltip"));
         }

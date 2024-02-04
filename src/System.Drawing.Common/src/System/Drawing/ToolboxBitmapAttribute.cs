@@ -3,14 +3,12 @@
 
 using System.Drawing.Imaging;
 using System.IO;
-using DpiHelper = System.Windows.Forms.DpiHelper;
-using Gdip = System.Drawing.SafeNativeMethods.Gdip;
 
 namespace System.Drawing;
 
 /// <summary>
-/// ToolboxBitmapAttribute defines the images associated with a specified component.
-/// The component can offer a small and large image (large is optional).
+///  ToolboxBitmapAttribute defines the images associated with a specified component.
+///  The component can offer a small and large image (large is optional).
 /// </summary>
 [AttributeUsage(AttributeTargets.Class)]
 public class ToolboxBitmapAttribute : Attribute
@@ -70,7 +68,7 @@ public class ToolboxBitmapAttribute : Attribute
 
     public Image? GetImage(object? component, bool large)
     {
-        if (component != null)
+        if (component is not null)
         {
             return GetImage(component.GetType(), large);
         }
@@ -84,13 +82,13 @@ public class ToolboxBitmapAttribute : Attribute
 
     public Image? GetImage(Type type, string? imgName, bool large)
     {
-        if ((large && _largeImage == null) || (!large && _smallImage == null))
+        if ((large && _largeImage is null) || (!large && _smallImage is null))
         {
             Image? img = large ? _largeImage : _smallImage;
             img ??= GetImageFromResource(type, imgName, large);
 
             // last resort for large images.
-            if (large && _largeImage == null && _smallImage != null)
+            if (large && _largeImage is null && _smallImage is not null)
             {
                 img = new Bitmap((Bitmap)_smallImage, s_largeSize.Width, s_largeSize.Height);
             }
@@ -100,13 +98,13 @@ public class ToolboxBitmapAttribute : Attribute
                 MakeBackgroundAlphaZero(b);
             }
 
-            if (img == null)
+            if (img is null)
             {
                 img = s_defaultComponent.GetImage(type, large);
 
                 // We don't want to hand out the static shared image
                 // because otherwise it might get disposed.
-                if (img != null)
+                if (img is not null)
                 {
                     img = (Image)img.Clone();
                 }
@@ -122,7 +120,7 @@ public class ToolboxBitmapAttribute : Attribute
             }
         }
 
-        Image? toReturn = (large) ? _largeImage : _smallImage;
+        Image? toReturn = large ? _largeImage : _smallImage;
 
         if (Equals(Default))
         {
@@ -136,17 +134,19 @@ public class ToolboxBitmapAttribute : Attribute
     // Helper to get the right icon from the given stream that represents an icon.
     private static Bitmap? GetIconFromStream(Stream? stream, bool large, bool scaled)
     {
-        if (stream == null)
+        if (stream is null)
         {
             return null;
         }
-        Icon ico = new Icon(stream);
-        Icon sizedico = new Icon(ico, large ? s_largeSize : s_smallSize);
+
+        Icon ico = new(stream);
+        Icon sizedico = new(ico, large ? s_largeSize : s_smallSize);
         Bitmap? b = sizedico.ToBitmap();
         if (DpiHelper.IsScalingRequired && scaled)
         {
             DpiHelper.ScaleBitmapLogicalToDevice(ref b);
         }
+
         return b;
     }
 
@@ -156,18 +156,18 @@ public class ToolboxBitmapAttribute : Attribute
         Image? image = null;
         try
         {
-            if (imageFile != null)
+            if (imageFile is not null)
             {
                 string? ext = Path.GetExtension(imageFile);
-                if (ext != null && string.Equals(ext, ".ico", StringComparison.OrdinalIgnoreCase))
+                if (ext is not null && string.Equals(ext, ".ico", StringComparison.OrdinalIgnoreCase))
                 {
-                    //ico files support both large and small, so we respect the large flag here.
+                    // ico files support both large and small, so we respect the large flag here.
                     using FileStream reader = File.OpenRead(imageFile!);
                     image = GetIconFromStream(reader, large, scaled);
                 }
                 else if (!large)
                 {
-                    //we only read small from non-ico files.
+                    // we only read small from non-ico files.
                     image = Image.FromFile(imageFile!);
                     Bitmap? b = image as Bitmap;
                     if (DpiHelper.IsScalingRequired && scaled)
@@ -186,7 +186,7 @@ public class ToolboxBitmapAttribute : Attribute
 
     private static Image? GetBitmapFromResource(Type t, string? bitmapname, bool large, bool scaled)
     {
-        if (bitmapname == null)
+        if (bitmapname is null)
         {
             return null;
         }
@@ -195,7 +195,7 @@ public class ToolboxBitmapAttribute : Attribute
 
         // Load the image from the manifest resources.
         Stream? stream = BitmapSelector.GetResourceStream(t, bitmapname);
-        if (stream != null)
+        if (stream is not null)
         {
             Bitmap? b = new Bitmap(stream);
             img = b;
@@ -204,6 +204,7 @@ public class ToolboxBitmapAttribute : Attribute
             {
                 img = new Bitmap(b, s_largeSize.Width, s_largeSize.Height);
             }
+
             if (DpiHelper.IsScalingRequired && scaled)
             {
                 b = (Bitmap)img;
@@ -211,12 +212,13 @@ public class ToolboxBitmapAttribute : Attribute
                 img = b;
             }
         }
+
         return img;
     }
 
     private static Bitmap? GetIconFromResource(Type t, string? bitmapname, bool large, bool scaled)
     {
-        if (bitmapname == null)
+        if (bitmapname is null)
         {
             return null;
         }
@@ -240,7 +242,7 @@ public class ToolboxBitmapAttribute : Attribute
             string? rawbmpname = null;
 
             // If we didn't get a name, use the class name
-            if (name == null)
+            if (name is null)
             {
                 name = t.FullName!;
                 int indexDot = name.LastIndexOf('.');
@@ -276,15 +278,18 @@ public class ToolboxBitmapAttribute : Attribute
                     iconname = name + ".ico";
                 }
             }
-            if (rawbmpname != null)
+
+            if (rawbmpname is not null)
             {
                 img = GetBitmapFromResource(t, rawbmpname, large, scaled);
             }
-            if (img == null && bmpname != null)
+
+            if (img is null && bmpname is not null)
             {
                 img = GetBitmapFromResource(t, bmpname, large, scaled);
             }
-            if (img == null && iconname != null)
+
+            if (img is null && iconname is not null)
             {
                 img = GetIconFromResource(t, iconname, large, scaled);
             }
@@ -317,9 +322,9 @@ public class ToolboxBitmapAttribute : Attribute
         Gdip.DummyFunction();
 
         Stream? stream = BitmapSelector.GetResourceStream(typeof(ToolboxBitmapAttribute), "DefaultComponent.bmp");
-        Debug.Assert(stream != null, "DefaultComponent.bmp must be present as an embedded resource.");
+        Debug.Assert(stream is not null, "DefaultComponent.bmp must be present as an embedded resource.");
 
-        var bitmap = new Bitmap(stream);
+        Bitmap bitmap = new(stream);
         MakeBackgroundAlphaZero(bitmap);
         s_defaultComponent = new ToolboxBitmapAttribute(bitmap, null);
     }

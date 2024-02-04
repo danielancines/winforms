@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 using System.Drawing;
@@ -59,6 +58,55 @@ public class HashtableTests
         enumerator.Current.Value.Should().BeEquivalentTo(new object[] { "That" });
     }
 
+    [Fact]
+    public void HashTable_CustomComparer()
+    {
+        Hashtable hashtable = new(new CustomHashCodeProvider(), StringComparer.OrdinalIgnoreCase)
+        {
+            { "This", "That" }
+        };
+
+        BinaryFormattedObject format = hashtable.SerializeAndParse();
+        format[1].Should().BeOfType<BinaryLibrary>();
+        format[2].Should().BeOfType<SystemClassWithMembersAndTypes>().Which.Name.Should().Be("System.Collections.Hashtable");
+        format[3].Should().BeOfType<SystemClassWithMembersAndTypes>().Which.Name.Should().Be("System.OrdinalComparer");
+        format[4].Should().BeOfType<ClassWithMembersAndTypes>().Which.Name.Should().Be("System.Windows.Forms.BinaryFormat.Tests.HashtableTests+CustomHashCodeProvider");
+        format[5].Should().BeOfType<ArraySingleObject>();
+        format[6].Should().BeOfType<ArraySingleObject>();
+    }
+
+    [Fact]
+    public void HashTable_CustomComparer_DoesNotRead()
+    {
+        Hashtable hashtable = new(new CustomHashCodeProvider(), StringComparer.OrdinalIgnoreCase)
+        {
+            { "This", "That" }
+        };
+
+        BinaryFormattedObject format = hashtable.SerializeAndParse();
+        format.TryGetPrimitiveHashtable(out Hashtable? deserialized).Should().BeFalse();
+        deserialized.Should().BeNull();
+    }
+
+    [Serializable]
+    public class CustomHashCodeProvider : IHashCodeProvider
+    {
+        public int GetHashCode(object obj) => HashCode.Combine(obj);
+    }
+
+    [Fact]
+    public void BinaryFormatWriter_WriteCustomComparerfails()
+    {
+        Hashtable hashtable = new(new CustomHashCodeProvider(), StringComparer.OrdinalIgnoreCase)
+        {
+            { "This", "That" }
+        };
+
+        using MemoryStream stream = new();
+        BinaryFormatWriter.TryWriteHashtable(stream, hashtable).Should().BeFalse();
+        stream.Position.Should().Be(0);
+    }
+
     [Theory]
     [MemberData(nameof(Hashtables_TestData))]
     public void BinaryFormatWriter_WriteHashtables(Hashtable hashtable)
@@ -67,14 +115,14 @@ public class HashtableTests
         BinaryFormatWriter.WritePrimitiveHashtable(stream, hashtable);
         stream.Position = 0;
 
-        using var formatterScope = new BinaryFormatterScope(enable: true);
+        using BinaryFormatterScope formatterScope = new(enable: true);
 #pragma warning disable SYSLIB0011 // Type or member is obsolete
         BinaryFormatter formatter = new();
         Hashtable deserialized = (Hashtable)formatter.Deserialize(stream);
 #pragma warning restore SYSLIB0011
 
         deserialized.Count.Should().Be(hashtable.Count);
-        foreach (var key in hashtable.Keys)
+        foreach (object? key in hashtable.Keys)
         {
             deserialized[key].Should().Be(hashtable[key]);
         }
@@ -97,7 +145,7 @@ public class HashtableTests
         format.TryGetPrimitiveHashtable(out Hashtable? deserialized).Should().BeTrue();
 
         deserialized!.Count.Should().Be(hashtable.Count);
-        foreach (var key in hashtable.Keys)
+        foreach (object? key in hashtable.Keys)
         {
             deserialized[key].Should().Be(hashtable[key]);
         }
@@ -114,7 +162,7 @@ public class HashtableTests
         BinaryFormattedObject format = new(stream);
         format.TryGetPrimitiveHashtable(out Hashtable? deserialized).Should().BeTrue();
         deserialized!.Count.Should().Be(hashtable.Count);
-        foreach (var key in hashtable.Keys)
+        foreach (object? key in hashtable.Keys)
         {
             deserialized[key].Should().Be(hashtable[key]);
         }

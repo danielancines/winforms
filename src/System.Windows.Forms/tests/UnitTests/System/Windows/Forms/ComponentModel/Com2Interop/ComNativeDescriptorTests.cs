@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 using System.ComponentModel;
@@ -12,7 +11,6 @@ using Windows.Win32.System.Ole;
 using Windows.Win32.System.Variant;
 using Windows.Win32.UI.Accessibility;
 using WMPLib;
-using static Interop;
 
 namespace System.Windows.Forms.ComponentModel.Com2Interop.Tests;
 
@@ -92,16 +90,16 @@ public unsafe class ComNativeDescriptorTests
     public void ComNativeDescriptor_GetProperties_FromActiveXMediaPlayerControl_ComInterop()
     {
         Guid guid = typeof(WindowsMediaPlayerClass).GUID;
-        HRESULT hr = Ole32.CoCreateInstance(
+        HRESULT hr = PInvokeCore.CoCreateInstance(
             in guid,
-            IntPtr.Zero,
+            pUnkOuter: null,
             CLSCTX.CLSCTX_INPROC_SERVER,
-            in IID.GetRef<IUnknown>(),
-            out object mediaPlayer);
+            out IUnknown* mediaPlayerPtr);
 
         Assert.Equal(HRESULT.S_OK, hr);
 
         ComNativeDescriptor descriptor = new();
+        object mediaPlayer = ComHelpers.GetObjectForIUnknown(mediaPlayerPtr);
         ValidateMediaPlayerProperties(mediaPlayer, descriptor.GetProperties(mediaPlayer));
     }
 
@@ -110,7 +108,7 @@ public unsafe class ComNativeDescriptorTests
     {
         Guid guid = typeof(WindowsMediaPlayerClass).GUID;
         ComScope<IUnknown> unknown = new(null);
-        HRESULT hr = PInvoke.CoCreateInstance(
+        HRESULT hr = PInvokeCore.CoCreateInstance(
             &guid,
             null,
             CLSCTX.CLSCTX_INPROC_SERVER,
@@ -234,19 +232,11 @@ public unsafe class ComNativeDescriptorTests
     ///  just forwards to the IDispatch ITypeInfo to exercise the IProvideMultipleClassInfo code path.
     /// </summary>
     private unsafe class StandardAccessibleObjectWithMultipleClassInfo :
-        StandardDispatch,
+        AccessibleDispatch,
         IProvideMultipleClassInfo.Interface,
         IAccessible.Interface,
         IManagedWrapper<IAccessible, IDispatch, IProvideMultipleClassInfo>
     {
-        // The accessibility TypeLib- lives in oleacc.dll
-        private static readonly Guid s_accessibilityTypeLib = new("1ea4dbf0-3c3b-11cf-810c-00aa00389b71");
-
-        public StandardAccessibleObjectWithMultipleClassInfo()
-            : base(s_accessibilityTypeLib, 1, 1, IAccessible.IID_Guid)
-        {
-        }
-
         HRESULT IProvideMultipleClassInfo.Interface.GetClassInfo(ITypeInfo** ppTI) => HRESULT.E_NOTIMPL;
 
         HRESULT IProvideMultipleClassInfo.Interface.GetGUID(uint dwGuidKind, Guid* pGUID) => HRESULT.E_NOTIMPL;

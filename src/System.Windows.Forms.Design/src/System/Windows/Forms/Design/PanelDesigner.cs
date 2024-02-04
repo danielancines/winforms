@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -74,7 +73,7 @@ internal class PanelDesigner : ScrollableControlDesigner
                           ControlPaint.Light(Control.BackColor) :
                           ControlPaint.Dark(Control.BackColor);
 
-            Pen pen = new Pen(penColor);
+            Pen pen = new(penColor);
             pen.DashStyle = DashStyle.Dash;
 
             return pen;

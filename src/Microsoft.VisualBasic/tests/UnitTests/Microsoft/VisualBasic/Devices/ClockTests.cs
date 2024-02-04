@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace Microsoft.VisualBasic.Devices.Tests;
 
@@ -9,7 +8,7 @@ public class ClockTests
     [Fact]
     public void LocalTime()
     {
-        var clock = new Clock();
+        Clock clock = new();
 
         var before = clock.LocalTime;
         System.Threading.Thread.Sleep(10);
@@ -26,7 +25,7 @@ public class ClockTests
     [Fact]
     public void GmtTime()
     {
-        var clock = new Clock();
+        Clock clock = new();
 
         var before = clock.GmtTime;
         System.Threading.Thread.Sleep(10);
@@ -43,12 +42,12 @@ public class ClockTests
     [Fact]
     public void TickCount()
     {
-        var clock = new Clock();
+        Clock clock = new();
 
-        var before = clock.TickCount;
+        int before = clock.TickCount;
         System.Threading.Thread.Sleep(10);
 
-        var after = clock.TickCount;
+        int after = clock.TickCount;
         Assert.True(before <= after);
     }
 }

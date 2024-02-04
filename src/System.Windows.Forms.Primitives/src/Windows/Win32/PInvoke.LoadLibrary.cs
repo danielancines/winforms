@@ -1,10 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Runtime.InteropServices;
 using Windows.Win32.System.LibraryLoader;
-using static Interop;
 
 namespace Windows.Win32;
 
@@ -56,7 +54,7 @@ internal static partial class PInvoke
         }
 
         // Load without this flag.
-        if (Marshal.GetLastWin32Error() != ERROR.INVALID_PARAMETER)
+        if (Marshal.GetLastWin32Error() != (int)WIN32_ERROR.ERROR_INVALID_PARAMETER)
         {
             return HINSTANCE.Null;
         }

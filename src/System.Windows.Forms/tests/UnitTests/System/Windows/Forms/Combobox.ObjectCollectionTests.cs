@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 using System.Windows.Forms.IntegrationTests.Common;
@@ -16,13 +15,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Add_Invoke_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         comboBoxObjectCollection.Add("a");
         comboBoxObjectCollection.Add("b");
@@ -38,16 +37,16 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Add_Object_Invoke_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
-        var person1 = new Person(1, "Name 1");
-        var person2 = new Person(2, "Name 2");
+        Person person1 = new(1, "Name 1");
+        Person person2 = new(2, "Name 2");
 
         comboBoxObjectCollection.Add(person1);
         comboBoxObjectCollection.Add(person2);
@@ -63,13 +62,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Add_Invoke_ReturnExpected(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         int firstIndex = comboBoxObjectCollection.Add("a");
         int secondIndex = comboBoxObjectCollection.Add("a");
@@ -84,13 +83,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Add_Invoke_NullItem_ThrowsArgumentNullException(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         Assert.Throws<ArgumentNullException>("item", () => comboBoxObjectCollection.Add(null));
         Assert.Equal(createControl, comboBox.IsHandleCreated);
@@ -111,7 +110,7 @@ public class ComboBox_ComboBoxObjectCollectionTests
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         Assert.Throws<ArgumentException>(() => comboBoxObjectCollection.Add("a"));
         Assert.Equal(createControl, comboBox.IsHandleCreated);
@@ -122,14 +121,14 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Sorted_Add_Invoke_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
         comboBox.Sorted = true;
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         comboBoxObjectCollection.Add("b");
         comboBoxObjectCollection.Add("c");
@@ -158,11 +157,11 @@ public class ComboBox_ComboBoxObjectCollectionTests
         }
 
         comboBox.Sorted = true;
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
-        var person1 = new Person(1, "Name 1");
-        var person2 = new Person(2, "Name 2");
-        var person3 = new Person(3, "Name 3");
+        Person person1 = new(1, "Name 1");
+        Person person2 = new(2, "Name 2");
+        Person person3 = new(3, "Name 3");
 
         comboBoxObjectCollection.Add(person3);
         comboBoxObjectCollection.Add(person1);
@@ -191,10 +190,10 @@ public class ComboBox_ComboBoxObjectCollectionTests
         }
 
         comboBox.Sorted = true;
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
-        var person1 = new Person(1, "Name 1");
-        var person2 = new Person(3, "Name 3");
+        Person person1 = new(1, "Name 1");
+        Person person2 = new(3, "Name 3");
 
         comboBoxObjectCollection.Add(person2);
         comboBoxObjectCollection.Add(person1);
@@ -212,14 +211,14 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Sorted_Add_Invoke_ReturnExpected(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
         comboBox.Sorted = true;
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         int firstIndex = comboBoxObjectCollection.Add("c");
         int secondIndex = comboBoxObjectCollection.Add("a");
@@ -235,13 +234,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_AddRange_Invoke_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.AddRange(new string[] { "a", "b" });
 
         // Check string values
@@ -255,17 +254,17 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_AddRange_Objects_Invoke_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        var person1 = new Person(1, "Name 1");
-        var person2 = new Person(2, "Name 2");
-        var person3 = new Person(3, "Name 3");
+        Person person1 = new(1, "Name 1");
+        Person person2 = new(2, "Name 2");
+        Person person3 = new(3, "Name 3");
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.AddRange(new Person[] { person1, person2, person3 });
 
         // Check string values
@@ -280,14 +279,14 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Sorted_AddRange_Invoke_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
         comboBox.Sorted = true;
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         comboBoxObjectCollection.AddRange(new string[] { "c", "a", "b" });
 
@@ -314,11 +313,11 @@ public class ComboBox_ComboBoxObjectCollectionTests
         }
 
         comboBox.Sorted = true;
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
-        var person1 = new Person(1, "Name 1");
-        var person2 = new Person(2, "Name 2");
-        var person3 = new Person(3, "Name 3");
+        Person person1 = new(1, "Name 1");
+        Person person2 = new(2, "Name 2");
+        Person person3 = new(3, "Name 3");
 
         comboBoxObjectCollection.AddRange(new Person[] { person3, person1, person2 });
 
@@ -345,10 +344,10 @@ public class ComboBox_ComboBoxObjectCollectionTests
         }
 
         comboBox.Sorted = true;
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
-        var person1 = new Person(1, "Name 1");
-        var person2 = new Person(3, "Name 3");
+        Person person1 = new(1, "Name 1");
+        Person person2 = new(3, "Name 3");
 
         comboBoxObjectCollection.AddRange(new object[] { "Name 2", person1, person2 });
 
@@ -364,13 +363,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_AddRange_Invoke_NullItems_ThrowsArgumentNullException(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         Assert.Throws<ArgumentNullException>("items", () => comboBoxObjectCollection.AddRange(null));
         Assert.Equal(createControl, comboBox.IsHandleCreated);
     }
@@ -390,7 +389,7 @@ public class ComboBox_ComboBoxObjectCollectionTests
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         Assert.Throws<ArgumentException>(() => comboBoxObjectCollection.AddRange(new string[] { "a", "b" }));
         Assert.Equal(createControl, comboBox.IsHandleCreated);
@@ -401,13 +400,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Clear_Invoke_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.AddRange(new string[] { "c", "a", "b" });
 
         Assert.Equal(3, comboBoxObjectCollection.Count);
@@ -423,7 +422,7 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [WinFormsFact]
     public void ComboBoxObjectCollection_Clear_Invoke_ClearItemAccessibleObjects()
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         comboBox.CreateControl();
         ObjectCollection comboBoxObjectCollection = comboBox.Items;
         comboBoxObjectCollection.AddRange(new string[] { "a", "b" });
@@ -458,7 +457,7 @@ public class ComboBox_ComboBoxObjectCollectionTests
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         Assert.Throws<ArgumentException>(() => comboBoxObjectCollection.Clear());
         Assert.Equal(createControl, comboBox.IsHandleCreated);
@@ -469,13 +468,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Contains_Invoke_ReturnExpected(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.AddRange(new string[] { "a", "b" });
 
         Assert.True(comboBoxObjectCollection.Contains("a"));
@@ -493,16 +492,16 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Contains_Object_Invoke_ReturnExpected(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
-        var person1 = new Person(1, "Name 1");
-        var person2 = new Person(2, "Name 2");
-        var person3 = new Person(3, "Name 3");
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
+        Person person1 = new(1, "Name 1");
+        Person person2 = new(2, "Name 2");
+        Person person3 = new(3, "Name 3");
 
         comboBoxObjectCollection.AddRange(new object[] { person1, person2 });
 
@@ -521,13 +520,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_CopyTo_Invoke_NullArray_ThrowsArgumentNullException(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         Assert.Throws<ArgumentNullException>("destination", () => comboBoxObjectCollection.CopyTo(null, 1));
         Assert.Equal(createControl, comboBox.IsHandleCreated);
@@ -538,13 +537,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_CopyTo_Invoke_NegativeIndex_ThrowsArgumentNullException(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         Assert.Throws<ArgumentOutOfRangeException>("arrayIndex", () => comboBoxObjectCollection.CopyTo(new object[1], -1));
         Assert.Equal(createControl, comboBox.IsHandleCreated);
@@ -555,13 +554,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_CopyTo_Invoke_TooMoreIndex_ThrowsArgumentNullException(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         Assert.Throws<ArgumentOutOfRangeException>("arrayIndex", () => comboBoxObjectCollection.CopyTo(new object[1], 3));
         Assert.Equal(createControl, comboBox.IsHandleCreated);
@@ -572,14 +571,14 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_CopyTo_InvokeEmpty_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
-        object[] array = new object[] { "1", "2", "3" };
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
+        object[] array = ["1", "2", "3"];
 
         comboBoxObjectCollection.CopyTo(array, 1);
 
@@ -592,16 +591,16 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_CopyTo_InvokeNotEmpty_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.Add(1);
         comboBoxObjectCollection.Add(2);
-        object[] array = new object[] { "1", "2", "3" };
+        object[] array = ["1", "2", "3"];
 
         comboBoxObjectCollection.CopyTo(array, 1);
 
@@ -614,13 +613,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Insert_Invoke_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.Add("a");
         comboBoxObjectCollection.Add("b");
 
@@ -637,17 +636,17 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Insert_Object_Invoke_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        var person1 = new Person(1, "Name 1");
-        var person2 = new Person(2, "Name 2");
-        var person3 = new Person(3, "Name 3");
+        Person person1 = new(1, "Name 1");
+        Person person2 = new(2, "Name 2");
+        Person person3 = new(3, "Name 3");
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.Add(person1);
         comboBoxObjectCollection.Add(person2);
 
@@ -664,14 +663,14 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Sorted_Insert_Invoke_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
         comboBox.Sorted = true;
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.Add("a");
         comboBoxObjectCollection.Add("b");
 
@@ -699,10 +698,10 @@ public class ComboBox_ComboBoxObjectCollectionTests
         }
 
         comboBox.Sorted = true;
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
-        var person1 = new Person(1, "Name 1");
-        var person2 = new Person(2, "Name 2");
-        var person3 = new Person(3, "Name 3");
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
+        Person person1 = new(1, "Name 1");
+        Person person2 = new(2, "Name 2");
+        Person person3 = new(3, "Name 3");
         comboBoxObjectCollection.Add(person1);
         comboBoxObjectCollection.Add(person2);
 
@@ -730,9 +729,9 @@ public class ComboBox_ComboBoxObjectCollectionTests
         }
 
         comboBox.Sorted = true;
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
-        var person1 = new Person(1, "Name 1");
-        var person2 = new Person(3, "Name 3");
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
+        Person person1 = new(1, "Name 1");
+        Person person2 = new(3, "Name 3");
         comboBoxObjectCollection.Add(person1);
         comboBoxObjectCollection.Add("Name 2");
 
@@ -751,13 +750,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Insert_Invoke_NullItem_ThrowsArgumentNullException(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         Assert.Throws<ArgumentNullException>("item", () => comboBoxObjectCollection.Insert(0, null));
         Assert.Equal(createControl, comboBox.IsHandleCreated);
@@ -768,13 +767,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Insert_Invoke_NegativeIndex_ThrowsArgumentNullException(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         Assert.Throws<ArgumentOutOfRangeException>("index", () => comboBoxObjectCollection.Insert(-1, 1));
         Assert.Equal(createControl, comboBox.IsHandleCreated);
@@ -785,13 +784,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Insert_Invoke_TooMoreIndex_ThrowsArgumentNullException(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         Assert.Throws<ArgumentOutOfRangeException>("index", () => comboBoxObjectCollection.Insert(3, 1));
         Assert.Equal(createControl, comboBox.IsHandleCreated);
@@ -812,7 +811,7 @@ public class ComboBox_ComboBoxObjectCollectionTests
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         Assert.Throws<ArgumentException>(() => comboBoxObjectCollection.Insert(3, 1));
         Assert.Equal(createControl, comboBox.IsHandleCreated);
@@ -823,13 +822,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_RemoveAt_Invoke_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.Add("a");
         comboBoxObjectCollection.Add("b");
 
@@ -843,7 +842,7 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [WinFormsFact]
     public void ComboBoxObjectCollection_RemoveAt_Invoke_RemoveItemAccessibleObject()
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         comboBox.CreateControl();
 
         comboBox.CreateControl();
@@ -867,13 +866,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_RemoveAt_Invoke_NegativeIndex_ThrowsArgumentNullException(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         Assert.Throws<ArgumentOutOfRangeException>("index", () => comboBoxObjectCollection.RemoveAt(-1));
         Assert.Equal(createControl, comboBox.IsHandleCreated);
@@ -884,13 +883,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_RemoveAt_Invoke_TooMoreIndex_ThrowsArgumentNullException(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         Assert.Throws<ArgumentOutOfRangeException>("index", () => comboBoxObjectCollection.RemoveAt(3));
         Assert.Equal(createControl, comboBox.IsHandleCreated);
@@ -911,7 +910,7 @@ public class ComboBox_ComboBoxObjectCollectionTests
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         Assert.Throws<ArgumentException>(() => comboBoxObjectCollection.RemoveAt(0));
         Assert.Equal(createControl, comboBox.IsHandleCreated);
@@ -922,13 +921,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Remove_Invoke_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.Add("a");
         comboBoxObjectCollection.Add("b");
 
@@ -944,13 +943,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Remove_Invoke_NonExistingItem_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.Add("a");
         comboBoxObjectCollection.Add("b");
 
@@ -965,16 +964,16 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Remove_Object_Invoke_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
-        var person1 = new Person(1, "Name 1");
-        var person2 = new Person(2, "Name 2");
-        var person3 = new Person(3, "Name 3");
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
+        Person person1 = new(1, "Name 1");
+        Person person2 = new(2, "Name 2");
+        Person person3 = new(3, "Name 3");
         comboBoxObjectCollection.Add(person1);
         comboBoxObjectCollection.Add(person2);
 
@@ -996,13 +995,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Remove_Entry_Invoke_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.Add("a");
         comboBoxObjectCollection.Add("b");
 
@@ -1016,7 +1015,7 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [WinFormsFact]
     public void ComboBoxObjectCollection_Remove_Invoke_RemoveItemAccessibleObject()
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         comboBox.CreateControl();
 
         comboBox.CreateControl();
@@ -1040,13 +1039,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_Remove_Invoke_DataSourceExists_ThrowsArgumentException(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.Add("a");
         comboBox.DataSource = new string[] { "b" };
 
@@ -1059,13 +1058,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_SetItemInternal_Invoke_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.Add("a");
         comboBoxObjectCollection.Add("b");
         comboBoxObjectCollection.SetItemInternal(0, "c");
@@ -1081,16 +1080,16 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_SetItemInternal_Object_Invoke_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
-        var person1 = new Person(1, "Name 1");
-        var person2 = new Person(2, "Name 2");
-        var person3 = new Person(3, "Name 3");
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
+        Person person1 = new(1, "Name 1");
+        Person person2 = new(2, "Name 2");
+        Person person3 = new(3, "Name 3");
         comboBoxObjectCollection.Add(person1);
         comboBoxObjectCollection.Add(person2);
         comboBoxObjectCollection.SetItemInternal(0, person3);
@@ -1106,13 +1105,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_SetItemInternal_Invoke_NullItem_ThrowsArgumentNullException(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.Add("a");
 
         Assert.Throws<ArgumentNullException>("value", () => comboBoxObjectCollection.SetItemInternal(0, null));
@@ -1124,13 +1123,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_SetItemInternal_Invoke_NegativeIndex_ThrowsArgumentNullException(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         Assert.Throws<ArgumentOutOfRangeException>("index", () => comboBoxObjectCollection.SetItemInternal(-1, 1));
         Assert.Equal(createControl, comboBox.IsHandleCreated);
@@ -1141,13 +1140,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_SetItemInternal_Invoke_TooMoreIndex_ThrowsArgumentNullException(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         Assert.Throws<ArgumentOutOfRangeException>("index", () => comboBoxObjectCollection.SetItemInternal(3, 1));
         Assert.Equal(createControl, comboBox.IsHandleCreated);
@@ -1158,13 +1157,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_IndexOf_ReturnExpected(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.Add("a");
         comboBoxObjectCollection.Add("b");
 
@@ -1184,16 +1183,16 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_IndexOf_Object_ReturnExpected(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
-        var person1 = new Person(1, "Name 1");
-        var person2 = new Person(2, "Name 2");
-        var person3 = new Person(3, "Name 3");
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
+        Person person1 = new(1, "Name 1");
+        Person person2 = new(2, "Name 2");
+        Person person3 = new(3, "Name 3");
         comboBoxObjectCollection.Add(person1);
         comboBoxObjectCollection.Add(person2);
 
@@ -1215,13 +1214,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_SetItem_Invoke_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.Add("a");
         comboBoxObjectCollection[0] = "b";
 
@@ -1234,16 +1233,16 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_SetItem_Object_Invoke_Success(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
-        var person1 = new Person(1, "Name 1");
-        var person2 = new Person(2, "Name 2");
-        var person3 = new Person(3, "Name 3");
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
+        Person person1 = new(1, "Name 1");
+        Person person2 = new(2, "Name 2");
+        Person person3 = new(3, "Name 3");
         comboBoxObjectCollection.Add(person1);
         comboBoxObjectCollection.Add(person2);
         comboBoxObjectCollection[0] = person3;
@@ -1257,10 +1256,10 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [WinFormsFact]
     public void ComboBoxObjectCollection_SetItem_DoesNotAffect_ItemsAccessibleObject()
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         comboBox.CreateControl();
         ComboBox.ComboBoxAccessibleObject accessibleObject = GetComboBoxAccessibleObject(comboBox);
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.Add("a");
         ComboBoxItemAccessibleObject oldAccessibleObjectItem = accessibleObject.ItemAccessibleObjects.GetComboBoxItemAccessibleObject(comboBoxObjectCollection.InnerList[0]);
         comboBoxObjectCollection[0] = "b";
@@ -1275,13 +1274,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_SetItem_Invoke_NullItem_ThrowsArgumentNullException(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.Add("a");
         Assert.Throws<ArgumentNullException>("value", () => comboBoxObjectCollection[0] = null);
         Assert.Equal(createControl, comboBox.IsHandleCreated);
@@ -1292,13 +1291,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_SetItem_Invoke_NegativeIndex_ThrowsArgumentNullException(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         Assert.Throws<ArgumentOutOfRangeException>("index", () => comboBoxObjectCollection[-1] = 1);
         Assert.Equal(createControl, comboBox.IsHandleCreated);
@@ -1309,13 +1308,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_SetItem_Invoke_TooMoreIndex_ThrowsArgumentNullException(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
 
         Assert.Throws<ArgumentOutOfRangeException>("index", () => comboBoxObjectCollection[3] = 1);
         Assert.Equal(createControl, comboBox.IsHandleCreated);
@@ -1326,13 +1325,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_SetItem_Invoke_DataSourceExists_ThrowsArgumentException(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         comboBoxObjectCollection.Add("a");
         comboBox.DataSource = new string[] { "b" };
 
@@ -1345,16 +1344,16 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_GetEnumerator_Invoke_Empty(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection collection = new ObjectCollection(comboBox);
+        ObjectCollection collection = new(comboBox);
         IEnumerator enumerator = collection.GetEnumerator();
 
-        ObjectCollection comboBoxObjectCollection = new ObjectCollection(comboBox);
+        ObjectCollection comboBoxObjectCollection = new(comboBox);
         for (int i = 0; i < 2; i++)
         {
             Assert.Throws<InvalidOperationException>(() => enumerator.Current);
@@ -1378,13 +1377,13 @@ public class ComboBox_ComboBoxObjectCollectionTests
     [InlineData(false)]
     public void ComboBoxObjectCollection_GetEnumerator_Invoke_NotEmpty(bool createControl)
     {
-        using ComboBox comboBox = new ComboBox();
+        using ComboBox comboBox = new();
         if (createControl)
         {
             comboBox.CreateControl();
         }
 
-        ObjectCollection collection = new ObjectCollection(comboBox);
+        ObjectCollection collection = new(comboBox);
         collection.Add(2);
         IEnumerator enumerator = collection.GetEnumerator();
 

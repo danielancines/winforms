@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using Moq;
 
@@ -12,7 +11,7 @@ public class KeyboardTooltipStateMachineTests
     public void HookToolTip()
     {
         using ToolTip toolTip = new();
-        var mock = new Mock<IKeyboardToolTip>(MockBehavior.Strict);
+        Mock<IKeyboardToolTip> mock = new(MockBehavior.Strict);
         IKeyboardToolTip keyboardToolTip = mock.Object;
 
         // Validate we don't get OnHooked if AllowsToolTip is false

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using System.Windows.Forms.Metafiles;
@@ -14,7 +13,7 @@ public partial class TextBoxTests
     {
         // Regression test for https://github.com/dotnet/winforms/issues/3706
 
-        using Form form = new Form();
+        using Form form = new();
         using TextBox textBox = new TextBox
         {
             Size = new Size(80, 23),
@@ -27,8 +26,8 @@ public partial class TextBoxTests
         Assert.NotEqual(IntPtr.Zero, form.Handle);
         Assert.NotEqual(IntPtr.Zero, textBox.Handle);
 
-        using var emf = new EmfScope();
-        DeviceContextState state = new DeviceContextState(emf);
+        using EmfScope emf = new();
+        DeviceContextState state = new(emf);
 
         textBox.TestAccessor().Dynamic.DrawPlaceholderText(emf.HDC);
 

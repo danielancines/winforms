@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Drawing;
@@ -14,7 +13,7 @@ public partial class ControlTests
     [WinFormsFact]
     public void Control_Ctor_Default()
     {
-        using var control = new SubControl();
+        using SubControl control = new();
         Assert.Null(control.AccessibleDefaultActionDescription);
         Assert.Null(control.AccessibleDescription);
         Assert.Null(control.AccessibleName);
@@ -103,7 +102,7 @@ public partial class ControlTests
     [NormalizedStringData]
     public void Control_Ctor_String(string text, string expectedText)
     {
-        using var control = new SubControl(text);
+        using SubControl control = new(text);
         Assert.Null(control.AccessibleDefaultActionDescription);
         Assert.Null(control.AccessibleDescription);
         Assert.Null(control.AccessibleName);
@@ -199,7 +198,7 @@ public partial class ControlTests
     [MemberData(nameof(Ctor_String_Int_Int_Int_Int_TestData))]
     public void Ctor_String_Int_Int_Int_Int(string text, int left, int top, int width, int height, string expectedText)
     {
-        using var control = new SubControl(text, left, top, width, height);
+        using SubControl control = new(text, left, top, width, height);
         Assert.Null(control.AccessibleDefaultActionDescription);
         Assert.Null(control.AccessibleDescription);
         Assert.Null(control.AccessibleName);
@@ -295,7 +294,7 @@ public partial class ControlTests
     [MemberData(nameof(Ctor_Control_String_TestData))]
     public void Control_Ctor_Control_String(Control parent, string text, string expectedText)
     {
-        using var control = new SubControl(parent, text);
+        using SubControl control = new(parent, text);
         Assert.Null(control.AccessibleDefaultActionDescription);
         Assert.Null(control.AccessibleDescription);
         Assert.Null(control.AccessibleName);
@@ -391,7 +390,7 @@ public partial class ControlTests
     [MemberData(nameof(Ctor_Control_String_Int_Int_Int_Int_TestData))]
     public void Control_Ctor_Control_String_Int_Int_Int_Int(Control parent, string text, int left, int top, int width, int height, string expectedText)
     {
-        using var control = new SubControl(parent, text, left, top, width, height);
+        using SubControl control = new(parent, text, left, top, width, height);
         Assert.Null(control.AccessibleDefaultActionDescription);
         Assert.Null(control.AccessibleDescription);
         Assert.Null(control.AccessibleName);
@@ -499,7 +498,7 @@ public partial class ControlTests
     [WinFormsFact]
     public void Control_CreateParams_GetDefault_ReturnsExpected()
     {
-        using var control = new SubControl();
+        using SubControl control = new();
         CreateParams createParams = control.CreateParams;
         Assert.Null(createParams.Caption);
         Assert.Null(createParams.ClassName);
@@ -521,7 +520,7 @@ public partial class ControlTests
     [InlineData(false, 0)]
     public void Control_CreateParams_GetContainerControl_ReturnsExpected(bool containerControl, int expectedExStyle)
     {
-        using var control = new SubControl();
+        using SubControl control = new();
         control.SetStyle(ControlStyles.ContainerControl, containerControl);
 
         CreateParams createParams = control.CreateParams;
@@ -545,7 +544,7 @@ public partial class ControlTests
     [InlineData(false, 0x5E010000)]
     public void Control_CreateParams_GetEnabled_ReturnsExpected(bool enabled, int expectedStyle)
     {
-        using var control = new SubControl
+        using SubControl control = new()
         {
             Enabled = enabled
         };
@@ -569,8 +568,8 @@ public partial class ControlTests
     [WinFormsFact]
     public void Control_CreateParams_GetParent_ReturnsExpected()
     {
-        using var parent = new Control();
-        using var control = new SubControl
+        using Control parent = new();
+        using SubControl control = new()
         {
             Parent = parent
         };
@@ -594,9 +593,9 @@ public partial class ControlTests
     [WinFormsFact]
     public void Control_CreateParams_GetParentWithHandle_ReturnsExpected()
     {
-        using var parent = new Control();
+        using Control parent = new();
         Assert.NotEqual(IntPtr.Zero, parent.Handle);
-        using var control = new SubControl
+        using SubControl control = new()
         {
             Parent = parent
         };
@@ -620,7 +619,7 @@ public partial class ControlTests
     [WinFormsFact]
     public void Control_CreateParams_GetTopLevel_ReturnsExpected()
     {
-        using var control = new SubControl();
+        using SubControl control = new();
         control.SetTopLevel(true);
 
         CreateParams createParams = control.CreateParams;
@@ -645,7 +644,7 @@ public partial class ControlTests
     [InlineData(RightToLeft.No, 0)]
     public void Control_CreateParams_GetRightToLeft_ReturnsExpected(RightToLeft rightToLeft, int expectedExStyle)
     {
-        using var control = new SubControl
+        using SubControl control = new()
         {
             RightToLeft = rightToLeft
         };
@@ -671,7 +670,7 @@ public partial class ControlTests
     [InlineData(false, 0x56000000)]
     public void Control_CreateParams_GetTabStop_ReturnsExpected(bool tabStop, int expectedStyle)
     {
-        using var control = new SubControl
+        using SubControl control = new()
         {
             TabStop = tabStop
         };
@@ -697,7 +696,7 @@ public partial class ControlTests
     [InlineData(false, 0x46010000)]
     public void Control_CreateParams_GetVisible_ReturnsExpected(bool visible, int expectedStyle)
     {
-        using var control = new SubControl
+        using SubControl control = new()
         {
             Visible = visible
         };
@@ -960,7 +959,7 @@ public partial class ControlTests
         toolStrip1_ComboBox1.ComboBox.AssignParent(toolStrip1);
         toolStrip1_TextBox1.Control.AssignParent(toolStrip1);
 
-        var result = form.SelectNextControl(toolStrip1_ComboBox1.ComboBox, forward: true, tabStopOnly: true, nested: true, wrap: true);
+        bool result = form.SelectNextControl(toolStrip1_ComboBox1.ComboBox, forward: true, tabStopOnly: true, nested: true, wrap: true);
         Assert.True(result);
         Assert.True(toolStrip2_ComboBox1.Focused);
         Assert.True(toolStrip2.Items[0].Selected);
@@ -1017,7 +1016,7 @@ public partial class ControlTests
         toolStrip2_ComboBox1.ComboBox.AssignParent(toolStrip2);
         toolStrip2_ComboBox2.ComboBox.AssignParent(toolStrip2);
 
-        var result = form.SelectNextControl(toolStrip2_ComboBox2.ComboBox, forward: false, tabStopOnly: true, nested: true, wrap: true);
+        bool result = form.SelectNextControl(toolStrip2_ComboBox2.ComboBox, forward: false, tabStopOnly: true, nested: true, wrap: true);
         Assert.True(result);
         Assert.True(toolStrip1.Focused);
         Assert.True(toolStrip1.Items[0].Selected);

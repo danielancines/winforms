@@ -1,8 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-#nullable disable
 
 using System.Globalization;
 
@@ -13,52 +10,47 @@ namespace System.Windows.Forms.Design;
 /// </summary>
 internal class MaskDescriptorTemplate : MaskDescriptor
 {
-    private readonly string _mask;
-    private readonly string _name;
-    private readonly string _sample;
-    private readonly Type _type;
-    private readonly CultureInfo _culture;
-
-    public MaskDescriptorTemplate(string mask, string name, string sample, Type validatingType, CultureInfo culture) : this(mask, name, sample, validatingType, culture, false)
+    public MaskDescriptorTemplate(string? mask, string name, string? sample, Type? validatingType, CultureInfo culture)
+        : this(mask, name, sample, validatingType, culture, skipValidation: false)
     {
     }
 
-    public MaskDescriptorTemplate(string mask, string name, string sample, Type validatingType, CultureInfo culture, bool skipValidation)
+    public MaskDescriptorTemplate(string? mask, string name, string? sample, Type? validatingType, CultureInfo? culture, bool skipValidation)
     {
-        _mask = mask;
-        _name = name;
-        _sample = sample;
-        _type = validatingType;
-        _culture = culture;
+        Mask = mask;
+        Name = name;
+        Sample = sample;
+        ValidatingType = validatingType;
+        Culture = culture!;
 
         if (skipValidation)
         {
             return;
         }
 
-        if (!IsValidMaskDescriptor(this, out _))
+        if (!IsValidMaskDescriptor(this))
         {
             // Don't throw here, callers should check the Mask property for validity. See the ValidMaskDescriptorList below.
-            _mask = null;
+            Mask = null;
         }
     }
 
-    public override string Mask => _mask;
+    public override string? Mask { get; }
 
-    public override string Name => _name;
+    public override string Name { get; }
 
-    public override string Sample => _sample;
+    public override string? Sample { get; }
 
-    public override Type ValidatingType => _type;
+    public override Type? ValidatingType { get; }
 
-    public override CultureInfo Culture => _culture;
+    public override CultureInfo Culture { get; }
 
     /// <summary>
     /// Get the canned mask descriptors according to the specified culture.
     /// </summary>
     public static List<MaskDescriptor> GetLocalizedMaskDescriptors(CultureInfo culture)
     {
-        ValidMaskDescriptorList maskDescriptors = new ValidMaskDescriptorList();
+        ValidMaskDescriptorList maskDescriptors = new();
 
         // Note: MaskDescriptor.Sample should not contain culture-sensitive literals since they can fail the mask
         //       for some specific cultures. (ex: date separator).
@@ -69,7 +61,7 @@ internal class MaskDescriptorTemplate : MaskDescriptor
                 culture = CultureInfo.InvariantCulture;
                 goto case "en";
 
-            //case "en-US": // English US.
+            // case "en-US": // English US.
             case "en": // English.
                 // Numeric.
                 maskDescriptors.Add(new MaskDescriptorTemplate("00000", "Numeric (5-digits)", "12345", typeof(int), culture));
@@ -91,7 +83,7 @@ internal class MaskDescriptorTemplate : MaskDescriptor
                 maskDescriptors.Add(new MaskDescriptorTemplate("00000-9999", "Zip Code", "980526399", null, culture));
                 break;
 
-            //case "ar-SA": // Arabic Saudi Arabia.
+            // case "ar-SA": // Arabic Saudi Arabia.
             case "ar": // Arabic.
                 // Phone Number.
                 maskDescriptors.Add(new MaskDescriptorTemplate("(999)000-0000", "Phone Number", "0123456789", null, culture));
@@ -109,7 +101,7 @@ internal class MaskDescriptorTemplate : MaskDescriptor
                 maskDescriptors.Add(new MaskDescriptorTemplate("00:00", "Time (24 Hour)", "1430", typeof(DateTime), culture));
                 break;
 
-            //case "de-DE": // German Germany.
+            // case "de-DE": // German Germany.
             case "de": // German.
                 // Short Date.
                 maskDescriptors.Add(new MaskDescriptorTemplate("00/00/0000", "Datum kurz", "28112005", typeof(DateTime), culture));
@@ -121,7 +113,7 @@ internal class MaskDescriptorTemplate : MaskDescriptor
                 maskDescriptors.Add(new MaskDescriptorTemplate("00000", "Postleitzahl", "91450", null, culture));
                 break;
 
-            //case "fr-FR": // French.
+            // case "fr-FR": // French.
             case "fr": // French.
                 // Special-case date sample format for French-Canada.
                 string dateSample = culture.Name == "fr-CA" ? "11282005" : "28112005";
@@ -141,7 +133,7 @@ internal class MaskDescriptorTemplate : MaskDescriptor
                 maskDescriptors.Add(new MaskDescriptorTemplate("00000", "Code postal (France)", "91450", null, culture));
                 break;
 
-            //case "it-IT": // Italian Italy.
+            // case "it-IT": // Italian Italy.
             case "it": // Italian.
                 // Numeric.
                 maskDescriptors.Add(new MaskDescriptorTemplate("99999", "Numerico (5 Cifre)", "12345", typeof(int), culture));
@@ -159,7 +151,7 @@ internal class MaskDescriptorTemplate : MaskDescriptor
                 maskDescriptors.Add(new MaskDescriptorTemplate("00000", "Codice postale", "12345", null, culture));
                 break;
 
-            //case "es-ES": // Spanish Spain.
+            // case "es-ES": // Spanish Spain.
             case "es": // Spanish.
                 // Numeric.
                 maskDescriptors.Add(new MaskDescriptorTemplate("99999", "Numérico", "12345", typeof(int), culture));
@@ -181,7 +173,7 @@ internal class MaskDescriptorTemplate : MaskDescriptor
                 maskDescriptors.Add(new MaskDescriptorTemplate("00000", "Código postal", "12345", null, culture));
                 break;
 
-            //case "ja-JP": // Japanese.
+            // case "ja-JP": // Japanese.
             case "ja": // Japanese.
                 // Numeric.
                 maskDescriptors.Add(new MaskDescriptorTemplate("99999", "数値（５桁）", "12345", typeof(int), culture));
@@ -213,7 +205,7 @@ internal class MaskDescriptorTemplate : MaskDescriptor
                 maskDescriptors.Add(new MaskDescriptorTemplate("90時90分", "時間（日本語）", " 633", typeof(DateTime), culture));
                 break;
 
-            //case "zh-CN":  // People's Republic of China.
+            // case "zh-CN":  // People's Republic of China.
             case "zh-CHS":  // Simplified Chinese.
             case "zh-Hans":  // New name of Simplified Chinese.
                 // Numeric.
@@ -244,7 +236,7 @@ internal class MaskDescriptorTemplate : MaskDescriptor
                 maskDescriptors.Add(new MaskDescriptorTemplate("000000", "邮政编码", "100080", null, culture));
                 break;
 
-            //case "zh-TW":  // Chinese (Taiwan).
+            // case "zh-TW":  // Chinese (Taiwan).
             case "zh-CHT":  // Traditional Chinese.
             case "zh-Hant":  // New name of Traditional Chinese.
                 // Phone Number.
@@ -269,7 +261,7 @@ internal class MaskDescriptorTemplate : MaskDescriptor
                 maskDescriptors.Add(new MaskDescriptorTemplate("99000", "3+2郵遞區號", "80407", null, culture));
                 break;
 
-            //case "ko-KR": // Korean.
+            // case "ko-KR": // Korean.
             case "ko": // Korean.
                 // Numeric.
                 maskDescriptors.Add(new MaskDescriptorTemplate("99999", "숫자(5자리)", "12345", typeof(int), culture));
@@ -320,6 +312,6 @@ internal class MaskDescriptorTemplate : MaskDescriptor
         /// <summary>
         /// Returns a reference to the internal List object.
         /// </summary>
-        public List<MaskDescriptor> List { get; } = new List<MaskDescriptor>();
+        public List<MaskDescriptor> List { get; } = new();
     }
 }

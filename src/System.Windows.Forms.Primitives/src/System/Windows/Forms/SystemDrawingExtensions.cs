@@ -1,12 +1,10 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Runtime.CompilerServices;
 using Microsoft.Win32;
-using static Interop;
 
 namespace System.Windows.Forms;
 
@@ -43,14 +41,6 @@ internal static class SystemDrawingExtensions
     ///  Returns true if the color is fully transparent.
     /// </summary>
     internal static bool IsFullyTransparent(this Color color) => color.A == 0;
-
-    internal static void ThrowIfFailed(this GdiPlus.GpStatus status)
-    {
-        if (status != GdiPlus.GpStatus.Ok)
-        {
-            throw new InvalidOperationException(status.ToString());
-        }
-    }
 
     /// <summary>
     ///  Draws lines with the <paramref name="pen"/> using points defined in <paramref name="lines"/>.

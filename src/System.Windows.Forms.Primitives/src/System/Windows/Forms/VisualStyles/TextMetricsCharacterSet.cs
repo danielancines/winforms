@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.VisualStyles;
 
@@ -25,7 +24,7 @@ public enum TextMetricsCharacterSet
     Arabic = 178,
     Hebrew = 177,
     Thai = 222,
-    //      #define ANSI_CHARSET            0
+    // #define ANSI_CHARSET            0
     //      #define BALTIC_CHARSET          186
     //      #define CHINESEBIG5_CHARSET     136
     //      #define DEFAULT_CHARSET         1

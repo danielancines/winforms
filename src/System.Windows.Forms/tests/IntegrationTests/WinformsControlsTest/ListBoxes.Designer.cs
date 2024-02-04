@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace WinformsControlsTest;
 
@@ -66,6 +65,7 @@ partial class ListBoxes
         this.listBox1.Name = "listBox1";
         this.listBox1.Size = new System.Drawing.Size(200, 150);
         this.listBox1.DrawMode = System.Windows.Forms.DrawMode.Normal;
+        this.listBox1.SelectionMode = SelectionMode.MultiSimple;
         // 
         // textBox1
         //

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -18,13 +17,13 @@ internal unsafe struct ICategorizeProperties : IComIID
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get
         {
-            ReadOnlySpan<byte> data = new byte[]
-            {
+            ReadOnlySpan<byte> data =
+            [
                 0x10, 0xfc, 0x07, 0x4d,
                 0x31, 0xf9,
                 0xce, 0x11,
                 0xb0, 0x01, 0x00, 0xaa, 0x00, 0x68, 0x84, 0xe5
-            };
+            ];
 
             return ref Unsafe.As<byte, Guid>(ref MemoryMarshal.GetReference(data));
         }

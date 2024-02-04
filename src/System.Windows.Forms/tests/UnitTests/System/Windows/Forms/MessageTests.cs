@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Runtime.InteropServices;
 using System.Windows.Forms.TestUtilities;
@@ -14,7 +13,7 @@ public class MessageTests
     [CommonMemberData(typeof(CommonTestHelper), nameof(CommonTestHelper.GetIntPtrTheoryData))]
     public void Message_HWnd_Set_GetReturnsExpected(IntPtr value)
     {
-        var message = new Message
+        Message message = new()
         {
             HWnd = value
         };
@@ -29,7 +28,7 @@ public class MessageTests
     [IntegerData<int>]
     public void Message_Msg_Set_GetReturnsExpected(int value)
     {
-        var message = new Message
+        Message message = new()
         {
             Msg = value
         };
@@ -44,7 +43,7 @@ public class MessageTests
     [CommonMemberData(typeof(CommonTestHelper), nameof(CommonTestHelper.GetIntPtrTheoryData))]
     public void Message_WParam_Set_GetReturnsExpected(IntPtr value)
     {
-        var message = new Message
+        Message message = new()
         {
             WParam = value
         };
@@ -55,7 +54,7 @@ public class MessageTests
     [CommonMemberData(typeof(CommonTestHelper), nameof(CommonTestHelper.GetIntPtrTheoryData))]
     public void Message_LParam_Set_GetReturnsExpected(IntPtr value)
     {
-        var message = new Message
+        Message message = new()
         {
             LParam = value
         };
@@ -70,7 +69,7 @@ public class MessageTests
     [CommonMemberData(typeof(CommonTestHelper), nameof(CommonTestHelper.GetIntPtrTheoryData))]
     public void Message_Result_Set_GetReturnsExpected(IntPtr value)
     {
-        var message = new Message
+        Message message = new()
         {
             Result = value
         };
@@ -149,7 +148,7 @@ public class MessageTests
         yield return new object[]
         {
             Create((IntPtr)1, 2, (IntPtr)3, (IntPtr)4, (IntPtr)5),
-            new object(),
+            new(),
             false
         };
         yield return new object[]
@@ -187,14 +186,14 @@ public class MessageTests
         IntPtr ptr = Marshal.AllocHGlobal(Marshal.SizeOf<TestStruct>());
         try
         {
-            var original = new TestStruct
+            TestStruct original = new()
             {
                 _field1 = 1,
                 _field2 = 2
             };
             Marshal.StructureToPtr(original, ptr, fDeleteOld: false);
 
-            var message = new Message
+            Message message = new()
             {
                 LParam = ptr
             };

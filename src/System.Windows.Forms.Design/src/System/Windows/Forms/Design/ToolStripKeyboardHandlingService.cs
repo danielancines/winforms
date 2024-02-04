@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 #nullable disable
 
@@ -15,19 +14,19 @@ namespace System.Windows.Forms.Design;
 internal class ToolStripKeyboardHandlingService
 {
     private ISelectionService _selectionService;
-    private IComponentChangeService _componentChangeSvc;
+    private IComponentChangeService _componentChangeService;
     private IServiceProvider _provider;
     private IMenuCommandService _menuCommandService;
     private readonly IDesignerHost _designerHost;
-    //primary selection during shift operation is the LAST selected item which is different from selSvc.PrimarySelection, hence cache it
+    // primary selection during shift operation is the LAST selected item which is different from selSvc.PrimarySelection, hence cache it
     private object _shiftPrimary;
     private bool _shiftPressed;
     // our cache of currently selected DesignerToolStripControl Host....
     private object _currentSelection;
-    //is the templateNode in Insitu Mode?
+    // is the templateNode in Insitu Mode?
     private bool _templateNodeActive;
     private ToolStripTemplateNode _activeTemplateNode;
-    //is the TemplateNode ContextMenu open. When the TemplateNode AddItems ContextMenu is opened we want to Disable all the Commands... And we enable them when the contextMenu closes...  But if the menu closes by "enter Key" we get OnKeyDefault and hence go into InSitu Edit Mode.. to avoid this we have a new flag to IGNORE the first OnKeyDefault.
+    // is the TemplateNode ContextMenu open. When the TemplateNode AddItems ContextMenu is opened we want to Disable all the Commands... And we enable them when the contextMenu closes...  But if the menu closes by "enter Key" we get OnKeyDefault and hence go into InSitu Edit Mode.. to avoid this we have a new flag to IGNORE the first OnKeyDefault.
     private bool _templateNodeContextMenuOpen;
     // old commands
     private List<MenuCommand> _oldCommands;
@@ -39,7 +38,7 @@ internal class ToolStripKeyboardHandlingService
     private bool _commandsAdded;
     private bool _copyInProgress;
     private bool _cutOrDeleteInProgress;
-    private bool _contextMenuShownByKeyBoard; //We should know when the contextMenu is shown by KeyBoard shortcut.
+    private bool _contextMenuShownByKeyBoard; // We should know when the contextMenu is shown by KeyBoard shortcut.
     private object _ownerItemAfterCut; // This value is set only of the ToolStripMenuItem is cut and now we need to reopen the dropDown which was closed in the previous CUT operation.
 
     /// <summary>
@@ -58,17 +57,17 @@ internal class ToolStripKeyboardHandlingService
 
         _designerHost = (IDesignerHost)_provider.GetService(typeof(IDesignerHost));
         Debug.Assert(_designerHost is not null, "ToolStripKeyboardHandlingService relies on the selection service, which is unavailable.");
-        _designerHost?.AddService(typeof(ToolStripKeyboardHandlingService), this);
+        _designerHost?.AddService(this);
 
-        _componentChangeSvc = (IComponentChangeService)_designerHost.GetService(typeof(IComponentChangeService));
-        Debug.Assert(_componentChangeSvc is not null, "ToolStripKeyboardHandlingService relies on the componentChange service, which is unavailable.");
-        if (_componentChangeSvc is not null)
+        _componentChangeService = (IComponentChangeService)_designerHost.GetService(typeof(IComponentChangeService));
+        Debug.Assert(_componentChangeService is not null, "ToolStripKeyboardHandlingService relies on the componentChange service, which is unavailable.");
+        if (_componentChangeService is not null)
         {
-            _componentChangeSvc.ComponentRemoved += new ComponentEventHandler(OnComponentRemoved);
+            _componentChangeService.ComponentRemoved += new ComponentEventHandler(OnComponentRemoved);
         }
     }
 
-    //Currently active TemplateNode
+    // Currently active TemplateNode
     internal ToolStripTemplateNode ActiveTemplateNode
     {
         get => _activeTemplateNode;
@@ -214,7 +213,7 @@ internal class ToolStripKeyboardHandlingService
         {
             _templateNodeActive = value;
 
-            //Disable all our Commands when TemplateNode is Active. Remove the new Commands
+            // Disable all our Commands when TemplateNode is Active. Remove the new Commands
             if (_newCommands is not null)
             {
                 foreach (MenuCommand newCommand in _newCommands)
@@ -232,7 +231,7 @@ internal class ToolStripKeyboardHandlingService
         set
         {
             _templateNodeContextMenuOpen = value;
-            //Disable all our Commands when templateNodeContextMenuOpen. Remove the new Commands
+            // Disable all our Commands when templateNodeContextMenuOpen. Remove the new Commands
             if (_newCommands is not null)
             {
                 foreach (MenuCommand newCommand in _newCommands)
@@ -255,7 +254,7 @@ internal class ToolStripKeyboardHandlingService
                 PopulateOldCommands();
             }
 
-            //Remove the Old Commands
+            // Remove the Old Commands
             foreach (MenuCommand oldCommand in _oldCommands)
             {
                 if (oldCommand is not null)
@@ -445,11 +444,11 @@ internal class ToolStripKeyboardHandlingService
             ToolStripKeyboardHandlingService keyboardHandlingService = (ToolStripKeyboardHandlingService)_provider.GetService(typeof(ToolStripKeyboardHandlingService));
             if (keyboardHandlingService is not null)
             {
-                //since we are going away .. restore the old commands.
+                // since we are going away .. restore the old commands.
                 keyboardHandlingService.RestoreCommands();
                 // clean up.
                 keyboardHandlingService.RemoveCommands();
-                _designerHost.RemoveService(typeof(ToolStripKeyboardHandlingService));
+                _designerHost.RemoveService<ToolStripKeyboardHandlingService>();
             }
         }
     }
@@ -496,7 +495,7 @@ internal class ToolStripKeyboardHandlingService
         bool cutCommand = false;
         try
         {
-            //If the Command is CUT and the new Selection is DesignerToolStripControlHost then select it and open its parentDropDown.
+            // If the Command is CUT and the new Selection is DesignerToolStripControlHost then select it and open its parentDropDown.
             if (sender is MenuCommand com && com.CommandID == StandardCommands.Cut)
             {
                 cutCommand = true;
@@ -575,7 +574,7 @@ internal class ToolStripKeyboardHandlingService
     // Handler for Paste Command
     private void OnCommandPaste(object sender, EventArgs e)
     {
-        //IF TemplateNode is Active DO NOT Support Paste. This is what MainMenu did
+        // IF TemplateNode is Active DO NOT Support Paste. This is what MainMenu did
         // We used to incorrectly paste the item to the parent's collection; so in order to make a simple fix I am being consistent with MainMenu
         if (TemplateNodeActive)
         {
@@ -593,7 +592,7 @@ internal class ToolStripKeyboardHandlingService
 
             ToolStripItem item = comp as ToolStripItem;
             ToolStrip parent = null;
-            //Case 1: If SelectedObj is ToolStripItem select all items in its immediate parent.
+            // Case 1: If SelectedObj is ToolStripItem select all items in its immediate parent.
             if (item is not null)
             {
                 parent = item.GetCurrentParent();
@@ -639,7 +638,7 @@ internal class ToolStripKeyboardHandlingService
                 // Get the Selection and ShowDropDown only on ToolStripDropDownItems to show dropDowns after paste operation.
                 if (selSvc.PrimarySelection is ToolStripDropDownItem dropDownItem && dropDownItem.DropDown.Visible)
                 {
-                    //Hide the DropDown
+                    // Hide the DropDown
                     dropDownItem.HideDropDown();
                     if (host.GetDesigner(dropDownItem) is ToolStripMenuItemDesigner selectedItemDesigner)
                     {
@@ -666,15 +665,15 @@ internal class ToolStripKeyboardHandlingService
             // Process Keys only if we are a ToolStripItem and the TemplateNode is not in Insitu Mode.
             if (item is not null)
             {
-                //only select the last item only if there is an Item added in addition to the TemplateNode...
+                // only select the last item only if there is an Item added in addition to the TemplateNode...
                 ToolStrip parent = item.GetCurrentParent();
                 int count = parent.Items.Count;
-                if (count >= 3) //3 //3 for the total number of items .. two ToolStripItems + 1 TemplateNode.
+                if (count >= 3) // 3 //3 for the total number of items .. two ToolStripItems + 1 TemplateNode.
                 {
                     bool shiftPressed = (Control.ModifierKeys & Keys.Shift) > 0;
                     if (shiftPressed)
                     {
-                        //Select all the items between current "item" till the Last item
+                        // Select all the items between current "item" till the Last item
                         int startIndexOfSelection = 0;
                         int endIndexOfSelection = Math.Max(0, parent.Items.IndexOf(item));
                         int countofItemsSelected = (endIndexOfSelection - startIndexOfSelection) + 1;
@@ -711,15 +710,15 @@ internal class ToolStripKeyboardHandlingService
             // Process Keys only if we are a ToolStripItem and the TemplateNode is not in Insitu Mode.
             if (item is not null)
             {
-                //only select the last item only if there is an Item added in addition to the TemplateNode...
+                // only select the last item only if there is an Item added in addition to the TemplateNode...
                 ToolStrip parent = item.GetCurrentParent();
                 int count = parent.Items.Count;
-                if (count >= 3)  //3 //3 for the total number of items .. two ToolStripItems + 1 TemplateNode.
+                if (count >= 3)  // 3 //3 for the total number of items .. two ToolStripItems + 1 TemplateNode.
                 {
                     bool shiftPressed = (Control.ModifierKeys & Keys.Shift) > 0;
                     if (shiftPressed)
                     {
-                        //Select all the items between current "item" till the Last item
+                        // Select all the items between current "item" till the Last item
                         int startIndexOfSelection = parent.Items.IndexOf(item);
                         int endIndexOfSelection = Math.Max(startIndexOfSelection, count - 2);
                         int countofItemsSelected = (endIndexOfSelection - startIndexOfSelection) + 1;
@@ -749,7 +748,7 @@ internal class ToolStripKeyboardHandlingService
         if (selSvc is not null)
         {
             object selectedObj = selSvc.PrimarySelection;
-            //Case 1: If SelectedObj is ToolStripItem select all items in its immediate parent.
+            // Case 1: If SelectedObj is ToolStripItem select all items in its immediate parent.
             if (selectedObj is ToolStripItem)
             {
                 ToolStripItem selectedItem = selectedObj as ToolStripItem;
@@ -774,7 +773,7 @@ internal class ToolStripKeyboardHandlingService
                 return;
             }
 
-            //Case 3: if selectedOj is ToolStripPanel ... select the ToolStrips within the ToolStripPanel...
+            // Case 3: if selectedOj is ToolStripPanel ... select the ToolStrips within the ToolStripPanel...
             if (selectedObj is ToolStripPanel)
             {
                 ToolStripPanel parentToolStripPanel = selectedObj as ToolStripPanel;
@@ -1203,7 +1202,7 @@ internal class ToolStripKeyboardHandlingService
                 {
                     if (right)
                     {
-                        //no where to go .. since we are on DesignerToolStripControlHost for DropDown.
+                        // no where to go .. since we are on DesignerToolStripControlHost for DropDown.
                     }
                     else
                     {
@@ -1240,7 +1239,7 @@ internal class ToolStripKeyboardHandlingService
                             if (targetSelection is not null)
                             {
                                 SetSelection(targetSelection);
-                                //Open the DropDown after the Selection is Completed.
+                                // Open the DropDown after the Selection is Completed.
                                 if (!(dropDownItem.DropDown.Visible))
                                 {
                                     if (host.GetDesigner(dropDownItem) is ToolStripMenuItemDesigner designer)
@@ -1301,7 +1300,7 @@ internal class ToolStripKeyboardHandlingService
             currentSelection = ShiftPrimaryItem;
         }
 
-        //Check for ContextMenuStrip first...
+        // Check for ContextMenuStrip first...
         if (currentSelection is ContextMenuStrip contextMenu)
         {
             if (down)
@@ -1373,12 +1372,12 @@ internal class ToolStripKeyboardHandlingService
                     }
                 }
 
-                if (parentToMoveOn is not null) //This will be null for NON dropDownItems...
+                if (parentToMoveOn is not null) // This will be null for NON dropDownItems...
                 {
                     if (down)
                     {
                         targetSelection = GetNextItem(parentToMoveOn, item, ArrowDirection.Down);
-                        //lets check the index to know if we have wrapped around... only on NON ContextMenuStrip, ToolStripDropDown (added from toolbox)
+                        // lets check the index to know if we have wrapped around... only on NON ContextMenuStrip, ToolStripDropDown (added from toolbox)
                         if (parentToMoveOn.OwnerItem is not null) // this can be null for overflow....
                         {
                             if (!(parentToMoveOn.OwnerItem.IsOnDropDown) && (parentToMoveOn.OwnerItem.Owner is not null && parentToMoveOn.OwnerItem.Owner.Site is not null))
@@ -1422,7 +1421,7 @@ internal class ToolStripKeyboardHandlingService
                             targetSelection = GetNextItem(parentToMoveOn, item, ArrowDirection.Up);
                         }
 
-                        //lets check the index to know if we have wrapped around...
+                        // lets check the index to know if we have wrapped around...
                         if (parentToMoveOn.OwnerItem is not null) // this can be null for overflow....
                         {
                             if (!(parentToMoveOn.OwnerItem.IsOnDropDown) && (parentToMoveOn.OwnerItem.Owner is not null && parentToMoveOn.OwnerItem.Owner.Site is not null))
@@ -1526,7 +1525,7 @@ internal class ToolStripKeyboardHandlingService
         _newCommands.Add(new MenuCommand(new EventHandler(OnCommandHome), MenuCommands.KeyShiftHome));
         _newCommands.Add(new MenuCommand(new EventHandler(OnCommandEnd), MenuCommands.KeyShiftEnd));
 
-        //Command for opening the DropDown for templatenode.
+        // Command for opening the DropDown for templatenode.
         _newCommands.Add(new MenuCommand(new EventHandler(OnKeyShowDesignerActions), MenuCommands.KeyInvokeSmartTag));
 
         _newCommands.Add(new MenuCommand(new EventHandler(OnCommandCopy), StandardCommands.Cut));
@@ -1539,7 +1538,7 @@ internal class ToolStripKeyboardHandlingService
         IMenuCommandService mcs = MenuService;
         if (mcs is not null & _commandsAdded)
         {
-            //Remove the new Commands
+            // Remove the new Commands
             if (_newCommands is not null)
             {
                 foreach (MenuCommand newCommand in _newCommands)
@@ -1595,7 +1594,7 @@ internal class ToolStripKeyboardHandlingService
         IMenuCommandService mcs = MenuService;
         if (mcs is not null && _commandsAdded)
         {
-            //Remove our Commands...
+            // Remove our Commands...
             if (_newCommands is not null)
             {
                 foreach (MenuCommand newCommand in _newCommands)
@@ -1635,10 +1634,10 @@ internal class ToolStripKeyboardHandlingService
             _selectionService = null;
         }
 
-        if (_componentChangeSvc is not null)
+        if (_componentChangeService is not null)
         {
-            _componentChangeSvc.ComponentRemoved -= new ComponentEventHandler(OnComponentRemoved);
-            _componentChangeSvc = null;
+            _componentChangeService.ComponentRemoved -= new ComponentEventHandler(OnComponentRemoved);
+            _componentChangeService = null;
         }
 
         _currentSelection = null;
@@ -1802,7 +1801,7 @@ internal class ToolStripKeyboardHandlingService
         }
 
         ctl = currentSelection as Control;
-        //Added New Code for ToolStrip Tabbing..
+        // Added New Code for ToolStrip Tabbing..
         if (targetSelection is null && ctl is ToolStrip wb)
         {
             ToolStripItemCollection collection = wb.Items;
@@ -1985,7 +1984,7 @@ internal class ToolStripKeyboardHandlingService
             }
         }
 
-        //Special Casing since moving to TemplateNode to TemplateNode is moving from null selection to null selection.
+        // Special Casing since moving to TemplateNode to TemplateNode is moving from null selection to null selection.
         if (targetSelection is DesignerToolStripControlHost && currentSelection is DesignerToolStripControlHost)
         {
             SelectedDesignerControl = targetSelection;
@@ -2021,10 +2020,10 @@ internal class ToolStripKeyboardHandlingService
         ISelectionService selSvc = SelectionService;
         if (selSvc is not null)
         {
-            //Cache original selection
+            // Cache original selection
             ICollection originalSelComps = selSvc.GetSelectedComponents();
             // Add the TemplateNode to the Selection if it is currently Selected as the GetSelectedComponents won't do it for us.
-            ArrayList origSel = new ArrayList(originalSelComps);
+            ArrayList origSel = new(originalSelComps);
             if (origSel.Count == 0)
             {
                 if (SelectedDesignerControl is not null)
@@ -2082,7 +2081,7 @@ internal class ToolStripKeyboardHandlingService
             ToolStripDesignerUtils.InvalidateSelection(origSel, targetSelection as ToolStripItem, _provider, _shiftPressed);
         }
 
-        //reset the shiftPressed since we end selection
+        // reset the shiftPressed since we end selection
         _shiftPressed = false;
     }
 }

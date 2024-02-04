@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Runtime.InteropServices;
 using System.Security;
@@ -223,7 +222,7 @@ public static partial class PlatformDetection
 
     private static unsafe int GetWindowsMinorVersion()
     {
-        var osvi = new RTL_OSVERSIONINFOEX
+        RTL_OSVERSIONINFOEX osvi = new()
         {
             dwOSVersionInfoSize = (uint)sizeof(RTL_OSVERSIONINFOEX)
         };
@@ -233,7 +232,7 @@ public static partial class PlatformDetection
 
     private static unsafe int GetWindowsBuildNumber()
     {
-        var osvi = new RTL_OSVERSIONINFOEX
+        RTL_OSVERSIONINFOEX osvi = new()
         {
             dwOSVersionInfoSize = (uint)sizeof(RTL_OSVERSIONINFOEX)
         };
@@ -289,7 +288,7 @@ public static partial class PlatformDetection
 
     private static unsafe int GetWindowsVersion()
     {
-        var osvi = new RTL_OSVERSIONINFOEX
+        RTL_OSVERSIONINFOEX osvi = new()
         {
             dwOSVersionInfoSize = (uint)sizeof(RTL_OSVERSIONINFOEX)
         };

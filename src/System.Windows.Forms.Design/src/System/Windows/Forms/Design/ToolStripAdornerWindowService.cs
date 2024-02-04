@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 #nullable disable
 
@@ -15,8 +14,8 @@ namespace System.Windows.Forms.Design;
 /// </summary>
 internal sealed class ToolStripAdornerWindowService : IDisposable
 {
-    private readonly IServiceProvider _serviceProvider; //standard service provider
-    private readonly ToolStripAdornerWindow _toolStripAdornerWindow; //the transparent window all glyphs are drawn to
+    private readonly IServiceProvider _serviceProvider; // standard service provider
+    private readonly ToolStripAdornerWindow _toolStripAdornerWindow; // the transparent window all glyphs are drawn to
     private BehaviorService _behaviorService;
     private Adorner _dropDownAdorner;
     private ArrayList _dropDownCollection;
@@ -28,12 +27,12 @@ internal sealed class ToolStripAdornerWindowService : IDisposable
     internal ToolStripAdornerWindowService(IServiceProvider serviceProvider, Control windowFrame)
     {
         _serviceProvider = serviceProvider;
-        //create the AdornerWindow
+        // create the AdornerWindow
         _toolStripAdornerWindow = new ToolStripAdornerWindow(windowFrame);
         _behaviorService = (BehaviorService)serviceProvider.GetService(typeof(BehaviorService));
         int indexToInsert = _behaviorService.AdornerWindowIndex;
 
-        //use the adornerWindow as an overlay
+        // use the adornerWindow as an overlay
         _overlayService = (IOverlayService)serviceProvider.GetService(typeof(IOverlayService));
         _overlayService?.InsertOverlay(_toolStripAdornerWindow, indexToInsert);
 
@@ -109,7 +108,7 @@ internal sealed class ToolStripAdornerWindowService : IDisposable
             return Point.Empty;
         }
 
-        var pt = new Point(c.Left, c.Top);
+        Point pt = new(c.Left, c.Top);
         PInvoke.MapWindowPoints(c.Parent, _toolStripAdornerWindow, ref pt);
         return pt;
     }
@@ -161,7 +160,7 @@ internal sealed class ToolStripAdornerWindowService : IDisposable
     /// </summary>
     private class ToolStripAdornerWindow : Control
     {
-        private Control _designerFrame; //the designer's frame
+        private Control _designerFrame; // the designer's frame
 
         internal ToolStripAdornerWindow(Control designerFrame)
         {

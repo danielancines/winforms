@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using Windows.Win32.UI.Input.KeyboardAndMouse;
 
@@ -37,7 +36,7 @@ internal static class InputBuilder
     public static INPUT CharacterDown(char character)
     {
         ushort scanCode = character;
-        var input = new INPUT
+        INPUT input = new()
         {
             type = INPUT_TYPE.INPUT_KEYBOARD,
             Anonymous =

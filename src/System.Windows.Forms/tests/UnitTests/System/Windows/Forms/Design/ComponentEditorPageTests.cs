@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Drawing;
@@ -15,7 +14,7 @@ public class ComponentEditorPageTests
     [WinFormsFact]
     public void ComponentEditorPagePanel_Ctor_Default()
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         Assert.Null(control.AccessibleDefaultActionDescription);
         Assert.Null(control.AccessibleDescription);
         Assert.Null(control.AccessibleName);
@@ -130,7 +129,7 @@ public class ComponentEditorPageTests
     [WinFormsFact]
     public void ComponentEditorPage_CreateParams_GetDefault_ReturnsExpected()
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         CreateParams createParams = control.CreateParams;
         Assert.Null(createParams.Caption);
         Assert.Null(createParams.ClassName);
@@ -151,7 +150,7 @@ public class ComponentEditorPageTests
     [BoolData]
     public void ComponentEditorPage_AutoSize_Set_GetReturnsExpected(bool value)
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         int layoutCallCount = 0;
         control.Layout += (sender, e) => layoutCallCount++;
 
@@ -176,7 +175,7 @@ public class ComponentEditorPageTests
     [WinFormsFact]
     public void ComponentEditorPage_AutoSize_SetWithHandler_CallsAutoSizeChanged()
     {
-        using var control = new SubComponentEditorPage
+        using SubComponentEditorPage control = new()
         {
             AutoSize = true
         };
@@ -215,7 +214,7 @@ public class ComponentEditorPageTests
     [BoolData]
     public void ComponentEditorPage_CommitOnDeactivate_Set_GetReturnsExpected(bool value)
     {
-        using var control = new SubComponentEditorPage
+        using SubComponentEditorPage control = new()
         {
             CommitOnDeactivate = value
         };
@@ -236,7 +235,7 @@ public class ComponentEditorPageTests
     public static IEnumerable<object[]> Component_Set_TestData()
     {
         yield return new object[] { null };
-        var mockComponent = new Mock<IComponent>(MockBehavior.Strict);
+        Mock<IComponent> mockComponent = new(MockBehavior.Strict);
         mockComponent
             .Setup(c => c.Dispose());
         yield return new object[] { mockComponent.Object };
@@ -246,7 +245,7 @@ public class ComponentEditorPageTests
     [MemberData(nameof(Component_Set_TestData))]
     public void ComponentEditorPage_Component_Set_GetReturnsExpected(IComponent value)
     {
-        using var control = new SubComponentEditorPage
+        using SubComponentEditorPage control = new()
         {
             Component = value
         };
@@ -265,7 +264,7 @@ public class ComponentEditorPageTests
     [BoolData]
     public void ComponentEditorPage_FirstActivate_Set_GetReturnsExpected(bool value)
     {
-        using var control = new SubComponentEditorPage
+        using SubComponentEditorPage control = new()
         {
             FirstActivate = value
         };
@@ -288,7 +287,7 @@ public class ComponentEditorPageTests
     {
         using (var value = Icon.FromHandle(new Bitmap(10, 10).GetHicon()))
         {
-            using var control = new SubComponentEditorPage
+            using SubComponentEditorPage control = new()
             {
                 Icon = value
             };
@@ -315,7 +314,7 @@ public class ComponentEditorPageTests
     [InlineData(1, true)]
     public void ComponentEditorPage_Loading_Set_GetReturnsExpected(int value, bool expectedIsLoading)
     {
-        using var control = new SubComponentEditorPage
+        using SubComponentEditorPage control = new()
         {
             Loading = value
         };
@@ -334,7 +333,7 @@ public class ComponentEditorPageTests
     [BoolData]
     public void ComponentEditorPage_LoadRequired_Set_GetReturnsExpected(bool value)
     {
-        using var control = new SubComponentEditorPage
+        using SubComponentEditorPage control = new()
         {
             LoadRequired = value
         };
@@ -355,7 +354,7 @@ public class ComponentEditorPageTests
     public static IEnumerable<object[]> PageSite_Set_TestData()
     {
         yield return new object[] { null };
-        var mockComponentEditorPageSite = new Mock<IComponentEditorPageSite>(MockBehavior.Strict);
+        Mock<IComponentEditorPageSite> mockComponentEditorPageSite = new(MockBehavior.Strict);
         yield return new object[] { mockComponentEditorPageSite.Object };
     }
 
@@ -363,7 +362,7 @@ public class ComponentEditorPageTests
     [MemberData(nameof(PageSite_Set_TestData))]
     public void ComponentEditorPage_PageSite_Set_GetReturnsExpected(IComponentEditorPageSite value)
     {
-        using var control = new SubComponentEditorPage
+        using SubComponentEditorPage control = new()
         {
             PageSite = value
         };
@@ -380,7 +379,7 @@ public class ComponentEditorPageTests
     [NormalizedStringData]
     public void ComponentEditorPage_Text_Set_GetReturnsExpected(string value, string expected)
     {
-        using var control = new SubComponentEditorPage
+        using SubComponentEditorPage control = new()
         {
             Text = value
         };
@@ -399,7 +398,7 @@ public class ComponentEditorPageTests
     [NormalizedStringData]
     public void ComponentEditorPage_Text_SetWithHandle_GetReturnsExpected(string value, string expected)
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -429,7 +428,7 @@ public class ComponentEditorPageTests
     [WinFormsFact]
     public void ComponentEditorPage_Text_SetWithHandler_CallsTextChanged()
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -470,7 +469,7 @@ public class ComponentEditorPageTests
     [InlineData(false, 0)]
     public void ComponentEditorPage_Activate_Invoke_SetsVisible(bool loadRequired, int expectedLoadComponentCallCount)
     {
-        using var control = new SubComponentEditorPage
+        using SubComponentEditorPage control = new()
         {
             LoadRequired = loadRequired
         };
@@ -494,7 +493,7 @@ public class ComponentEditorPageTests
     [BoolData]
     public void ComponentEditorPage_ApplyChanges_Invoke_CallsSaveComponent(bool loadRequired)
     {
-        using var control = new SubComponentEditorPage
+        using SubComponentEditorPage control = new()
         {
             LoadRequired = loadRequired
         };
@@ -517,7 +516,7 @@ public class ComponentEditorPageTests
     [InlineData(false, 0)]
     public void ComponentEditorPage_Deactivate_InvokeActivated_SetsInvisible(bool loadRequired, int expectedLoadComponentCallCount)
     {
-        using var control = new SubComponentEditorPage
+        using SubComponentEditorPage control = new()
         {
             LoadRequired = loadRequired
         };
@@ -548,7 +547,7 @@ public class ComponentEditorPageTests
     [BoolData]
     public void ComponentEditorPage_Deactivate_InvokeNotActivated_SetsInvisible(bool loadRequired)
     {
-        using var control = new SubComponentEditorPage
+        using SubComponentEditorPage control = new()
         {
             LoadRequired = loadRequired
         };
@@ -571,7 +570,7 @@ public class ComponentEditorPageTests
     [WinFormsFact]
     public void ComponentEditorPage_EnterLoadingMode_Invoke_IncrementsLoading()
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         control.EnterLoadingMode();
         Assert.Equal(1, control.Loading);
 
@@ -583,7 +582,7 @@ public class ComponentEditorPageTests
     [WinFormsFact]
     public void ComponentEditorPage_EnterLoadingMode_ExitLoadingMode_Resets()
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         control.EnterLoadingMode();
         Assert.Equal(1, control.Loading);
 
@@ -594,7 +593,7 @@ public class ComponentEditorPageTests
     [WinFormsFact]
     public void ComponentEditorPage_ExitLoadingMode_Invoke_DoesNotDecrementLoading()
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         control.ExitLoadingMode();
         Assert.Equal(0, control.Loading);
 
@@ -606,7 +605,7 @@ public class ComponentEditorPageTests
     [WinFormsFact]
     public void ComponentEditorPage_ExitLoadingMode_EnterLoadingMode_IncrementsLoading()
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         control.ExitLoadingMode();
         Assert.Equal(0, control.Loading);
 
@@ -617,7 +616,7 @@ public class ComponentEditorPageTests
     [WinFormsFact]
     public void ComponentEditorPage_IsFirstActivate_Invoke_ReturnsTrue()
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         Assert.True(control.IsFirstActivate());
         Assert.False(control.IsHandleCreated);
     }
@@ -625,7 +624,7 @@ public class ComponentEditorPageTests
     [WinFormsFact]
     public void ComponentEditorPage_IsLoading_Invoke_ReturnsFalse()
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         Assert.False(control.IsLoading());
         Assert.False(control.IsHandleCreated);
     }
@@ -633,8 +632,8 @@ public class ComponentEditorPageTests
     [WinFormsFact]
     public void ComponentEditorPage_IsPageMessage_Invoke_ReturnsExpected()
     {
-        using var control = new SubComponentEditorPage();
-        var message = new Message();
+        using SubComponentEditorPage control = new();
+        Message message = new();
         Assert.True(control.IsPageMessage(ref message));
         Assert.Equal(1, control.PreProcessMessageCallCount);
     }
@@ -642,21 +641,21 @@ public class ComponentEditorPageTests
     [WinFormsFact]
     public void ComponentEditorPage_GetAutoSizeMode_Invoke_ReturnsExpected()
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         Assert.Equal(AutoSizeMode.GrowOnly, control.GetAutoSizeMode());
     }
 
     [WinFormsFact]
     public void ComponentEditorPage_GetControl_InvokeDefault_ReturnsSame()
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         Assert.Same(control, control.GetControl());
     }
 
     [WinFormsFact]
     public void ComponentEditorPage_GetSelectedComponent_InvokeDefault_ReturnsNull()
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         Assert.Null(control.GetSelectedComponent());
     }
 
@@ -671,7 +670,7 @@ public class ComponentEditorPageTests
     [InlineData((-1), false)]
     public void ComponentEditorPage_GetScrollState_Invoke_ReturnsExpected(int bit, bool expected)
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         Assert.Equal(expected, control.GetScrollState(bit));
     }
 
@@ -698,7 +697,7 @@ public class ComponentEditorPageTests
     [InlineData((ControlStyles)(-1), false)]
     public void ComponentEditorPage_GetStyle_Invoke_ReturnsExpected(ControlStyles flag, bool expected)
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         Assert.Equal(expected, control.GetStyle(flag));
 
         // Call again to test caching.
@@ -708,7 +707,7 @@ public class ComponentEditorPageTests
     [WinFormsFact]
     public void ComponentEditorPage_GetTopLevel_Invoke_ReturnsExpected()
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         Assert.False(control.GetTopLevel());
     }
 
@@ -717,7 +716,7 @@ public class ComponentEditorPageTests
     [InlineData(false, true)]
     public void ComponentEditorPage_OnApplyComplete_Invoke_SetsLoadRequired(bool visible, bool expectedLoadRequired)
     {
-        using var control = new SubComponentEditorPage
+        using SubComponentEditorPage control = new()
         {
             Visible = visible
         };
@@ -733,7 +732,7 @@ public class ComponentEditorPageTests
     [InlineData(false, true)]
     public void ComponentEditorPage_ReloadComponent_Invoke_SetsLoadRequired(bool visible, bool expectedLoadRequired)
     {
-        using var control = new SubComponentEditorPage
+        using SubComponentEditorPage control = new()
         {
             Visible = visible
         };
@@ -748,7 +747,7 @@ public class ComponentEditorPageTests
     [MemberData(nameof(Component_Set_TestData))]
     public void ComponentEditorPage_SetComponent_Invoke_SetsComponent(IComponent component)
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         control.SetComponent(component);
         Assert.Same(component, control.Component);
         Assert.Equal(0, control.LoadComponentCallCount);
@@ -769,11 +768,11 @@ public class ComponentEditorPageTests
     [InlineData(1, 0)]
     public void ComponentEditorPage_SetDirty_InvokeWithPageSites_CallsSetDirty(int loading, int expectedSetDirtyCallCount)
     {
-        var mockComponentEditorPageSite = new Mock<IComponentEditorPageSite>(MockBehavior.Strict);
+        Mock<IComponentEditorPageSite> mockComponentEditorPageSite = new(MockBehavior.Strict);
         mockComponentEditorPageSite
             .Setup(s => s.SetDirty())
             .Verifiable();
-        using var control = new SubComponentEditorPage
+        using SubComponentEditorPage control = new()
         {
             PageSite = mockComponentEditorPageSite.Object,
             Loading = loading
@@ -792,7 +791,7 @@ public class ComponentEditorPageTests
     [InlineData(1)]
     public void ComponentEditorPage_SetDirty_InvokeWithoutPageSite_Nop(int loading)
     {
-        using var control = new SubComponentEditorPage
+        using SubComponentEditorPage control = new()
         {
             Loading = loading
         };
@@ -803,18 +802,18 @@ public class ComponentEditorPageTests
     [WinFormsFact]
     public void ComponentEditorPage_SetSite_Invoke_SetsPageSite()
     {
-        using var result = new Control();
-        var controlSite = new Mock<IComponentEditorPageSite>(MockBehavior.Strict);
+        using Control result = new();
+        Mock<IComponentEditorPageSite> controlSite = new(MockBehavior.Strict);
         controlSite
             .Setup(s => s.GetControl())
             .Returns(result)
             .Verifiable();
-        var noControlSite = new Mock<IComponentEditorPageSite>(MockBehavior.Strict);
+        Mock<IComponentEditorPageSite> noControlSite = new(MockBehavior.Strict);
         noControlSite
             .Setup(s => s.GetControl())
             .Returns<Control>(null)
             .Verifiable();
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         control.SetSite(controlSite.Object);
         Assert.Same(controlSite.Object, control.PageSite);
         Assert.Same(control, Assert.Single(result.Controls));
@@ -850,7 +849,7 @@ public class ComponentEditorPageTests
     [WinFormsFact]
     public void ComponentEditorPage_ShowHelp_Invoke_Nop()
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         control.ShowHelp();
 
         // Call again.
@@ -860,7 +859,7 @@ public class ComponentEditorPageTests
     [WinFormsFact]
     public void ComponentEditorPage_SupportsHelp_Invoke_ReturnsFalse()
     {
-        using var control = new SubComponentEditorPage();
+        using SubComponentEditorPage control = new();
         Assert.False(control.SupportsHelp());
 
         // Call again.

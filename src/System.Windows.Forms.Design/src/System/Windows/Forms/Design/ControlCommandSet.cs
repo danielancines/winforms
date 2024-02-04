@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 #nullable disable
 
@@ -9,7 +8,6 @@ using System.Collections;
 using System.ComponentModel.Design;
 using System.Drawing;
 using System.Windows.Forms.Design.Behavior;
-using static Interop;
 
 namespace System.Windows.Forms.Design;
 
@@ -22,7 +20,7 @@ internal class ControlCommandSet : CommandSet
     private readonly CommandSetItem[] commandSet;
     private TabOrder tabOrder;
     private readonly Control baseControl;
-    private StatusCommandUI statusCommandUI; //used to update the StatusBarInfo.
+    private StatusCommandUI statusCommandUI; // used to update the StatusBarInfo.
 
     /// <summary>
     ///  Creates a new CommandSet object.  This object implements the set
@@ -39,233 +37,233 @@ internal class ControlCommandSet : CommandSet
         commandSet = new CommandSetItem[]
         {
             // Alignment commands
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusMultiSelectPrimary),
-                              new EventHandler(OnMenuAlignByPrimary),
-                              StandardCommands.AlignLeft, true),
+            new(
+                this,
+                new EventHandler(OnStatusMultiSelectPrimary),
+                new EventHandler(OnMenuAlignByPrimary),
+                StandardCommands.AlignLeft, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusMultiSelectPrimary),
-                              new EventHandler(OnMenuAlignByPrimary),
-                              StandardCommands.AlignTop, true),
+            new(
+                this,
+                new EventHandler(OnStatusMultiSelectPrimary),
+                new EventHandler(OnMenuAlignByPrimary),
+                StandardCommands.AlignTop, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusControlsOnlySelectionAndGrid),
-                              new EventHandler(OnMenuAlignToGrid),
-                              StandardCommands.AlignToGrid, true),
+            new(
+                this,
+                new EventHandler(OnStatusControlsOnlySelectionAndGrid),
+                new EventHandler(OnMenuAlignToGrid),
+                StandardCommands.AlignToGrid, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusMultiSelectPrimary),
-                              new EventHandler(OnMenuAlignByPrimary),
-                              StandardCommands.AlignBottom, true),
+            new(
+                this,
+                new EventHandler(OnStatusMultiSelectPrimary),
+                new EventHandler(OnMenuAlignByPrimary),
+                StandardCommands.AlignBottom, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusMultiSelectPrimary),
-                              new EventHandler(OnMenuAlignByPrimary),
-                              StandardCommands.AlignHorizontalCenters, true),
+            new(
+                this,
+                new EventHandler(OnStatusMultiSelectPrimary),
+                new EventHandler(OnMenuAlignByPrimary),
+                StandardCommands.AlignHorizontalCenters, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusMultiSelectPrimary),
-                              new EventHandler(OnMenuAlignByPrimary),
-                              StandardCommands.AlignRight, true),
+            new(
+                this,
+                new EventHandler(OnStatusMultiSelectPrimary),
+                new EventHandler(OnMenuAlignByPrimary),
+                StandardCommands.AlignRight, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusMultiSelectPrimary),
-                              new EventHandler(OnMenuAlignByPrimary),
-                              StandardCommands.AlignVerticalCenters, true),
+            new(
+                this,
+                new EventHandler(OnStatusMultiSelectPrimary),
+                new EventHandler(OnMenuAlignByPrimary),
+                StandardCommands.AlignVerticalCenters, true),
 
             // Centering commands
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusControlsOnlySelection),
-                              new EventHandler(OnMenuCenterSelection),
-                              StandardCommands.CenterHorizontally, true),
+            new(
+                this,
+                new EventHandler(OnStatusControlsOnlySelection),
+                new EventHandler(OnMenuCenterSelection),
+                StandardCommands.CenterHorizontally, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusControlsOnlySelection),
-                              new EventHandler(OnMenuCenterSelection),
-                              StandardCommands.CenterVertically, true),
+            new(
+                this,
+                new EventHandler(OnStatusControlsOnlySelection),
+                new EventHandler(OnMenuCenterSelection),
+                StandardCommands.CenterVertically, true),
 
             // Spacing commands
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusMultiSelectNonContained),
-                              new EventHandler(OnMenuSpacingCommand),
-                              StandardCommands.HorizSpaceConcatenate, true),
+            new(
+                this,
+                new EventHandler(OnStatusMultiSelectNonContained),
+                new EventHandler(OnMenuSpacingCommand),
+                StandardCommands.HorizSpaceConcatenate, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusMultiSelectNonContained),
-                              new EventHandler(OnMenuSpacingCommand),
-                              StandardCommands.HorizSpaceDecrease, true),
+            new(
+                this,
+                new EventHandler(OnStatusMultiSelectNonContained),
+                new EventHandler(OnMenuSpacingCommand),
+                StandardCommands.HorizSpaceDecrease, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusMultiSelectNonContained),
-                              new EventHandler(OnMenuSpacingCommand),
-                              StandardCommands.HorizSpaceIncrease, true),
+            new(
+                this,
+                new EventHandler(OnStatusMultiSelectNonContained),
+                new EventHandler(OnMenuSpacingCommand),
+                StandardCommands.HorizSpaceIncrease, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusMultiSelectNonContained),
-                              new EventHandler(OnMenuSpacingCommand),
-                              StandardCommands.HorizSpaceMakeEqual, true),
+            new(
+                this,
+                new EventHandler(OnStatusMultiSelectNonContained),
+                new EventHandler(OnMenuSpacingCommand),
+                StandardCommands.HorizSpaceMakeEqual, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusMultiSelectNonContained),
-                              new EventHandler(OnMenuSpacingCommand),
-                              StandardCommands.VertSpaceConcatenate, true),
+            new(
+                this,
+                new EventHandler(OnStatusMultiSelectNonContained),
+                new EventHandler(OnMenuSpacingCommand),
+                StandardCommands.VertSpaceConcatenate, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusMultiSelectNonContained),
-                              new EventHandler(OnMenuSpacingCommand),
-                              StandardCommands.VertSpaceDecrease, true),
+            new(
+                this,
+                new EventHandler(OnStatusMultiSelectNonContained),
+                new EventHandler(OnMenuSpacingCommand),
+                StandardCommands.VertSpaceDecrease, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusMultiSelectNonContained),
-                              new EventHandler(OnMenuSpacingCommand),
-                              StandardCommands.VertSpaceIncrease, true),
+            new(
+                this,
+                new EventHandler(OnStatusMultiSelectNonContained),
+                new EventHandler(OnMenuSpacingCommand),
+                StandardCommands.VertSpaceIncrease, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusMultiSelectNonContained),
-                              new EventHandler(OnMenuSpacingCommand),
-                              StandardCommands.VertSpaceMakeEqual, true),
+            new(
+                this,
+                new EventHandler(OnStatusMultiSelectNonContained),
+                new EventHandler(OnMenuSpacingCommand),
+                StandardCommands.VertSpaceMakeEqual, true),
 
             // Sizing commands
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusMultiSelectPrimary),
-                              new EventHandler(OnMenuSizingCommand),
-                              StandardCommands.SizeToControl, true),
+            new(
+                this,
+                new EventHandler(OnStatusMultiSelectPrimary),
+                new EventHandler(OnMenuSizingCommand),
+                StandardCommands.SizeToControl, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusMultiSelectPrimary),
-                              new EventHandler(OnMenuSizingCommand),
-                              StandardCommands.SizeToControlWidth, true),
+            new(
+                this,
+                new EventHandler(OnStatusMultiSelectPrimary),
+                new EventHandler(OnMenuSizingCommand),
+                StandardCommands.SizeToControlWidth, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusMultiSelectPrimary),
-                              new EventHandler(OnMenuSizingCommand),
-                              StandardCommands.SizeToControlHeight, true),
+            new(
+                this,
+                new EventHandler(OnStatusMultiSelectPrimary),
+                new EventHandler(OnMenuSizingCommand),
+                StandardCommands.SizeToControlHeight, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusControlsOnlySelectionAndGrid),
-                              new EventHandler(OnMenuSizeToGrid),
-                              StandardCommands.SizeToGrid, true),
+            new(
+                this,
+                new EventHandler(OnStatusControlsOnlySelectionAndGrid),
+                new EventHandler(OnMenuSizeToGrid),
+                StandardCommands.SizeToGrid, true),
 
             // Z-Order commands
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusZOrder),
-                              new EventHandler(OnMenuZOrderSelection),
-                              StandardCommands.BringToFront, true),
+            new(
+                this,
+                new EventHandler(OnStatusZOrder),
+                new EventHandler(OnMenuZOrderSelection),
+                StandardCommands.BringToFront, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusZOrder),
-                              new EventHandler(OnMenuZOrderSelection),
-                              StandardCommands.SendToBack, true),
+            new(
+                this,
+                new EventHandler(OnStatusZOrder),
+                new EventHandler(OnMenuZOrderSelection),
+                StandardCommands.SendToBack, true),
 
             // Miscellaneous commands
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusShowGrid),
-                              new EventHandler(OnMenuShowGrid),
-                              StandardCommands.ShowGrid, true),
+            new(
+                this,
+                new EventHandler(OnStatusShowGrid),
+                new EventHandler(OnMenuShowGrid),
+                StandardCommands.ShowGrid, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusSnapToGrid),
-                              new EventHandler(OnMenuSnapToGrid),
-                              StandardCommands.SnapToGrid, true),
+            new(
+                this,
+                new EventHandler(OnStatusSnapToGrid),
+                new EventHandler(OnMenuSnapToGrid),
+                StandardCommands.SnapToGrid, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusAnyControls),
-                              new EventHandler(OnMenuTabOrder),
-                              StandardCommands.TabOrder, true),
+            new(
+                this,
+                new EventHandler(OnStatusAnyControls),
+                new EventHandler(OnMenuTabOrder),
+                StandardCommands.TabOrder, true),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusLockControls),
-                              new EventHandler(OnMenuLockControls),
-                              StandardCommands.LockControls, true),
+            new(
+                this,
+                new EventHandler(OnStatusLockControls),
+                new EventHandler(OnMenuLockControls),
+                StandardCommands.LockControls, true),
 
             // Keyboard commands
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusAlways),
-                              new EventHandler(OnKeySize),
-                              MenuCommands.KeySizeWidthIncrease),
+            new(
+                this,
+                new EventHandler(OnStatusAlways),
+                new EventHandler(OnKeySize),
+                MenuCommands.KeySizeWidthIncrease),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusAlways),
-                              new EventHandler(OnKeySize),
-                              MenuCommands.KeySizeHeightIncrease),
+            new(
+                this,
+                new EventHandler(OnStatusAlways),
+                new EventHandler(OnKeySize),
+                MenuCommands.KeySizeHeightIncrease),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusAlways),
-                              new EventHandler(OnKeySize),
-                              MenuCommands.KeySizeWidthDecrease),
+            new(
+                this,
+                new EventHandler(OnStatusAlways),
+                new EventHandler(OnKeySize),
+                MenuCommands.KeySizeWidthDecrease),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusAlways),
-                              new EventHandler(OnKeySize),
-                              MenuCommands.KeySizeHeightDecrease),
+            new(
+                this,
+                new EventHandler(OnStatusAlways),
+                new EventHandler(OnKeySize),
+                MenuCommands.KeySizeHeightDecrease),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusAlways),
-                              new EventHandler(OnKeySize),
-                              MenuCommands.KeyNudgeWidthIncrease),
+            new(
+                this,
+                new EventHandler(OnStatusAlways),
+                new EventHandler(OnKeySize),
+                MenuCommands.KeyNudgeWidthIncrease),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusAlways),
-                              new EventHandler(OnKeySize),
-                              MenuCommands.KeyNudgeHeightIncrease),
+            new(
+                this,
+                new EventHandler(OnStatusAlways),
+                new EventHandler(OnKeySize),
+                MenuCommands.KeyNudgeHeightIncrease),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusAlways),
-                              new EventHandler(OnKeySize),
-                              MenuCommands.KeyNudgeWidthDecrease),
+            new(
+                this,
+                new EventHandler(OnStatusAlways),
+                new EventHandler(OnKeySize),
+                MenuCommands.KeyNudgeWidthDecrease),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusAlways),
-                              new EventHandler(OnKeySize),
-                              MenuCommands.KeyNudgeHeightDecrease),
+            new(
+                this,
+                new EventHandler(OnStatusAlways),
+                new EventHandler(OnKeySize),
+                MenuCommands.KeyNudgeHeightDecrease),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusAlways),
-                              new EventHandler(OnKeySelect),
-                              MenuCommands.KeySelectNext),
+            new(
+                this,
+                new EventHandler(OnStatusAlways),
+                new EventHandler(OnKeySelect),
+                MenuCommands.KeySelectNext),
 
-            new CommandSetItem(
-                              this,
-                              new EventHandler(OnStatusAlways),
-                              new EventHandler(OnKeySelect),
-                              MenuCommands.KeySelectPrevious),
+            new(
+                this,
+                new EventHandler(OnStatusAlways),
+                new EventHandler(OnKeySelect),
+                MenuCommands.KeySelectPrevious),
         };
 
         if (MenuService is not null)
@@ -469,13 +467,13 @@ internal class ControlCommandSet : CommandSet
         Point pt = BehaviorService.ControlToAdornerWindow(primaryControl);
         bool fRTL = (primaryControl.Parent is not null && primaryControl.Parent.IsMirrored);
 
-        //remember that snaplines must be in adornerwindow coordinates
+        // remember that snaplines must be in adornerwindow coordinates
 
         if (directionOffsetX != 0)
         {
             Debug.Assert(directionOffsetY == 0, "Can only resize in one direction at a time using the keyboard");
 
-            //we are resizing in the x-dir, so add the vertical snaplines for the right edge
+            // we are resizing in the x-dir, so add the vertical snaplines for the right edge
             if (!fRTL)
             {
                 if ((rules & SelectionRules.RightSizeable) != 0)
@@ -498,7 +496,7 @@ internal class ControlCommandSet : CommandSet
         {
             Debug.Assert(directionOffsetX == 0, "Can only resize in one direction at a time using the keyboard");
 
-            //we are resizing in the y-dir, so add the horizonal snaplines for the bottom edge
+            // we are resizing in the y-dir, so add the horizonal snaplines for the bottom edge
             if ((rules & SelectionRules.BottomSizeable) != 0)
             {
                 lines.Add(new SnapLine(SnapLineType.Bottom, pt.Y + primaryControl.Height - 1));
@@ -525,13 +523,13 @@ internal class ControlCommandSet : CommandSet
                 IDesignerHost host = (IDesignerHost)GetService(typeof(IDesignerHost));
                 if (host is not null)
                 {
-                    //This will excluded components in the ComponentTray, but that's okay, they are not resizable to begin with.
+                    // This will excluded components in the ComponentTray, but that's okay, they are not resizable to begin with.
                     ControlDesigner des = host.GetDesigner(comp) as ControlDesigner;
                     if (des is not null && ((des.SelectionRules & SelectionRules.Locked) == 0))
                     {
-                        //Possibly flip our size adjustments depending on the dock prop of the control.
-                        //EX: If the control is docked right, then shift+left arrow will cause
-                        //the control's width to decrease when it should increase
+                        // Possibly flip our size adjustments depending on the dock prop of the control.
+                        // EX: If the control is docked right, then shift+left arrow will cause
+                        // the control's width to decrease when it should increase
                         bool flipOffset = false;
                         PropertyDescriptor dockProp = TypeDescriptor.GetProperties(comp)["Dock"];
                         if (dockProp is not null)
@@ -609,8 +607,8 @@ internal class ControlCommandSet : CommandSet
 
                         try
                         {
-                            //if we can find the behaviorservice, then we can use it and the SnapLineEngine to help us
-                            //move these controls...
+                            // if we can find the behaviorservice, then we can use it and the SnapLineEngine to help us
+                            // move these controls...
                             if (BehaviorService is not null)
                             {
                                 Control primaryControl = comp as Control;
@@ -623,23 +621,23 @@ internal class ControlCommandSet : CommandSet
                                     EndDragManager();
                                 }
 
-                                //If we CTRL+Arrow and we're using SnapLines - snap to the next location
+                                // If we CTRL+Arrow and we're using SnapLines - snap to the next location
                                 if (invertSnap && useSnapLines)
                                 {
                                     List<IComponent> selComps = (List<IComponent>)selSvc.GetSelectedComponents();
 
-                                    //create our snapline engine
+                                    // create our snapline engine
                                     dragManager = new DragAssistanceManager(des.Component.Site, selComps);
 
                                     List<SnapLine> targetSnaplines = GenerateSnapLines(des.SelectionRules, primaryControl, moveOffsetX, moveOffsetY);
 
-                                    //ask our snapline engine to find the nearest snap position with the given direction
+                                    // ask our snapline engine to find the nearest snap position with the given direction
                                     Point snappedOffset = dragManager.OffsetToNearestSnapLocation(primaryControl, targetSnaplines, new Point(moveOffsetX, moveOffsetY));
 
-                                    //update the offset according to the snapline engine - but only if the new size is not smaller than the minimum control size
-                                    //E.g. Say button 1 is above button 2 (in the y direction). Button 2 is selected.
-                                    //If the user does a ctrl-shift-up arrow, then OffsetToNearestSnapLocation would return a match to the bottom snapline for button 1
-                                    //resulting in button2's size to be negative
+                                    // update the offset according to the snapline engine - but only if the new size is not smaller than the minimum control size
+                                    // E.g. Say button 1 is above button 2 (in the y direction). Button 2 is selected.
+                                    // If the user does a ctrl-shift-up arrow, then OffsetToNearestSnapLocation would return a match to the bottom snapline for button 1
+                                    // resulting in button2's size to be negative
 
                                     Size primaryControlsize = primaryControl.Size;
                                     primaryControlsize += new Size(snappedOffset.X, snappedOffset.Y);
@@ -676,7 +674,7 @@ internal class ControlCommandSet : CommandSet
                                     }
                                 }
 
-                                //if we used a regular arrow key and we're in SnapToGrid mode...
+                                // if we used a regular arrow key and we're in SnapToGrid mode...
 
                                 else if (!invertSnap && !useSnapLines)
                                 {
@@ -697,7 +695,7 @@ internal class ControlCommandSet : CommandSet
                                         ParentControlDesigner parentDesigner = host.GetDesigner(primaryControl.Parent) as ParentControlDesigner;
                                         if (parentDesigner is not null)
                                         {
-                                            //ask the parent to adjust our wanna-be snapped position
+                                            // ask the parent to adjust our wanna-be snapped position
                                             moveOffsetX *= snapSize.Width;
                                             moveOffsetY *= snapSize.Height;
 
@@ -717,12 +715,12 @@ internal class ControlCommandSet : CommandSet
                                                 moveOffsetX *= -1;
                                             }
 
-                                            Rectangle dragRect = new Rectangle(primaryControl.Location.X, primaryControl.Location.Y,
+                                            Rectangle dragRect = new(primaryControl.Location.X, primaryControl.Location.Y,
                                                                                 primaryControl.Width + moveOffsetX, primaryControl.Height + moveOffsetY);
 
                                             Rectangle newRect = parentDesigner.GetSnappedRect(primaryControl.Bounds, dragRect, true);
 
-                                            //reset our offsets now that we've snapped correctly
+                                            // reset our offsets now that we've snapped correctly
                                             if (moveOffsetX != 0)
                                             {
                                                 moveOffsetX = newRect.Width - primaryControl.Width;
@@ -736,7 +734,7 @@ internal class ControlCommandSet : CommandSet
                                     }
                                     else
                                     {
-                                        //In this case we are just moving 1 pixel
+                                        // In this case we are just moving 1 pixel
                                         checkForIntegralHeight = true;
                                         if (primaryControl.Parent.IsMirrored)
                                         {
@@ -758,7 +756,7 @@ internal class ControlCommandSet : CommandSet
                                     des = host.GetDesigner(component) as ControlDesigner;
                                     if (des is not null && ((des.SelectionRules & rules) != rules))
                                     {
-                                        //the control must match the rules, if not, then we don't resize it
+                                        // the control must match the rules, if not, then we don't resize it
                                         continue;
                                     }
 
@@ -766,7 +764,7 @@ internal class ControlCommandSet : CommandSet
 
                                     if (control is not null)
                                     {
-                                        int offsetY = moveOffsetY; //we don't want to change moveOFfsetY for all subsequent controls, so cache it off
+                                        int offsetY = moveOffsetY; // we don't want to change moveOFfsetY for all subsequent controls, so cache it off
 
                                         if (checkForIntegralHeight)
                                         {
@@ -779,7 +777,7 @@ internal class ControlCommandSet : CommandSet
                                                     PropertyDescriptor propItemHeight = TypeDescriptor.GetProperties(component)["ItemHeight"];
                                                     if (propItemHeight is not null)
                                                     {
-                                                        offsetY *= (int)propItemHeight.GetValue(component); //adjust for integralheight
+                                                        offsetY *= (int)propItemHeight.GetValue(component); // adjust for integralheight
                                                     }
                                                 }
                                             }
@@ -794,7 +792,7 @@ internal class ControlCommandSet : CommandSet
                                         }
                                     }
 
-                                    //change the Status information ....
+                                    // change the Status information ....
                                     if (control == selSvc.PrimarySelection && statusCommandUI is not null)
                                     {
                                         statusCommandUI.SetStatusInformation(control);
@@ -809,10 +807,10 @@ internal class ControlCommandSet : CommandSet
 
                             if (dragManager is not null)
                             {
-                                //start our timer for the snaplines
+                                // start our timer for the snaplines
                                 SnapLineTimer.Start();
 
-                                //render any lines
+                                // render any lines
                                 dragManager.RenderSnapLinesInternal();
                             }
                         }
@@ -871,7 +869,7 @@ internal class ControlCommandSet : CommandSet
                         foreach (IComponent comp in components)
                         {
                             PropertyDescriptor prop = GetProperty(comp, "Locked");
-                            //check to see the prop is not null & not readonly
+                            // check to see the prop is not null & not readonly
                             if (prop is null)
                             {
                                 continue;
@@ -938,8 +936,8 @@ internal class ControlCommandSet : CommandSet
         }
         else
         {
-            //if we're creating a tab order view, set the focus to the base comp,
-            //this prevents things such as the menu editor service getting broken.
+            // if we're creating a tab order view, set the focus to the base comp,
+            // this prevents things such as the menu editor service getting broken.
             //
             ISelectionService selSvc = SelectionService;
             IDesignerHost host = (IDesignerHost)GetService(typeof(IDesignerHost));
@@ -952,7 +950,7 @@ internal class ControlCommandSet : CommandSet
                 }
             }
 
-            using (DpiHelper.EnterDpiAwarenessScope(DPI_AWARENESS_CONTEXT.DPI_AWARENESS_CONTEXT_SYSTEM_AWARE))
+            using (ScaleHelper.EnterDpiAwarenessScope(DPI_AWARENESS_CONTEXT.DPI_AWARENESS_CONTEXT_SYSTEM_AWARE))
             {
                 tabOrder = new TabOrder((IDesignerHost)GetService(typeof(IDesignerHost)));
             }
@@ -1051,7 +1049,7 @@ internal class ControlCommandSet : CommandSet
                                             {
                                                 // For a perf improvement, we will
                                                 // call OnComponentChanging only once per parent to make sure we do not do unnecessary serialization for Undo
-                                                //this makes bulk operations way faster (see bug 532657)
+                                                // this makes bulk operations way faster (see bug 532657)
 
                                                 parentList.Add(parent);
                                                 ccs.OnComponentChanging(parent, controlsProp);
@@ -1185,7 +1183,7 @@ internal class ControlCommandSet : CommandSet
         cmd.Enabled = controlsOnlySelection;
         cmd.Checked = false;
 
-        //Get the locked property of the base control first...
+        // Get the locked property of the base control first...
         //
         PropertyDescriptor lockedProp = TypeDescriptor.GetProperties(baseControl)["Locked"];
         if (lockedProp is not null && ((bool)lockedProp.GetValue(baseControl)))
@@ -1783,7 +1781,7 @@ internal class ControlCommandSet : CommandSet
                 }
                 else
                 {
-                    //REVIEW This doesn't look 64-bit safe
+                    // REVIEW This doesn't look 64-bit safe
                     return PARAM.ToInt(cX.Parent.Handle) - PARAM.ToInt(cY.Parent.Handle);
                 }
             }

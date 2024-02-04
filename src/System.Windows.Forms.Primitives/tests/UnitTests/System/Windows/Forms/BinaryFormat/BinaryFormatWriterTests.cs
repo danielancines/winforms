@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -20,7 +19,7 @@ public class BinaryFormatWriterTests
         BinaryFormatWriter.WriteString(stream, testString);
         stream.Position = 0;
 
-        using var formatterScope = new BinaryFormatterScope(enable: true);
+        using BinaryFormatterScope formatterScope = new(enable: true);
 #pragma warning disable SYSLIB0011 // Type or member is obsolete
         BinaryFormatter formatter = new();
 #pragma warning restore
@@ -33,10 +32,11 @@ public class BinaryFormatWriterTests
     public void BinaryFormatWriter_TryWriteObject_SupportedObjects_BinaryFormatterRead(object value)
     {
         using MemoryStream stream = new();
-        BinaryFormatWriter.TryWriteFrameworkObject(stream, value).Should().BeTrue();
+        bool success = BinaryFormatWriter.TryWriteFrameworkObject(stream, value);
+        success.Should().BeTrue();
         stream.Position = 0;
 
-        using BinaryFormatterScope formaterScope = new(enable: true);
+        using BinaryFormatterScope formatterScope = new(enable: true);
 #pragma warning disable SYSLIB0011 // Type or member is obsolete
         BinaryFormatter formatter = new();
 #pragma warning restore SYSLIB0011 // Type or member is obsolete
@@ -46,7 +46,7 @@ public class BinaryFormatWriterTests
         {
             Hashtable deserializedHashtable = (Hashtable)deserialized;
             deserializedHashtable.Count.Should().Be(hashtable.Count);
-            foreach (var key in hashtable.Keys)
+            foreach (object? key in hashtable.Keys)
             {
                 deserializedHashtable[key].Should().Be(hashtable[key]);
             }
@@ -76,7 +76,7 @@ public class BinaryFormatWriterTests
         {
             Hashtable deserializedHashtable = (Hashtable)deserialized!;
             deserializedHashtable.Count.Should().Be(hashtable.Count);
-            foreach (var key in hashtable.Keys)
+            foreach (object? key in hashtable.Keys)
             {
                 deserializedHashtable[key].Should().Be(hashtable[key]);
             }

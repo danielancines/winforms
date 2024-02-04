@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.ComponentModel.Design.Serialization;
@@ -49,7 +48,7 @@ public class ListViewSubItemConverterTests
 
     public static IEnumerable<object[]> ConvertTo_InstanceDescriptor_TestData()
     {
-        var item = new ListViewItem();
+        ListViewItem item = new();
         yield return new object[]
         {
             new ListViewItem.ListViewSubItem(item, "text"),

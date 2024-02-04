@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 #nullable enable
 
@@ -37,7 +36,7 @@ internal unsafe struct EMREXTSELECTCLIPRGN
             return $"[{nameof(EMREXTSELECTCLIPRGN)}] Mode: Set Default";
         }
 
-        StringBuilder sb = new StringBuilder(512);
+        StringBuilder sb = new(512);
         sb.Append($@"[{nameof(EMREXTSELECTCLIPRGN)}] Mode: {iMode} Bounds: {RegionDataHeader->rcBound} Rects: {RegionDataHeader->nCount}");
 
         RECT[] clippingRects = ClippingRectangles;

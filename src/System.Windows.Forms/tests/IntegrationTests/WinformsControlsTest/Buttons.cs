@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 
@@ -23,7 +22,7 @@ public partial class Buttons : Form
 
     protected override void OnLoad(EventArgs e)
     {
-        var table = new TableLayoutPanel
+        TableLayoutPanel table = new()
         {
             Dock = DockStyle.Fill,
             ColumnCount = 3,
@@ -37,7 +36,7 @@ public partial class Buttons : Form
         table.RowStyles.Add(new RowStyle(SizeType.Percent, 30.0f));
         Controls.Add(table);
 
-        var panel = new FlowLayoutPanel
+        FlowLayoutPanel panel = new()
         {
             Dock = DockStyle.Fill,
             FlowDirection = FlowDirection.TopDown

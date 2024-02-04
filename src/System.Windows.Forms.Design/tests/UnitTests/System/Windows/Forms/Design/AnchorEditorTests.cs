@@ -1,12 +1,12 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Drawing.Design;
-using Moq;
-using System.Windows.Forms.TestUtilities;
 using System.Reflection;
+using System.Windows.Forms.TestUtilities;
+using Moq;
+using Windows.Win32.UI.Accessibility;
 
 namespace System.Windows.Forms.Design.Tests;
 
@@ -24,7 +24,7 @@ public class AnchorEditorTests
         yield return new object[] { null };
         yield return new object[] { "value" };
         yield return new object[] { AnchorStyles.Top };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
     }
 
     [Theory]
@@ -76,22 +76,21 @@ public class AnchorEditorTests
     }
 
     [Theory]
-    [InlineData("left")]
-    [InlineData("right")]
-    [InlineData("top")]
-    [InlineData("bottom")]
+    [InlineData("_left")]
+    [InlineData("_right")]
+    [InlineData("_top")]
+    [InlineData("_bottom")]
     public void AnchorEditor_AnchorUI_ControlType_IsCheckButton(string fieldName)
     {
-        AnchorEditor editor = new();
-        Type type = editor.GetType()
+        Type type = typeof(AnchorEditor)
             .GetNestedType("AnchorUI", BindingFlags.NonPublic | BindingFlags.Instance);
-        var anchorUI = (Control)Activator.CreateInstance(type, new object[] { editor });
+        var anchorUI = (Control)Activator.CreateInstance(type);
         var item = (Control)anchorUI.GetType()
             .GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance).GetValue(anchorUI);
 
-        object actual = item.AccessibilityObject.TestAccessor().Dynamic
-            .GetPropertyValue(Interop.UiaCore.UIA.ControlTypePropertyId);
+        var actual = (UIA_CONTROLTYPE_ID)(int)item.AccessibilityObject.TestAccessor().Dynamic
+            .GetPropertyValue(UIA_PROPERTY_ID.UIA_ControlTypePropertyId);
 
-        Assert.Equal(Interop.UiaCore.UIA.CheckBoxControlTypeId, actual);
+        Assert.Equal(UIA_CONTROLTYPE_ID.UIA_CheckBoxControlTypeId, actual);
     }
 }

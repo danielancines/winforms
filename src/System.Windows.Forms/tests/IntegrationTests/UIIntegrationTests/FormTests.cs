@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
@@ -145,7 +144,7 @@ public class FormTests : ControlTestBase
         await RunFormWithoutControlAsync(
             () =>
             {
-                var form = new Form();
+                Form form = new();
                 form.TopMost = true;
 
                 return form;

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.CodeDom;
 using System.CodeDom.Compiler;
@@ -696,7 +695,7 @@ public partial class StronglyTypedResourceBuilderTests
     {
         using UnmanagedMemoryStream resourceAudio =
             Assert.IsType<UnmanagedMemoryStream>(audioPropertyInfo.GetValue(obj: null));
-        var contents = new byte[resourceAudio.Length];
+        byte[] contents = new byte[resourceAudio.Length];
         int pos = (int)(resourceAudio.Position = 0);
         while (pos < resourceAudio.Length)
         {

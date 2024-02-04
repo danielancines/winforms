@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using static System.Windows.Forms.ImageList;
 
@@ -11,7 +10,7 @@ public class ImageListStreamerTests
     [WinFormsFact]
     public void ImageListStreamer_BinaryFormatter_Stream_BinaryFormatter_round_trip_equality()
     {
-        using var formatterScope = new BinaryFormatterScope(enable: true);
+        using BinaryFormatterScope formatterScope = new(enable: true);
 
         // Create an ImageListStreamer via BinaryFormatter
         using ImageListStreamer streamerFromBf = BinarySerialization.EnsureDeserialize<ImageListStreamer>(ClassicBfImageListStreamer);
@@ -25,7 +24,7 @@ public class ImageListStreamerTests
 
         // Create a new ImageListStreamer from the stream
         ms.Position = 0;
-        using ImageListStreamer streamerFromMs = new(ms);
+        using ImageListStreamer streamerFromMs = new(ms.GetBuffer());
         using NativeImageList nativeImageListMs = streamerFromMs.GetNativeImageList();
         Assert.NotEqual(HIMAGELIST.Null, nativeImageListMs.HIMAGELIST);
 
@@ -43,12 +42,11 @@ public class ImageListStreamerTests
     [WinFormsFact]
     public void ImageListStreamer_Stream_BinaryFormatter_compatible()
     {
-        using var formatterScope = new BinaryFormatterScope(enable: true);
+        using BinaryFormatterScope formatterScope = new(enable: true);
 
         // Create a new ImageListStreamer from the stream
         byte[] bytes = Convert.FromBase64String(DevMsImageListStreamer);
-        using MemoryStream ms = new(bytes);
-        using ImageListStreamer streamerFromMs = new(ms);
+        using ImageListStreamer streamerFromMs = new(bytes);
         using NativeImageList nativeImageListMs = streamerFromMs.GetNativeImageList();
         Assert.NotEqual(HIMAGELIST.Null, nativeImageListMs.HIMAGELIST);
 

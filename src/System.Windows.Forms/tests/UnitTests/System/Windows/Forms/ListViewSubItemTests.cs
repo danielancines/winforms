@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -31,8 +30,8 @@ public class ListViewSubItemTests
         yield return new object[] { new ListViewItem(), "reasonable", "reasonable" };
         yield return new object[] { new ListViewItem() { BackColor = Color.Yellow, ForeColor = Color.Yellow, Font = SystemFonts.StatusFont }, "reasonable", "reasonable" };
 
-        var listView = new ListView();
-        var item = new ListViewItem();
+        ListView listView = new();
+        ListViewItem item = new();
         Assert.Null(item.ListView);
         yield return new object[] { item, "reasonable", "reasonable" };
     }
@@ -58,7 +57,7 @@ public class ListViewSubItemTests
         yield return new object[] { new ListViewItem(), "reasonable", Color.Red, Color.Blue, SystemFonts.MenuFont, Color.Red, Color.Blue, "reasonable" };
         yield return new object[] { new ListViewItem() { BackColor = Color.Yellow, ForeColor = Color.Yellow, Font = SystemFonts.StatusFont }, string.Empty, Color.Red, Color.Blue, SystemFonts.MenuFont, Color.Red, Color.Blue, string.Empty };
 
-        var item = new ListViewItem();
+        ListViewItem item = new();
         Assert.Null(item.ListView);
         yield return new object[] { item, "reasonable", Color.Red, Color.Blue, SystemFonts.MenuFont, Color.Red, Color.Blue, "reasonable" };
     }
@@ -80,11 +79,11 @@ public class ListViewSubItemTests
     [WinFormsFact]
     public void ListViewSubItem_BackColor_GetWithListView_ReturnsEqual()
     {
-        using var listView = new ListView
+        using ListView listView = new()
         {
             BackColor = Color.Red
         };
-        var item = new ListViewItem();
+        ListViewItem item = new();
         listView.Items.Add(item);
 
         var subItem = new ListViewItem.ListViewSubItem(item, "text");
@@ -98,7 +97,7 @@ public class ListViewSubItemTests
     [Fact]
     public void ListViewSubItem_BackColor_GetWithListViewItem_ReturnsEqual()
     {
-        var item = new ListViewItem
+        ListViewItem item = new()
         {
             BackColor = Color.Red
         };
@@ -113,11 +112,11 @@ public class ListViewSubItemTests
     [WinFormsFact]
     public void ListViewSubItem_BackColor_GetWithListViewItemWithListView_ReturnsEqual()
     {
-        using var listView = new ListView
+        using ListView listView = new()
         {
             BackColor = Color.Red
         };
-        var item = new ListViewItem
+        ListViewItem item = new()
         {
             BackColor = Color.Blue
         };
@@ -162,11 +161,11 @@ public class ListViewSubItemTests
     [MemberData(nameof(BackColor_SetWithListView_TestData))]
     public void ListViewSubItem_BackColor_SetWithListViewItemWithListView_GetReturnsExpected(Color value, Color expected)
     {
-        using var listView = new ListView
+        using ListView listView = new()
         {
             BackColor = Color.Red
         };
-        var item = new ListViewItem
+        ListViewItem item = new()
         {
             BackColor = Color.Blue
         };
@@ -186,7 +185,7 @@ public class ListViewSubItemTests
     [MemberData(nameof(BackColor_Set_TestData))]
     public void ListViewSubItem_BackColor_SetWithListViewItem_GetReturnsExpected(Color value, Color expected)
     {
-        var item = new ListViewItem
+        ListViewItem item = new()
         {
             BackColor = Color.Blue
         };
@@ -204,8 +203,8 @@ public class ListViewSubItemTests
     [WinFormsFact]
     public void ListViewSubItem_Bounds_GetWithListViewHandle_ReturnsEqual()
     {
-        using var listView = new ListView();
-        var item = new ListViewItem();
+        using ListView listView = new();
+        ListViewItem item = new();
         listView.Items.Add(item);
         Assert.NotEqual(IntPtr.Zero, listView.Handle);
 
@@ -216,11 +215,11 @@ public class ListViewSubItemTests
     [WinFormsFact]
     public void ListViewSubItem_Font_GetWithListView_ReturnsEqual()
     {
-        using var listView = new ListView
+        using ListView listView = new()
         {
             Font = SystemFonts.MenuFont
         };
-        var item = new ListViewItem();
+        ListViewItem item = new();
         listView.Items.Add(item);
 
         var subItem = new ListViewItem.ListViewSubItem(item, "text");
@@ -234,7 +233,7 @@ public class ListViewSubItemTests
     [Fact]
     public void ListViewSubItem_Font_GetWithListViewItem_ReturnsEqual()
     {
-        var item = new ListViewItem
+        ListViewItem item = new()
         {
             Font = SystemFonts.DialogFont
         };
@@ -249,11 +248,11 @@ public class ListViewSubItemTests
     [WinFormsFact]
     public void ListViewSubItem_Font_GetWithListViewItemWithListView_ReturnsEqual()
     {
-        using var listView = new ListView
+        using ListView listView = new()
         {
             Font = SystemFonts.CaptionFont
         };
-        var item = new ListViewItem
+        ListViewItem item = new()
         {
             Font = SystemFonts.DialogFont
         };
@@ -287,11 +286,11 @@ public class ListViewSubItemTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetFontTheoryData))]
     public void ListViewSubItem_Font_SetWithListViewItemWithListView_GetReturnsExpected(Font value)
     {
-        using var listView = new ListView
+        using ListView listView = new()
         {
             Font = SystemFonts.CaptionFont
         };
-        var item = new ListViewItem
+        ListViewItem item = new()
         {
             Font = SystemFonts.DialogFont
         };
@@ -311,7 +310,7 @@ public class ListViewSubItemTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetFontTheoryData))]
     public void ListViewSubItem_Font_SetWithListViewItem_GetReturnsExpected(Font value)
     {
-        var item = new ListViewItem
+        ListViewItem item = new()
         {
             Font = SystemFonts.DialogFont
         };
@@ -329,11 +328,11 @@ public class ListViewSubItemTests
     [WinFormsFact]
     public void ListViewSubItem_ForeColor_GetWithListView_ReturnsEqual()
     {
-        using var listView = new ListView
+        using ListView listView = new()
         {
             ForeColor = Color.Red
         };
-        var item = new ListViewItem();
+        ListViewItem item = new();
         listView.Items.Add(item);
 
         var subItem = new ListViewItem.ListViewSubItem(item, "text");
@@ -347,7 +346,7 @@ public class ListViewSubItemTests
     [Fact]
     public void ListViewSubItem_ForeColor_GetWithListViewItem_ReturnsEqual()
     {
-        var item = new ListViewItem
+        ListViewItem item = new()
         {
             ForeColor = Color.Red
         };
@@ -362,11 +361,11 @@ public class ListViewSubItemTests
     [WinFormsFact]
     public void ListViewSubItem_ForeColor_GetWithListViewItemWithListView_ReturnsEqual()
     {
-        using var listView = new ListView
+        using ListView listView = new()
         {
             ForeColor = Color.Red
         };
-        var item = new ListViewItem
+        ListViewItem item = new()
         {
             ForeColor = Color.Blue
         };
@@ -413,11 +412,11 @@ public class ListViewSubItemTests
     [MemberData(nameof(ForeColor_SetWithListView_TestData))]
     public void ListViewSubItem_ForeColor_SetWithListViewItemWithListView_GetReturnsExpected(Color value, Color expected)
     {
-        using var listView = new ListView
+        using ListView listView = new()
         {
             ForeColor = Color.Red
         };
-        var item = new ListViewItem
+        ListViewItem item = new()
         {
             ForeColor = Color.Blue
         };
@@ -437,7 +436,7 @@ public class ListViewSubItemTests
     [MemberData(nameof(ForeColor_Set_TestData))]
     public void ListViewSubItem_ForeColor_SetWithListViewItem_GetReturnsExpected(Color value, Color expected)
     {
-        var item = new ListViewItem
+        ListViewItem item = new()
         {
             ForeColor = Color.Blue
         };
@@ -456,7 +455,7 @@ public class ListViewSubItemTests
     [NormalizedStringData]
     public void ListViewSubItem_Name_SetWithOwner_GetReturnsExpected(string value, string expected)
     {
-        var item = new ListViewItem();
+        ListViewItem item = new();
         var subItem = new ListViewItem.ListViewSubItem(item, "text")
         {
             Name = value
@@ -502,7 +501,7 @@ public class ListViewSubItemTests
     [NormalizedStringData]
     public void ListViewSubItem_Text_SetWithOwner_GetReturnsExpected(string value, string expected)
     {
-        var item = new ListViewItem();
+        ListViewItem item = new();
         var subItem = new ListViewItem.ListViewSubItem(item, "text")
         {
             Text = value
@@ -578,10 +577,10 @@ public class ListViewSubItemTests
     [MemberData(nameof(Serialize_Deserialize_TestData))]
     public void ListViewSubItem_Serialize_Deserialize_Success(ListViewItem.ListViewSubItem subItem)
     {
-        using var formatterScope = new BinaryFormatterScope(enable: true);
-        using var stream = new MemoryStream();
+        using BinaryFormatterScope formatterScope = new(enable: true);
+        using MemoryStream stream = new();
 #pragma warning disable SYSLIB0011 // Type or member is obsolete
-        var formatter = new BinaryFormatter();
+        BinaryFormatter formatter = new();
         new BinaryFormatter().Serialize(stream, subItem);
         stream.Seek(0, SeekOrigin.Begin);
 

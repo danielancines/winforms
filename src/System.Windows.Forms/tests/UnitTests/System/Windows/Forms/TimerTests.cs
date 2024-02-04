@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using Moq;
@@ -12,7 +11,7 @@ public class TimerTests
     [WinFormsFact]
     public void Timer_Ctor_Default()
     {
-        using var timer = new SubTimer();
+        using SubTimer timer = new();
         Assert.Null(timer.Container);
         Assert.False(timer.DesignMode);
         Assert.False(timer.Enabled);
@@ -24,8 +23,8 @@ public class TimerTests
     [WinFormsFact]
     public void Timer_Ctor_IContainer()
     {
-        using var container = new Container();
-        using var timer = new SubTimer(container);
+        using Container container = new();
+        using SubTimer timer = new(container);
         Assert.Same(container, timer.Container);
         Assert.False(timer.DesignMode);
         Assert.False(timer.Enabled);
@@ -44,7 +43,7 @@ public class TimerTests
     [BoolData]
     public void Timer_Enabled_Set_GetReturnsExpected(bool value)
     {
-        using var timer = new Timer
+        using Timer timer = new()
         {
             Enabled = value
         };
@@ -59,8 +58,8 @@ public class TimerTests
     [BoolData]
     public void Timer_Enabled_SetDesignMode_GetReturnsExpected(bool value)
     {
-        using var timer = new SubTimer();
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        using SubTimer timer = new();
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.DesignMode)
             .Returns(true);
@@ -83,8 +82,8 @@ public class TimerTests
     [BoolData]
     public void Timer_Enabled_SetDesignModeAfterEnabling_GetReturnsExpected(bool value)
     {
-        using var timer = new SubTimer();
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        using SubTimer timer = new();
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.DesignMode)
             .Returns(true);
@@ -114,7 +113,7 @@ public class TimerTests
     [InlineData(100)]
     public void Timer_Interval_Set_GetReturnsExpected(int value)
     {
-        using var timer = new Timer
+        using Timer timer = new()
         {
             Interval = value
         };
@@ -130,7 +129,7 @@ public class TimerTests
     [InlineData(100)]
     public void Timer_Interval_SetStarted_GetReturnsExpected(int value)
     {
-        using var timer = new Timer();
+        using Timer timer = new();
         timer.Start();
 
         timer.Interval = value;
@@ -146,7 +145,7 @@ public class TimerTests
     [InlineData(100)]
     public void Timer_Interval_SetStopped_GetReturnsExpected(int value)
     {
-        using var timer = new Timer();
+        using Timer timer = new();
         timer.Start();
         timer.Stop();
 
@@ -163,8 +162,8 @@ public class TimerTests
     [InlineData(100)]
     public void Timer_Interval_SetDesignMode_GetReturnsExpected(int value)
     {
-        using var timer = new SubTimer();
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        using SubTimer timer = new();
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.DesignMode)
             .Returns(true);
@@ -188,8 +187,8 @@ public class TimerTests
     [InlineData(100)]
     public void Timer_Interval_SetDesignModeAfterEnabling_GetReturnsExpected(int value)
     {
-        using var timer = new SubTimer();
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        using SubTimer timer = new();
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.DesignMode)
             .Returns(true);
@@ -219,7 +218,7 @@ public class TimerTests
     [InlineData(-1)]
     public void Timer_Interval_SetInvalid_ThrowsArgumentOutOfRangeException(int value)
     {
-        using var timer = new Timer();
+        using Timer timer = new();
         Assert.Throws<ArgumentOutOfRangeException>("value", () => timer.Interval = value);
     }
 
@@ -227,7 +226,7 @@ public class TimerTests
     [StringWithNullData]
     public void Timer_Tag_Set_GetReturnsExpected(object value)
     {
-        using var timer = new Timer
+        using Timer timer = new()
         {
             Tag = value
         };
@@ -242,8 +241,8 @@ public class TimerTests
     [StringWithNullData]
     public void Timer_Tag_SetDesignMode_GetReturnsExpected(object value)
     {
-        using var timer = new SubTimer();
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        using SubTimer timer = new();
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.DesignMode)
             .Returns(true);
@@ -266,8 +265,8 @@ public class TimerTests
     [BoolData]
     public void Timer_Start_Stop_Success(bool designMode)
     {
-        using var timer = new SubTimer();
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        using SubTimer timer = new();
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.DesignMode)
             .Returns(designMode);
@@ -291,8 +290,8 @@ public class TimerTests
     [BoolData]
     public void Timer_Start_MultipleTimes_Success(bool designMode)
     {
-        using var timer = new SubTimer();
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        using SubTimer timer = new();
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.DesignMode)
             .Returns(designMode);
@@ -316,8 +315,8 @@ public class TimerTests
     [BoolData]
     public void Timer_Stop_Restart_Success(bool designMode)
     {
-        using var timer = new SubTimer();
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        using SubTimer timer = new();
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.DesignMode)
             .Returns(designMode);
@@ -349,8 +348,8 @@ public class TimerTests
     [BoolData]
     public void Timer_Stop_MultipleTimes_Success(bool designMode)
     {
-        using var timer = new SubTimer();
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        using SubTimer timer = new();
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.DesignMode)
             .Returns(designMode);
@@ -377,8 +376,8 @@ public class TimerTests
     [WinFormsFact]
     public void Timer_OnTick_Invoke_CallsTick()
     {
-        using var timer = new SubTimer();
-        var eventArgs = new EventArgs();
+        using SubTimer timer = new();
+        EventArgs eventArgs = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -401,7 +400,7 @@ public class TimerTests
     [WinFormsFact]
     public void Timer_Dispose_NotStarted_Success()
     {
-        using var timer = new Timer();
+        using Timer timer = new();
         timer.Dispose();
         Assert.False(timer.Enabled);
 
@@ -413,7 +412,7 @@ public class TimerTests
     [WinFormsFact]
     public void Timer_Dispose_Started_Success()
     {
-        using var timer = new Timer();
+        using Timer timer = new();
         timer.Start();
 
         timer.Dispose();
@@ -427,7 +426,7 @@ public class TimerTests
     [WinFormsFact]
     public void Timer_Dispose_Stopped_Success()
     {
-        using var timer = new Timer();
+        using Timer timer = new();
         timer.Start();
         timer.Stop();
 
@@ -442,7 +441,7 @@ public class TimerTests
     [WinFormsFact]
     public void Timer_ToString_Invoke_ReturnsExpected()
     {
-        using var timer = new Timer();
+        using Timer timer = new();
         Assert.Equal("System.Windows.Forms.Timer, Interval: 100", timer.ToString());
     }
 

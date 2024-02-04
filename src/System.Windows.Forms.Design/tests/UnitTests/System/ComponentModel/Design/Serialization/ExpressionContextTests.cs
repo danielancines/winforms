@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.CodeDom;
 
@@ -10,8 +9,8 @@ public class ExpressionContextTests
 {
     public static IEnumerable<object[]> Ctor_CodeExpression_Type_Object_Object_TestData()
     {
-        yield return new object[] { new CodeExpression(), typeof(int), new object(), new object() };
-        yield return new object[] { new CodeExpression(), typeof(int), new object(), null };
+        yield return new object[] { new CodeExpression(), typeof(int), new(), new() };
+        yield return new object[] { new CodeExpression(), typeof(int), new(), null };
     }
 
     [Theory]
@@ -27,7 +26,7 @@ public class ExpressionContextTests
 
     public static IEnumerable<object[]> Ctor_CodeExpression_Type_Object_TestData()
     {
-        yield return new object[] { new CodeExpression(), typeof(int), new object() };
+        yield return new object[] { new CodeExpression(), typeof(int), new() };
     }
 
     [Theory]

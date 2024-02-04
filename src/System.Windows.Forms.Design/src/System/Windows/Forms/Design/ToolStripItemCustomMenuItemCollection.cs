@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 #nullable disable
 
@@ -66,7 +65,7 @@ internal class ToolStripItemCustomMenuItemCollection : CustomMenuItemCollection
     /// </summary>
     private ToolStripMenuItem CreatePropertyBasedItem(string text, string propertyName, string imageName)
     {
-        ToolStripMenuItem item = new ToolStripMenuItem(text);
+        ToolStripMenuItem item = new(text);
         bool browsable = IsPropertyBrowsable(propertyName);
         item.Visible = browsable;
         if (browsable)
@@ -92,7 +91,7 @@ internal class ToolStripItemCustomMenuItemCollection : CustomMenuItemCollection
     /// </summary>
     private ToolStripMenuItem CreateEnumValueItem(string propertyName, string name, object value)
     {
-        ToolStripMenuItem item = new ToolStripMenuItem(name)
+        ToolStripMenuItem item = new(name)
         {
             Tag = new EnumValueDescription(propertyName, value)
         };
@@ -102,7 +101,7 @@ internal class ToolStripItemCustomMenuItemCollection : CustomMenuItemCollection
 
     private ToolStripMenuItem CreateBooleanItem(string text, string propertyName)
     {
-        ToolStripMenuItem item = new ToolStripMenuItem(text);
+        ToolStripMenuItem item = new(text);
         bool browsable = IsPropertyBrowsable(propertyName);
         item.Visible = browsable;
         item.Tag = propertyName;
@@ -123,7 +122,7 @@ internal class ToolStripItemCustomMenuItemCollection : CustomMenuItemCollection
                 Image = new Icon(typeof(ToolStripMenuItem), "image").ToBitmap(),
                 ImageTransparentColor = Color.Magenta
             };
-            //Add event Handlers
+            // Add event Handlers
             imageToolStripMenuItem.Click += new EventHandler(OnImageToolStripMenuItemClick);
             enabledToolStripMenuItem = CreateBooleanItem("E&nabled", "Enabled");
             AddRange(new ToolStripItem[] { imageToolStripMenuItem, enabledToolStripMenuItem });
@@ -284,7 +283,7 @@ internal class ToolStripItemCustomMenuItemCollection : CustomMenuItemCollection
         Type t = senderItem.ItemType;
         if (senderItem.ConvertTo)
         {
-            //we are morphing the currentItem
+            // we are morphing the currentItem
             MorphToolStripItem(t);
         }
         else
@@ -520,7 +519,7 @@ internal class ToolStripItemCustomMenuItemCollection : CustomMenuItemCollection
                 ((ComponentDesigner)designer).InitializeNewComponent(null);
             }
 
-            //Set the Image property and DisplayStyle...
+            // Set the Image property and DisplayStyle...
             if (component is ToolStripButton || component is ToolStripSplitButton || component is ToolStripDropDownButton)
             {
                 Image image = null;
@@ -577,7 +576,7 @@ internal class ToolStripItemCustomMenuItemCollection : CustomMenuItemCollection
         return true;
     }
 
-    //helper function to get the property on the actual Control
+    // helper function to get the property on the actual Control
     private object GetProperty(string propertyName)
     {
         PropertyDescriptor getProperty = TypeDescriptor.GetProperties(currentItem)[propertyName];
@@ -590,7 +589,7 @@ internal class ToolStripItemCustomMenuItemCollection : CustomMenuItemCollection
         return null;
     }
 
-    //helper function to change the property on the actual Control
+    // helper function to change the property on the actual Control
     protected void ChangeProperty(string propertyName, object value)
     {
         ChangeProperty(currentItem, propertyName, value);

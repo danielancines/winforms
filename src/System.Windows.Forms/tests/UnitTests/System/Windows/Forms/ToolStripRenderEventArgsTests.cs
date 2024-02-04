@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 
@@ -10,7 +9,7 @@ public class ToolStripRenderEventArgsTests
 {
     public static IEnumerable<object[]> Ctor_Null_Graphics_ToolStrip_TestData()
     {
-        var image = new Bitmap(10, 10);
+        Bitmap image = new(10, 10);
         Graphics graphics = Graphics.FromImage(image);
 
         yield return new object[] { null, null };
@@ -37,10 +36,10 @@ public class ToolStripRenderEventArgsTests
     [MemberData(nameof(Ctor_Graphics_ToolStrip_TestData))]
     public void ToolStripRenderEventArgs_Ctor_Graphics_ToolStrip(ToolStrip toolStrip, Rectangle expectedAffectedBounds, Color expectedBackColor)
     {
-        using var image = new Bitmap(10, 10);
+        using Bitmap image = new(10, 10);
         using Graphics graphics = Graphics.FromImage(image);
 
-        var e = new ToolStripRenderEventArgs(graphics, toolStrip);
+        ToolStripRenderEventArgs e = new(graphics, toolStrip);
 
         Assert.Same(graphics, e.Graphics);
         Assert.Same(toolStrip, e.ToolStrip);
@@ -61,10 +60,10 @@ public class ToolStripRenderEventArgsTests
     [MemberData(nameof(Ctor_Graphics_ToolStrip_Rectangle_Color_TestData))]
     public void ToolStripRenderEventArgs_Ctor_Graphics_ToolStrip_Rectangle_Color(ToolStrip toolStrip, Rectangle affectedBounds, Color backColor, Color expectedBackColor)
     {
-        using var image = new Bitmap(10, 10);
+        using Bitmap image = new(10, 10);
         using Graphics graphics = Graphics.FromImage(image);
 
-        var e = new ToolStripRenderEventArgs(graphics, toolStrip, affectedBounds, backColor);
+        ToolStripRenderEventArgs e = new(graphics, toolStrip, affectedBounds, backColor);
 
         Assert.Same(graphics, e.Graphics);
         Assert.Same(toolStrip, e.ToolStrip);
@@ -79,8 +78,8 @@ public class ToolStripRenderEventArgsTests
         yield return new object[] { new ToolStripOverflow(new ToolStripButton()) };
         yield return new object[] { new ToolStripOverflow(new ToolStripDropDownButton()) };
 
-        var ownedDropDownItem = new ToolStripDropDownButton();
-        var owner = new ToolStrip();
+        ToolStripDropDownButton ownedDropDownItem = new();
+        ToolStrip owner = new();
         owner.Items.Add(ownedDropDownItem);
         yield return new object[] { new ToolStripOverflow(ownedDropDownItem) };
         yield return new object[] { new ToolStripOverflow(owner.OverflowButton) };
@@ -90,10 +89,10 @@ public class ToolStripRenderEventArgsTests
     [MemberData(nameof(ConnectedArea_Empty_TestData))]
     public void ToolStripRenderEventArgs_ConnectedArea_Get_ReturnsEmpty(ToolStrip toolStrip)
     {
-        using (var image = new Bitmap(10, 10))
+        using (Bitmap image = new(10, 10))
         using (Graphics graphics = Graphics.FromImage(image))
         {
-            var e = new ToolStripRenderEventArgs(graphics, toolStrip, new Rectangle(1, 2, 3, 4), Color.Empty);
+            ToolStripRenderEventArgs e = new(graphics, toolStrip, new Rectangle(1, 2, 3, 4), Color.Empty);
             Assert.Equal(Rectangle.Empty, e.ConnectedArea);
         }
     }

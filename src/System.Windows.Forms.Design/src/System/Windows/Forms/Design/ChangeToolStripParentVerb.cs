@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 #nullable disable
 
@@ -17,7 +16,7 @@ internal class ChangeToolStripParentVerb
 {
     private readonly ToolStripDesigner _designer;
     private readonly IDesignerHost _host;
-    private readonly IComponentChangeService _componentChangeSvc;
+    private readonly IComponentChangeService _componentChangeService;
     private readonly IServiceProvider _provider;
 
     /// <summary>
@@ -28,8 +27,8 @@ internal class ChangeToolStripParentVerb
         Debug.Assert(designer is not null, "Can't have a StandardMenuStripVerb without an associated designer");
         _designer = designer;
         _provider = designer.Component.Site;
-        _host = (IDesignerHost)_provider.GetService(typeof(IDesignerHost));
-        _componentChangeSvc = (IComponentChangeService)_provider.GetService(typeof(IComponentChangeService));
+        _host = _provider.GetService<IDesignerHost>();
+        _componentChangeService = (IComponentChangeService)_provider.GetService(typeof(IComponentChangeService));
     }
 
     /// <summary>
@@ -44,7 +43,7 @@ internal class ChangeToolStripParentVerb
         try
         {
             Cursor.Current = Cursors.WaitCursor;
-            //Add a New ToolStripContainer to the RootComponent ...
+            // Add a New ToolStripContainer to the RootComponent ...
             Control root = _host.RootComponent as Control;
             if (_host.GetDesigner(root) is ParentControlDesigner rootDesigner)
             {
@@ -53,16 +52,16 @@ internal class ChangeToolStripParentVerb
                 ToolStrip toolStrip = _designer.Component as ToolStrip;
                 if (toolStrip is not null && _designer is not null && _designer.Component is not null && _provider is not null)
                 {
-                    DesignerActionUIService dapuisvc = _provider.GetService(typeof(DesignerActionUIService)) as DesignerActionUIService;
-                    dapuisvc.HideUI(toolStrip);
+                    DesignerActionUIService designerActionUIService = _provider.GetService(typeof(DesignerActionUIService)) as DesignerActionUIService;
+                    designerActionUIService.HideUI(toolStrip);
                 }
 
                 // Get OleDragHandler ...
-                ToolboxItem tbi = new ToolboxItem(typeof(ToolStripContainer));
-                OleDragDropHandler ddh = rootDesigner.GetOleDragHandler();
-                if (ddh is not null)
+                ToolboxItem toolboxItem = new(typeof(ToolStripContainer));
+                OleDragDropHandler oleDragDropHandler = rootDesigner.GetOleDragHandler();
+                if (oleDragDropHandler is not null)
                 {
-                    IComponent[] newComp = ddh.CreateTool(tbi, root, 0, 0, 0, 0, false, false);
+                    IComponent[] newComp = oleDragDropHandler.CreateTool(toolboxItem, root, 0, 0, 0, 0, false, false);
                     if (newComp[0] is ToolStripContainer tsc)
                     {
                         if (toolStrip is not null)
@@ -74,25 +73,25 @@ internal class ChangeToolStripParentVerb
                             if (oldParent is not null)
                             {
                                 changeService.OnComponentChanging(oldParent, controlsProp);
-                                //remove control from the old parent
+                                // remove control from the old parent
                                 oldParent.Controls.Remove(toolStrip);
                             }
 
                             if (newParent is not null)
                             {
                                 changeService.OnComponentChanging(newParent, controlsProp);
-                                //finally add & relocate the control with the new parent
+                                // finally add & relocate the control with the new parent
                                 newParent.Controls.Add(toolStrip);
                             }
 
-                            //fire our comp changed events
+                            // fire our comp changed events
                             if (changeService is not null && oldParent is not null && newParent is not null)
                             {
                                 changeService.OnComponentChanged(oldParent, controlsProp);
                                 changeService.OnComponentChanged(newParent, controlsProp);
                             }
 
-                            //Set the Selection on the new Parent ... so that the selection is restored to the new item,
+                            // Set the Selection on the new Parent ... so that the selection is restored to the new item,
                             if (_provider.GetService(typeof(ISelectionService)) is ISelectionService selSvc)
                             {
                                 selSvc.SetSelectedComponents(new IComponent[] { tsc });

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 using System.ComponentModel;
@@ -17,7 +16,7 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_Ctor_Default()
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         Assert.Null(control.AccessibleDefaultActionDescription);
         Assert.Null(control.AccessibleDescription);
         Assert.Null(control.AccessibleName);
@@ -115,7 +114,7 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_CreateParams_GetDefault_ReturnsExpected()
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         CreateParams createParams = control.CreateParams;
         Assert.Null(createParams.Caption);
         Assert.Null(createParams.ClassName);
@@ -142,7 +141,7 @@ public class ListControlTests
     [MemberData(nameof(BindingContext_Set_TestData))]
     public void ListControl_BindingContext_Set_GetReturnsExpected(BindingContext value)
     {
-        using var control = new SubListControl
+        using SubListControl control = new()
         {
             BindingContext = value
         };
@@ -165,7 +164,7 @@ public class ListControlTests
     [MemberData(nameof(BindingContext_Set_TestData))]
     public void ListControl_BindingContext_SetWithNonNullBindingContext_GetReturnsExpected(BindingContext value)
     {
-        using var control = new SubListControl
+        using SubListControl control = new()
         {
             BindingContext = new BindingContext()
         };
@@ -189,9 +188,9 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_BindingContext_SetWithDataSource_GetReturnsExpected()
     {
-        var value = new BindingContext();
-        var dataSource = new List<DataClass>();
-        using var control = new SubListControl
+        BindingContext value = new();
+        List<DataClass> dataSource = new();
+        using SubListControl control = new()
         {
             DataSource = dataSource
         };
@@ -215,9 +214,9 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_BindingContext_SetWithDataSourceAndDisplayMember_GetReturnsExpected()
     {
-        var value = new BindingContext();
-        var dataSource = new List<DataClass>();
-        using var control = new SubListControl
+        BindingContext value = new();
+        List<DataClass> dataSource = new();
+        using SubListControl control = new()
         {
             DataSource = dataSource,
             DisplayMember = "Value"
@@ -242,10 +241,10 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_BindingContext_SetWithDataSourceWithBindingContext_GetReturnsExpected()
     {
-        var originalValue = new BindingContext();
-        var value = new BindingContext();
-        var dataSource = new List<DataClass>();
-        using var control = new SubListControl
+        BindingContext originalValue = new();
+        BindingContext value = new();
+        List<DataClass> dataSource = new();
+        using SubListControl control = new()
         {
             BindingContext = originalValue,
             DataSource = dataSource
@@ -270,10 +269,10 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_BindingContext_SetWithDataSourceAndDisplayMemberWithBindingContext_GetReturnsExpected()
     {
-        var originalValue = new BindingContext();
-        var value = new BindingContext();
-        var dataSource = new List<DataClass>();
-        using var control = new SubListControl
+        BindingContext originalValue = new();
+        BindingContext value = new();
+        List<DataClass> dataSource = new();
+        using SubListControl control = new()
         {
             BindingContext = originalValue,
             DataSource = dataSource,
@@ -298,7 +297,7 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_BindingContext_SetWithHandler_CallsBindingContextChanged()
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -309,7 +308,7 @@ public class ListControlTests
         control.BindingContextChanged += handler;
 
         // Set different.
-        var context1 = new BindingContext();
+        BindingContext context1 = new();
         control.BindingContext = context1;
         Assert.Same(context1, control.BindingContext);
         Assert.Equal(1, callCount);
@@ -320,7 +319,7 @@ public class ListControlTests
         Assert.Equal(1, callCount);
 
         // Set different.
-        var context2 = new BindingContext();
+        BindingContext context2 = new();
         control.BindingContext = context2;
         Assert.Same(context2, control.BindingContext);
         Assert.Equal(2, callCount);
@@ -340,9 +339,9 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataManager_ChangePosition_UpdatesSelectionIndex()
     {
-        var context = new BindingContext();
-        var dataSource = new List<DataClass> { new DataClass(), new DataClass() };
-        using var control = new SubListControl
+        BindingContext context = new();
+        List<DataClass> dataSource = new() { new DataClass(), new DataClass() };
+        using SubListControl control = new()
         {
             BindingContext = context,
             DataSource = dataSource
@@ -355,9 +354,9 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataManager_ChangePositionDoesNotAllowSelection_DoesNotUpdateSelectionIndex()
     {
-        var context = new BindingContext();
-        var dataSource = new List<DataClass> { new DataClass(), new DataClass() };
-        using var control = new AllowSelectionFalseListControl
+        BindingContext context = new();
+        List<DataClass> dataSource = new() { new DataClass(), new DataClass() };
+        using AllowSelectionFalseListControl control = new()
         {
             SelectedIndex = -2,
             BindingContext = context,
@@ -371,9 +370,9 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataManager_SuspendResumeBinding_CallsSetItemsCore()
     {
-        var context = new BindingContext();
-        var dataSource = new List<DataClass> { new DataClass(), new DataClass() };
-        using var control = new SubListControl
+        BindingContext context = new();
+        List<DataClass> dataSource = new() { new DataClass(), new DataClass() };
+        using SubListControl control = new()
         {
             SelectedIndex = -1,
             BindingContext = context,
@@ -416,9 +415,9 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataManager_SuspendResumeBindingAfterDataManagerChanged_DoesNotCallSetItemsCore()
     {
-        var context = new BindingContext();
-        var dataSource = new List<DataClass> { new DataClass(), new DataClass() };
-        using var control = new SubListControl
+        BindingContext context = new();
+        List<DataClass> dataSource = new() { new DataClass(), new DataClass() };
+        using SubListControl control = new()
         {
             SelectedIndex = -1,
             BindingContext = context,
@@ -447,9 +446,9 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataManager_SuspendResumeBindingDoesNotAllowSelection_CallsSetItemsCore()
     {
-        var context = new BindingContext();
-        var dataSource = new List<DataClass> { new DataClass(), new DataClass() };
-        using var control = new AllowSelectionFalseListControl
+        BindingContext context = new();
+        List<DataClass> dataSource = new() { new DataClass(), new DataClass() };
+        using AllowSelectionFalseListControl control = new()
         {
             SelectedIndex = -1,
             BindingContext = context,
@@ -489,9 +488,9 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataManager_CancelCurrentEdit_CallsSetItemCore()
     {
-        var context = new BindingContext();
-        var dataSource = new List<DataClass> { new DataClass(), new DataClass() };
-        using var control = new SubListControl
+        BindingContext context = new();
+        List<DataClass> dataSource = new() { new DataClass(), new DataClass() };
+        using SubListControl control = new()
         {
             SelectedIndex = -1,
             BindingContext = context,
@@ -516,9 +515,9 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataManager_CancelCurrentEditAfterDataManagerChanged_DoesNotCallSetItemCore()
     {
-        var context = new BindingContext();
-        var dataSource = new List<DataClass> { new DataClass(), new DataClass() };
-        using var control = new SubListControl
+        BindingContext context = new();
+        List<DataClass> dataSource = new() { new DataClass(), new DataClass() };
+        using SubListControl control = new()
         {
             SelectedIndex = -1,
             BindingContext = context,
@@ -551,7 +550,7 @@ public class ListControlTests
         yield return new object[] { new List<int>() };
         yield return new object[] { Array.Empty<int>() };
 
-        var mockSource = new Mock<IListSource>(MockBehavior.Strict);
+        Mock<IListSource> mockSource = new(MockBehavior.Strict);
         mockSource
             .Setup(s => s.GetList())
             .Returns(new int[] { 1 });
@@ -562,7 +561,7 @@ public class ListControlTests
     [MemberData(nameof(DataSource_Set_TestData))]
     public void ListControl_DataSource_Set_GetReturnsExpected(object value)
     {
-        using var control = new SubListControl
+        using SubListControl control = new()
         {
             DataSource = value
         };
@@ -583,7 +582,7 @@ public class ListControlTests
     [MemberData(nameof(DataSource_Set_TestData))]
     public void ListControl_DataSource_SetWithDataSourceNoDisplayMember_GetReturnsExpected(object value)
     {
-        using var control = new SubListControl
+        using SubListControl control = new()
         {
             DataSource = new List<int>()
         };
@@ -606,7 +605,7 @@ public class ListControlTests
     [MemberData(nameof(DataSource_Set_TestData))]
     public void ListControl_DataSource_SetWithDisplayMember_GetReturnsExpected(object value)
     {
-        using var control = new SubListControl
+        using SubListControl control = new()
         {
             DisplayMember = "Capacity"
         };
@@ -629,8 +628,8 @@ public class ListControlTests
     [MemberData(nameof(DataSource_Set_TestData))]
     public void ListControl_DataSource_SetWithDataSourceNoSuchDisplayMemberAnymore_GetReturnsExpected(object value)
     {
-        var originalValue = new List<int>();
-        using var control = new SubListControl
+        List<int> originalValue = new();
+        using SubListControl control = new()
         {
             DataSource = originalValue,
             DisplayMember = "Capacity"
@@ -653,8 +652,8 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataSource_SetComponent_DisposeValue_Removes()
     {
-        var value = new ComponentList();
-        using var control = new SubListControl
+        ComponentList value = new();
+        using SubListControl control = new()
         {
             DataSource = value,
             DisplayMember = "Count"
@@ -672,8 +671,8 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataSource_SetComponent_DisposeValueDifferentSender_Removes()
     {
-        var value = new ComponentList();
-        using var control = new SubListControl
+        ComponentList value = new();
+        using SubListControl control = new()
         {
             DataSource = value,
             DisplayMember = "Count"
@@ -691,8 +690,8 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataSource_SetComponent_DisposeValueNullSender_Removes()
     {
-        var value = new ComponentList();
-        using var control = new SubListControl
+        ComponentList value = new();
+        using SubListControl control = new()
         {
             DataSource = value,
             DisplayMember = "Count"
@@ -710,9 +709,9 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataSource_SetOverridenComponent_DisposeValue_DoesNotRemove()
     {
-        var originalValue = new ComponentList();
-        var value = new List<int>();
-        using var control = new SubListControl
+        ComponentList originalValue = new();
+        List<int> value = new();
+        using SubListControl control = new()
         {
             DataSource = originalValue,
             DisplayMember = "Count"
@@ -731,13 +730,13 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataSource_SetSupportInitializeNotification_InitializeValueNotInitializedSetsInitialized_Success()
     {
-        var value = new SupportInitializeNotificationList();
+        SupportInitializeNotificationList value = new();
         value.Initialized += (sender, e) =>
         {
             value.IsInitialized = true;
         };
 
-        using var control = new SubListControl
+        using SubListControl control = new()
         {
             DataSource = value,
             DisplayMember = "Count"
@@ -755,8 +754,8 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataSource_SetSupportInitializeNotification_InitializeValueNotInitialized_Success()
     {
-        var value = new SupportInitializeNotificationList();
-        using var control = new SubListControl
+        SupportInitializeNotificationList value = new();
+        using SubListControl control = new()
         {
             DataSource = value,
             DisplayMember = "Count"
@@ -774,8 +773,8 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataSource_SetSupportInitializeNotification_InitializeValueInitialized_Success()
     {
-        var value = new SupportInitializeNotificationList();
-        using var control = new SubListControl
+        SupportInitializeNotificationList value = new();
+        using SubListControl control = new()
         {
             DataSource = value,
             DisplayMember = "Count"
@@ -793,8 +792,8 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataSource_SetSupportInitializeNotification_InitializeValueDifferentSender_Success()
     {
-        var value = new SupportInitializeNotificationList();
-        using var control = new SubListControl
+        SupportInitializeNotificationList value = new();
+        using SubListControl control = new()
         {
             DataSource = value,
             DisplayMember = "Count"
@@ -812,8 +811,8 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataSource_SetSupportInitializeNotification_InitializeValueNullSender_Succes()
     {
-        var value = new SupportInitializeNotificationList();
-        using var control = new SubListControl
+        SupportInitializeNotificationList value = new();
+        using SubListControl control = new()
         {
             DataSource = value,
             DisplayMember = "Count"
@@ -832,9 +831,9 @@ public class ListControlTests
     [BoolData]
     public void ListControl_DataSource_SetOverridenSupportInitializeNotification_InitializeValue_Success(bool isInitialized)
     {
-        var originalValue = new SupportInitializeNotificationList();
-        var value = new List<int>();
-        using var control = new SubListControl
+        SupportInitializeNotificationList originalValue = new();
+        List<int> value = new();
+        using SubListControl control = new()
         {
             DataSource = originalValue,
             DisplayMember = "Count"
@@ -855,8 +854,8 @@ public class ListControlTests
     [MemberData(nameof(DataSource_Set_TestData))]
     public void ListControl_DataSource_SetWithBindingContext_GetReturnsExpected(object value)
     {
-        var context = new BindingContext();
-        using var control = new SubListControl
+        BindingContext context = new();
+        using SubListControl control = new()
         {
             BindingContext = context
         };
@@ -891,8 +890,8 @@ public class ListControlTests
     [MemberData(nameof(DataSource_Set_TestData))]
     public void ListControl_DataSource_SetWithBindingContextWithDataSource_GetReturnsExpected(object value)
     {
-        var context = new BindingContext();
-        using var control = new SubListControl
+        BindingContext context = new();
+        using SubListControl control = new()
         {
             BindingContext = context,
             DataSource = new List<int>()
@@ -927,9 +926,9 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataSource_SetWithBindingContextWithDisplayMemberCanCreate_GetReturnsExpected()
     {
-        var context = new BindingContext();
-        var value = new List<DataClass>();
-        using var control = new SubListControl
+        BindingContext context = new();
+        List<DataClass> value = new();
+        using SubListControl control = new()
         {
             BindingContext = context,
             DisplayMember = "Value"
@@ -951,8 +950,8 @@ public class ListControlTests
     [MemberData(nameof(DataSource_Set_TestData))]
     public void ListControl_DataSource_SetWithBindingContextWithDisplayMemberCantCreate_GetReturnsExpected(object value)
     {
-        var context = new BindingContext();
-        using var control = new SubListControl
+        BindingContext context = new();
+        using SubListControl control = new()
         {
             BindingContext = context,
             DisplayMember = "NoSuchDisplayMember"
@@ -987,7 +986,7 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataSource_SetWithHandler_CallsDataSourceChanged()
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int dataSourceCallCount = 0;
         int displayMemberCallCount = 0;
         EventHandler dataSourceHandler = (sender, e) =>
@@ -1006,7 +1005,7 @@ public class ListControlTests
         control.DisplayMemberChanged += displayMemberHandler;
 
         // Set different.
-        var dataSource1 = new List<int>();
+        List<int> dataSource1 = new();
         control.DataSource = dataSource1;
         Assert.Same(dataSource1, control.DataSource);
         Assert.Equal(1, dataSourceCallCount);
@@ -1019,7 +1018,7 @@ public class ListControlTests
         Assert.Equal(0, displayMemberCallCount);
 
         // Set different.
-        var dataSource2 = new List<int>();
+        List<int> dataSource2 = new();
         control.DataSource = dataSource2;
         Assert.Same(dataSource2, control.DataSource);
         Assert.Equal(2, dataSourceCallCount);
@@ -1043,7 +1042,7 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataSource_SetInsideDataSourceChanged_Nop()
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -1052,7 +1051,7 @@ public class ListControlTests
         };
         control.DataSourceChanged += handler;
 
-        var value = new List<int>();
+        List<int> value = new();
         control.DataSource = value;
         Assert.Same(value, control.DataSource);
         Assert.Empty(control.DisplayMember);
@@ -1062,7 +1061,7 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DataSource_SetInvalid_ThrowsArgumentException()
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         Assert.Throws<ArgumentException>("value", () => control.DataSource = new object());
     }
 
@@ -1070,7 +1069,7 @@ public class ListControlTests
     [NormalizedStringData]
     public void ListControl_DisplayMember_Set_GetReturnsExpected(string value, string expected)
     {
-        using var control = new SubListControl
+        using SubListControl control = new()
         {
             DisplayMember = value
         };
@@ -1091,7 +1090,7 @@ public class ListControlTests
     [NormalizedStringData]
     public void ListControl_DataMember_SetWithDisplayMember_GetReturnsExpected(string value, string expected)
     {
-        using var control = new SubListControl
+        using SubListControl control = new()
         {
             DisplayMember = "DataMember"
         };
@@ -1114,8 +1113,8 @@ public class ListControlTests
     [StringData]
     public void ListControl_DisplayMember_SetWithDataSource_GetReturnsExpected(string value)
     {
-        var dataSource = new List<int>();
-        using var control = new SubListControl
+        List<int> dataSource = new();
+        using SubListControl control = new()
         {
             DataSource = dataSource
         };
@@ -1138,8 +1137,8 @@ public class ListControlTests
     [NormalizedStringData]
     public void ListControl_DisplayMember_SetWithBindingContext_GetReturnsExpected(string value, string expected)
     {
-        var context = new BindingContext();
-        using var control = new SubListControl
+        BindingContext context = new();
+        using SubListControl control = new()
         {
             BindingContext = context
         };
@@ -1162,9 +1161,9 @@ public class ListControlTests
     [StringData]
     public void ListControl_DisplayMember_SetWithBindingContextWithDataSource_GetReturnsExpected(string value)
     {
-        var context = new BindingContext();
-        var dataSource = new List<int>();
-        using var control = new SubListControl
+        BindingContext context = new();
+        List<int> dataSource = new();
+        using SubListControl control = new()
         {
             BindingContext = context,
             DataSource = dataSource
@@ -1191,9 +1190,9 @@ public class ListControlTests
     [InlineData("value", "value")]
     public void ListControl_DisplayMember_SetWithBindingContextWithDataSourceCanCreate_GetReturnsExpected(string value, string expected)
     {
-        var context = new BindingContext();
-        var dataSource = new List<DataClass>();
-        using var control = new SubListControl
+        BindingContext context = new();
+        List<DataClass> dataSource = new();
+        using SubListControl control = new()
         {
             BindingContext = context,
             DataSource = dataSource
@@ -1218,9 +1217,9 @@ public class ListControlTests
     [InlineData("ListValue")]
     public void ListControl_DisplayMember_SetWithBindingContextWithDataSourceCantCreate_GetReturnsExpected(string value)
     {
-        var context = new BindingContext();
-        var dataSource = new List<DataClass>();
-        using var control = new SubListControl
+        BindingContext context = new();
+        List<DataClass> dataSource = new();
+        using SubListControl control = new()
         {
             BindingContext = context,
             DataSource = dataSource
@@ -1259,7 +1258,7 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DisplayMember_SetWithHandler_CallsDisplayMemberChanged()
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int displayMemberCallCount = 0;
         int dataSourceCallCount = 0;
         EventHandler displayMemberHandler = (sender, e) =>
@@ -1319,7 +1318,7 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_DisplayMember_SetInsideDisplayMemberChanged_Nop()
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -1336,7 +1335,7 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_Format_AddRemove_CallsRefreshItems()
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         control.RefreshItemsHandler = () => callCount++;
         ListControlConvertEventHandler handler = (sender, e) => { };
@@ -1360,7 +1359,7 @@ public class ListControlTests
     [MemberData(nameof(FormatInfo_Set_TestData))]
     public void ListControl_FormatInfo_Set_GetReturnsExpected(IFormatProvider value)
     {
-        using var control = new SubListControl
+        using SubListControl control = new()
         {
             FormatInfo = value
         };
@@ -1377,7 +1376,7 @@ public class ListControlTests
     [MemberData(nameof(FormatInfo_Set_TestData))]
     public void ListControl_FormatInfo_SetWithCustomOldValue_GetReturnsExpected(IFormatProvider value)
     {
-        using var control = new SubListControl
+        using SubListControl control = new()
         {
             FormatInfo = CultureInfo.InvariantCulture
         };
@@ -1395,7 +1394,7 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_FormatInfo_Set_CallsRefreshItems()
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         control.RefreshItemsHandler = () => callCount++;
 
@@ -1423,7 +1422,7 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_FormatInfo_SetWithHandler_CallsOnFormatInfoChanged()
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -1464,7 +1463,7 @@ public class ListControlTests
     [NormalizedStringData]
     public void ListControl_FormatString_Set_GetReturnsExpected(string value, string expected)
     {
-        using var control = new SubListControl
+        using SubListControl control = new()
         {
             FormatString = value
         };
@@ -1481,7 +1480,7 @@ public class ListControlTests
     [NormalizedStringData]
     public void ListControl_FormatString_SetWithCustomOldValue_GetReturnsExpected(string value, string expected)
     {
-        using var control = new SubListControl
+        using SubListControl control = new()
         {
             FormatString = "FormatString"
         };
@@ -1499,7 +1498,7 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_FormatString_Set_CallsRefreshItems()
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         control.RefreshItemsHandler = () => callCount++;
 
@@ -1532,7 +1531,7 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_FormatString_SetWithHandler_CallsOnFormatStringChanged()
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -1578,7 +1577,7 @@ public class ListControlTests
     [BoolData]
     public void ListControl_FormattingEnabled_Set_GetReturnsExpected(bool value)
     {
-        using var control = new SubListControl
+        using SubListControl control = new()
         {
             FormattingEnabled = value
         };
@@ -1600,7 +1599,7 @@ public class ListControlTests
     [BoolData]
     public void ListControl_FormattingEnabled_SetWithFormattingEnabled_GetReturnsExpected(bool value)
     {
-        using var control = new SubListControl
+        using SubListControl control = new()
         {
             FormattingEnabled = true
         };
@@ -1623,7 +1622,7 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_FormattingEnabled_Set_CallsRefreshItems()
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         control.RefreshItemsHandler = () => callCount++;
 
@@ -1646,7 +1645,7 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_FormattingEnabled_SetWithHandler_CallsOnFormattingEnabledChanged()
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -1682,7 +1681,7 @@ public class ListControlTests
     [NormalizedStringData]
     public void ListControl_ValueMember_Set_GetReturnsExpected(string value, string expected)
     {
-        using var control = new SubListControl
+        using SubListControl control = new()
         {
             ValueMember = value
         };
@@ -1705,7 +1704,7 @@ public class ListControlTests
     [NormalizedStringData]
     public void ListControl_ValueMember_SetWithDisplayMember_GetReturnsExpected(string value, string expected)
     {
-        using var control = new SubListControl
+        using SubListControl control = new()
         {
             DisplayMember = "DisplayMember"
         };
@@ -1730,8 +1729,8 @@ public class ListControlTests
     [NormalizedStringData]
     public void ListControl_ValueMember_SetWithBindingContext_GetReturnsExpected(string value, string expected)
     {
-        var context = new BindingContext();
-        using var control = new SubListControl
+        BindingContext context = new();
+        using SubListControl control = new()
         {
             BindingContext = context
         };
@@ -1759,9 +1758,9 @@ public class ListControlTests
     [InlineData("value", "value")]
     public void ListControl_ValueMember_SetWithBindingContextWithDataSourceCanCreate_GetReturnsExpected(string value, string expected)
     {
-        var context = new BindingContext();
-        var dataSource = new List<DataClass>();
-        using var control = new SubListControl
+        BindingContext context = new();
+        List<DataClass> dataSource = new();
+        using SubListControl control = new()
         {
             BindingContext = context,
             DataSource = dataSource
@@ -1786,9 +1785,9 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_ValueMember_SetWithBindingContextWithDataSourceCantCreate_ThrowsArgumentException()
     {
-        var context = new BindingContext();
-        var dataSource = new List<DataClass>();
-        using var control = new SubListControl
+        BindingContext context = new();
+        List<DataClass> dataSource = new();
+        using SubListControl control = new()
         {
             BindingContext = context,
             DataSource = dataSource
@@ -1806,9 +1805,9 @@ public class ListControlTests
     [InlineData("value", "value")]
     public void ListControl_ValueMember_SetWithBindingContextWithDataSourceWithDisplayMemberCanCreate_GetReturnsExpected(string value, string expected)
     {
-        var context = new BindingContext();
-        var dataSource = new List<DataClass>();
-        using var control = new SubListControl
+        BindingContext context = new();
+        List<DataClass> dataSource = new();
+        using SubListControl control = new()
         {
             BindingContext = context,
             DataSource = dataSource,
@@ -1834,9 +1833,9 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_ValueMember_SetWithBindingContextWithDataSourceWithDisplayMemberCantCreate_ThrowsArgumentException()
     {
-        var context = new BindingContext();
-        var dataSource = new List<DataClass>();
-        using var control = new SubListControl
+        BindingContext context = new();
+        List<DataClass> dataSource = new();
+        using SubListControl control = new()
         {
             BindingContext = context,
             DataSource = dataSource,
@@ -1851,7 +1850,7 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_ValueMember_SetWithHandler_CallsValueMemberChanged()
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int valueMemberCallCount = 0;
         int selectedValueCallCount = 0;
         EventHandler valueMemberHandler = (sender, e) =>
@@ -1914,9 +1913,9 @@ public class ListControlTests
     [InlineData("value")]
     public void ListControl_SelectedValue_SetWithMatchingValue_Success(string valueMember)
     {
-        var context = new BindingContext();
-        var dataSource = new List<DataClass> { new DataClass { Value = "StringValue" } };
-        using var control = new SubListControl
+        BindingContext context = new();
+        List<DataClass> dataSource = new() { new DataClass { Value = "StringValue" } };
+        using SubListControl control = new()
         {
             SelectedIndex = 0,
             ValueMember = valueMember,
@@ -1939,17 +1938,17 @@ public class ListControlTests
     public static IEnumerable<object[]> SelectedValue_NoMatchingValue_TestData()
     {
         yield return new object[] { new List<DataClass>(), "selected" };
-        yield return new object[] { new List<DataClass> { new DataClass { Value = "NoSuchValue" } }, string.Empty };
-        yield return new object[] { new List<DataClass> { new DataClass { Value = "NoSuchValue" } }, "selected" };
-        yield return new object[] { new List<DataClass> { new DataClass { Value = "NoSuchValue" } }, "nosuchvalue" };
+        yield return new object[] { new List<DataClass> { new() { Value = "NoSuchValue" } }, string.Empty };
+        yield return new object[] { new List<DataClass> { new() { Value = "NoSuchValue" } }, "selected" };
+        yield return new object[] { new List<DataClass> { new() { Value = "NoSuchValue" } }, "nosuchvalue" };
     }
 
     [WinFormsTheory]
     [MemberData(nameof(SelectedValue_NoMatchingValue_TestData))]
     public void ListControl_SelectedValue_SetWithNoMatchingValue_Success(object dataSource, string value)
     {
-        var context = new BindingContext();
-        using var control = new SubListControl
+        BindingContext context = new();
+        using SubListControl control = new()
         {
             SelectedIndex = 0,
             ValueMember = "Value",
@@ -1972,9 +1971,9 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_SelectedValue_SetWithChangedDataManager_Success()
     {
-        var context = new BindingContext();
-        var dataSource = new List<DataClass>();
-        using var control = new SubListControl
+        BindingContext context = new();
+        List<DataClass> dataSource = new();
+        using SubListControl control = new()
         {
             SelectedIndex = 0,
             ValueMember = "ValueMember",
@@ -1999,7 +1998,7 @@ public class ListControlTests
     [InlineData(1)]
     public void ListControl_SelectedValue_SetWithoutDataManager_GetReturnsNull(object value)
     {
-        using var control = new SubListControl
+        using SubListControl control = new()
         {
             SelectedIndex = 0,
             SelectedValue = value
@@ -2017,9 +2016,9 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_SelectedValue_SetWithHandler_DoesNotCallSelectedValueChanged()
     {
-        var context = new BindingContext();
-        var dataSource = new List<DataClass> { new DataClass { Value = "StringValue" } };
-        using var control = new SubListControl
+        BindingContext context = new();
+        List<DataClass> dataSource = new() { new DataClass { Value = "StringValue" } };
+        using SubListControl control = new()
         {
             SelectedIndex = 0,
             ValueMember = "Value",
@@ -2056,9 +2055,9 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_SelectedValue_SetNull_ThrowsArgumentNullException()
     {
-        var context = new BindingContext();
-        var dataSource = new List<DataClass>();
-        using var control = new SubListControl
+        BindingContext context = new();
+        List<DataClass> dataSource = new();
+        using SubListControl control = new()
         {
             SelectedIndex = 0,
             BindingContext = context,
@@ -2075,9 +2074,9 @@ public class ListControlTests
     [InlineData(1)]
     public void ListControl_SelectedValue_SetWithoutValueMember_ThrowsInvalidOperationException(object value)
     {
-        var context = new BindingContext();
-        var dataSource = new List<DataClass>();
-        using var control = new SubListControl
+        BindingContext context = new();
+        List<DataClass> dataSource = new();
+        using SubListControl control = new()
         {
             SelectedIndex = 0,
             BindingContext = context,
@@ -2098,7 +2097,7 @@ public class ListControlTests
     [InlineData(Keys.A, false)]
     public void IsInputKey_Invoke_ReturnsExpected(Keys keyData, bool expected)
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         Assert.Equal(expected, control.IsInputKey(keyData));
     }
 
@@ -2111,7 +2110,7 @@ public class ListControlTests
             null
         };
 
-        var item = new object();
+        object item = new();
         yield return new object[]
         {
             new SubListControl(),
@@ -2144,8 +2143,8 @@ public class ListControlTests
             "abc"
         };
 
-        var dataClass = new DataClass { Value = 10 };
-        var list = new List<DataClass> { dataClass };
+        DataClass dataClass = new() { Value = 10 };
+        List<DataClass> list = new() { dataClass };
         yield return new object[]
         {
             new SubListControl
@@ -2229,7 +2228,7 @@ public class ListControlTests
             null
         };
 
-        var item = new object();
+        object item = new();
         yield return new object[]
         {
             new SubListControl(),
@@ -2267,8 +2266,8 @@ public class ListControlTests
             "abc"
         };
 
-        var dataClass = new DataClass { Value = 10 };
-        var list = new List<DataClass> { dataClass };
+        DataClass dataClass = new() { Value = 10 };
+        List<DataClass> list = new() { dataClass };
         yield return new object[]
         {
             new SubListControl
@@ -2386,9 +2385,9 @@ public class ListControlTests
 
     public static IEnumerable<object[]> GetItemText_HasHandler_TestData()
     {
-        var item = new DataClass { Value = 3 };
+        DataClass item = new() { Value = 3 };
         yield return new object[] { item, null, "3" };
-        yield return new object[] { item, new object(), "3" };
+        yield return new object[] { item, new(), "3" };
         yield return new object[] { item, item, "3" };
         yield return new object[] { item, "custom", "custom" };
     }
@@ -2397,7 +2396,7 @@ public class ListControlTests
     [MemberData(nameof(GetItemText_HasHandler_TestData))]
     public void ListControl_GetItemText_HasHandler_CallsFormat(object item, object value, object expected)
     {
-        using var control = new SubListControl
+        using SubListControl control = new()
         {
             FormattingEnabled = true,
             DisplayMember = "Value"
@@ -2428,9 +2427,9 @@ public class ListControlTests
 
     public static IEnumerable<object[]> GetItemText_HasHandlerFormattingDisabled_TestData()
     {
-        var item = new DataClass { Value = 3 };
+        DataClass item = new() { Value = 3 };
         yield return new object[] { item, null };
-        yield return new object[] { item, new object() };
+        yield return new object[] { item, new() };
         yield return new object[] { item, item };
         yield return new object[] { item, "custom" };
     }
@@ -2439,7 +2438,7 @@ public class ListControlTests
     [MemberData(nameof(GetItemText_HasHandlerFormattingDisabled_TestData))]
     public void ListControl_GetItemText_HasHandlerFormattingDisabled_DoesNotCallFormat(object item, object value)
     {
-        using var control = new SubListControl
+        using SubListControl control = new()
         {
             FormattingEnabled = false,
             DisplayMember = "Value"
@@ -2471,8 +2470,8 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_GetItemText_CustomConverter_ReturnsExpected()
     {
-        var item = new CustomTypeConverterDataClass { Value = 10 };
-        using var control = new SubListControl
+        CustomTypeConverterDataClass item = new() { Value = 10 };
+        using SubListControl control = new()
         {
             FormattingEnabled = true,
             BindingContext = new BindingContext(),
@@ -2488,8 +2487,8 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_GetItemText_CustomConverterFormattingDisabled_ReturnsExpected()
     {
-        var item = new CustomTypeConverterDataClass { Value = 10 };
-        using var control = new SubListControl
+        CustomTypeConverterDataClass item = new() { Value = 10 };
+        using SubListControl control = new()
         {
             FormattingEnabled = false,
             BindingContext = new BindingContext(),
@@ -2505,8 +2504,8 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_GetItemText_CustomConverterNoContext_ReturnsExpected()
     {
-        var item = new CustomTypeConverterDataClass { Value = 10 };
-        using var control = new SubListControl
+        CustomTypeConverterDataClass item = new() { Value = 10 };
+        using SubListControl control = new()
         {
             FormattingEnabled = true,
             DataSource = new List<CustomTypeConverterDataClass> { item },
@@ -2521,8 +2520,8 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_GetItemText_NonCriticalThrowingExceptionType_ReturnsExpected()
     {
-        var item = new NonCriticalThrowingTypeConverterDataClass();
-        using var control = new SubListControl
+        NonCriticalThrowingTypeConverterDataClass item = new();
+        using SubListControl control = new()
         {
             FormattingEnabled = true,
             BindingContext = new BindingContext(),
@@ -2538,8 +2537,8 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_GetItemText_CriticalThrowingExceptionType_RethrowsException()
     {
-        var item = new CriticalThrowingTypeConverterDataClass();
-        using var control = new SubListControl
+        CriticalThrowingTypeConverterDataClass item = new();
+        using SubListControl control = new()
         {
             FormattingEnabled = true,
             BindingContext = new BindingContext(),
@@ -2555,7 +2554,7 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_GetAutoSizeMode_Invoke_ReturnsExpected()
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         Assert.Equal(AutoSizeMode.GrowOnly, control.GetAutoSizeMode());
     }
 
@@ -2582,7 +2581,7 @@ public class ListControlTests
     [InlineData((ControlStyles)(-1), false)]
     public void ListControl_GetStyle_Invoke_ReturnsExpected(ControlStyles flag, bool expected)
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         Assert.Equal(expected, control.GetStyle(flag));
 
         // Call again to test caching.
@@ -2592,7 +2591,7 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_GetTopLevel_Invoke_ReturnsExpected()
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         Assert.False(control.GetTopLevel());
     }
 
@@ -2600,7 +2599,7 @@ public class ListControlTests
     [NewAndDefaultData<EventArgs>]
     public void ListControl_OnBindingContextChanged_Invoke_CallsBindingContextChanged(EventArgs eventArgs)
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -2624,7 +2623,7 @@ public class ListControlTests
     [NewAndDefaultData<EventArgs>]
     public void ListControl_OnDataSourceChanged_Invoke_CallsDataSourceChanged(EventArgs eventArgs)
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -2648,7 +2647,7 @@ public class ListControlTests
     [NewAndDefaultData<EventArgs>]
     public void ListControl_OnDisplayMemberChanged_Invoke_CallsDisplayMemberChanged(EventArgs eventArgs)
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -2679,7 +2678,7 @@ public class ListControlTests
     [MemberData(nameof(OnFormat_TestData))]
     public void ListControl_OnFormat_Invoke_CallsFormat(ListControlConvertEventArgs eventArgs)
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         ListControlConvertEventHandler handler = (sender, e) =>
         {
@@ -2703,7 +2702,7 @@ public class ListControlTests
     [NewAndDefaultData<EventArgs>]
     public void ListControl_OnFormatInfoChanged_Invoke_CallsFormatInfoChanged(EventArgs eventArgs)
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -2727,7 +2726,7 @@ public class ListControlTests
     [NewAndDefaultData<EventArgs>]
     public void ListControl_OnFormatStringChanged_Invoke_CallsFormatStringChanged(EventArgs eventArgs)
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -2751,7 +2750,7 @@ public class ListControlTests
     [NewAndDefaultData<EventArgs>]
     public void ListControl_OnFormattingEnabledChanged_Invoke_CallsFormattingEnabledChanged(EventArgs eventArgs)
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -2775,7 +2774,7 @@ public class ListControlTests
     [NewAndDefaultData<EventArgs>]
     public void ListControl_OnSelectedIndexChanged_Invoke_CallsSelectedValueChanged(EventArgs eventArgs)
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -2799,7 +2798,7 @@ public class ListControlTests
     [NewAndDefaultData<EventArgs>]
     public void ListControl_OnSelectedValueChanged_Invoke_CallsSelectedValueChanged(EventArgs eventArgs)
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -2823,7 +2822,7 @@ public class ListControlTests
     [NewAndDefaultData<EventArgs>]
     public void ListControl_OnValueMemberChanged_Invoke_CallsValueMemberChanged(EventArgs eventArgs)
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -2846,7 +2845,7 @@ public class ListControlTests
     [WinFormsFact]
     public void ListControl_RefreshItems_Invoke_Nop()
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         control.RefreshItemsEntry();
     }
 
@@ -2855,7 +2854,7 @@ public class ListControlTests
     [InlineData(-1, 1)]
     public void ListControl_SetItemCore_Invoke_Nop(int index, object value)
     {
-        using var control = new SubListControl();
+        using SubListControl control = new();
         control.SetItemCoreEntry(index, value);
     }
 

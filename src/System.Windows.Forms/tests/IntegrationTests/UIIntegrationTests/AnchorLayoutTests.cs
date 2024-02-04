@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using System.Windows.Forms.Layout;
@@ -162,7 +161,7 @@ public class AnchorLayoutTests : ControlTestBase
         (Form form, Button button) = GetFormWithAnchoredButton(anchorAllDirection);
         try
         {
-            using var container = new ContainerControl();
+            using ContainerControl container = new();
             container.Dock = DockStyle.Fill;
             container.SuspendLayout();
             container.Controls.Add(button);
@@ -193,7 +192,7 @@ public class AnchorLayoutTests : ControlTestBase
         (Form form, Button button) = GetFormWithAnchoredButton(anchorAllDirection);
         try
         {
-            using var container = new ContainerControl();
+            using ContainerControl container = new();
             container.Dock = DockStyle.Fill;
             container.SuspendLayout();
             container.Controls.Add(button);

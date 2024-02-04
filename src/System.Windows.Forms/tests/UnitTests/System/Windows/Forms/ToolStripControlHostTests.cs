@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.ComponentModel.Design;
@@ -45,7 +44,7 @@ public class ToolStripControlHostTests
     [MemberData(nameof(Ctor_Control_TestData))]
     public void ToolStripControlHost_Ctor_Control(Control c)
     {
-        using var item = new SubToolStripControlHost(c);
+        using SubToolStripControlHost item = new(c);
         Assert.NotNull(item.AccessibilityObject);
         Assert.Same(item.AccessibilityObject, item.AccessibilityObject);
         Assert.Null(item.AccessibleDefaultActionDescription);
@@ -135,8 +134,8 @@ public class ToolStripControlHostTests
     [StringData]
     public void ToolStripControlHost_AccessibleDefaultActionDescription_Set_GetReturnsExpected(string value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c)
+        using Control c = new();
+        using ToolStripControlHost item = new(c)
         {
             AccessibleDefaultActionDescription = value
         };
@@ -154,8 +153,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_AccessibleDefaultActionDescription_SetDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => item.AccessibleDefaultActionDescription = "value");
@@ -165,8 +164,8 @@ public class ToolStripControlHostTests
     [StringData]
     public void ToolStripControlHost_AccessibleDescription_Set_GetReturnsExpected(string value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c)
+        using Control c = new();
+        using ToolStripControlHost item = new(c)
         {
             AccessibleDescription = value
         };
@@ -184,8 +183,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_AccessibleDescription_SetDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => item.AccessibleDescription = "value");
@@ -195,8 +194,8 @@ public class ToolStripControlHostTests
     [StringData]
     public void ToolStripControlHost_AccessibleName_Set_GetReturnsExpected(string value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c)
+        using Control c = new();
+        using ToolStripControlHost item = new(c)
         {
             AccessibleName = value
         };
@@ -214,8 +213,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_AccessibleName_SetDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => item.AccessibleName = "value");
@@ -225,8 +224,8 @@ public class ToolStripControlHostTests
     [EnumData<AccessibleRole>]
     public void ToolStripControlHost_AccessibleRole_Set_GetReturnsExpected(AccessibleRole value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c)
+        using Control c = new();
+        using ToolStripControlHost item = new(c)
         {
             AccessibleRole = value
         };
@@ -245,16 +244,16 @@ public class ToolStripControlHostTests
     [InvalidEnumData<AccessibleRole>]
     public void ToolStripControlHost_AccessibleRole_SetInvalid_ThrowsInvalidEnumArgumentException(AccessibleRole value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         Assert.Throws<InvalidEnumArgumentException>("value", () => item.AccessibleRole = value);
     }
 
     [WinFormsFact]
     public void ToolStripControlHost_BackColor_GetDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => item.BackColor);
@@ -264,8 +263,8 @@ public class ToolStripControlHostTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetBackColorTheoryData))]
     public void ToolStripControlHost_BackColor_Set_GetReturnsExpected(Color value, Color expected)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c)
+        using Control c = new();
+        using SubToolStripControlHost item = new(c)
         {
             BackColor = value
         };
@@ -283,8 +282,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_BackColor_SetWithHandler_CallsBackColorChanged()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -319,8 +318,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_BackColor_SetDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => item.BackColor = Color.Red);
@@ -330,8 +329,8 @@ public class ToolStripControlHostTests
     public void ToolStripControlHost_BackColor_ResetValue_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(ToolStripControlHost))[nameof(ToolStripControlHost.BackColor)];
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         Assert.False(property.CanResetValue(item));
 
         item.BackColor = Color.Red;
@@ -347,8 +346,8 @@ public class ToolStripControlHostTests
     public void ToolStripControlHost_BackColor_ResetValueDisposed_ThrowsObjectDisposedException()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(ToolStripControlHost))[nameof(ToolStripControlHost.BackColor)];
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         item.Dispose();
         Assert.False(property.CanResetValue(item));
 
@@ -361,8 +360,8 @@ public class ToolStripControlHostTests
     public void ToolStripControlHost_BackColor_ShouldSerializeValue_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(ToolStripControlHost))[nameof(ToolStripControlHost.BackColor)];
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         Assert.False(property.ShouldSerializeValue(item));
 
         item.BackColor = Color.Red;
@@ -378,8 +377,8 @@ public class ToolStripControlHostTests
     public void ToolStripControlHost_BackColor_ShouldSerializeValueDisposed_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(ToolStripControlHost))[nameof(ToolStripControlHost.BackColor)];
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         item.Dispose();
         Assert.False(property.ShouldSerializeValue(item));
     }
@@ -387,8 +386,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_BackgroundImage_GetDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => item.BackgroundImage);
@@ -406,8 +405,8 @@ public class ToolStripControlHostTests
     [MemberData(nameof(BackgroundImage_Set_TestData))]
     public void ToolStripControlHost_BackgroundImage_Set_GetReturnsExpected(Image value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c)
+        using Control c = new();
+        using ToolStripControlHost item = new(c)
         {
             BackgroundImage = value
         };
@@ -425,19 +424,19 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_BackgroundImage_SetDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
-        using var value = new Bitmap(10, 10);
+        using Bitmap value = new(10, 10);
         Assert.Throws<ObjectDisposedException>(() => item.BackgroundImage = value);
     }
 
     [WinFormsFact]
     public void ToolStripControlHost_BackgroundImageLayout_GetDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => item.BackgroundImageLayout);
@@ -447,8 +446,8 @@ public class ToolStripControlHostTests
     [EnumData<ImageLayout>]
     public void ToolStripControlHost_BackgroundImageLayout_Set_GetReturnsExpected(ImageLayout value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c)
+        using Control c = new();
+        using ToolStripControlHost item = new(c)
         {
             BackgroundImageLayout = value
         };
@@ -466,8 +465,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_BackgroundImageLayout_SetDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => item.BackgroundImageLayout = ImageLayout.Zoom);
@@ -477,7 +476,7 @@ public class ToolStripControlHostTests
     [BoolData]
     public void ToolStripControlHost_CanSelect_InvokeDesignMode_ReturnsExpected(bool enabled)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Name)
             .Returns("Name");
@@ -490,11 +489,11 @@ public class ToolStripControlHostTests
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
-        using var c = new Control
+        using Control c = new()
         {
             Enabled = enabled
         };
-        using var item = new ToolStripControlHost(c)
+        using ToolStripControlHost item = new(c)
         {
             Site = mockSite.Object
         };
@@ -504,8 +503,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_CanSelect_GetDisposed_ReturnsFalse()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
         Assert.False(item.CanSelect);
     }
@@ -514,8 +513,8 @@ public class ToolStripControlHostTests
     [BoolData]
     public void ToolStripControlHost_CausesValidation_Set_GetReturnsExpected(bool value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c)
+        using Control c = new();
+        using ToolStripControlHost item = new(c)
         {
             CausesValidation = value
         };
@@ -539,8 +538,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Control_ChangeBackColor_UpdatesHost()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         int callCount = 0;
         item.BackColorChanged += (sender, e) => callCount++;
 
@@ -553,10 +552,10 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Control_ChangeBackgroundImage_UpdatesHost()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
-        using var backgroundImage = new Bitmap(10, 10);
+        using Bitmap backgroundImage = new(10, 10);
         c.BackgroundImage = backgroundImage;
         Assert.Same(backgroundImage, c.BackgroundImage);
         Assert.Same(backgroundImage, item.BackgroundImage);
@@ -565,8 +564,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Control_ChangeBackgroundImageLayout_UpdatesHost()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
         c.BackgroundImageLayout = ImageLayout.Zoom;
         Assert.Equal(ImageLayout.Zoom, c.BackgroundImageLayout);
@@ -576,8 +575,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Control_ChangeCausesValidation_UpdatesHost()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
         c.CausesValidation = false;
         Assert.False(c.CausesValidation);
@@ -591,8 +590,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Control_ChangeEnabled_UpdatesHost()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         int callCount = 0;
         item.EnabledChanged += (sender, e) => callCount++;
 
@@ -610,10 +609,10 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Control_ChangeFont_UpdatesHost()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
-        using var value = new Font("Arial", 8.25f);
+        using Font value = new("Arial", 8.25f);
         c.Font = value;
         Assert.Same(value, c.Font);
         Assert.Same(value, item.Font);
@@ -622,8 +621,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Control_ChangeForeColor_UpdatesHost()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         int callCount = 0;
         item.ForeColorChanged += (sender, e) => callCount++;
 
@@ -636,8 +635,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Control_ChangeRightToLeft_UpdatesHost()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         int callCount = 0;
         item.RightToLeftChanged += (sender, e) => callCount++;
 
@@ -650,8 +649,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Control_ChangeSize_GetReturnsExpected()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
         c.Size = new Size(10, 20);
         Assert.Equal(new Size(10, 20), c.Size);
@@ -660,8 +659,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Control_ChangeText_UpdatesHost()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         int callCount = 0;
         item.TextChanged += (sender, e) => callCount++;
 
@@ -674,8 +673,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Control_ChangeVisible_UpdatesHost()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         int callCount = 0;
         item.VisibleChanged += (sender, e) => callCount++;
 
@@ -696,11 +695,11 @@ public class ToolStripControlHostTests
     [EnumData<ContentAlignment>]
     public void ToolStripControlHost_ControlAlign_Set_GetReturnsExpected(ContentAlignment value)
     {
-        using var c = new Control
+        using Control c = new()
         {
             Bounds = new Rectangle(10, 20, 30, 40)
         };
-        using var item = new ToolStripControlHost(c)
+        using ToolStripControlHost item = new(c)
         {
             ControlAlign = value
         };
@@ -721,8 +720,8 @@ public class ToolStripControlHostTests
     [EnumData<ContentAlignment>]
     public void ToolStripControlHost_ControlAlign_SetDisposed_GetReturnsExpected(ContentAlignment value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         item.ControlAlign = value;
@@ -741,16 +740,16 @@ public class ToolStripControlHostTests
     [InlineData((ContentAlignment)int.MinValue)]
     public void ToolStripControlHost_ControlAlign_SetInvalid_ThrowsInvalidEnumArgumentException(ContentAlignment value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         Assert.Throws<InvalidEnumArgumentException>("value", () => item.ControlAlign = value);
     }
 
     [WinFormsFact]
     public void ToolStripControlHost_DefaultSize_GetDisposed_ReturnsExpected()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Equal(new Size(23, 23), item.DefaultSize);
@@ -760,8 +759,8 @@ public class ToolStripControlHostTests
     [EnumData<ToolStripItemDisplayStyle>]
     public void ToolStripControlHost_DisplayStyle_Set_GetReturnsExpected(ToolStripItemDisplayStyle value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c)
+        using Control c = new();
+        using ToolStripControlHost item = new(c)
         {
             DisplayStyle = value
         };
@@ -777,8 +776,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_DisplayStyle_SetWithHandler_CallsDisplayStyleChanged()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -813,8 +812,8 @@ public class ToolStripControlHostTests
     [InvalidEnumData<ToolStripItemDisplayStyle>]
     public void ToolStripControlHost_DisplayStyle_SetInvalid_ThrowsInvalidEnumArgumentException(ToolStripItemDisplayStyle value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         Assert.Throws<InvalidEnumArgumentException>("value", () => item.DisplayStyle = value);
     }
 
@@ -822,8 +821,8 @@ public class ToolStripControlHostTests
     [BoolData]
     public void ToolStripControlHost_DoubleClickEnabled_Set_GetReturnsExpected(bool value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c)
+        using Control c = new();
+        using ToolStripControlHost item = new(c)
         {
             DoubleClickEnabled = value
         };
@@ -839,8 +838,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Enabled_GetDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => item.Enabled);
@@ -862,8 +861,8 @@ public class ToolStripControlHostTests
     [MemberData(nameof(Enabled_Set_TestData))]
     public void ToolStripControlHost_Enabled_Set_GetReturnsExpected(bool visible, Image image, bool value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c)
+        using Control c = new();
+        using ToolStripControlHost item = new(c)
         {
             Visible = visible,
             Image = image,
@@ -889,8 +888,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Enabled_SetWithHandler_CallsEnabledChanged()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -924,8 +923,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Enabled_SetDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => item.Enabled = false);
@@ -934,8 +933,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Focused_GetDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => item.Focused);
@@ -944,8 +943,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Font_GetDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => item.Font);
@@ -964,8 +963,8 @@ public class ToolStripControlHostTests
     [MemberData(nameof(Font_Set_TestData))]
     public void ToolStripControlHost_Font_Set_GetReturnsExpected(ToolStripItemDisplayStyle displayStyle, Font value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c)
+        using Control c = new();
+        using ToolStripControlHost item = new(c)
         {
             DisplayStyle = displayStyle
         };
@@ -985,11 +984,11 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Font_SetDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
-        using var font = new Font("Arial", 8.25f);
+        using Font font = new("Arial", 8.25f);
         Assert.Throws<ObjectDisposedException>(() => item.Font = font);
     }
 
@@ -997,11 +996,11 @@ public class ToolStripControlHostTests
     public void ToolStripControlHost_Font_ResetValue_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(ToolStripControlHost))[nameof(ToolStripControlHost.Font)];
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         Assert.False(property.CanResetValue(item));
 
-        using var font = new Font("Arial", 8.25f);
+        using Font font = new("Arial", 8.25f);
         item.Font = font;
         Assert.Same(font, item.Font);
         Assert.True(property.CanResetValue(item));
@@ -1023,8 +1022,8 @@ public class ToolStripControlHostTests
     public void ToolStripControlHost_Font_ResetValueDisposed_ThrowsObjectDisposedException()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(ToolStripControlHost))[nameof(ToolStripControlHost.Font)];
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
         Assert.False(property.CanResetValue(item));
 
@@ -1037,11 +1036,11 @@ public class ToolStripControlHostTests
     public void ToolStripControlHost_Font_ShouldSerializeValue_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(ToolStripControlHost))[nameof(ToolStripControlHost.Font)];
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         Assert.False(property.ShouldSerializeValue(item));
 
-        using var font = new Font("Arial", 8.25f);
+        using Font font = new("Arial", 8.25f);
         item.Font = font;
         Assert.Same(font, item.Font);
         Assert.True(property.ShouldSerializeValue(item));
@@ -1063,8 +1062,8 @@ public class ToolStripControlHostTests
     public void ToolStripControlHost_Font_ShouldSerializeValueDisposed_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(ToolStripControlHost))[nameof(ToolStripControlHost.Font)];
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
         Assert.False(property.ShouldSerializeValue(item));
     }
@@ -1072,8 +1071,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_ForeColor_GetDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => item.ForeColor);
@@ -1083,8 +1082,8 @@ public class ToolStripControlHostTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetForeColorTheoryData))]
     public void ToolStripControlHost_ForeColor_Set_GetReturnsExpected(Color value, Color expected)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c)
+        using Control c = new();
+        using SubToolStripControlHost item = new(c)
         {
             ForeColor = value
         };
@@ -1102,8 +1101,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_ForeColor_SetWithHandler_CallsForeColorChanged()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -1138,8 +1137,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_ForeColor_SetDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => item.ForeColor = Color.Red);
@@ -1149,8 +1148,8 @@ public class ToolStripControlHostTests
     public void ToolStripControlHost_ForeColor_ResetValue_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(ToolStripControlHost))[nameof(ToolStripControlHost.ForeColor)];
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         Assert.False(property.CanResetValue(item));
 
         item.ForeColor = Color.Red;
@@ -1166,8 +1165,8 @@ public class ToolStripControlHostTests
     public void ToolStripControlHost_ForeColor_ResetValueDisposed_ThrowsObjectDisposedException()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(ToolStripControlHost))[nameof(ToolStripControlHost.ForeColor)];
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
         Assert.False(property.CanResetValue(item));
 
@@ -1180,8 +1179,8 @@ public class ToolStripControlHostTests
     public void ToolStripControlHost_ForeColor_ShouldSerializeValue_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(ToolStripControlHost))[nameof(ToolStripControlHost.ForeColor)];
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         Assert.False(property.ShouldSerializeValue(item));
 
         item.ForeColor = Color.Red;
@@ -1197,8 +1196,8 @@ public class ToolStripControlHostTests
     public void ToolStripControlHost_ForeColor_ShouldSerializeValueDisposed_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(ToolStripControlHost))[nameof(ToolStripControlHost.ForeColor)];
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
         Assert.False(property.ShouldSerializeValue(item));
     }
@@ -1218,8 +1217,8 @@ public class ToolStripControlHostTests
     [MemberData(nameof(Image_Set_TestData))]
     public void ToolStripControlHost_Image_Set_GetReturnsExpected(Color imageTransparentColor, Image value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c)
+        using Control c = new();
+        using ToolStripControlHost item = new(c)
         {
             ImageTransparentColor = imageTransparentColor
         };
@@ -1240,8 +1239,8 @@ public class ToolStripControlHostTests
     [EnumData<ContentAlignment>]
     public void ToolStripControlHost_ImageAlign_Set_GetReturnsExpected(ContentAlignment value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c)
+        using Control c = new();
+        using ToolStripControlHost item = new(c)
         {
             ImageAlign = value
         };
@@ -1260,8 +1259,8 @@ public class ToolStripControlHostTests
     [InlineData((ContentAlignment)int.MinValue)]
     public void ToolStripControlHost_ImageAlign_SetInvalid_ThrowsInvalidEnumArgumentException(ContentAlignment value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         Assert.Throws<InvalidEnumArgumentException>("value", () => item.ImageAlign = value);
     }
 
@@ -1271,8 +1270,8 @@ public class ToolStripControlHostTests
     [InlineData(1)]
     public void ToolStripControlHost_ImageIndex_Set_GetReturnsExpected(int value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c)
+        using Control c = new();
+        using ToolStripControlHost item = new(c)
         {
             ImageIndex = value
         };
@@ -1293,8 +1292,8 @@ public class ToolStripControlHostTests
     [NormalizedStringData]
     public void ToolStripControlHost_ImageKey_Set_GetReturnsExpected(string value, string expected)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c)
+        using Control c = new();
+        using ToolStripControlHost item = new(c)
         {
             ImageKey = value
         };
@@ -1315,8 +1314,8 @@ public class ToolStripControlHostTests
     [EnumData<ToolStripItemImageScaling>]
     public void ToolStripControlHost_ImageScaling_Set_GetReturnsExpected(ToolStripItemImageScaling value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c)
+        using Control c = new();
+        using ToolStripControlHost item = new(c)
         {
             ImageScaling = value
         };
@@ -1344,8 +1343,8 @@ public class ToolStripControlHostTests
     [MemberData(nameof(ImageTransparentColor_Set_TestData))]
     public void ToolStripControlHost_ImageTransparentColor_Set_GetReturnsExpected(Image image, Color value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c)
+        using Control c = new();
+        using ToolStripControlHost item = new(c)
         {
             Image = image
         };
@@ -1382,11 +1381,11 @@ public class ToolStripControlHostTests
     [MemberData(nameof(Parent_Set_TestData))]
     public void ToolStripControlHost_Parent_Set_GetReturnsExpected(bool enabled, bool visible, Image image, bool allowDrop)
     {
-        using var parent = new ToolStrip();
-        using var otherParent = new ToolStrip();
-        using var statusParent = new StatusStrip();
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c)
+        using ToolStrip parent = new();
+        using ToolStrip otherParent = new();
+        using StatusStrip statusParent = new();
+        using Control c = new();
+        using SubToolStripControlHost item = new(c)
         {
             Enabled = enabled,
             Visible = visible,
@@ -1449,12 +1448,12 @@ public class ToolStripControlHostTests
     [MemberData(nameof(Parent_Set_TestData))]
     public void ToolStripControlHost_Parent_SetWithOwner_GetReturnsExpected(bool enabled, bool visible, Image image, bool allowDrop)
     {
-        using var owner = new ToolStrip();
-        using var parent = new ToolStrip();
-        using var otherParent = new ToolStrip();
-        using var statusParent = new StatusStrip();
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c)
+        using ToolStrip owner = new();
+        using ToolStrip parent = new();
+        using ToolStrip otherParent = new();
+        using StatusStrip statusParent = new();
+        using Control c = new();
+        using SubToolStripControlHost item = new(c)
         {
             Enabled = enabled,
             Visible = visible,
@@ -1527,9 +1526,9 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Parent_SetDisposed_GetReturnsExpected()
     {
-        using var parent = new ToolStrip();
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using ToolStrip parent = new();
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => item.Parent = parent);
@@ -1544,8 +1543,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_RightToLeft_GetDisposed_ReturnsExpected()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Equal(RightToLeft.Inherit, item.RightToLeft);
@@ -1555,8 +1554,8 @@ public class ToolStripControlHostTests
     [EnumData<RightToLeft>]
     public void ToolStripControlHost_RightToLeft_SetDisposed_Nop(RightToLeft value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         item.RightToLeft = value;
@@ -1575,8 +1574,8 @@ public class ToolStripControlHostTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetRightToLeftTheoryData))]
     public void ToolStripControlHost_RightToLeft_Set_GetReturnsExpected(RightToLeft value, RightToLeft expected)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c)
+        using Control c = new();
+        using ToolStripControlHost item = new(c)
         {
             RightToLeft = value
         };
@@ -1594,8 +1593,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_RightToLeft_SetWithHandler_CallsRightToLeftChanged()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -1631,8 +1630,8 @@ public class ToolStripControlHostTests
     [InvalidEnumData<RightToLeft>]
     public void ToolStripControlHost_RightToLeft_SetInvalid_ThrowsInvalidEnumArgumentException(RightToLeft value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         Assert.Throws<InvalidEnumArgumentException>("value", () => item.RightToLeft = value);
     }
 
@@ -1640,8 +1639,8 @@ public class ToolStripControlHostTests
     public void ToolStripControlHost_RightToLeft_ResetValue_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(SubToolStripControlHost))[nameof(ToolStripControlHost.RightToLeft)];
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         Assert.False(property.CanResetValue(item));
 
         item.RightToLeft = RightToLeft.Yes;
@@ -1669,8 +1668,8 @@ public class ToolStripControlHostTests
     public void ToolStripControlHost_RightToLeft_ResetValueDisposed_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(SubToolStripControlHost))[nameof(ToolStripControlHost.RightToLeft)];
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
         item.Dispose();
         Assert.False(property.CanResetValue(item));
@@ -1683,8 +1682,8 @@ public class ToolStripControlHostTests
     public void ToolStripControlHost_RightToLeft_ShouldSerializeValue_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(SubToolStripControlHost))[nameof(ToolStripControlHost.RightToLeft)];
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         Assert.False(property.ShouldSerializeValue(item));
 
         item.RightToLeft = RightToLeft.Yes;
@@ -1712,8 +1711,8 @@ public class ToolStripControlHostTests
     public void ToolStripControlHost_RightToLeft_ShouldSerializeValueDisposed_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(SubToolStripControlHost))[nameof(ToolStripControlHost.RightToLeft)];
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
         item.Dispose();
         Assert.False(property.ShouldSerializeValue(item));
@@ -1723,8 +1722,8 @@ public class ToolStripControlHostTests
     [BoolData]
     public void ToolStripControlHost_RightToLeftAutoMirrorImage_Set_GetReturnsExpected(bool value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c)
+        using Control c = new();
+        using ToolStripControlHost item = new(c)
         {
             RightToLeftAutoMirrorImage = value
         };
@@ -1745,8 +1744,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Selected_GetDisposed_ReturnsFalse()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.False(item.Selected);
@@ -1768,10 +1767,10 @@ public class ToolStripControlHostTests
     [MemberData(nameof(Site_Set_TestData))]
     public void ToolStripControlHost_Site_Set_GetReturnsExpected(IContainer container, string name, bool designMode)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns(container);
@@ -1814,11 +1813,11 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Site_GetControlSiteContainerAfterSettingNull_IsNull()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
-        using var container = new Container();
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        using Container container = new();
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns(container);
@@ -1835,11 +1834,11 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Site_GetControlSiteDesignModeAfterSettingNull_IsFalse()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
-        using var container = new Container();
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        using Container container = new();
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns(container);
@@ -1856,11 +1855,11 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Site_GetControlSiteNameAfterSettingNull_IsNull()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
-        using var container = new Container();
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        using Container container = new();
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns(container);
@@ -1878,11 +1877,11 @@ public class ToolStripControlHostTests
     [NormalizedStringData]
     public void ToolStripControlHost_Site_SetControlSiteName_GetReturnsExpected(string value, string expected)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
-        using var container = new Container();
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        using Container container = new();
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns(container);
@@ -1914,11 +1913,11 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Site_SetControlSiteNameAfterSettingNull_IsNull()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
-        using var container = new Container();
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        using Container container = new();
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns(container);
@@ -1936,17 +1935,17 @@ public class ToolStripControlHostTests
     public static IEnumerable<object[]> Site_GetService_TestData()
     {
         yield return new object[] { null };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
     }
 
     [WinFormsTheory]
     [MemberData(nameof(Site_GetService_TestData))]
     public void ToolStripControlHost_Site_ControlSiteGetService_ReturnsExpected(object result)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
@@ -1966,10 +1965,10 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Site_ControlSiteGetServiceIDictionaryServices_ReturnsExpected()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
@@ -1984,10 +1983,10 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Site_ControlSiteGetServiceAfterSettingNull_ReturnsExpected()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
@@ -2005,10 +2004,10 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Site_ControlSiteGetServiceNullServiceType_ThrowsArgumentNullException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
@@ -2024,10 +2023,10 @@ public class ToolStripControlHostTests
     [InlineData("value")]
     public void ToolStripControlHost_Site_ControlSiteGetKey_NoSuchValueEmpty_ReturnsExpected(object value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
@@ -2044,10 +2043,10 @@ public class ToolStripControlHostTests
     [InlineData("value")]
     public void ToolStripControlHost_Site_ControlSiteGetKey_NoSuchValueNotEmpty_ReturnsExpected(object value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
@@ -2066,10 +2065,10 @@ public class ToolStripControlHostTests
     [InlineData("key")]
     public void ToolStripControlHost_Site_ControlSiteGetValue_NoSuchKeyEmpty_ReturnsExpected(object key)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
@@ -2085,10 +2084,10 @@ public class ToolStripControlHostTests
     [InlineData("key")]
     public void ToolStripControlHost_Site_ControlSiteGetValue_NoSuchKeyNotEmpty_ReturnsExpected(object key)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
@@ -2105,10 +2104,10 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Site_ControlSiteGetValue_NullKey_ThrowsArgumentNullException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
@@ -2125,10 +2124,10 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Site_ControlSiteSetValue_Invoke_Success()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
@@ -2157,10 +2156,10 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Site_ControlSiteSetValue_NullKey_ThrowsArgumentNullException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
 
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
@@ -2176,11 +2175,11 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Site_SetDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
@@ -2202,11 +2201,11 @@ public class ToolStripControlHostTests
     [MemberData(nameof(Size_Set_TestData))]
     public void ToolStripControlHost_Size_Set_GetReturnsExpected(Size value)
     {
-        using var c = new Control
+        using Control c = new()
         {
             Bounds = new Rectangle(1, 2, 3, 4)
         };
-        using var item = new ToolStripControlHost(c);
+        using ToolStripControlHost item = new(c);
         int locationChangedCallCount = 0;
         item.LocationChanged += (sender, e) => locationChangedCallCount++;
 
@@ -2226,8 +2225,8 @@ public class ToolStripControlHostTests
     [MemberData(nameof(Size_Set_TestData))]
     public void ToolStripControlHost_Size_SetDisposed_GetReturnsExpected(Size value)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         int locationChangedCallCount = 0;
@@ -2247,8 +2246,8 @@ public class ToolStripControlHostTests
     [NormalizedStringData]
     public void ToolStripControlHost_Text_Set_GetReturnsExpected(string value, string expected)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c)
+        using Control c = new();
+        using SubToolStripControlHost item = new(c)
         {
             Text = value
         };
@@ -2266,8 +2265,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Text_SetWithHandler_CallsTextChanged()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -2303,8 +2302,8 @@ public class ToolStripControlHostTests
     [EnumData<ContentAlignment>]
     public void ToolStripControlHost_TextAlign_Set_GetReturnsExpected(ContentAlignment value)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c)
+        using Control c = new();
+        using SubToolStripControlHost item = new(c)
         {
             TextAlign = value
         };
@@ -2321,8 +2320,8 @@ public class ToolStripControlHostTests
     [InlineData((ContentAlignment)int.MinValue)]
     public void ToolStripControlHost_TextAlign_SetInvalid_ThrowsInvalidEnumArgumentException(ContentAlignment value)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         Assert.Throws<InvalidEnumArgumentException>("value", () => item.TextAlign = value);
     }
 
@@ -2338,8 +2337,8 @@ public class ToolStripControlHostTests
     [MemberData(nameof(TextDirection_Set_TestData))]
     public void ToolStripControlHost_TextDirection_Set_GetReturnsExpected(ToolStripTextDirection value, ToolStripTextDirection expected)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c)
+        using Control c = new();
+        using SubToolStripControlHost item = new(c)
         {
             TextDirection = value
         };
@@ -2354,8 +2353,8 @@ public class ToolStripControlHostTests
     [InvalidEnumData<ToolStripTextDirection>]
     public void ToolStripControlHost_TextDirection_SetInvalid_ThrowsInvalidEnumArgumentException(ToolStripTextDirection value)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         Assert.Throws<InvalidEnumArgumentException>("value", () => item.TextDirection = value);
     }
 
@@ -2363,8 +2362,8 @@ public class ToolStripControlHostTests
     [EnumData<TextImageRelation>]
     public void ToolStripControlHost_TextImageRelation_Set_GetReturnsExpected(TextImageRelation value)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c)
+        using Control c = new();
+        using SubToolStripControlHost item = new(c)
         {
             TextImageRelation = value
         };
@@ -2383,8 +2382,8 @@ public class ToolStripControlHostTests
     [InlineData((TextImageRelation)7)]
     public void ToolStripControlHost_TextImageRelation_SetInvalid_ThrowsInvalidEnumArgumentException(TextImageRelation value)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         Assert.Throws<InvalidEnumArgumentException>("value", () => item.TextImageRelation = value);
     }
 
@@ -2404,8 +2403,8 @@ public class ToolStripControlHostTests
     [MemberData(nameof(SetVisibleCore_TestData))]
     public void ToolStripControlHost_Visible_Set_GetReturnsExpected(bool enabled, Image image, bool value)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c)
+        using Control c = new();
+        using SubToolStripControlHost item = new(c)
         {
             Enabled = enabled,
             Image = image,
@@ -2434,8 +2433,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Visible_SetWithHandler_CallsAvailableChanged()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -2470,8 +2469,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Visible_SetWithHandler_CallsVisibleChanged()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -2508,14 +2507,14 @@ public class ToolStripControlHostTests
     [InlineData(false, AccessibleRole.None)]
     public void ToolStripControlHost_CreateAccessibilityInstance_Invoke_ReturnsExpected(bool createControl, AccessibleRole expectedAccessibleRole)
     {
-        using var c = new Control();
+        using Control c = new();
         if (createControl)
         {
             c.CreateControl();
         }
 
         Assert.Equal(createControl, c.IsHandleCreated);
-        using var item = new SubToolStripControlHost(c);
+        using SubToolStripControlHost item = new(c);
         ToolStripItem.ToolStripItemAccessibleObject accessibleObject = Assert.IsAssignableFrom<ToolStripItem.ToolStripItemAccessibleObject>(item.CreateAccessibilityInstance());
         Assert.Equal(createControl, c.IsHandleCreated);
         Assert.Empty(accessibleObject.DefaultAction);
@@ -2528,8 +2527,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_CreateAccessibilityInstance_InvokeWithCustomRole_ReturnsExpected()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c)
+        using Control c = new();
+        using SubToolStripControlHost item = new(c)
         {
             AccessibleDefaultActionDescription = "AccessibleDefaultActionDescription",
             AccessibleRole = AccessibleRole.HelpBalloon
@@ -2546,8 +2545,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_CreateAccessibilityInstance_InvokeDisposed_ReturnsExpected()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         item.Dispose();
 
         ToolStripItem.ToolStripItemAccessibleObject accessibleObject = Assert.IsAssignableFrom<ToolStripItem.ToolStripItemAccessibleObject>(item.CreateAccessibilityInstance());
@@ -2561,8 +2560,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_CreateAccessibilityInstanceDoDefaultAction_Nop()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         ToolStripItem.ToolStripItemAccessibleObject accessibleObject = Assert.IsAssignableFrom<ToolStripItem.ToolStripItemAccessibleObject>(item.CreateAccessibilityInstance());
         accessibleObject.DoDefaultAction();
 
@@ -2573,8 +2572,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Dispose_Invoke_Success()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         void handler(object sender, EventArgs e)
         {
@@ -2615,8 +2614,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Dispose_InvokeDisposing_Success()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         void handler(object sender, EventArgs e)
         {
@@ -2657,8 +2656,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Dispose_InvokeNotDisposing_Success()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         void handler(object sender, EventArgs e) => callCount++;
         item.Disposed += handler;
@@ -2689,8 +2688,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Focus_InvokeWithoutHandle_Nop()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Focus();
         Assert.False(c.Focused);
         Assert.False(c.IsHandleCreated);
@@ -2699,8 +2698,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_Focus_InvokeDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => item.Focus());
@@ -2719,11 +2718,11 @@ public class ToolStripControlHostTests
     [MemberData(nameof(GetPreferredSize_TestData))]
     public void ToolStripControlHost_GetPreferredSize_Invoke_ReturnsExpected(Size proposedSize)
     {
-        using var c = new Control
+        using Control c = new()
         {
             MinimumSize = new Size(10, 20)
         };
-        using var item = new ToolStripControlHost(c);
+        using ToolStripControlHost item = new(c);
         Assert.Equal(new Size(10, 20), item.GetPreferredSize(proposedSize));
 
         // Call again.
@@ -2734,11 +2733,11 @@ public class ToolStripControlHostTests
     [MemberData(nameof(GetPreferredSize_TestData))]
     public void ToolStripControlHost_GetPreferredSize_InvokeWithPadding_ReturnsExpected(Size proposedSize)
     {
-        using var c = new Control
+        using Control c = new()
         {
             MinimumSize = new Size(10, 20)
         };
-        using var item = new ToolStripControlHost(c)
+        using ToolStripControlHost item = new(c)
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -2752,8 +2751,8 @@ public class ToolStripControlHostTests
     [MemberData(nameof(GetPreferredSize_TestData))]
     public void ToolStripControlHost_GetPreferredSize_InvokeDisposed_ThrowsObjectDisposedException(Size proposedSize)
     {
-        using var c = new Control();
-        using var item = new ToolStripControlHost(c);
+        using Control c = new();
+        using ToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => item.GetPreferredSize(proposedSize));
@@ -2766,11 +2765,11 @@ public class ToolStripControlHostTests
     [EnumData<ContentAlignment>]
     public void ToolStripControlHost_OnBoundsChanged_Invoke_Success(ContentAlignment controlAlign)
     {
-        using var c = new Control
+        using Control c = new()
         {
             Bounds = new Rectangle(10, 20, 30, 40)
         };
-        using var item = new SubToolStripControlHost(c)
+        using SubToolStripControlHost item = new(c)
         {
             ControlAlign = controlAlign
         };
@@ -2790,8 +2789,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_OnBoundsChanged_InvokeDisposed_Nop()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         item.Dispose();
 
         item.OnBoundsChanged();
@@ -2804,8 +2803,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnEnter_Invoke_CallsEnter(EventArgs eventArgs)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -2829,8 +2828,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnGotFocus_Invoke_CallsGotFocus(EventArgs eventArgs)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -2854,11 +2853,11 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnHostedControlResize_Invoke_CallsHostedControlResize(EventArgs eventArgs)
     {
-        using var c = new Control
+        using Control c = new()
         {
             Bounds = new Rectangle(1, 2, 3, 4)
         };
-        using var item = new SubToolStripControlHost(c);
+        using SubToolStripControlHost item = new(c);
 
         item.OnHostedControlResize(eventArgs);
         Assert.Equal(new Rectangle(1, 2, 3, 4), item.Bounds);
@@ -2872,8 +2871,8 @@ public class ToolStripControlHostTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetKeyEventArgsTheoryData))]
     public void ToolStripControlHost_OnKeyDown_Invoke_CallsKeyDown(KeyEventArgs eventArgs)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         KeyEventHandler handler = (sender, e) =>
         {
@@ -2897,8 +2896,8 @@ public class ToolStripControlHostTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetKeyPressEventArgsTheoryData))]
     public void ToolStripControlHost_OnKeyPress_Invoke_CallsKeyPress(KeyPressEventArgs eventArgs)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         KeyPressEventHandler handler = (sender, e) =>
         {
@@ -2922,8 +2921,8 @@ public class ToolStripControlHostTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetKeyEventArgsTheoryData))]
     public void ToolStripControlHost_OnKeyUp_Invoke_CallsKeyUp(KeyEventArgs eventArgs)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         KeyEventHandler handler = (sender, e) =>
         {
@@ -2947,8 +2946,8 @@ public class ToolStripControlHostTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetLayoutEventArgsTheoryData))]
     public void ToolStripControlHost_OnLayout_Invoke_Nop(LayoutEventArgs eventArgs)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
 
         item.OnLayout(eventArgs);
 
@@ -2960,8 +2959,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnLeave_Invoke_CallsLeave(EventArgs eventArgs)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -2985,8 +2984,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnLostFocus_Invoke_CallsLostFocus(EventArgs eventArgs)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -3010,8 +3009,8 @@ public class ToolStripControlHostTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetPaintEventArgsTheoryData))]
     public void ToolStripControlHost_OnPaint_Invoke_DoesNotCallPaint(PaintEventArgs eventArgs)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         PaintEventHandler handler = (sender, e) =>
         {
@@ -3055,8 +3054,8 @@ public class ToolStripControlHostTests
     [MemberData(nameof(OnParentChanged_TestData))]
     public void ToolStripControlHost_OnParentChanged_Invoke_Success(bool enabled, bool visible, Image image, bool allowDrop, ToolStrip oldParent, ToolStrip newParent)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c)
+        using Control c = new();
+        using SubToolStripControlHost item = new(c)
         {
             Enabled = enabled,
             Visible = visible,
@@ -3073,9 +3072,9 @@ public class ToolStripControlHostTests
     [MemberData(nameof(OnParentChanged_TestData))]
     public void ToolStripControlHost_OnParentChanged_InvokeWithOwner_Success(bool enabled, bool visible, Image image, bool allowDrop, ToolStrip oldParent, ToolStrip newParent)
     {
-        using var owner = new ToolStrip();
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c)
+        using ToolStrip owner = new();
+        using Control c = new();
+        using SubToolStripControlHost item = new(c)
         {
             Enabled = enabled,
             Visible = visible,
@@ -3095,11 +3094,11 @@ public class ToolStripControlHostTests
     [MemberData(nameof(Parent_Set_TestData))]
     public void ToolStripControlHost_OnParentChanged_InvokeControlWithoutParent_Success(bool enabled, bool visible, Image image, bool allowDrop)
     {
-        using var parent = new ToolStrip();
-        using var otherParent = new ToolStrip();
-        using var statusParent = new StatusStrip();
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c)
+        using ToolStrip parent = new();
+        using ToolStrip otherParent = new();
+        using StatusStrip statusParent = new();
+        using Control c = new();
+        using SubToolStripControlHost item = new(c)
         {
             Enabled = enabled,
             Visible = visible,
@@ -3164,15 +3163,15 @@ public class ToolStripControlHostTests
     [MemberData(nameof(Parent_Set_TestData))]
     public void ToolStripControlHost_OnParentChanged_InvokeControlWithParent_Success(bool enabled, bool visible, Image image, bool allowDrop)
     {
-        using var parent = new ToolStrip();
-        using var otherParent = new ToolStrip();
-        using var statusParent = new StatusStrip();
-        using var controlParent = new Control();
-        using var c = new Control
+        using ToolStrip parent = new();
+        using ToolStrip otherParent = new();
+        using StatusStrip statusParent = new();
+        using Control controlParent = new();
+        using Control c = new()
         {
             Parent = controlParent
         };
-        using var item = new SubToolStripControlHost(c)
+        using SubToolStripControlHost item = new(c)
         {
             Enabled = enabled,
             Visible = visible,
@@ -3242,8 +3241,8 @@ public class ToolStripControlHostTests
     [MemberData(nameof(OnParentChanged_TestData))]
     public void ToolStripControlHost_OnParentChanged_InvokeDisposed_Success(bool enabled, bool visible, Image image, bool allowDrop, ToolStrip oldParent, ToolStrip newParent)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c)
+        using Control c = new();
+        using SubToolStripControlHost item = new(c)
         {
             Enabled = enabled,
             Visible = visible,
@@ -3262,9 +3261,9 @@ public class ToolStripControlHostTests
     [MemberData(nameof(OnParentChanged_TestData))]
     public void ToolStripControlHost_OnParentChanged_InvokeDisposedWithOwner_Success(bool enabled, bool visible, Image image, bool allowDrop, ToolStrip oldParent, ToolStrip newParent)
     {
-        using var owner = new ToolStrip();
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c)
+        using ToolStrip owner = new();
+        using Control c = new();
+        using SubToolStripControlHost item = new(c)
         {
             Enabled = enabled,
             Visible = visible,
@@ -3284,8 +3283,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeBackColorChanged_Success(EventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3304,8 +3303,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeClick_Success(EventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3324,8 +3323,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeDoubleClick_Success(EventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3350,8 +3349,8 @@ public class ToolStripControlHostTests
     [MemberData(nameof(DragEventArgs_TestData))]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeDragDrop_Success(DragEventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3370,8 +3369,8 @@ public class ToolStripControlHostTests
     [MemberData(nameof(DragEventArgs_TestData))]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeDragEnter_Success(DragEventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3390,8 +3389,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeDragLeave_Success(EventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3410,8 +3409,8 @@ public class ToolStripControlHostTests
     [MemberData(nameof(DragEventArgs_TestData))]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeDragOver_Success(DragEventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3430,8 +3429,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeEnabledChanged_Success(EventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3450,8 +3449,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeEnter_Success(EventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3470,8 +3469,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeForeColorChanged_Success(EventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3496,8 +3495,8 @@ public class ToolStripControlHostTests
     [MemberData(nameof(GiveFeedbackEventArgs_TestData))]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeGiveFeedback_Success(GiveFeedbackEventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3516,8 +3515,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeGotFocus_Success(EventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3536,8 +3535,8 @@ public class ToolStripControlHostTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetKeyEventArgsTheoryData))]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeKeyDown_Success(KeyEventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3556,8 +3555,8 @@ public class ToolStripControlHostTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetKeyPressEventArgsTheoryData))]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeKeyPress_Success(KeyPressEventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3576,8 +3575,8 @@ public class ToolStripControlHostTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetKeyEventArgsTheoryData))]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeKeyUp_Success(KeyEventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3596,8 +3595,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeLeave_Success(EventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3616,8 +3615,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeLocationChanged_Success(EventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3636,8 +3635,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeLostFocus_Success(EventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3656,8 +3655,8 @@ public class ToolStripControlHostTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetMouseEventArgsTheoryData))]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeMouseDown_Success(MouseEventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3676,8 +3675,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeMouseEnter_Success(EventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3696,8 +3695,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeMouseHover_Success(EventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3716,8 +3715,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeMouseLeave_Success(EventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3736,8 +3735,8 @@ public class ToolStripControlHostTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetMouseEventArgsTheoryData))]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeMouseMove_Success(MouseEventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3756,8 +3755,8 @@ public class ToolStripControlHostTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetMouseEventArgsTheoryData))]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeMouseUp_Success(MouseEventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3776,8 +3775,8 @@ public class ToolStripControlHostTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetPaintEventArgsTheoryData))]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokePaint_Success(PaintEventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3802,8 +3801,8 @@ public class ToolStripControlHostTests
     [MemberData(nameof(QueryContinueDragEventArgs_TestData))]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeQueryContinueDrag_Success(QueryContinueDragEventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3821,8 +3820,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeQueryAccessibilityHelp_Success()
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3843,11 +3842,11 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeResize_Success(EventArgs eventArgs)
     {
-        using var c = new SubControl
+        using SubControl c = new()
         {
             Bounds = new Rectangle(1, 2, 3, 4)
         };
-        using var item = new SubToolStripControlHost(c);
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         c.OnResize(eventArgs);
@@ -3858,8 +3857,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeRightToLeftChanged_Success(EventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3878,8 +3877,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeTextChanged_Success(EventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3898,8 +3897,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeValidated_Success(EventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3925,8 +3924,8 @@ public class ToolStripControlHostTests
     [MemberData(nameof(CancelEventArgs_TestData))]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeValidating_Success(CancelEventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3945,8 +3944,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnSubscribeControlEvents_InvokeVisibleChanged_Success(EventArgs eventArgs)
     {
-        using var c = new SubControl();
-        using var item = new SubToolStripControlHost(c);
+        using SubControl c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnSubscribeControlEvents(c);
 
         int callCount = 0;
@@ -3966,14 +3965,14 @@ public class ToolStripControlHostTests
     [InlineData(false, -1)]
     public void ToolStripControlHost_OnUnsubscribeControlEvents_Invoke_Success(bool createControl, int expectedResult)
     {
-        using var c = new SubControl();
+        using SubControl c = new();
 
         if (createControl)
         {
             c.CreateControl();
         }
 
-        using var item = new SubToolStripControlHost(c);
+        using SubToolStripControlHost item = new(c);
         item.OnUnsubscribeControlEvents(c);
 
         int backColorChangedCallCount = 0;
@@ -4106,9 +4105,9 @@ public class ToolStripControlHostTests
         c.OnQueryContinueDrag(new QueryContinueDragEventArgs(0, false, DragAction.Cancel));
         Assert.Equal(0, queryContinueDragCallCount);
 
-        using var image = new Bitmap(10, 10);
+        using Bitmap image = new(10, 10);
         var graphics = Graphics.FromImage(image);
-        using var eventArgs = new PaintEventArgs(graphics, new Rectangle(1, 2, 3, 4));
+        using PaintEventArgs eventArgs = new(graphics, new Rectangle(1, 2, 3, 4));
         c.OnPaint(eventArgs);
         Assert.Equal(0, paintCallCount);
 
@@ -4134,8 +4133,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_OnUnsubscribeControlEvents_InvokeNullControl_Nop()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         item.OnUnsubscribeControlEvents(null);
     }
 
@@ -4143,8 +4142,8 @@ public class ToolStripControlHostTests
     [NewAndDefaultData<EventArgs>]
     public void ToolStripControlHost_OnValidated_Invoke_CallsValidated(EventArgs eventArgs)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -4168,8 +4167,8 @@ public class ToolStripControlHostTests
     [MemberData(nameof(CancelEventArgs_TestData))]
     public void ToolStripControlHost_OnValidating_Invoke_CallsValidating(CancelEventArgs eventArgs)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         CancelEventHandler handler = (sender, e) =>
         {
@@ -4197,9 +4196,9 @@ public class ToolStripControlHostTests
     [InlineData((Keys)(Keys.None - 1))]
     public void ToolStripControlHost_ProcessCmdKey_Invoke_ReturnsFalse(Keys keyData)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
-        var m = new Message();
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
+        Message m = new();
         Assert.False(item.ProcessCmdKey(ref m, keyData));
         Assert.False(c.IsHandleCreated);
     }
@@ -4216,12 +4215,12 @@ public class ToolStripControlHostTests
             return result;
         }
 
-        using var c = new CustomProcessControl
+        using CustomProcessControl c = new()
         {
             ProcessCmdKeyAction = action
         };
-        using var item = new SubToolStripControlHost(c);
-        var m = new Message
+        using SubToolStripControlHost item = new(c);
+        Message m = new()
         {
             Msg = 1
         };
@@ -4238,11 +4237,11 @@ public class ToolStripControlHostTests
     [InlineData((Keys)(Keys.None - 1))]
     public void ToolStripControlHost_ProcessCmdKey_InvokeDisposed_ReturnsFalse(Keys keyData)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         item.Dispose();
 
-        var m = new Message();
+        Message m = new();
         Assert.False(item.ProcessCmdKey(ref m, keyData));
     }
 
@@ -4254,8 +4253,8 @@ public class ToolStripControlHostTests
     [InlineData((Keys)(Keys.None - 1))]
     public void ToolStripControlHost_ProcessDialogKey_Invoke_ReturnsFalse(Keys keyData)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int clickCallCount = 0;
         item.Click += (sender, e) => clickCallCount++;
 
@@ -4276,11 +4275,11 @@ public class ToolStripControlHostTests
             return result;
         }
 
-        using var c = new CustomProcessControl
+        using CustomProcessControl c = new()
         {
             ProcessDialogKeyAction = action
         };
-        using var item = new SubToolStripControlHost(c);
+        using SubToolStripControlHost item = new(c);
         int clickCallCount = 0;
         item.Click += (sender, e) => clickCallCount++;
 
@@ -4298,8 +4297,8 @@ public class ToolStripControlHostTests
     [InlineData((Keys)(Keys.None - 1))]
     public void ToolStripControlHost_ProcessDialogKey_InvokeDisposed_ReturnsFalse(Keys keyData)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         item.Dispose();
         int clickCallCount = 0;
         item.Click += (sender, e) => clickCallCount++;
@@ -4313,8 +4312,8 @@ public class ToolStripControlHostTests
     [InlineData(char.MinValue)]
     public void ToolStripControlHost_ProcessMnemonic_Invoke_ReturnsFalse(char charCode)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int clickCallCount = 0;
         item.Click += (sender, e) => clickCallCount++;
 
@@ -4336,11 +4335,11 @@ public class ToolStripControlHostTests
             return result;
         }
 
-        using var c = new CustomProcessControl
+        using CustomProcessControl c = new()
         {
             ProcessMnemonicAction = action
         };
-        using var item = new SubToolStripControlHost(c);
+        using SubToolStripControlHost item = new(c);
         int clickCallCount = 0;
         item.Click += (sender, e) => clickCallCount++;
 
@@ -4354,8 +4353,8 @@ public class ToolStripControlHostTests
     [BoolData]
     public void ToolStripControlHost_ProcessMnemonic_InvokeDisposed_ThrowsObjectDisposedException(bool enabled)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c)
+        using Control c = new();
+        using SubToolStripControlHost item = new(c)
         {
             Enabled = enabled
         };
@@ -4386,8 +4385,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_ResetBackColor_Invoke_Success()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
 
         // Reset without value.
         item.ResetBackColor();
@@ -4409,8 +4408,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_ResetBackColor_InvokeDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => item.ResetBackColor());
@@ -4419,8 +4418,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_ResetForeColor_Invoke_Success()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
 
         // Reset without value.
         item.ResetForeColor();
@@ -4442,8 +4441,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_ResetForeColor_InvokeDisposed_ThrowsObjectDisposedException()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         item.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() => item.ResetForeColor());
@@ -4453,8 +4452,8 @@ public class ToolStripControlHostTests
     [MemberData(nameof(SetVisibleCore_TestData))]
     public void ToolStripControlHost_SetVisibleCore_Invoke_GetReturnsExpected(bool enabled, Image image, bool value)
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c)
+        using Control c = new();
+        using SubToolStripControlHost item = new(c)
         {
             Enabled = enabled,
             Image = image
@@ -4487,8 +4486,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_SetVisibleCore_InvokeWithHandler_CallsAvailableChanged()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -4523,8 +4522,8 @@ public class ToolStripControlHostTests
     [WinFormsFact]
     public void ToolStripControlHost_SetVisibleCore_InvokeWithHandler_CallsVisibleChanged()
     {
-        using var c = new Control();
-        using var item = new SubToolStripControlHost(c);
+        using Control c = new();
+        using SubToolStripControlHost item = new(c);
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {

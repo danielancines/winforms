@@ -1,11 +1,10 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Windows.Forms.PropertyGridInternal.TestUtilities;
 using System.Windows.Forms.UITests;
+using Windows.Win32.UI.Accessibility;
 using Xunit.Abstractions;
-using static Interop.UiaCore;
 
 namespace System.Windows.Forms.PropertyGridInternal.UITests;
 
@@ -23,7 +22,7 @@ public class DropDownButtonAccessibleObjectTests : ControlTestBase
             grid.SelectedEntry = grid[nameof(Button.AccessibleRole)];
 
             Assert.Equal(grid.SelectedEntry.AccessibilityObject,
-                grid.GridView.DropDownButton.AccessibilityObject.FragmentNavigate(NavigateDirection.Parent));
+                grid.GridView.DropDownButton.AccessibilityObject.FragmentNavigate(NavigateDirection.NavigateDirection_Parent));
 
             return Task.CompletedTask;
         });
@@ -37,7 +36,7 @@ public class DropDownButtonAccessibleObjectTests : ControlTestBase
             grid.SelectedEntry = grid[nameof(Button.AccessibleRole)];
 
             Assert.Equal(grid.GridView.EditAccessibleObject,
-                grid.GridView.DropDownButton.AccessibilityObject.FragmentNavigate(NavigateDirection.PreviousSibling));
+                grid.GridView.DropDownButton.AccessibilityObject.FragmentNavigate(NavigateDirection.NavigateDirection_PreviousSibling));
 
             return Task.CompletedTask;
         });
@@ -50,7 +49,7 @@ public class DropDownButtonAccessibleObjectTests : ControlTestBase
         {
             grid.SelectedEntry = grid[nameof(Button.AccessibleRole)];
 
-            Assert.Null(grid.GridView.DropDownButton.AccessibilityObject.FragmentNavigate(NavigateDirection.NextSibling));
+            Assert.Null(grid.GridView.DropDownButton.AccessibilityObject.FragmentNavigate(NavigateDirection.NavigateDirection_NextSibling));
 
             return Task.CompletedTask;
         });
@@ -65,8 +64,9 @@ public class DropDownButtonAccessibleObjectTests : ControlTestBase
 
             grid.SelectedEntry.Expanded = true;
 
-            Assert.Equal(grid.SelectedEntry.Children.First().AccessibilityObject,
-                grid.GridView.DialogButton.AccessibilityObject.FragmentNavigate(NavigateDirection.NextSibling));
+            Assert.Equal(
+                grid.SelectedEntry.Children.First().AccessibilityObject,
+                grid.GridView.DialogButton.AccessibilityObject.FragmentNavigate(NavigateDirection.NavigateDirection_NextSibling));
 
             return Task.CompletedTask;
         });

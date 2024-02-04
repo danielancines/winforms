@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 #nullable disable
 
@@ -20,6 +19,8 @@ internal class ComboBoxDesigner : ControlDesigner
 {
     private EventHandler propChanged; // Delegate used to dirty the selectionUIItem when needed.
 
+    public override ComboBox Control => (ComboBox)Component;
+
     /// <summary>
     ///  Adds a baseline SnapLine to the list of SnapLines related
     ///  to this control.
@@ -28,14 +29,14 @@ internal class ComboBoxDesigner : ControlDesigner
     {
         get
         {
-            ArrayList snapLines = base.SnapLines as ArrayList;
+            IList<SnapLine> snapLines = SnapLinesInternal;
 
-            //a single text-baseline for the label (and linklabel) control
+            // a single text-baseline for the label (and linklabel) control
             int baseline = DesignerUtils.GetTextBaseline(Control, Drawing.ContentAlignment.TopLeft);
             baseline += 3;
             snapLines.Add(new SnapLine(SnapLineType.Baseline, baseline, SnapLinePriority.Medium));
 
-            return snapLines;
+            return snapLines.Unwrap();
         }
     }
 
@@ -47,9 +48,9 @@ internal class ComboBoxDesigner : ControlDesigner
         if (disposing)
         {
             // Hook up the property change notification so that we can dirty the SelectionUIItem when needed.
-            if (propChanged is not null)
+            if (HasComponent && propChanged is not null)
             {
-                ((ComboBox)Control).StyleChanged -= propChanged;
+                Control.StyleChanged -= propChanged;
             }
         }
 
@@ -67,7 +68,7 @@ internal class ComboBoxDesigner : ControlDesigner
 
         // Hook up the property change notification so that we can dirty the SelectionUIItem when needed.
         propChanged = new EventHandler(OnControlPropertyChanged);
-        ((ComboBox)Control).StyleChanged += propChanged;
+        Control.StyleChanged += propChanged;
     }
 
     /// <summary>
@@ -78,7 +79,7 @@ internal class ComboBoxDesigner : ControlDesigner
         base.InitializeNewComponent(defaultValues);
 
         // in Whidbey, formattingEnabled is TRUE
-        ((ComboBox)Component).FormattingEnabled = true;
+        Control.FormattingEnabled = true;
 
         PropertyDescriptor textProp = TypeDescriptor.GetProperties(Component)["Text"];
         if (textProp is not null && textProp.PropertyType == typeof(string) && !textProp.IsReadOnly && textProp.IsBrowsable)

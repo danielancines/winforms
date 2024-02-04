@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Drawing;
@@ -44,7 +43,10 @@ public abstract class PropertyTab : IExtenderProvider
             {
                 try
                 {
-                    _bitmap = DpiHelper.GetBitmapFromIcon(GetType(), GetType().Name);
+                    _bitmap = ScaleHelper.GetIconResourceAsBestMatchBitmap(
+                        GetType(),
+                        GetType().Name,
+                        ScaleHelper.SystemIconSize);
                 }
                 catch (Exception)
                 {
@@ -79,7 +81,7 @@ public abstract class PropertyTab : IExtenderProvider
     ///  Gets a value indicating whether this <see cref="PropertyTab"/> can display properties for the
     ///  specified <paramref name="extendee"/>.
     /// </summary>
-    public virtual bool CanExtend(object extendee) => true;
+    public virtual bool CanExtend(object? extendee) => true;
 
     public virtual void Dispose()
     {

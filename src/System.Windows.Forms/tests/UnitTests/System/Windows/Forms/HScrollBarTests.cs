@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Windows.Forms.TestUtilities;
@@ -14,7 +13,7 @@ public class HScrollBarTests
     [WinFormsFact]
     public void HScrollBar_Ctor_Default()
     {
-        using var control = new SubHScrollBar();
+        using SubHScrollBar control = new();
         Assert.Null(control.AccessibleDefaultActionDescription);
         Assert.Null(control.AccessibleDescription);
         Assert.Null(control.AccessibleName);
@@ -121,7 +120,7 @@ public class HScrollBarTests
     [WinFormsFact]
     public void HScrollBar_CreateParams_GetDefault_ReturnsExpected()
     {
-        using var control = new SubHScrollBar();
+        using SubHScrollBar control = new();
         CreateParams createParams = control.CreateParams;
         Assert.Null(createParams.Caption);
         Assert.Equal("ScrollBar", createParams.ClassName);
@@ -142,7 +141,7 @@ public class HScrollBarTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetRightToLeftTheoryData))]
     public void HScrollBar_RightToLeft_Set_GetReturnsExpected(RightToLeft value, RightToLeft expected)
     {
-        using var control = new HScrollBar
+        using HScrollBar control = new()
         {
             RightToLeft = value
         };
@@ -158,7 +157,7 @@ public class HScrollBarTests
     [WinFormsFact]
     public void HScrollBar_RightToLeft_SetWithHandler_CallsRightToLeftChanged()
     {
-        using var control = new HScrollBar();
+        using HScrollBar control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -194,14 +193,14 @@ public class HScrollBarTests
     [InvalidEnumData<RightToLeft>]
     public void HScrollBar_RightToLeft_SetInvalid_ThrowsInvalidEnumArgumentException(RightToLeft value)
     {
-        using var control = new HScrollBar();
+        using HScrollBar control = new();
         Assert.Throws<InvalidEnumArgumentException>("value", () => control.RightToLeft = value);
     }
 
     [WinFormsFact]
     public void HScrollBar_GetAutoSizeMode_Invoke_ReturnsExpected()
     {
-        using var control = new SubHScrollBar();
+        using SubHScrollBar control = new();
         Assert.Equal(AutoSizeMode.GrowOnly, control.GetAutoSizeMode());
     }
 
@@ -228,7 +227,7 @@ public class HScrollBarTests
     [InlineData((ControlStyles)(-1), false)]
     public void HScrollBar_GetStyle_Invoke_ReturnsExpected(ControlStyles flag, bool expected)
     {
-        using var control = new SubHScrollBar();
+        using SubHScrollBar control = new();
         Assert.Equal(expected, control.GetStyle(flag));
 
         // Call again to test caching.
@@ -238,7 +237,7 @@ public class HScrollBarTests
     [WinFormsFact]
     public void HScrollBar_GetTopLevel_Invoke_ReturnsExpected()
     {
-        using var control = new SubHScrollBar();
+        using SubHScrollBar control = new();
         Assert.False(control.GetTopLevel());
     }
 

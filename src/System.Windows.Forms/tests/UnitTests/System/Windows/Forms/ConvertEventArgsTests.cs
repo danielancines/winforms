@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -12,7 +11,7 @@ public class ConvertEventArgsTests
     [InlineData(null, null)]
     public void Ctor_Object_Type(object value, Type desiredType)
     {
-        var e = new ConvertEventArgs(value, desiredType);
+        ConvertEventArgs e = new(value, desiredType);
         Assert.Equal(value, e.Value);
         Assert.Equal(desiredType, e.DesiredType);
     }
@@ -22,7 +21,7 @@ public class ConvertEventArgsTests
     [InlineData(1)]
     public void Value_Set_GetReturnsExpected(object value)
     {
-        var e = new ConvertEventArgs("value", typeof(int))
+        ConvertEventArgs e = new("value", typeof(int))
         {
             Value = value
         };

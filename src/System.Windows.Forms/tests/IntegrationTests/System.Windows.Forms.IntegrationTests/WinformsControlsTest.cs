@@ -1,8 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
-//#define MAUI
+// #define MAUI
 
 using System.Diagnostics;
 using System.Windows.Forms.IntegrationTests.Common;
@@ -207,9 +206,9 @@ public partial class WinformsControlsTest
     {
         var mainObject = new Mocks.MainObject();
         mainObject.Text = "Test text";
-        Form form = new Form();
-        TextBox textBox = new TextBox();
-        Binding binding = new Binding("Text", mainObject, "Text");
+        Form form = new();
+        TextBox textBox = new();
+        Binding binding = new("Text", mainObject, "Text");
         textBox.DataBindings.Add(binding);
         textBox.Parent = form;
         form.Show();

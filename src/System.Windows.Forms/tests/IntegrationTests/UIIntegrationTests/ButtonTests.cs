@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
@@ -112,7 +111,7 @@ public class ButtonTests : ControlTestBase
             var originalFormSize = form.DisplayRectangle.Size;
             var originalButtonPosition = button.DisplayRectangle;
 
-            var mouseDragHandleOnForm = new Point(form.DisplayRectangle.Right, form.DisplayRectangle.Top + form.DisplayRectangle.Height / 2);
+            Point mouseDragHandleOnForm = new(form.DisplayRectangle.Right, form.DisplayRectangle.Top + form.DisplayRectangle.Height / 2);
             await MoveMouseAsync(form, form.PointToScreen(mouseDragHandleOnForm));
 
             await InputSimulator.SendAsync(
@@ -136,7 +135,7 @@ public class ButtonTests : ControlTestBase
             var originalFormSize = form.DisplayRectangle.Size;
             var originalButtonPosition = button.DisplayRectangle;
 
-            var mouseDragHandleOnForm = new Point(form.DisplayRectangle.Left + form.DisplayRectangle.Width / 2, form.DisplayRectangle.Bottom);
+            Point mouseDragHandleOnForm = new(form.DisplayRectangle.Left + form.DisplayRectangle.Width / 2, form.DisplayRectangle.Bottom);
             await MoveMouseAsync(form, form.PointToScreen(mouseDragHandleOnForm));
 
             await InputSimulator.SendAsync(
@@ -162,7 +161,7 @@ public class ButtonTests : ControlTestBase
             var originalFormSize = form.DisplayRectangle.Size;
             var originalButtonPosition = button.DisplayRectangle;
 
-            var mouseDragHandleOnForm = new Point(form.DisplayRectangle.Right, form.DisplayRectangle.Top + form.DisplayRectangle.Height / 2);
+            Point mouseDragHandleOnForm = new(form.DisplayRectangle.Right, form.DisplayRectangle.Top + form.DisplayRectangle.Height / 2);
             await MoveMouseAsync(form, form.PointToScreen(mouseDragHandleOnForm));
 
             await InputSimulator.SendAsync(
@@ -192,7 +191,7 @@ public class ButtonTests : ControlTestBase
             var originalFormSize = form.DisplayRectangle.Size;
             var originalButtonPosition = button.DisplayRectangle;
 
-            var mouseDragHandleOnForm = new Point(form.DisplayRectangle.Left + form.DisplayRectangle.Width / 2, form.DisplayRectangle.Bottom);
+            Point mouseDragHandleOnForm = new(form.DisplayRectangle.Left + form.DisplayRectangle.Width / 2, form.DisplayRectangle.Bottom);
             await MoveMouseAsync(form, form.PointToScreen(mouseDragHandleOnForm));
 
             await InputSimulator.SendAsync(

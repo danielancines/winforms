@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -18,7 +17,7 @@ public class DataGridViewCellMouseEventArgsTests
     [MemberData(nameof(Ctor_Int_Int_Int_Int_MouseEventArgs_TestData))]
     public void Ctor_Int_Int_Int_Int_MouseEventArgs(int columnIndex, int rowIndex, int localX, int localY, MouseEventArgs mouseE)
     {
-        var e = new DataGridViewCellMouseEventArgs(columnIndex, rowIndex, localX, localY, mouseE);
+        DataGridViewCellMouseEventArgs e = new(columnIndex, rowIndex, localX, localY, mouseE);
         Assert.Equal(columnIndex, e.ColumnIndex);
         Assert.Equal(rowIndex, e.RowIndex);
         Assert.Equal(mouseE.Button, e.Button);

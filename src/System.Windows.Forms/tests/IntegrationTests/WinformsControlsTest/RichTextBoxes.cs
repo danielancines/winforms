@@ -1,9 +1,9 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using Windows.Win32.UI.Controls.RichEdit;
 
 namespace WinformsControlsTest;
 
@@ -25,6 +25,7 @@ public partial class RichTextBoxes : Form
 \pard\sa200\sl276\slmult1\f0\fs22\lang9  for more information.\par
 This is a \v #data#\v0 custom link with hidden text before the link.\par
 This is a custom link\v #data#\v0  with hidden text after the link.\par
+\trowd\pard\intbl Test\cell Example\cell Meow\cell Woof\cell \row
 }";
 
         // Allow setting custom links.
@@ -41,14 +42,14 @@ This is a custom link\v #data#\v0  with hidden text after the link.\par
         var format = new Interop.Richedit.CHARFORMAT2W
         {
             cbSize = (uint)sizeof(Interop.Richedit.CHARFORMAT2W),
-            dwMask = Interop.Richedit.CFM.LINK,
-            dwEffects = Interop.Richedit.CFE.LINK,
+            dwMask = CFM_MASK.CFM_LINK,
+            dwEffects = CFE_EFFECTS.CFE_LINK,
         };
 
         PInvoke.SendMessage(
             control,
             PInvoke.EM_SETCHARFORMAT,
-            (WPARAM)(uint)Interop.Richedit.SCF.SELECTION,
+            (WPARAM)PInvoke.SCF_SELECTION,
             ref format);
 
         control.Select(0, 0);
@@ -56,12 +57,12 @@ This is a custom link\v #data#\v0  with hidden text after the link.\par
 
     private string ReportLinkClickedEventArgs(object sender, LinkClickedEventArgs e)
     {
-        var control = (RichTextBox)sender;
-        var prefix = control.Text.Remove(e.LinkStart);
-        var content = control.Text.Substring(e.LinkStart, e.LinkLength);
-        var suffix = control.Text.Substring(e.LinkStart + e.LinkLength);
+        RichTextBox control = (RichTextBox)sender;
+        string prefix = control.Text.Remove(e.LinkStart);
+        string content = control.Text.Substring(e.LinkStart, e.LinkLength);
+        string suffix = control.Text.Substring(e.LinkStart + e.LinkLength);
 
-        var index = prefix.LastIndexOf('\n');
+        int index = prefix.LastIndexOf('\n');
         if (index >= 0)
         {
             prefix = prefix.Substring(index + 1);
@@ -85,13 +86,54 @@ This is a custom link\v #data#\v0  with hidden text after the link.\par
                 """;
     }
 
-    private void richTextBox1_LinkClicked(object sender, LinkClickedEventArgs e)
+    private void RichTextKeyDown(object sender, KeyEventArgs e)
+    {
+        if (sender is RichTextBox richTextBox)
+        {
+            try
+            {
+                if (e.Control && e.KeyCode == Keys.F)
+                {
+                    richTextBox.Select();
+                    int location = richTextBox.Find(Prompt.ShowDialog(this, "", ""));
+                    Debug.WriteLine(location.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(this, ex.Message);
+            }
+        }
+    }
+
+    private void LinkClicked(object sender, LinkClickedEventArgs e)
     {
         MessageBox.Show(this, ReportLinkClickedEventArgs(sender, e), "link clicked");
     }
 
-    private void richTextBox2_LinkClicked(object sender, LinkClickedEventArgs e)
+    private static class Prompt
     {
-        MessageBox.Show(this, ReportLinkClickedEventArgs(sender, e), "link clicked");
+        public static string ShowDialog(Form owner, string text, string caption)
+        {
+            Form prompt = new()
+            {
+                Width = 500,
+                Height = 150,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                Text = caption,
+                StartPosition = FormStartPosition.CenterScreen,
+                Owner = owner,
+            };
+            Label textLabel = new() { Left = 50, Top = 20, Text = text };
+            TextBox textBox = new() { Left = 50, Top = 50, Width = 400 };
+            Button confirmation = new() { Text = "Ok", Left = 350, Width = 100, Top = 70, DialogResult = DialogResult.OK };
+            confirmation.Click += (sender, e) => { prompt.Close(); };
+            prompt.Controls.Add(textBox);
+            prompt.Controls.Add(confirmation);
+            prompt.Controls.Add(textLabel);
+            prompt.AcceptButton = confirmation;
+
+            return prompt.ShowDialog() == DialogResult.OK ? textBox.Text : "";
+        }
     }
 }

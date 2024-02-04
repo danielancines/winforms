@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 using System.ComponentModel;
@@ -94,8 +93,7 @@ internal class SplitterPanelDesigner : PanelDesigner
 
     protected override void Dispose(bool disposing)
     {
-        IComponentChangeService cs = (IComponentChangeService)GetService(typeof(IComponentChangeService));
-        if (cs is not null)
+        if (TryGetService(out IComponentChangeService? cs))
         {
             cs.ComponentChanged -= new ComponentChangedEventHandler(OnComponentChanged);
         }
@@ -111,8 +109,7 @@ internal class SplitterPanelDesigner : PanelDesigner
         _designerHost = (IDesignerHost?)component.Site?.GetService(typeof(IDesignerHost));
         _splitContainerDesigner = (SplitContainerDesigner?)_designerHost?.GetDesigner(_splitterPanel.Parent!);
 
-        var cs = (IComponentChangeService)GetService(typeof(IComponentChangeService));
-        if (cs is not null)
+        if (TryGetService(out IComponentChangeService? cs))
         {
             cs.ComponentChanged += new ComponentChangedEventHandler(OnComponentChanged);
         }

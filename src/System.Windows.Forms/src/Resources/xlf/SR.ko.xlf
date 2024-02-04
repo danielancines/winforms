@@ -262,11 +262,6 @@
         <target state="translated">요청한 동작에 대해 1차원 배열만 지원됩니다.</target>
         <note />
       </trans-unit>
-      <trans-unit id="ArgumentOutOfRange_NeedNonNegNum">
-        <source>Non-negative number required.</source>
-        <target state="translated">음수가 아닌 수가 필요합니다.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="Argument_IncompatibleArrayType">
         <source>Target array type is not compatible with the type of items in the collection.</source>
         <target state="translated">대상 배열 형식이 컬렉션의 항목 형식과 호환되지 않습니다.</target>
@@ -4140,8 +4135,8 @@ To replace this default dialog please handle the DataError event.</source>
         <note />
       </trans-unit>
       <trans-unit id="DataGridView_SortedDescr">
-        <source>Occurs when the DataGridView compares two cell values to perform a sort operation.</source>
-        <target state="translated">DataGridView가 정렬 작업을 수행하기 위해 두 셀 값을 비교할 때 발생합니다.</target>
+        <source>Occurs when the DataGridView control completes a sorting operation.</source>
+        <target state="translated">DataGridView 컨트롤이 정렬 작업을 완료할 때 발생합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="DataGridView_StandardTabDescr">
@@ -5210,9 +5205,9 @@ Do you want to replace it?</source>
         <target state="translated">대화 상자의 tree view 컨트롤 위에 표시되는 문자열입니다. 이 문자열을 사용하여 사용자에게 표시될 지시 사항을 지정할 수 있습니다.</target>
         <note />
       </trans-unit>
-      <trans-unit id="FolderBrowserDialogNoRootFolder">
-        <source>Unable to retrieve the root folder.</source>
-        <target state="translated">루트 폴더를 검색할 수 없습니다.</target>
+      <trans-unit id="FolderBrowserDialogMultiSelectDescr">
+        <source>Controls whether multiple folders can be selected in the dialog.</source>
+        <target state="translated">대화 상자에서 여러 폴더를 선택할 수 있는지 여부를 제어합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="FolderBrowserDialogOkRequiresInteraction">
@@ -5228,6 +5223,11 @@ Do you want to replace it?</source>
       <trans-unit id="FolderBrowserDialogSelectedPath">
         <source>The path of the folder first selected in the dialog or the last one selected by the user.</source>
         <target state="translated">대화 상자에 처음 선택되어 있거나 사용자가 마지막에 선택한 폴더의 경로입니다.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="FolderBrowserDialogSelectedPathsDescr">
+        <source>Retrieves the paths of all selected folders in the dialog box.</source>
+        <target state="translated">대화 상자에서 선택한 모든 폴더의 경로를 검색합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="FolderBrowserDialogShowHiddenFiles">
@@ -5859,11 +5859,6 @@ Stack trace where the illegal operation occurred was:
         <target state="translated">이 컨트롤에서 수행 중인 작업이 잘못된 스레드에서 호출되고 있습니다. 이 작업을 수행하려면 Control.Invoke 또는 Control.BeginInvoke를 사용하여 올바른 스레드로 마샬링하십시오.</target>
         <note />
       </trans-unit>
-      <trans-unit id="InvalidExBoundArgument">
-        <source>Value of '{1}' is not valid for '{0}'. '{0}' should be greater than {2} and less than {3}.</source>
-        <target state="translated">'{1}'의 값은 '{0}'에 사용할 수 없습니다. '{0}'은(는) {2}보다 커야 하며 {3}보다 작아야 합니다.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="InvalidFileFormat">
         <source>File format is not valid.</source>
         <target state="translated">파일 형식이 잘못되었습니다.</target>
@@ -5882,26 +5877,6 @@ Stack trace where the illegal operation occurred was:
       <trans-unit id="InvalidHdcType">
         <source>Invalid HDC type: {0}</source>
         <target state="translated">잘못된 HDC 형식: {0}</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="InvalidHighBoundArgument">
-        <source>Value of '{1}' is not valid for '{0}'. '{0}' must be less than {2}.</source>
-        <target state="translated">'{1}'의 값은 '{0}'에 사용할 수 없습니다. '{0}'은(는) {2}보다 작아야 합니다.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="InvalidHighBoundArgumentEx">
-        <source>Value of '{1}' is not valid for '{0}'. '{0}' must be less than or equal to {2}.</source>
-        <target state="translated">'{1}'의 값은 '{0}'에 사용할 수 없습니다. '{0}'은(는) {2}보다 작거나 같아야 합니다.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="InvalidLowBoundArgument">
-        <source>Value of '{1}' is not valid for '{0}'. '{0}' must be greater than {2}.</source>
-        <target state="translated">'{1}'의 값은 '{0}'에 사용할 수 없습니다. '{0}'은(는) {2}보다 커야 합니다.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="InvalidLowBoundArgumentEx">
-        <source>Value of '{1}' is not valid for '{0}'. '{0}' must be greater than or equal to {2}.</source>
-        <target state="translated">'{1}'의 값은 '{0}'에 사용할 수 없습니다. '{0}'은(는) {2}보다 크거나 같아야 합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidNullArgument">
@@ -7414,11 +7389,6 @@ Stack trace where the illegal operation occurred was:
         <target state="translated">단추를 클릭할 때마다 증가/감소할 양을 나타냅니다.</target>
         <note />
       </trans-unit>
-      <trans-unit id="NumericUpDownLessThanZeroError">
-        <source>Parameter value must be greater than or equal to 0.</source>
-        <target state="translated">매개 변수 값이 0보다 크거나 같아야 합니다.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="NumericUpDownMaximumDescr">
         <source>Indicates the maximum value for the numeric up-down control.</source>
         <target state="translated">숫자 up-down 컨트롤의 최대값을 나타냅니다.</target>
@@ -8272,11 +8242,6 @@ Stack trace where the illegal operation occurred was:
       <trans-unit id="PropertyCategoryText">
         <source>Text</source>
         <target state="translated">텍스트</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="PropertyGridBadTabIndex">
-        <source>Tab index not valid.</source>
-        <target state="translated">탭 인덱스가 잘못되었습니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="PropertyGridCanShowCommandsDesc">
@@ -10247,6 +10212,11 @@ Stack trace where the illegal operation occurred was:
       <trans-unit id="ToolStripItemRightToLeftDescr">
         <source>Indicates whether the item should draw right-to-left for RTL languages.</source>
         <target state="translated">RTL 언어의 경우 항목을 오른쪽에서 왼쪽으로 그릴지 여부를 나타냅니다.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ToolStripItemSelectedChangedDescr">
+        <source>Occurs when the Selected property value changes.</source>
+        <target state="translated">Selected 속성 값이 변경될 때 발생합니다.</target>
         <note />
       </trans-unit>
       <trans-unit id="ToolStripItemSize">

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -11,7 +10,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms.Layout;
 using System.Windows.Forms.VisualStyles;
 using Windows.Win32.System.Threading;
-using static Interop;
+using Windows.Win32.UI.Accessibility;
 
 namespace System.Windows.Forms;
 
@@ -279,7 +278,7 @@ public partial class Form : ContainerControl
     /// <summary>
     ///  Gets the currently active form for this application.
     /// </summary>
-    public static Form? ActiveForm => FromHandle(PInvoke.GetForegroundWindow()) as Form;
+    public static Form? ActiveForm => FromHandle(PInvokeCore.GetForegroundWindow()) as Form;
 
     /// <summary>
     ///
@@ -337,8 +336,8 @@ public partial class Form : ContainerControl
         }
     }
 
-    //we don't repaint the mdi child that used to be active any more.  We used to do this in Activated, but no
-    //longer do because of added event Deactivate.
+    // we don't repaint the mdi child that used to be active any more.  We used to do this in Activated, but no
+    // longer do because of added event Deactivate.
     private Form? FormerlyActiveMdiChild
     {
         get
@@ -667,7 +666,7 @@ public partial class Form : ContainerControl
     /// </summary>
     [SRCategory(nameof(SR.CatAppearance))]
     [DefaultValue(FormBorderStyle.Sizable)]
-    [DispId(PInvoke.DISPID_BORDERSTYLE)]
+    [DispId(PInvokeCore.DISPID_BORDERSTYLE)]
     [SRDescription(nameof(SR.FormBorderStyleDescr))]
     public FormBorderStyle FormBorderStyle
     {
@@ -866,9 +865,9 @@ public partial class Form : ContainerControl
 
             if (RightToLeft == RightToLeft.Yes && RightToLeftLayout)
             {
-                //We want to turn on mirroring for Form explicitly.
+                // We want to turn on mirroring for Form explicitly.
                 cp.ExStyle |= (int)(WINDOW_EX_STYLE.WS_EX_LAYOUTRTL | WINDOW_EX_STYLE.WS_EX_NOINHERITLAYOUT);
-                //Don't need these styles when mirroring is turned on.
+                // Don't need these styles when mirroring is turned on.
                 cp.ExStyle &= ~(int)(WINDOW_EX_STYLE.WS_EX_RTLREADING | WINDOW_EX_STYLE.WS_EX_RIGHT | WINDOW_EX_STYLE.WS_EX_LEFTSCROLLBAR);
             }
 
@@ -988,7 +987,7 @@ public partial class Form : ContainerControl
 
         set
         {
-            //valid values are 0x0 to 0x7
+            // valid values are 0x0 to 0x7
             SourceGenerated.EnumValidator.Validate(value);
 
             _dialogResult = value;
@@ -1168,8 +1167,8 @@ public partial class Form : ContainerControl
                 _ctlClient.Dispose();
             }
 
-            //since we paint the background when mdi is true, we need
-            //to invalidate here
+            // since we paint the background when mdi is true, we need
+            // to invalidate here
             //
             Invalidate();
         }
@@ -1952,7 +1951,7 @@ public partial class Form : ContainerControl
             //  as its nCmdShow parameter. Subsequent calls to ShowWindow must use one of the values in the given list,
             //  instead of the one specified by the WinMain function's nCmdShow parameter.
 
-            //  As noted in the discussion of the nCmdShow parameter, the nCmdShow value is ignored in the first call
+            // As noted in the discussion of the nCmdShow parameter, the nCmdShow value is ignored in the first call
             //  to ShowWindow if the program that launched the application specifies startup information in the
             //  STARTUPINFO structure. In this case, ShowWindow uses the information specified in the STARTUPINFO
             //  structure to show the window. On subsequent calls, the application must call ShowWindow with nCmdShow
@@ -2020,9 +2019,9 @@ public partial class Form : ContainerControl
         {
             if (SizeGripStyle != value)
             {
-                //do some bounds checking here
+                // do some bounds checking here
                 //
-                //valid values are 0x0 to 0x2
+                // valid values are 0x0 to 0x2
                 SourceGenerated.EnumValidator.Validate(value);
 
                 _formState[FormStateSizeGripStyle] = (int)value;
@@ -2047,7 +2046,7 @@ public partial class Form : ContainerControl
         }
         set
         {
-            //valid values are 0x0 to 0x4
+            // valid values are 0x0 to 0x4
             SourceGenerated.EnumValidator.Validate(value);
             _formState[FormStateStartPos] = (int)value;
         }
@@ -2077,7 +2076,7 @@ public partial class Form : ContainerControl
     [DefaultValue(true)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [DispId(PInvoke.DISPID_TABSTOP)]
+    [DispId(PInvokeCore.DISPID_TABSTOP)]
     [SRDescription(nameof(SR.ControlTabStopDescr))]
     public new bool TabStop
     {
@@ -2125,21 +2124,17 @@ public partial class Form : ContainerControl
     }
 
     /// <summary>
-    ///  Gets or sets a value indicating whether to display the form as a top-level
-    ///  window.
+    ///  Gets or sets a value indicating whether to display the form as a top-level window.
     /// </summary>
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool TopLevel
     {
-        get
-        {
-            return GetTopLevel();
-        }
+        get => GetTopLevel();
         set
         {
-            if (!value && this.IsMdiContainer && !DesignMode)
+            if (!value && IsMdiContainer && !DesignMode)
             {
                 throw new ArgumentException(SR.MDIContainerMustBeTopLevel, nameof(value));
             }
@@ -2346,7 +2341,7 @@ public partial class Form : ContainerControl
             OnVisibleChanged(EventArgs.Empty);
         }
 
-        //(
+        // (
 
         if (value && !IsMdiChild && (WindowState == FormWindowState.Maximized || TopMost))
         {
@@ -2844,7 +2839,7 @@ public partial class Form : ContainerControl
             Debug.WriteLineIf(CompModSwitches.RichLayout.TraceInfo, $"base  ={baseVar}");
             SizeF newVarF = GetAutoScaleSize(Font);
             Debug.WriteLineIf(CompModSwitches.RichLayout.TraceInfo, $"new(f)={newVarF}");
-            Size newVar = new Size((int)Math.Round(newVarF.Width), (int)Math.Round(newVarF.Height));
+            Size newVar = new((int)Math.Round(newVarF.Width), (int)Math.Round(newVarF.Height));
             Debug.WriteLineIf(CompModSwitches.RichLayout.TraceInfo, $"new(i)={newVar}");
 
             // We save a significant amount of time by bailing early if there's no work to be done
@@ -2912,7 +2907,7 @@ public partial class Form : ContainerControl
             }
         }
 
-        PInvoke.GetClientRect(this, out RECT currentClient);
+        PInvokeCore.GetClientRect(this, out RECT currentClient);
         Rectangle bounds = Bounds;
 
         // If the width is incorrect, compute the correct size with
@@ -2939,7 +2934,7 @@ public partial class Form : ContainerControl
             bounds.Width = correct.Width;
             bounds.Height = correct.Height;
             Bounds = bounds;
-            PInvoke.GetClientRect(this, out currentClient);
+            PInvokeCore.GetClientRect(this, out currentClient);
         }
 
         // If it still isn't correct, then we assume that the problem is
@@ -2997,7 +2992,7 @@ public partial class Form : ContainerControl
 
         try
         {
-            FormClosingEventArgs e = new FormClosingEventArgs(_closeReason, false);
+            FormClosingEventArgs e = new(_closeReason, false);
 
             if (!CalledClosing)
             {
@@ -3017,7 +3012,7 @@ public partial class Form : ContainerControl
 
             if (!closingOnly && _dialogResult != DialogResult.None)
             {
-                FormClosedEventArgs fc = new FormClosedEventArgs(_closeReason);
+                FormClosedEventArgs fc = new(_closeReason);
                 OnClosed(fc);
                 OnFormClosed(fc);
 
@@ -3101,7 +3096,7 @@ public partial class Form : ContainerControl
         // If the form has any control (ActiveControl is true), a screen reader will focus on it instead.
         if (Focused && ActiveControl is null)
         {
-            accessibleObject.RaiseAutomationEvent(UiaCore.UIA.AutomationFocusChangedEventId);
+            accessibleObject.RaiseAutomationEvent(UIA_EVENT_ID.UIA_AutomationFocusChangedEventId);
         }
 
         return accessibleObject;
@@ -3392,7 +3387,7 @@ public partial class Form : ContainerControl
 
             if (Properties.TryGetObject(PropDummyMdiMenu, out HMENU dummyMenu) && !dummyMenu.IsNull)
             {
-                Properties.SetObject(PropDummyMdiMenu, null);
+                Properties.RemoveObject(PropDummyMdiMenu);
                 PInvoke.DestroyMenu(dummyMenu);
             }
         }
@@ -3977,7 +3972,7 @@ public partial class Form : ContainerControl
         // If the form has any control, a screen reader will focus on it instead.
         if (Focused && IsAccessibilityObjectCreated && ActiveControl is null)
         {
-            AccessibilityObject.RaiseAutomationEvent(UiaCore.UIA.AutomationFocusChangedEventId);
+            AccessibilityObject.RaiseAutomationEvent(UIA_EVENT_ID.UIA_AutomationFocusChangedEventId);
         }
     }
 
@@ -4052,30 +4047,25 @@ public partial class Form : ContainerControl
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     protected virtual void OnLoad(EventArgs e)
     {
-        //First - add the form to Application.OpenForms
+        // First - add the form to Application.OpenForms
         Application.OpenForms.Add(this);
         if (Application.UseWaitCursor)
         {
             UseWaitCursor = true;
         }
 
-        // subhag: This will apply AutoScaling to the form just
-        // before the form becomes visible.
-        //
+        // This will apply AutoScaling to the form just before the form becomes visible.
         if (_formState[FormStateAutoScaling] == 1 && !DesignMode)
         {
-            // Turn off autoscaling so we don't do this on every handle
-            // creation.
-            //
+            // Turn off autoscaling so we don't do this on every handle creation.
             _formState[FormStateAutoScaling] = 0;
-            // Obsolete code required here for backwards compat
+
+            // Obsolete code required here for backwards compat.
             ApplyAutoScaling();
         }
 
-        // Also, at this time we can now locate the form the correct
-        // area of the screen.  We must do this after applying any
-        // autoscaling.
-        //
+        // Also, at this time we can now locate the form on the correct area of the screen.
+        // We must do this after applying any autoscaling.
         if (GetState(States.Modal))
         {
             AdjustFormPosition();
@@ -4104,7 +4094,7 @@ public partial class Form : ContainerControl
             }
         }
 
-        //finally fire the newOnShown(unless the form has already been closed)
+        // Finally fire the new OnShown(unless the form has already been closed).
         if (IsHandleCreated)
         {
             BeginInvoke(new MethodInvoker(CallShownEvent));
@@ -4174,7 +4164,7 @@ public partial class Form : ContainerControl
         if (IsHandleCreated
             && Visible
             && (AcceptButton is not null)
-            && PInvoke.SystemParametersInfo(SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETSNAPTODEFBUTTON, ref data)
+            && PInvokeCore.SystemParametersInfo(SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETSNAPTODEFBUTTON, ref data)
             && data)
         {
             Control button = (Control)AcceptButton;
@@ -4345,7 +4335,7 @@ public partial class Form : ContainerControl
     {
         DefWndProc(ref m);
 
-        DpiChangedEventArgs e = new DpiChangedEventArgs(_deviceDpi, m);
+        DpiChangedEventArgs e = new(_deviceDpi, m);
         _deviceDpi = e.DeviceDpiNew;
 
         OnDpiChanged(e);
@@ -4370,7 +4360,7 @@ public partial class Form : ContainerControl
         // Calculate AutoscaleFactor for AutoScaleMode.Font. We will be using this factor to scale child controls
         // and use same factor to compute desired size for top-level windows for the current DPI.
         // This desired size is then used to notify Windows that we need non-linear size for top-level window.
-        FontHandleWrapper fontwrapper = new FontHandleWrapper(fontForDpi);
+        FontHandleWrapper fontwrapper = new(fontForDpi);
         SizeF currentAutoScaleDimensions = GetCurrentAutoScaleDimensions(fontwrapper.Handle);
         SizeF autoScaleFactor = GetCurrentAutoScaleFactor(currentAutoScaleDimensions, AutoScaleDimensions);
 
@@ -4526,7 +4516,7 @@ public partial class Form : ContainerControl
                     button = (IButtonControl?)Properties.GetObject(PropDefaultButton);
                     if (button is not null)
                     {
-                        //PerformClick now checks for validationcancelled...
+                        // PerformClick now checks for validationcancelled...
                         if (button is Control)
                         {
                             button.PerformClick();
@@ -4545,9 +4535,9 @@ public partial class Form : ContainerControl
                         // the focus on Escape. If we do, we end up with giving it
                         // the focus when we reshow the dialog.
                         //
-                        //if (button is Control) {
+                        // if (button is Control) {
                         //    ((Control)button).Focus();
-                        //}
+                        // }
                         button.PerformClick();
                         return true;
                     }
@@ -4639,7 +4629,7 @@ public partial class Form : ContainerControl
             if (ownedFormsCount > 0)
             {
                 Form[] ownedForms = OwnedForms;
-                FormClosedEventArgs fce = new FormClosedEventArgs(CloseReason.FormOwnerClosing);
+                FormClosedEventArgs fce = new(CloseReason.FormOwnerClosing);
                 for (int i = ownedFormsCount - 1; i >= 0; i--)
                 {
                     if (ownedForms[i] is not null && !Application.OpenForms.Contains(ownedForms[i]))
@@ -4659,7 +4649,7 @@ public partial class Form : ContainerControl
     /// </summary>
     internal bool RaiseFormClosingOnAppExit()
     {
-        FormClosingEventArgs e = new FormClosingEventArgs(CloseReason.ApplicationExitCall, false);
+        FormClosingEventArgs e = new(CloseReason.ApplicationExitCall, false);
         // e.Cancel = !Validate(true);    This would cause a breaking change between v2.0 and v1.0/v1.1 in case validation fails.
         if (!Modal)
         {
@@ -4669,7 +4659,7 @@ public partial class Form : ContainerControl
             if (ownedFormsCount > 0)
             {
                 Form[] ownedForms = OwnedForms;
-                FormClosingEventArgs fce = new FormClosingEventArgs(CloseReason.FormOwnerClosing, false);
+                FormClosingEventArgs fce = new(CloseReason.FormOwnerClosing, false);
                 for (int i = ownedFormsCount - 1; i >= 0; i--)
                 {
                     if (ownedForms[i] is not null && !Application.OpenForms.Contains(ownedForms[i]))
@@ -6159,7 +6149,7 @@ public partial class Form : ContainerControl
     /// </summary>
     private void WmClose(ref Message m)
     {
-        FormClosingEventArgs e = new FormClosingEventArgs(CloseReason, false);
+        FormClosingEventArgs e = new(CloseReason, false);
 
         // Pass 1 (WM_CLOSE & WM_QUERYENDSESSION)... Closing
         if (m.Msg != (int)PInvoke.WM_ENDSESSION)
@@ -6192,7 +6182,7 @@ public partial class Form : ContainerControl
                 // Call OnClosing/OnFormClosing on all MDI children
                 if (IsMdiContainer)
                 {
-                    FormClosingEventArgs fe = new FormClosingEventArgs(CloseReason.MdiFormClosing, e.Cancel);
+                    FormClosingEventArgs fe = new(CloseReason.MdiFormClosing, e.Cancel);
                     foreach (Form mdiChild in MdiChildren)
                     {
                         if (mdiChild.IsHandleCreated)
@@ -6211,18 +6201,18 @@ public partial class Form : ContainerControl
                     }
                 }
 
-                //Always fire OnClosing irrespectively of the validation result
-                //Pass the validation result into the EventArgs...
+                // Always fire OnClosing irrespectively of the validation result
+                // Pass the validation result into the EventArgs...
 
                 // Call OnClosing/OnFormClosing on all the forms that current form owns.
                 Form[] ownedForms = OwnedForms;
                 int ownedFormsCount = Properties.GetInteger(PropOwnedFormsCount);
                 for (int i = ownedFormsCount - 1; i >= 0; i--)
                 {
-                    FormClosingEventArgs cfe = new FormClosingEventArgs(CloseReason.FormOwnerClosing, e.Cancel);
+                    FormClosingEventArgs cfe = new(CloseReason.FormOwnerClosing, e.Cancel);
                     if (ownedForms[i] is not null)
                     {
-                        //Call OnFormClosing on the child forms.
+                        // Call OnFormClosing on the child forms.
                         ownedForms[i].OnFormClosing(cfe);
                         if (cfe.Cancel)
                         {
@@ -6239,7 +6229,7 @@ public partial class Form : ContainerControl
 
             if (m.MsgInternal == PInvoke.WM_QUERYENDSESSION)
             {
-                m.ResultInternal = (LRESULT)(nint)(BOOL)e.Cancel;
+                m.ResultInternal = (LRESULT)(BOOL)!e.Cancel;
             }
             else if (e.Cancel && (MdiParent is not null))
             {
@@ -6288,7 +6278,7 @@ public partial class Form : ContainerControl
                     fc = new FormClosedEventArgs(CloseReason.FormOwnerClosing);
                     if (ownedForms[i] is not null)
                     {
-                        //Call OnClosed and OnFormClosed on the child forms.
+                        // Call OnClosed and OnFormClosed on the child forms.
                         ownedForms[i].OnClosed(fc);
                         ownedForms[i].OnFormClosed(fc);
                     }
@@ -6556,7 +6546,7 @@ public partial class Form : ContainerControl
                 _formStateEx[FormStateExInModalSizingLoop] = 1;
                 break;
             case PInvoke.SC_CONTEXTHELP:
-                CancelEventArgs e = new CancelEventArgs(false);
+                CancelEventArgs e = new(false);
                 OnHelpButtonClicked(e);
                 if (e.Cancel)
                 {
@@ -6679,7 +6669,7 @@ public partial class Form : ContainerControl
             case PInvoke.WM_WINDOWPOSCHANGED:
                 WmWindowPosChanged(ref m);
                 break;
-            //case PInvoke.WM_WINDOWPOSCHANGING:
+            // case PInvoke.WM_WINDOWPOSCHANGING:
             //    WmWindowPosChanging(ref m);
             //    break;
             case PInvoke.WM_ENTERMENULOOP:

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 #nullable enable
 
@@ -23,10 +22,19 @@ public partial class MessageBoxes : Form
 
         _btnOpen.Click += (s, e) =>
         {
-            MessageBox.Show(this, _messgageBoxProxy.Text, _messgageBoxProxy.Caption,
-                _messgageBoxProxy.Buttons, _messgageBoxProxy.Icon,
-                _messgageBoxProxy.DefaultButton, _messgageBoxProxy.Options,
-                "mspaint.chm", HelpNavigator.KeywordIndex, "ovals");
+            if ((_messgageBoxProxy.Options & (MessageBoxOptions.ServiceNotification | MessageBoxOptions.DefaultDesktopOnly)) == 0)
+            {
+                MessageBox.Show(this, _messgageBoxProxy.Text, _messgageBoxProxy.Caption,
+                    _messgageBoxProxy.Buttons, _messgageBoxProxy.Icon,
+                    _messgageBoxProxy.DefaultButton, _messgageBoxProxy.Options,
+                    "mmc.chm", HelpNavigator.KeywordIndex, "ovals");
+            }
+            else
+            {
+                MessageBox.Show(_messgageBoxProxy.Text, _messgageBoxProxy.Caption,
+                    _messgageBoxProxy.Buttons, _messgageBoxProxy.Icon,
+                    _messgageBoxProxy.DefaultButton, _messgageBoxProxy.Options);
+            }
         };
 
         ToolStrip toolbar = GetToolbar();

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 
@@ -11,7 +10,7 @@ public class MaskedTextBoxTests
     [WinFormsFact]
     public void MaskedTextBox_Constructor()
     {
-        using var mtb = new MaskedTextBox();
+        using MaskedTextBox mtb = new();
 
         Assert.NotNull(mtb);
     }
@@ -19,7 +18,7 @@ public class MaskedTextBoxTests
     [WinFormsFact]
     public void MaskedTextBox_ConstructorString()
     {
-        using var mtb = new MaskedTextBox("Hello World!");
+        using MaskedTextBox mtb = new("Hello World!");
 
         Assert.NotNull(mtb);
     }
@@ -27,7 +26,7 @@ public class MaskedTextBoxTests
     [WinFormsFact]
     public void MaskedTextBox_ConstructorMaskedTextProvider()
     {
-        using var mtb = new MaskedTextBox(new MaskedTextProvider("Hello World!"));
+        using MaskedTextBox mtb = new(new MaskedTextProvider("Hello World!"));
 
         Assert.NotNull(mtb);
     }

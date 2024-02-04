@@ -28,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\BuildAssist\BuildAssist.msbuildproj" />
     <ProjectReference Include="..\..\..\..\System.Design\src\System.Design.Facade.csproj" />
+    <ProjectReference Include="..\..\..\..\System.Drawing.Design\src\System.Drawing.Design.Facade.csproj" />
     <ProjectReference Include="..\..\..\..\System.Windows.Forms.Design\src\System.Windows.Forms.Design.csproj" />
     <ProjectReference Include="..\..\..\..\System.Drawing.Common\src\System.Drawing.Common.csproj" />
     <ProjectReference Include="..\..\..\src\System.Windows.Forms.csproj" />
@@ -90,7 +91,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Data.SqlClient" Version="5.0.0-alpha.1.19618.1" />
     <PackageReference Include="System.Management" Version="4.5.0-preview1-25914-04" />
+    <PackageReference Include="System.Windows.Forms.DataVisualization" Version="1.0.0-prerelease.20110.1" />
   </ItemGroup>
 
   <ItemGroup>

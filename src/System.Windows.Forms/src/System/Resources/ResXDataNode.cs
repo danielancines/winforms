@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.ComponentModel.Design;
@@ -18,7 +17,7 @@ namespace System.Resources;
 
 public sealed class ResXDataNode : ISerializable
 {
-    private static readonly char[] s_specialChars = new char[] { ' ', '\r', '\n' };
+    private static readonly char[] s_specialChars = [' ', '\r', '\n'];
 
     private DataNodeInfo? _nodeInfo;
 
@@ -39,7 +38,7 @@ public sealed class ResXDataNode : ISerializable
 
     // This is going to be used to check if a ResXDataNode is of type ResXFileRef
     private static readonly ITypeResolutionService s_internalTypeResolver
-        = new AssemblyNamesTypeResolutionService(new AssemblyName[] { new AssemblyName("System.Windows.Forms") });
+        = new AssemblyNamesTypeResolutionService(new AssemblyName[] { new("System.Windows.Forms") });
 
     // Callback function to get type name for multitargeting.
     // No public property to force using constructors for the following reasons:
@@ -199,7 +198,7 @@ public sealed class ResXDataNode : ISerializable
         if (raw.Length > lineWrap)
         {
             // Word wrap on lineWrap chars, \r\n
-            StringBuilder output = new StringBuilder(raw.Length + (raw.Length / lineWrap) * 3);
+            StringBuilder output = new(raw.Length + (raw.Length / lineWrap) * 3);
             int current = 0;
             for (; current < raw.Length - lineWrap; current += lineWrap)
             {
@@ -304,7 +303,7 @@ public sealed class ResXDataNode : ISerializable
                 bool success = false;
                 try
                 {
-                    success = BinaryFormatWriter.TryWriteFrameworkObject(stream, value);
+                    success = WinFormsBinaryFormatWriter.TryWriteObject(stream, value);
                 }
                 catch (Exception ex) when (!ex.IsCriticalException())
                 {
@@ -377,7 +376,7 @@ public sealed class ResXDataNode : ISerializable
         catch (NotSupportedException nse)
         {
             string newMessage = string.Format(SR.NotSupported, typeName, dataNodeInfo.ReaderPosition.Y, dataNodeInfo.ReaderPosition.X, nse.Message);
-            XmlException xml = new XmlException(newMessage, nse, dataNodeInfo.ReaderPosition.Y, dataNodeInfo.ReaderPosition.X);
+            XmlException xml = new(newMessage, nse, dataNodeInfo.ReaderPosition.Y, dataNodeInfo.ReaderPosition.X);
             throw new NotSupportedException(newMessage, xml);
         }
 
@@ -434,7 +433,7 @@ public sealed class ResXDataNode : ISerializable
         try
         {
             BinaryFormattedObject format = new(stream, leaveOpen: true);
-            if (format.TryGetFrameworkObject(out object? value))
+            if (format.TryGetObject(out object? value))
             {
                 return value;
             }
@@ -590,7 +589,7 @@ public sealed class ResXDataNode : ISerializable
     /// <summary>
     ///  Retrieves the type name for the value by examining the specified assemblies.
     /// </summary>
-    public string? GetValueTypeName(AssemblyName[] names)
+    public string? GetValueTypeName(AssemblyName[]? names)
         => GetValueTypeName(new AssemblyNamesTypeResolutionService(names));
 
     /// <summary>
@@ -633,7 +632,7 @@ public sealed class ResXDataNode : ISerializable
     /// <summary>
     ///  Retrieves the object that is stored by this node by searching the specified assemblies.
     /// </summary>
-    public object? GetValue(AssemblyName[] names) => GetValue(new AssemblyNamesTypeResolutionService(names));
+    public object? GetValue(AssemblyName[]? names) => GetValue(new AssemblyNamesTypeResolutionService(names));
 
     private static byte[] FromBase64WrappedString(string text)
     {
@@ -672,12 +671,12 @@ public sealed class ResXDataNode : ISerializable
             resolvedType = typeResolver.GetType(typeName, false);
             if (resolvedType is null)
             {
-                string[] typeParts = typeName.Split(',');
+                string[] typeParts = typeName.Split(',', StringSplitOptions.TrimEntries);
 
                 // Break up the type name from the rest of the assembly strong name.
                 if (typeParts is not null && typeParts.Length >= 2)
                 {
-                    resolvedType = typeResolver.GetType($"{typeParts[0].Trim()}, {typeParts[1].Trim()}", false);
+                    resolvedType = typeResolver.GetType($"{typeParts[0]}, {typeParts[1]}", false);
                 }
             }
         }

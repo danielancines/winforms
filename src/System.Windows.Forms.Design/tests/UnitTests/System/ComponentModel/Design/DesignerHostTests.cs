@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 using System.ComponentModel.Design.Serialization;
@@ -2232,7 +2231,7 @@ public class DesignerHostTests
     [WinFormsFact]
     public void DesignerHost_GetComponents_Invoke_ReturnsFiltered()
     {
-        ComponentCollection collection = new(new Component[] { new Component() });
+        ComponentCollection collection = new(new Component[] { new() });
         Mock<ContainerFilterService> mockFilterService = new(MockBehavior.Strict);
         mockFilterService
             .Setup(f => f.FilterComponents(new ComponentCollection(Array.Empty<IComponent>())))
@@ -2404,7 +2403,7 @@ public class DesignerHostTests
     public static IEnumerable<object[]> GetType_InvalidTypeResolutionService_TestData()
     {
         yield return new object[] { null };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
     }
 
     [WinFormsTheory]
@@ -2923,7 +2922,7 @@ public class DesignerHostTests
     public static IEnumerable<object[]> OnComponentChanging_TestData()
     {
         yield return new object[] { null, null };
-        yield return new object[] { new object(), TypeDescriptor.GetProperties(typeof(string))[0] };
+        yield return new object[] { new(), TypeDescriptor.GetProperties(typeof(string))[0] };
     }
 
     [WinFormsTheory]
@@ -2993,7 +2992,7 @@ public class DesignerHostTests
     public static IEnumerable<object[]> OnComponentChanged_TestData()
     {
         yield return new object[] { null, null, null, null };
-        yield return new object[] { new object(), TypeDescriptor.GetProperties(typeof(string))[0], new object(), new object() };
+        yield return new object[] { new(), TypeDescriptor.GetProperties(typeof(string))[0], new(), new() };
     }
 
     [WinFormsTheory]

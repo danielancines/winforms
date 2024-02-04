@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Design.Tests;
 
@@ -10,7 +9,7 @@ public class ToolStripItemDesignerAvailabilityAttributeTests
     [Fact]
     public void ToolStripItemDesignerAvailabilityAttribute_Ctor_Default()
     {
-        var attribute = new ToolStripItemDesignerAvailabilityAttribute();
+        ToolStripItemDesignerAvailabilityAttribute attribute = new();
         Assert.Equal(ToolStripItemDesignerAvailability.None, attribute.ItemAdditionVisibility);
         Assert.True(attribute.IsDefaultAttribute());
     }
@@ -20,7 +19,7 @@ public class ToolStripItemDesignerAvailabilityAttributeTests
     [InvalidEnumData<ToolStripItemDesignerAvailability>]
     public void ToolStripItemDesignerAvailabilityAttribute_Ctor_ToolStripItemDesignerAvailability(ToolStripItemDesignerAvailability visibility)
     {
-        var attribute = new ToolStripItemDesignerAvailabilityAttribute(visibility);
+        ToolStripItemDesignerAvailabilityAttribute attribute = new(visibility);
         Assert.Equal(visibility, attribute.ItemAdditionVisibility);
     }
 
@@ -48,12 +47,12 @@ public class ToolStripItemDesignerAvailabilityAttributeTests
 
     public static IEnumerable<object[]> Equals_TestData()
     {
-        var attribute = new ToolStripItemDesignerAvailabilityAttribute(ToolStripItemDesignerAvailability.All);
+        ToolStripItemDesignerAvailabilityAttribute attribute = new(ToolStripItemDesignerAvailability.All);
         yield return new object[] { attribute, attribute, true };
         yield return new object[] { attribute, new ToolStripItemDesignerAvailabilityAttribute(ToolStripItemDesignerAvailability.All), true };
         yield return new object[] { attribute, new ToolStripItemDesignerAvailabilityAttribute(ToolStripItemDesignerAvailability.None), false };
 
-        yield return new object[] { attribute, new object(), false };
+        yield return new object[] { attribute, new(), false };
         yield return new object[] { attribute, null, false };
     }
 

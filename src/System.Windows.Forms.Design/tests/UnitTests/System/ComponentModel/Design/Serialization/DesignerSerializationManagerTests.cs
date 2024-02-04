@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 using Moq;
@@ -406,9 +405,9 @@ public class DesignerSerializationManagerTests
     public static IEnumerable<object[]> AddSerializationProvider_TestData()
     {
         yield return new object[] { null, null };
-        yield return new object[] { null, new object() };
+        yield return new object[] { null, new() };
         yield return new object[] { typeof(int), null };
-        yield return new object[] { typeof(int), new object() };
+        yield return new object[] { typeof(int), new() };
     }
 
     [Theory]
@@ -796,9 +795,9 @@ public class DesignerSerializationManagerTests
     public static IEnumerable<object[]> GetInstance_InvokeWithResolveName_TestData()
     {
         yield return new object[] { string.Empty, null };
-        yield return new object[] { string.Empty, new object() };
+        yield return new object[] { string.Empty, new() };
         yield return new object[] { "NoSuchName", null };
-        yield return new object[] { "NoSuchName", new object() };
+        yield return new object[] { "NoSuchName", new() };
     }
 
     [Theory]
@@ -872,7 +871,7 @@ public class DesignerSerializationManagerTests
 
     public static IEnumerable<object[]> GetName_NoNamedInstance_TestData()
     {
-        yield return new object[] { new object(), null };
+        yield return new object[] { new(), null };
         yield return new object[] { new Component(), null };
 
         Mock<IComponent> mockNoSiteComponent = new(MockBehavior.Strict);
@@ -1035,7 +1034,7 @@ public class DesignerSerializationManagerTests
         Assert.Same(service, iManager.GetService(serviceType));
         mockServiceProvider.Verify(p => p.GetService(serviceType), Times.Once());
 
-        Assert.Same(service, ((IServiceProvider)iManager).GetService(serviceType));
+        Assert.Same(service, iManager.GetService(serviceType));
         mockServiceProvider.Verify(p => p.GetService(serviceType), Times.Exactly(2));
     }
 
@@ -1045,7 +1044,7 @@ public class DesignerSerializationManagerTests
     {
         IDesignerSerializationManager iManager = new DesignerSerializationManager(provider);
         Assert.Same(expected, iManager.GetService(typeof(IContainer)));
-        Assert.Same(expected, ((IServiceProvider)iManager).GetService(typeof(IContainer)));
+        Assert.Same(expected, iManager.GetService(typeof(IContainer)));
     }
 
     [Theory]
@@ -1056,7 +1055,7 @@ public class DesignerSerializationManagerTests
     {
         IDesignerSerializationManager iManager = new DesignerSerializationManager();
         Assert.Null(iManager.GetService(serviceType));
-        Assert.Null(((IServiceProvider)iManager).GetService(serviceType));
+        Assert.Null(iManager.GetService(serviceType));
     }
 
     public static IEnumerable<object[]> GetRuntimeType_ValidProvider_TestData()
@@ -2115,7 +2114,7 @@ public class DesignerSerializationManagerTests
 
     private class PublicDesignerSerializationProvider : IDesignerSerializationProvider
     {
-        public static object Serializer { get; } = new object();
+        public static object Serializer { get; } = new();
 
         private PublicDesignerSerializationProvider()
         {
@@ -2129,7 +2128,7 @@ public class DesignerSerializationManagerTests
 
     private class PrivateDesignerSerializationProvider : IDesignerSerializationProvider
     {
-        public static object Serializer { get; } = new object();
+        public static object Serializer { get; } = new();
 
         private PrivateDesignerSerializationProvider()
         {

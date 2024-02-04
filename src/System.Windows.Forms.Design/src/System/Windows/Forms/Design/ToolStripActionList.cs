@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.ComponentModel.Design;
@@ -58,7 +57,7 @@ internal class ToolStripActionList : DesignerActionList
         }
     }
 
-    //helper function to get the property on the actual Control
+    // helper function to get the property on the actual Control
     private object? GetProperty(string propertyName)
     {
         PropertyDescriptor? getProperty = TypeDescriptor.GetProperties(_toolStrip)[propertyName];
@@ -71,7 +70,7 @@ internal class ToolStripActionList : DesignerActionList
         return null;
     }
 
-    //helper function to change the property on the actual Control
+    // helper function to change the property on the actual Control
     private void ChangeProperty(string propertyName, object value)
     {
         PropertyDescriptor? changingProperty = TypeDescriptor.GetProperties(_toolStrip)[propertyName];
@@ -149,7 +148,7 @@ internal class ToolStripActionList : DesignerActionList
     /// </summary>
     public override DesignerActionItemCollection GetSortedActionItems()
     {
-        DesignerActionItemCollection items = new DesignerActionItemCollection();
+        DesignerActionItemCollection items = new();
         if (!IsReadOnly)
         {
             items.Add(new DesignerActionMethodItem(this, "InvokeEmbedVerb", SR.ToolStripDesignerEmbedVerb, "", SR.ToolStripDesignerEmbedVerbDesc, true));

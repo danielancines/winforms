@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using Microsoft.VisualBasic.Devices;
@@ -15,7 +14,7 @@ public class ClipboardProxyTests
     public void Clear()
     {
         var clipboard = (new Computer()).Clipboard;
-        var text = GetUniqueText();
+        string text = GetUniqueText();
         clipboard.SetText(text);
         Assert.True(System.Windows.Forms.Clipboard.ContainsText());
         clipboard.Clear();
@@ -26,7 +25,7 @@ public class ClipboardProxyTests
     public void Text()
     {
         var clipboard = (new Computer()).Clipboard;
-        var text = GetUniqueText();
+        string text = GetUniqueText();
         clipboard.SetText(text, TextDataFormat.UnicodeText);
         Assert.Equal(System.Windows.Forms.Clipboard.ContainsText(), clipboard.ContainsText());
         Assert.Equal(System.Windows.Forms.Clipboard.GetText(), clipboard.GetText());
@@ -38,7 +37,7 @@ public class ClipboardProxyTests
     public void Image()
     {
         var clipboard = (new Computer()).Clipboard;
-        var image = new Bitmap(2, 2);
+        Bitmap image = new(2, 2);
         Assert.Equal(System.Windows.Forms.Clipboard.ContainsImage(), clipboard.ContainsImage());
         Assert.Equal(System.Windows.Forms.Clipboard.GetImage(), clipboard.GetImage());
         clipboard.SetImage(image);

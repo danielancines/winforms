@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Runtime.InteropServices;
 
@@ -18,7 +17,7 @@ public class SYSTEMTIMETests
     [Fact]
     public void SYSTEMTIME_Ctor_Default()
     {
-        var st = new SYSTEMTIME();
+        SYSTEMTIME st = new();
 
         Assert.Equal(0, st.wYear);
         Assert.Equal(0, st.wMonth);
@@ -33,7 +32,7 @@ public class SYSTEMTIMETests
     [Fact]
     public void SYSTEMTIME_CastToDateTime_ReturnsExpected()
     {
-        var st = new SYSTEMTIME()
+        SYSTEMTIME st = new()
         {
             wYear = 2021,
             wMonth = 5,
@@ -59,7 +58,7 @@ public class SYSTEMTIMETests
     [Fact]
     public void SYSTEMTIME_CastToDateTime_ThrowsException_IfArgumentsAreIncorrect()
     {
-        var st = new SYSTEMTIME()
+        SYSTEMTIME st = new()
         {
             wYear = 9999,
             wMonth = 99,
@@ -77,7 +76,7 @@ public class SYSTEMTIMETests
     [Fact]
     public void SYSTEMTIME_CastToDateTime_ReturnsMinValue_IfValueIsDefault()
     {
-        var st = new SYSTEMTIME();
+        SYSTEMTIME st = new();
         DateTime dt;
 
         using (new NoAssertContext())

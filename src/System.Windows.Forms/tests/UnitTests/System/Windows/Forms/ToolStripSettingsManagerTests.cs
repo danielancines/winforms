@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -9,15 +8,15 @@ public class ToolStripSettingsManagerTests : IClassFixture<UserConfigDisposableF
     [WinFormsFact]
     public void ToolStripSettingsManager_Save_Load_RoundTripExpected()
     {
-        using var mainForm = new Form();
+        using Form mainForm = new();
 
-        using var toolStrip = new ToolStrip();
+        using ToolStrip toolStrip = new();
         toolStrip.Name = "Child";
         toolStrip.Size = new Drawing.Size(10, 10);
         toolStrip.Visible = false;
         mainForm.Controls.Add(toolStrip);
 
-        var toolStripSettingsManager = new ToolStripSettingsManager(mainForm, "MainForm");
+        ToolStripSettingsManager toolStripSettingsManager = new(mainForm, "MainForm");
 
         toolStripSettingsManager.Save();
 

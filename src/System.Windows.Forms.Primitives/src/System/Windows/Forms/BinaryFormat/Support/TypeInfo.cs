@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.BinaryFormat;
 
@@ -84,5 +83,29 @@ internal static class TypeInfo
         // TypeCode.Object => 0,
         // TypeCode.DBNull => 0,
         _ => type == typeof(TimeSpan) ? PrimitiveType.TimeSpan : default,
+    };
+
+    /// <summary>
+    ///  Returns the <see cref="Type"/> for the given <paramref name="primitiveType"/>.
+    /// </summary>
+    internal static Type GetPrimitiveTypeType(this PrimitiveType primitiveType) => primitiveType switch
+    {
+        PrimitiveType.Boolean => typeof(bool),
+        PrimitiveType.Char => typeof(char),
+        PrimitiveType.SByte => typeof(sbyte),
+        PrimitiveType.Byte => typeof(byte),
+        PrimitiveType.Int16 => typeof(short),
+        PrimitiveType.UInt16 => typeof(ushort),
+        PrimitiveType.Int32 => typeof(int),
+        PrimitiveType.UInt32 => typeof(uint),
+        PrimitiveType.Int64 => typeof(long),
+        PrimitiveType.UInt64 => typeof(ulong),
+        PrimitiveType.Single => typeof(float),
+        PrimitiveType.Double => typeof(double),
+        PrimitiveType.Decimal => typeof(decimal),
+        PrimitiveType.DateTime => typeof(DateTime),
+        PrimitiveType.String => typeof(string),
+        PrimitiveType.TimeSpan => typeof(TimeSpan),
+        _ => throw new NotSupportedException(),
     };
 }

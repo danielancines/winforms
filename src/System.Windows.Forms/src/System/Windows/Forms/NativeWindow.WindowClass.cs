@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Runtime.InteropServices;
@@ -114,7 +113,7 @@ public partial class NativeWindow
         }
 
         /// <summary>
-        ///  Once the classname and style bits have been set, this can be called to register the class.
+        ///  Once the class name and style bits have been set, this can be called to register the class.
         /// </summary>
         private unsafe void RegisterClass()
         {
@@ -128,8 +127,8 @@ public partial class NativeWindow
                 // creates a little bit if flicker.  This happens even though we are overriding wm_erasebackgnd.
                 // Make this hollow to avoid all flicker.
 
-                windowClass.hbrBackground = (HBRUSH)PInvoke.GetStockObject(GET_STOCK_OBJECT_FLAGS.NULL_BRUSH);
-                windowClass.style = (WNDCLASS_STYLES)_classStyle;
+                windowClass.hbrBackground = (HBRUSH)PInvokeCore.GetStockObject(GET_STOCK_OBJECT_FLAGS.NULL_BRUSH);
+                windowClass.style = _classStyle;
 
                 _defaultWindProc = DefaultWindowProc;
                 localClassName = $"Window.{(int)_classStyle:x}";

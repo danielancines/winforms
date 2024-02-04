@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 
@@ -12,7 +11,7 @@ public class LinkAreaTests
     [Fact]
     public void LinkArea_Ctor_Default()
     {
-        var area = new LinkArea();
+        LinkArea area = new();
         Assert.Equal(0, area.Start);
         Assert.Equal(0, area.Length);
         Assert.True(area.IsEmpty);
@@ -26,7 +25,7 @@ public class LinkAreaTests
     [InlineData(0, 1, false)]
     public void LinkArea_Ctor_Int_Int(int start, int length, bool expectedIsEmpty)
     {
-        var area = new LinkArea(start, length);
+        LinkArea area = new(start, length);
         Assert.Equal(start, area.Start);
         Assert.Equal(length, area.Length);
         Assert.Equal(expectedIsEmpty, area.IsEmpty);
@@ -36,7 +35,7 @@ public class LinkAreaTests
     [IntegerData<int>]
     public void LinkArea_Start_Set_GetReturnsExpected(int value)
     {
-        var area = new LinkArea
+        LinkArea area = new()
         {
             Start = value
         };
@@ -51,7 +50,7 @@ public class LinkAreaTests
     [IntegerData<int>]
     public void LinkArea_Length_Set_GetReturnsExpected(int value)
     {
-        var area = new LinkArea
+        LinkArea area = new()
         {
             Length = value
         };
@@ -68,7 +67,7 @@ public class LinkAreaTests
         yield return new object[] { new LinkArea(1, 2), new LinkArea(2, 2), false };
         yield return new object[] { new LinkArea(1, 2), new LinkArea(1, 3), false };
 
-        yield return new object[] { new LinkArea(1, 2), new object(), false };
+        yield return new object[] { new LinkArea(1, 2), new(), false };
         yield return new object[] { new LinkArea(1, 2), null, false };
     }
 
@@ -89,14 +88,14 @@ public class LinkAreaTests
     [Fact]
     public void LinkArea_ToString_Invoke_ReturnsExpected()
     {
-        var area = new LinkArea(1, 2);
+        LinkArea area = new(1, 2);
         Assert.Equal("{Start=1, Length=2}", area.ToString());
     }
 
     [Fact]
     public void LinkArea_TypeConverter_Get_ReturnsLinkAreaConverter()
     {
-        var area = new LinkArea(1, 2);
+        LinkArea area = new(1, 2);
         Assert.IsType<LinkArea.LinkAreaConverter>(TypeDescriptor.GetConverter(area));
     }
 }

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Reflection;
 
@@ -18,7 +17,7 @@ public class AssemblyInfoTests
     [MemberData(nameof(AssemblyProperties_TestData))]
     public void AssemblyProperties(System.Reflection.Assembly assembly)
     {
-        var assemblyInfo = new AssemblyInfo(assembly);
+        AssemblyInfo assemblyInfo = new(assembly);
         var assemblyName = assembly.GetName();
         Assert.Equal(assemblyName.Name, assemblyInfo.AssemblyName);
         Assert.Equal(System.IO.Path.GetDirectoryName(assembly.Location), assemblyInfo.DirectoryPath);
@@ -41,7 +40,7 @@ public class AssemblyInfoTests
     public void LoadedAssemblies()
     {
         var executingAssembly = Assembly.GetExecutingAssembly();
-        var assemblyInfo = new AssemblyInfo(executingAssembly);
+        AssemblyInfo assemblyInfo = new(executingAssembly);
         var loadedAssemblies = assemblyInfo.LoadedAssemblies;
         Assert.Contains(executingAssembly, loadedAssemblies);
     }
@@ -50,8 +49,8 @@ public class AssemblyInfoTests
     public void StackTrace()
     {
         // Property is independent of the actual assembly.
-        var assemblyInfo = new AssemblyInfo(Assembly.GetExecutingAssembly());
-        var stackTrace = assemblyInfo.StackTrace;
+        AssemblyInfo assemblyInfo = new(Assembly.GetExecutingAssembly());
+        string stackTrace = assemblyInfo.StackTrace;
         Assert.Contains(nameof(AssemblyInfoTests), stackTrace);
     }
 
@@ -59,8 +58,8 @@ public class AssemblyInfoTests
     public void WorkingSet()
     {
         // Property is independent of the actual assembly.
-        var assemblyInfo = new AssemblyInfo(Assembly.GetExecutingAssembly());
-        var workingSet = assemblyInfo.WorkingSet;
+        AssemblyInfo assemblyInfo = new(Assembly.GetExecutingAssembly());
+        long workingSet = assemblyInfo.WorkingSet;
         Assert.True(workingSet > 0);
     }
 

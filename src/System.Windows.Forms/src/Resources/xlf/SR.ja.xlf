@@ -262,11 +262,6 @@
         <target state="translated">要求されたアクションに対しては、1 次元配列のみがサポートされます。</target>
         <note />
       </trans-unit>
-      <trans-unit id="ArgumentOutOfRange_NeedNonNegNum">
-        <source>Non-negative number required.</source>
-        <target state="translated">負でない数値が必要です。</target>
-        <note />
-      </trans-unit>
       <trans-unit id="Argument_IncompatibleArrayType">
         <source>Target array type is not compatible with the type of items in the collection.</source>
         <target state="translated">ターゲット配列の型と、コレクション内の項目の型とに互換性がありません。</target>
@@ -4140,8 +4135,8 @@ To replace this default dialog please handle the DataError event.</source>
         <note />
       </trans-unit>
       <trans-unit id="DataGridView_SortedDescr">
-        <source>Occurs when the DataGridView compares two cell values to perform a sort operation.</source>
-        <target state="translated">並べ替え操作の実行のため、DataGridView が 2 つのセルの値を比較するときに発生します。</target>
+        <source>Occurs when the DataGridView control completes a sorting operation.</source>
+        <target state="translated">DataGridView コントロールが並べ替え操作を完了したときに発生します。</target>
         <note />
       </trans-unit>
       <trans-unit id="DataGridView_StandardTabDescr">
@@ -5210,9 +5205,9 @@ Do you want to replace it?</source>
         <target state="translated">ダイアログ ボックスのツリー ビュー コントロールの上に表示される文字列です。この文字列は、ユーザーに手順を指定するのに使用されます。</target>
         <note />
       </trans-unit>
-      <trans-unit id="FolderBrowserDialogNoRootFolder">
-        <source>Unable to retrieve the root folder.</source>
-        <target state="translated">ルート フォルダーを取得できません。</target>
+      <trans-unit id="FolderBrowserDialogMultiSelectDescr">
+        <source>Controls whether multiple folders can be selected in the dialog.</source>
+        <target state="translated">そのダイアログで複数のフォルダーを選択できるようにするかどうかを制御します。</target>
         <note />
       </trans-unit>
       <trans-unit id="FolderBrowserDialogOkRequiresInteraction">
@@ -5228,6 +5223,11 @@ Do you want to replace it?</source>
       <trans-unit id="FolderBrowserDialogSelectedPath">
         <source>The path of the folder first selected in the dialog or the last one selected by the user.</source>
         <target state="translated">ダイアログで最初に、またはユーザーによって最後に選択されたフォルダーのパスです。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="FolderBrowserDialogSelectedPathsDescr">
+        <source>Retrieves the paths of all selected folders in the dialog box.</source>
+        <target state="translated">そのダイアログ ボックスで選択されたすべてのフォルダーのパスを取得します。</target>
         <note />
       </trans-unit>
       <trans-unit id="FolderBrowserDialogShowHiddenFiles">
@@ -5859,11 +5859,6 @@ Stack trace where the illegal operation occurred was:
         <target state="translated">このコントロールで実行されている動作は、間違ったスレッドから呼び出されています。この動作を実行するには、Control.Invoke または Control.BeginInvoke を使って正しいスレッドにマーシャリングしてください。</target>
         <note />
       </trans-unit>
-      <trans-unit id="InvalidExBoundArgument">
-        <source>Value of '{1}' is not valid for '{0}'. '{0}' should be greater than {2} and less than {3}.</source>
-        <target state="translated">'{1}' の値は '{0}' に対して有効ではありません。'{0}' は {2} より大きく、{3} より小さくなければなりません。</target>
-        <note />
-      </trans-unit>
       <trans-unit id="InvalidFileFormat">
         <source>File format is not valid.</source>
         <target state="translated">ファイル形式が有効ではありません。</target>
@@ -5882,26 +5877,6 @@ Stack trace where the illegal operation occurred was:
       <trans-unit id="InvalidHdcType">
         <source>Invalid HDC type: {0}</source>
         <target state="translated">無効な HDC の種類: {0}</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="InvalidHighBoundArgument">
-        <source>Value of '{1}' is not valid for '{0}'. '{0}' must be less than {2}.</source>
-        <target state="translated">'{1}' の値は '{0}' に対して有効ではありません。'{0}' は {2} 未満でなければなりません。</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="InvalidHighBoundArgumentEx">
-        <source>Value of '{1}' is not valid for '{0}'. '{0}' must be less than or equal to {2}.</source>
-        <target state="translated">'{1}' の値は '{0}' に対して有効ではありません。'{0}' は {2} 以下でなければなりません。</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="InvalidLowBoundArgument">
-        <source>Value of '{1}' is not valid for '{0}'. '{0}' must be greater than {2}.</source>
-        <target state="translated">'{1}' の値は '{0}' に対して有効ではありません。'{0}' は {2} より大きくなければなりません。</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="InvalidLowBoundArgumentEx">
-        <source>Value of '{1}' is not valid for '{0}'. '{0}' must be greater than or equal to {2}.</source>
-        <target state="translated">'{1}' の値は '{0}' に対して有効ではありません。'{0}' は {2} 以上でなければなりません。</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidNullArgument">
@@ -7414,11 +7389,6 @@ Stack trace where the illegal operation occurred was:
         <target state="translated">ボタンをクリックするごとに増減する量を示します。</target>
         <note />
       </trans-unit>
-      <trans-unit id="NumericUpDownLessThanZeroError">
-        <source>Parameter value must be greater than or equal to 0.</source>
-        <target state="translated">パラメーター値には 0 以上の値を指定しなけれなばりません。</target>
-        <note />
-      </trans-unit>
       <trans-unit id="NumericUpDownMaximumDescr">
         <source>Indicates the maximum value for the numeric up-down control.</source>
         <target state="translated">数値のアップダウン コントロールの最大値を示します。</target>
@@ -8272,11 +8242,6 @@ Stack trace where the illegal operation occurred was:
       <trans-unit id="PropertyCategoryText">
         <source>Text</source>
         <target state="translated">テキスト</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="PropertyGridBadTabIndex">
-        <source>Tab index not valid.</source>
-        <target state="translated">タブ インデックスが有効ではありません。</target>
         <note />
       </trans-unit>
       <trans-unit id="PropertyGridCanShowCommandsDesc">
@@ -10247,6 +10212,11 @@ Stack trace where the illegal operation occurred was:
       <trans-unit id="ToolStripItemRightToLeftDescr">
         <source>Indicates whether the item should draw right-to-left for RTL languages.</source>
         <target state="translated">RTL 言語に対して、アイテムが右から左へ描画するべきかどうかを示します。</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ToolStripItemSelectedChangedDescr">
+        <source>Occurs when the Selected property value changes.</source>
+        <target state="translated">Selected プロパティ値が変更されたときに発生します。</target>
         <note />
       </trans-unit>
       <trans-unit id="ToolStripItemSize">

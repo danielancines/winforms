@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.UITests.Dpi;
 
@@ -8,7 +7,7 @@ internal static class DpiMessageHelper
 {
     public static void TriggerDpiMessage(MessageId message, Control control, int newDpi)
     {
-        double factor = newDpi / DpiHelper.LogicalDpi;
+        double factor = newDpi / (double)ScaleHelper.OneHundredPercentLogicalDpi;
         WPARAM wParam = WPARAM.MAKEWPARAM(newDpi, newDpi);
 
         _ = (uint)message switch

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 
@@ -10,7 +9,7 @@ public class ToolStripPanelRenderEventArgsTests
 {
     public static IEnumerable<object[]> Ctor_Null_Graphics_ToolStripPanel_TestData()
     {
-        var image = new Bitmap(10, 10);
+        Bitmap image = new(10, 10);
         Graphics graphics = Graphics.FromImage(image);
 
         yield return new object[] { null, null };
@@ -28,10 +27,10 @@ public class ToolStripPanelRenderEventArgsTests
     [WinFormsFact]
     public void Ctor_Graphics_ToolStripPanel()
     {
-        using var image = new Bitmap(10, 10);
+        using Bitmap image = new(10, 10);
         using Graphics graphics = Graphics.FromImage(image);
-        using var toolStripPanel = new ToolStripPanel();
-        var e = new ToolStripPanelRenderEventArgs(graphics, toolStripPanel);
+        using ToolStripPanel toolStripPanel = new();
+        ToolStripPanelRenderEventArgs e = new(graphics, toolStripPanel);
         Assert.Equal(graphics, e.Graphics);
         Assert.Equal(toolStripPanel, e.ToolStripPanel);
         Assert.False(e.Handled);
@@ -42,11 +41,11 @@ public class ToolStripPanelRenderEventArgsTests
     [InlineData(false)]
     public void Handled_Set_GetReturnsExpected(bool value)
     {
-        using (var image = new Bitmap(10, 10))
+        using (Bitmap image = new(10, 10))
         using (Graphics graphics = Graphics.FromImage(image))
         {
-            using var panel = new ToolStripPanel();
-            var e = new ToolStripPanelRenderEventArgs(graphics, panel)
+            using ToolStripPanel panel = new();
+            ToolStripPanelRenderEventArgs e = new(graphics, panel)
             {
                 Handled = value
             };

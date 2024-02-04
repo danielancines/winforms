@@ -1,12 +1,10 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Windows.Win32.System.Com;
 using Windows.Win32.System.Variant;
-using InteropMarshal = System.Runtime.InteropServices.Marshal;
 
 namespace Windows.Win32.System.Ole;
 
@@ -31,11 +29,15 @@ internal unsafe class ClassPropertyDispatchAdapter
     /// <param name="priorAdapter">
     ///  A prior adapter for chaining. This adapter will be consulted first for all results.
     /// </param>
-    public ClassPropertyDispatchAdapter(object instance, ClassPropertyDispatchAdapter? priorAdapter = null)
+    public ClassPropertyDispatchAdapter(
+        object instance,
+        ClassPropertyDispatchAdapter? priorAdapter = null)
     {
         ArgumentNullException.ThrowIfNull(instance);
         _instance = new(instance);
+#pragma warning disable IL2074 // value stored in field does not satisfy DynamicallyAccessedMemberTypes.PublicProperties requirements. https://github.com/dotnet/winforms/issues/10226
         _type = instance.GetType();
+#pragma warning restore IL2074
         _priorAdapter = priorAdapter;
 
         var properties = _type.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static);
@@ -71,7 +73,7 @@ internal unsafe class ClassPropertyDispatchAdapter
 
     private int GetUnusedDispId(int desiredId)
     {
-        if (desiredId != PInvoke.DISPID_UNKNOWN && !_members.ContainsKey(desiredId))
+        if (desiredId != PInvokeCore.DISPID_UNKNOWN && !IdInUse(desiredId))
         {
             return desiredId;
         }
@@ -155,6 +157,16 @@ internal unsafe class ClassPropertyDispatchAdapter
             }
         }
 
+        if (!_members.TryGetValue(dispId, out var entry))
+        {
+            return HRESULT.DISP_E_MEMBERNOTFOUND;
+        }
+
+        if (!_instance.TryGetTarget(out object? target))
+        {
+            return HRESULT.COR_E_OBJECTDISPOSED;
+        }
+
         BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static;
 
         if (flags.HasFlag(DISPATCH_FLAGS.DISPATCH_PROPERTYPUT | DISPATCH_FLAGS.DISPATCH_PROPERTYPUTREF))
@@ -176,20 +188,12 @@ internal unsafe class ClassPropertyDispatchAdapter
 
         Debug.Assert(!bindingFlags.HasFlag(BindingFlags.NonPublic));
 
-        if (!_members.TryGetValue(dispId, out var entry))
-        {
-            return HRESULT.DISP_E_MEMBERNOTFOUND;
-        }
-
-        if (!_instance.TryGetTarget(out object? target))
-        {
-            return HRESULT.COR_E_OBJECTDISPOSED;
-        }
-
         object? resultObject = null;
 
         if (bindingFlags.HasFlag(BindingFlags.PutDispProperty))
         {
+            // Setter
+
             if (parameters->cArgs != 1)
             {
                 return HRESULT.DISP_E_BADPARAMCOUNT;
@@ -197,7 +201,8 @@ internal unsafe class ClassPropertyDispatchAdapter
 
             try
             {
-                object? value = InteropMarshal.GetObjectForNativeVariant((nint)parameters->rgvarg);
+                VARIANT* variantValue = parameters->rgvarg;
+                object? value = variantValue is null ? null : variantValue->ToObject();
                 resultObject = _type.InvokeMember(
                     entry.Name,
                     bindingFlags,
@@ -212,10 +217,7 @@ internal unsafe class ClassPropertyDispatchAdapter
         }
         else
         {
-            if (result is null)
-            {
-                return HRESULT.E_POINTER;
-            }
+            // Getter
 
             try
             {
@@ -226,7 +228,11 @@ internal unsafe class ClassPropertyDispatchAdapter
                     target,
                     args: null);
 
-                InteropMarshal.GetNativeVariantForObject(resultObject, (nint)result);
+                // It is technically ok to not get the result.
+                if (result is not null)
+                {
+                    *result = VARIANT.FromObject(resultObject);
+                }
             }
             catch (Exception ex)
             {
@@ -254,7 +260,7 @@ internal unsafe class ClassPropertyDispatchAdapter
             return true;
         }
 
-        bool foundLast = dispId == PInvoke.DISPID_STARTENUM;
+        bool foundLast = dispId == PInvokeCore.DISPID_STARTENUM;
 
         foreach (int currentId in _members.Keys)
         {
@@ -267,7 +273,7 @@ internal unsafe class ClassPropertyDispatchAdapter
             foundLast = dispId == currentId;
         }
 
-        nextDispId = PInvoke.DISPID_UNKNOWN;
+        nextDispId = PInvokeCore.DISPID_UNKNOWN;
         return false;
     }
 
@@ -305,29 +311,16 @@ internal unsafe class ClassPropertyDispatchAdapter
     // {
     //     int dispid = info.GetCustomAttribute<DispIdAttribute>()?.Value ?? Interop.DISPID_UNKNOWN;
     //     string name = info.Name;
-    //     FDEX_PROP_FLAGS flags =
-    //         FDEX_PROP_FLAGS.fdexPropCanGet
-    //         | FDEX_PROP_FLAGS.fdexPropCanPut
-    //         | FDEX_PROP_FLAGS.fdexPropCannotPutRef
-    //         | FDEX_PROP_FLAGS.fdexPropCannotCall
-    //         | FDEX_PROP_FLAGS.fdexPropCannotConstruct
-    //         | FDEX_PROP_FLAGS.fdexPropCannotSourceEvents;
+    //     FDEX_PROP_FLAGS flags = IDispatch.GetFieldProperty();
     //
     //     return (name, dispid, flags);
     // }
 
     private static (string Name, int DispId, FDEX_PROP_FLAGS Flags) GetPropertyInfo(PropertyInfo info)
     {
-        int dispid = info.GetCustomAttribute<DispIdAttribute>()?.Value ?? PInvoke.DISPID_UNKNOWN;
+        int dispid = info.GetCustomAttribute<DispIdAttribute>()?.Value ?? PInvokeCore.DISPID_UNKNOWN;
         string name = info.Name;
-        FDEX_PROP_FLAGS flags =
-            (info.CanRead ? FDEX_PROP_FLAGS.fdexPropCanGet : FDEX_PROP_FLAGS.fdexPropCannotGet)
-            | (info.CanWrite ? FDEX_PROP_FLAGS.fdexPropCanPut : FDEX_PROP_FLAGS.fdexPropCannotPut)
-            | FDEX_PROP_FLAGS.fdexPropCannotPutRef
-            | FDEX_PROP_FLAGS.fdexPropCannotCall
-            | FDEX_PROP_FLAGS.fdexPropCannotConstruct
-            | FDEX_PROP_FLAGS.fdexPropCannotSourceEvents;
-
+        FDEX_PROP_FLAGS flags = IDispatch.GetPropertyFlags(info.CanRead, info.CanWrite);
         return (name, dispid, flags);
     }
 

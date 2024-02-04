@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 using System.ComponentModel;
@@ -62,7 +61,7 @@ internal partial class SplitContainerDesigner : ParentControlDesigner
     /// </summary>
     public override IList SnapLines =>
         // We don't want padding snaplines, so call directly to the internal method.
-        SnapLinesInternal();
+        EdgeAndMarginSnapLines().Unwrap();
 
     /// <summary>
     ///  Returns the number of internal control designers in the <see cref="SplitContainerDesigner"/>. An internal control is a control that is not in the
@@ -89,7 +88,7 @@ internal partial class SplitContainerDesigner : ParentControlDesigner
                 return null;
         }
 
-        return _designerHost?.GetDesigner(panel!) as ControlDesigner;
+        return _designerHost?.GetDesigner(panel) as ControlDesigner;
     }
 
     /// <summary>
@@ -156,8 +155,7 @@ internal partial class SplitContainerDesigner : ParentControlDesigner
 
     protected override void Dispose(bool disposing)
     {
-        var svc = (ISelectionService)GetService(typeof(ISelectionService));
-        if (svc is not null)
+        if (TryGetService(out ISelectionService? svc))
         {
             svc.SelectionChanged -= new EventHandler(OnSelectionChanged);
         }
@@ -180,18 +178,16 @@ internal partial class SplitContainerDesigner : ParentControlDesigner
     /// </summary>
     protected override ControlBodyGlyph GetControlGlyph(GlyphSelectionType selectionType)
     {
-        var selMgr = (SelectionManager)GetService(typeof(SelectionManager));
-        if (selMgr is not null)
+        if (TryGetService(out SelectionManager? selMgr))
         {
             Rectangle translatedBounds = BehaviorService.ControlRectInAdornerWindow(_splitterPanel1!);
             var panelDesigner = _designerHost?.GetDesigner(_splitterPanel1!) as SplitterPanelDesigner;
             OnSetCursor();
 
-            ControlBodyGlyph? bodyGlyph = null;
             if (panelDesigner is not null)
             {
                 // Create our glyph, and set its cursor appropriately.
-                bodyGlyph = new ControlBodyGlyph(translatedBounds, Cursor.Current, _splitterPanel1, panelDesigner);
+                ControlBodyGlyph bodyGlyph = new(translatedBounds, Cursor.Current, _splitterPanel1, panelDesigner);
                 selMgr.BodyGlyphAdorner.Glyphs.Add(bodyGlyph);
             }
 
@@ -201,7 +197,7 @@ internal partial class SplitContainerDesigner : ParentControlDesigner
             if (panelDesigner is not null)
             {
                 // Create our glyph, and set its cursor appropriately.
-                bodyGlyph = new ControlBodyGlyph(translatedBounds, Cursor.Current, _splitterPanel2, panelDesigner);
+                ControlBodyGlyph bodyGlyph = new(translatedBounds, Cursor.Current, _splitterPanel2, panelDesigner);
                 selMgr.BodyGlyphAdorner.Glyphs.Add(bodyGlyph);
             }
         }
@@ -234,8 +230,7 @@ internal partial class SplitContainerDesigner : ParentControlDesigner
         _splitContainer.SplitterMoving += new SplitterCancelEventHandler(OnSplitterMoving);
         _splitContainer.DoubleClick += new EventHandler(OnSplitContainerDoubleClick);
 
-        var svc = (ISelectionService)GetService(typeof(ISelectionService));
-        if (svc is not null)
+        if (TryGetService(out ISelectionService? svc))
         {
             svc.SelectionChanged += new EventHandler(OnSelectionChanged);
         }
@@ -268,7 +263,7 @@ internal partial class SplitContainerDesigner : ParentControlDesigner
 
     private void OnSplitContainer(object? sender, MouseEventArgs e)
     {
-        var svc = (ISelectionService)GetService(typeof(ISelectionService));
+        var svc = GetRequiredService<ISelectionService>();
         svc.SetSelectedComponents(new object[] { Control });
     }
 
@@ -304,7 +299,7 @@ internal partial class SplitContainerDesigner : ParentControlDesigner
             {
                 BehaviorService.EnableAllAdorners(true);
 
-                var selMgr = (SelectionManager)GetService(typeof(SelectionManager));
+                var selMgr = GetService<SelectionManager>();
                 selMgr?.Refresh();
                 _disabledGlyphs = false;
             }
@@ -341,12 +336,8 @@ internal partial class SplitContainerDesigner : ParentControlDesigner
         _disabledGlyphs = true;
 
         // Find our BodyGlyph adorner offered by the behavior service. We don't want to disable the transparent body glyphs.
-        Adorner? bodyGlyphAdorner = null;
-        var selMgr = (SelectionManager)GetService(typeof(SelectionManager));
-        if (selMgr is not null)
-        {
-            bodyGlyphAdorner = selMgr.BodyGlyphAdorner;
-        }
+        SelectionManager? selMgr = GetService<SelectionManager>();
+        Adorner? bodyGlyphAdorner = selMgr?.BodyGlyphAdorner;
 
         // Disable all adorners except for BodyGlyph adorner.
         foreach (Adorner adorner in BehaviorService.Adorners)
@@ -382,10 +373,9 @@ internal partial class SplitContainerDesigner : ParentControlDesigner
     /// </summary>
     private void OnSelectionChanged(object? sender, EventArgs e)
     {
-        var svc = (ISelectionService)GetService(typeof(ISelectionService));
         _splitContainerSelected = false;
 
-        if (svc is null)
+        if (!TryGetService(out ISelectionService? svc))
         {
             return;
         }

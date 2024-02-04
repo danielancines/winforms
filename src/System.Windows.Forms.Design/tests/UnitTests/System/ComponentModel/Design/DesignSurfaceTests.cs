@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel.Design.Serialization;
 using System.Reflection;
@@ -686,7 +685,7 @@ public class DesignSurfaceTests
     public static IEnumerable<object[]> BeginLoad_InvalidIExtenderProvider_TestData()
     {
         yield return new object[] { null };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
     }
 
     [WinFormsTheory]
@@ -1761,7 +1760,7 @@ public class DesignSurfaceTests
 
     private class RootComponentDesigner : ComponentDesigner, IRootDesigner
     {
-        public static object View { get; } = new object();
+        public static object View { get; } = new();
 
         public ViewTechnology[] SupportedTechnologies => new ViewTechnology[] { ViewTechnology.Default + 1 };
         public object GetView(ViewTechnology technology)

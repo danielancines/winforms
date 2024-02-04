@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Drawing.Design;
@@ -15,11 +14,11 @@ internal sealed partial class Com2AboutBoxPropertyDescriptor : Com2PropertyDescr
 
     public Com2AboutBoxPropertyDescriptor()
         : base(
-              PInvoke.DISPID_ABOUTBOX,
+              PInvokeCore.DISPID_ABOUTBOX,
               "About",
               new Attribute[]
               {
-                  new DispIdAttribute(PInvoke.DISPID_ABOUTBOX),
+                  new DispIdAttribute(PInvokeCore.DISPID_ABOUTBOX),
                   DesignerSerializationVisibilityAttribute.Hidden,
                   new DescriptionAttribute(SR.AboutBoxDesc),
                   new ParenthesizePropertyNameAttribute(true)

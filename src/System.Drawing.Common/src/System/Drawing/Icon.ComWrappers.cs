@@ -1,11 +1,9 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System.Drawing.Internal;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
-using static Interop;
 
 namespace System.Drawing;
 
@@ -13,13 +11,13 @@ public sealed partial class Icon : MarshalByRefObject, ICloneable, IDisposable, 
 {
     public unsafe void Save(Stream outputStream)
     {
-        if (_iconData != null)
+        if (_iconData is not null)
         {
             outputStream.Write(_iconData, 0, _iconData.Length);
         }
         else
         {
-            if (outputStream == null)
+            if (outputStream is null)
                 throw new ArgumentNullException(nameof(outputStream));
 
             // Ideally, we would pick apart the icon using
@@ -39,10 +37,8 @@ public sealed partial class Icon : MarshalByRefObject, ICloneable, IDisposable, 
                 using DrawingCom.IPicture picture = (DrawingCom.IPicture)DrawingCom.Instance
                     .GetOrCreateObjectForComInstance(lpPicture, CreateObjectFlags.UniqueInstance);
 
-                var gpStream = new GPStream(outputStream, makeSeekable: false);
-                streamPtr = DrawingCom.Instance.GetOrCreateComInterfaceForObject(gpStream, CreateComInterfaceFlags.None);
-
-                DrawingCom.ThrowExceptionForHR(picture.SaveAsFile(streamPtr, -1, null));
+                using var iStream = outputStream.ToIStream(makeSeekable: true);
+                DrawingCom.ThrowExceptionForHR(picture.SaveAsFile(iStream, -1, null));
             }
             finally
             {

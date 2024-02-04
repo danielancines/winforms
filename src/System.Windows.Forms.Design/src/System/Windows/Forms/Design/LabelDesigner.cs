@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 #nullable disable
 
@@ -32,7 +31,7 @@ internal class LabelDesigner : ControlDesigner
     {
         get
         {
-            ArrayList snapLines = base.SnapLines as ArrayList;
+            IList<SnapLine> snapLines = SnapLinesInternal;
             ContentAlignment alignment = ContentAlignment.TopLeft;
 
             PropertyDescriptor prop;
@@ -43,14 +42,14 @@ internal class LabelDesigner : ControlDesigner
                 alignment = (ContentAlignment)prop.GetValue(Component);
             }
 
-            //a single text-baseline for the label (and linklabel) control
+            // a single text-baseline for the label (and linklabel) control
             int baseline = DesignerUtils.GetTextBaseline(Control, alignment);
 
             if ((prop = props["AutoSize"]) is not null)
             {
                 if ((bool)prop.GetValue(Component) == false)
                 {
-                    //Only adjust if AutoSize is false
+                    // Only adjust if AutoSize is false
                     BorderStyle borderStyle = BorderStyle.None;
                     if ((prop = props["BorderStyle"]) is not null)
                     {
@@ -94,7 +93,7 @@ internal class LabelDesigner : ControlDesigner
                 }
             }
 
-            return snapLines;
+            return snapLines.Unwrap();
         }
     }
 
@@ -118,7 +117,7 @@ internal class LabelDesigner : ControlDesigner
             }
         }
         else
-        {//bottom alignment
+        {// bottom alignment
             if (borderStyle == BorderStyle.None)
             {
                 return -1;

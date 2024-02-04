@@ -4,12 +4,10 @@
     <AssemblyName>System.Windows.Forms</AssemblyName>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <CLSCompliant>true</CLSCompliant>
-    <EnablePreviewFeatures>True</EnablePreviewFeatures>
-    <GenerateRequiresPreviewFeaturesAttribute>False</GenerateRequiresPreviewFeaturesAttribute>
     <Nullable>enable</Nullable>
 
     <NoWarn>$(NoWarn);618</NoWarn>
-    <!-- 
+    <!--
       IL Trim warnings which should be removed in order to make WinForms trimmable
       See https://github.com/dotnet/winforms/issues/4649
     -->
@@ -30,11 +28,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Accessibility\src\Accessibility.ilproj" />
+    <ProjectReference Include="..\..\System.Private.Windows.Core\src\System.Private.Windows.Core.csproj" />
     <ProjectReference Include="..\..\System.Windows.Forms.Primitives\src\System.Windows.Forms.Primitives.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Win32.SystemEvents" Version="$(MicrosoftWin32SystemEventsPackageVersion)" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="$(SystemConfigurationConfigurationManagerPackageVersion)" />
     <PackageReference Include="System.Resources.Extensions" Version="$(SystemResourcesExtensionsPackageVersion)" />
     <PackageReference Include="System.Windows.Extensions" Version="$(SystemWindowsExtensionsPackageVersion)" />
@@ -45,7 +43,6 @@
     <Compile Include="..\..\Common\src\IComparerHelpers.cs" Link="Common\IComparerHelpers.cs" />
     <Compile Include="..\..\Common\src\Obsoletions.cs" Link="Common\Obsoletions.cs" />
     <Compile Include="..\..\Common\src\RTLAwareMessageBox.cs" Link="Common\RTLAwareMessageBox.cs" />
-    <Compile Include="..\..\Common\src\TraceSwitchExtensions.cs" Link="Common\TraceSwitchExtensions.cs" />
   </ItemGroup>
 
   <ItemGroup>

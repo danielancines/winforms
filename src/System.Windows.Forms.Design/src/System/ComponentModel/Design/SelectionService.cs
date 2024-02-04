@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 using System.Collections.Specialized;
@@ -19,7 +18,7 @@ namespace System.ComponentModel.Design;
 internal sealed class SelectionService : ISelectionService, IDisposable
 {
     // These are the selection types we use for context help.
-    private static readonly string[] s_selectionKeywords = new string[] { "None", "Single", "Multiple" };
+    private static readonly string[] s_selectionKeywords = ["None", "Single", "Multiple"];
 
     // State flags for the selection service
     private static readonly int s_stateTransaction = BitVector32.CreateMask(); // Designer is in a transaction
@@ -465,7 +464,7 @@ internal sealed class SelectionService : ISelectionService, IDisposable
         // Notify that our selection has changed
         if (fChanged)
         {
-            //Set the SelectionInformation
+            // Set the SelectionInformation
             if (_selection?.Count > 0)
             {
                 _statusCommandUI.SetStatusInformation(_selection[0] as Component);

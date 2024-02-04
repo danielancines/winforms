@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -13,7 +12,7 @@ public class DataGridViewRowHeightInfoNeededEventArgsTests
     [InlineData(65536, 65536)]
     public void DataGridViewRowHeightInfoNeededEventArgs_Height_Set_GetReturnsExpected(int value, int expected)
     {
-        using var dataGridView = new DataGridView
+        using DataGridView dataGridView = new()
         {
             ColumnCount = 1,
             VirtualMode = true
@@ -37,7 +36,7 @@ public class DataGridViewRowHeightInfoNeededEventArgsTests
     [InlineData(65537)]
     public void Height_SetInvalid_ThrowsArgumentOutOfRangeException(int value)
     {
-        using var dataGridView = new DataGridView
+        using DataGridView dataGridView = new()
         {
             ColumnCount = 1,
             VirtualMode = true
@@ -65,7 +64,7 @@ public class DataGridViewRowHeightInfoNeededEventArgsTests
     [InlineData(65537, 65537)]
     public void MinimumHeight_Set_GetReturnsExpected(int value, int expectedHeight)
     {
-        using var dataGridView = new DataGridView
+        using DataGridView dataGridView = new()
         {
             ColumnCount = 1,
             VirtualMode = true
@@ -93,7 +92,7 @@ public class DataGridViewRowHeightInfoNeededEventArgsTests
     [InlineData(1)]
     public void MinimumHeight_SetInvalid_ThrowsArgumentOutOfRangeException(int value)
     {
-        using var dataGridView = new DataGridView
+        using DataGridView dataGridView = new()
         {
             ColumnCount = 1,
             VirtualMode = true

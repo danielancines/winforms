@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using System.Windows.Forms.ComponentModel.Com2Interop;
@@ -13,7 +12,7 @@ namespace System.Windows.Forms.Tests.ComponentModel.Com2Interop;
 // NB: doesn't require thread affinity
 public unsafe class COM2PictureConverterTests
 {
-    private static Com2PictureConverter Instance { get; } = new Com2PictureConverter(new Com2PropertyDescriptor(
+    private static Com2PictureConverter Instance { get; } = new(new Com2PropertyDescriptor(
         default,
         "Foo",
         default,
@@ -91,7 +90,7 @@ public unsafe class COM2PictureConverterTests
         }
         finally
         {
-            PInvoke.DeleteObject((HGDIOBJ)hBitmap);
+            PInvokeCore.DeleteObject((HGDIOBJ)hBitmap);
         }
     }
 
@@ -138,7 +137,7 @@ public unsafe class COM2PictureConverterTests
     public unsafe void ConvertManagedToNative_Bitmap()
     {
         bool cancelSet = true;
-        using Bitmap bitmap = new Bitmap(42, 70);
+        using Bitmap bitmap = new(42, 70);
 
         using VARIANT native = Instance.ConvertManagedToNative(bitmap, null, ref cancelSet);
         using ComScope<IPicture> picture = ComScope<IPicture>.QueryFrom((IUnknown*)native);

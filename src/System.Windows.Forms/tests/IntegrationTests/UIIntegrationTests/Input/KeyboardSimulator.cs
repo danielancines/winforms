@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Runtime.InteropServices;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
@@ -20,10 +19,10 @@ internal class KeyboardSimulator
 
     internal KeyboardSimulator KeyDown(VIRTUAL_KEY key)
     {
-        Span<INPUT> inputs = stackalloc INPUT[]
-        {
+        Span<INPUT> inputs =
+        [
             InputBuilder.KeyDown(key),
-        };
+        ];
 
         PInvoke.SendInput(inputs, Marshal.SizeOf<INPUT>());
         return this;
@@ -31,10 +30,10 @@ internal class KeyboardSimulator
 
     internal KeyboardSimulator KeyUp(VIRTUAL_KEY key)
     {
-        Span<INPUT> inputs = stackalloc INPUT[]
-        {
+        Span<INPUT> inputs =
+        [
             InputBuilder.KeyUp(key),
-        };
+        ];
 
         PInvoke.SendInput(inputs, Marshal.SizeOf<INPUT>());
         return this;
@@ -42,11 +41,11 @@ internal class KeyboardSimulator
 
     internal KeyboardSimulator KeyPress(VIRTUAL_KEY key)
     {
-        Span<INPUT> inputs = stackalloc INPUT[]
-        {
+        Span<INPUT> inputs =
+        [
             InputBuilder.KeyDown(key),
             InputBuilder.KeyUp(key),
-        };
+        ];
 
         PInvoke.SendInput(inputs, Marshal.SizeOf<INPUT>());
         return this;
@@ -54,11 +53,11 @@ internal class KeyboardSimulator
 
     internal KeyboardSimulator TextEntry(char character)
     {
-        Span<INPUT> inputs = stackalloc INPUT[]
-        {
+        Span<INPUT> inputs =
+        [
             InputBuilder.CharacterDown(character),
             InputBuilder.CharacterUp(character),
-        };
+        ];
 
         PInvoke.SendInput(inputs, Marshal.SizeOf<INPUT>());
         return this;
@@ -72,7 +71,7 @@ internal class KeyboardSimulator
         }
 
         Span<INPUT> inputs = stackalloc INPUT[text.Length * 2];
-        for (var i = 0; i < text.Length; i++)
+        for (int i = 0; i < text.Length; i++)
         {
             inputs[i * 2] = InputBuilder.CharacterDown(text[i]);
             inputs[i * 2 + 1] = InputBuilder.CharacterUp(text[i]);
@@ -97,13 +96,13 @@ internal class KeyboardSimulator
         }
 
         Span<INPUT> inputs = stackalloc INPUT[modifierArray.Length * 2 + keyArray.Length * 2];
-        for (var i = 0; i < modifierArray.Length; i++)
+        for (int i = 0; i < modifierArray.Length; i++)
         {
             inputs[i] = InputBuilder.KeyDown(modifierArray[i]);
             inputs[^(i + 1)] = InputBuilder.KeyUp(modifierArray[i]);
         }
 
-        for (var i = 0; i < keyArray.Length; i++)
+        for (int i = 0; i < keyArray.Length; i++)
         {
             inputs[modifierArray.Length + i] = InputBuilder.KeyDown(keyArray[i]);
             inputs[modifierArray.Length + i + 1] = InputBuilder.KeyUp(keyArray[i]);

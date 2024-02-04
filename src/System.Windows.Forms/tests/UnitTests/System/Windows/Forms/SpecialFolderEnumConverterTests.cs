@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using Moq;
@@ -74,7 +73,7 @@ public class SpecialFolderEnumConverterTests
         Assert.Equal(expected, converter.GetStandardValues(null).Cast<Environment.SpecialFolder>());
 
         converter = GetNewSpecialFolderEnumConverter();
-        var mockProvider = new Mock<TypeDescriptionProvider>(MockBehavior.Strict);
+        Mock<TypeDescriptionProvider> mockProvider = new(MockBehavior.Strict);
         mockProvider
             .Setup(p => p.GetReflectionType(typeof(Environment.SpecialFolder), null))
             .Returns(() => typeof(CustomReflectionType));

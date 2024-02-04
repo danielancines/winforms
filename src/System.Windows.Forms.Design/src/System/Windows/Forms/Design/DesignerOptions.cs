@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Drawing;
@@ -27,7 +26,7 @@ public class DesignerOptions
         get => _gridSize;
         set
         {
-            //do some validation checking here
+            // do some validation checking here
             if (value.Width < MinGridSize)
             {
                 value.Width = MinGridSize;

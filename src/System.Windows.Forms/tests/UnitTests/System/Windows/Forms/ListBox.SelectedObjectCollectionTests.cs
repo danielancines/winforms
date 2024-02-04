@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 
@@ -11,7 +10,7 @@ public class ListBoxSelectedObjectCollectionTests
     [WinFormsFact]
     public void ListBoxSelectedObjectCollection_Ctor_ListBox()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         var collection = new ListBox.SelectedObjectCollection(owner);
         Assert.Equal(0, collection.Count);
         Assert.True(collection.IsReadOnly);
@@ -20,14 +19,14 @@ public class ListBoxSelectedObjectCollectionTests
     [WinFormsFact]
     public void ListBoxSelectedObjectCollection_Ctor_NullOwner_ThrowsArgumentNullException()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         Assert.Throws<ArgumentNullException>("owner", () => new ListBox.SelectedObjectCollection(null));
     }
 
     [WinFormsFact]
     public void ListBoxSelectedObjectCollection_ICollection_Properties_GetReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         ICollection collection = new ListBox.SelectedObjectCollection(owner);
         Assert.Equal(0, collection.Count);
         Assert.False(collection.IsSynchronized);
@@ -37,7 +36,7 @@ public class ListBoxSelectedObjectCollectionTests
     [WinFormsFact]
     public void ListBoxSelectedObjectCollection_IList_Properties_GetReturnsExpected()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.SelectedObjectCollection(owner);
         Assert.Equal(0, collection.Count);
         Assert.True(collection.IsFixedSize);
@@ -58,7 +57,7 @@ public class ListBoxSelectedObjectCollectionTests
     [InlineData(1, "1")]
     public void ListBoxSelectedObjectCollection_IListItem_Set_ThrowsNotSupportedException(int index, object value)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.SelectedObjectCollection(owner);
         Assert.Throws<NotSupportedException>(() => collection[index] = value);
     }
@@ -69,7 +68,7 @@ public class ListBoxSelectedObjectCollectionTests
     [InlineData("1")]
     public void ListBoxSelectedObjectCollection_IListAdd_Invoke_ThrowsNotSupportedException(object value)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.SelectedObjectCollection(owner);
         Assert.Throws<NotSupportedException>(() => collection.Add(value));
     }
@@ -77,7 +76,7 @@ public class ListBoxSelectedObjectCollectionTests
     [WinFormsFact]
     public void ListBoxSelectedObjectCollection_IListClear_Invoke_ThrowsNotSupportedException()
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.SelectedObjectCollection(owner);
         Assert.Throws<NotSupportedException>(() => collection.Clear());
     }
@@ -94,7 +93,7 @@ public class ListBoxSelectedObjectCollectionTests
     [InlineData(1, "1")]
     public void ListBoxSelectedObjectCollection_IListInsert_Invoke_ThrowsNotSupportedException(int index, object value)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.SelectedObjectCollection(owner);
         Assert.Throws<NotSupportedException>(() => collection.Insert(index, value));
     }
@@ -105,7 +104,7 @@ public class ListBoxSelectedObjectCollectionTests
     [InlineData("1")]
     public void ListBoxSelectedObjectCollection_IListRemove_Invoke_ThrowsNotSupportedException(object value)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.SelectedObjectCollection(owner);
         Assert.Throws<NotSupportedException>(() => collection.Remove(value));
     }
@@ -116,7 +115,7 @@ public class ListBoxSelectedObjectCollectionTests
     [InlineData(1)]
     public void ListBoxSelectedObjectCollection_IListRemoveAt_Invoke_ThrowsNotSupportedException(int index)
     {
-        using var owner = new ListBox();
+        using ListBox owner = new();
         IList collection = new ListBox.SelectedObjectCollection(owner);
         Assert.Throws<NotSupportedException>(() => collection.RemoveAt(index));
     }

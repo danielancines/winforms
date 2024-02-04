@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -211,7 +210,7 @@ public sealed partial class Application
 
                     if (hr.Succeeded && componentManagerHandle is not null)
                     {
-                        ComHelpers.TryGetManagedInterface(
+                        ComHelpers.TryGetObjectForIUnknown(
                             (IUnknown*)componentManagerHandle,
                             takeOwnership: true,
                             out IMsoComponentManager? componentManager);
@@ -277,9 +276,10 @@ public sealed partial class Application
                     }
 #endif
 
-                    using (DpiHelper.EnterDpiAwarenessScope(context))
+                    using (ScaleHelper.EnterDpiAwarenessScope(context))
                     {
                         parkingWindow = new ParkingWindow();
+                        s_parkingWindowCreated = true;
                     }
 
                     _parkingWindows.Add(parkingWindow);
@@ -302,7 +302,7 @@ public sealed partial class Application
 
             // Legacy OS/target framework scenario where ControlDpiContext is set to DPI_AWARENESS_CONTEXT.DPI_AWARENESS_CONTEXT_UNSPECIFIED
             // because of 'ThreadContextDpiAwareness' API unavailability or this feature is not enabled.
-            if (PInvoke.AreDpiAwarenessContextsEqualInternal(context, DPI_AWARENESS_CONTEXT.UNSPECIFIED_DPI_AWARENESS_CONTEXT))
+            if (context.IsEquivalent(DPI_AWARENESS_CONTEXT.UNSPECIFIED_DPI_AWARENESS_CONTEXT))
             {
                 Debug.Assert(_parkingWindows.Count == 1, "parkingWindows count can not be > 1 for legacy OS/target framework versions");
 
@@ -312,7 +312,7 @@ public sealed partial class Application
             // Supported OS scenario.
             foreach (ParkingWindow p in _parkingWindows)
             {
-                if (PInvoke.AreDpiAwarenessContextsEqualInternal(p.DpiAwarenessContext, context))
+                if (context.IsEquivalent(p.DpiAwarenessContext))
                 {
                     return p;
                 }
@@ -570,7 +570,7 @@ public sealed partial class Application
                 }
 
                 // Then, we rudely destroy all of the windows on the thread
-                ThreadWindows tw = new ThreadWindows(true);
+                ThreadWindows tw = new(true);
                 tw.Dispose();
 
                 // And dispose the parking form, if it isn't already

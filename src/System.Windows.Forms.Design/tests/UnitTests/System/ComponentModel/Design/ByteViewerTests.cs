@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using System.Windows.Forms.TestUtilities;
@@ -161,7 +160,7 @@ public class ByteViewerTests
     public void ByteViewer_GetBytes_Invoke_ReturnsExpected()
     {
         using ByteViewer control = new();
-        Assert.Null(control.GetBytes());
+        Assert.Empty(control.GetBytes());
         Assert.False(control.IsHandleCreated);
     }
 
@@ -588,15 +587,6 @@ public class ByteViewerTests
         Assert.Throws<NullReferenceException>(() => control.OnPaint(null));
     }
 
-    [WinFormsTheory]
-    [InlineData(null)]
-    [InlineData("*")] // Invalid path
-    public void ByteViewer_SaveToFile_InvokeNoBytes_Nop(string path)
-    {
-        using ByteViewer control = new();
-        control.SaveToFile(path);
-    }
-
     [WinFormsFact]
     public void ByteViewer_SaveToFile_InvokeWithBytes_Success()
     {
@@ -636,8 +626,8 @@ public class ByteViewerTests
     {
         yield return new object[] { null, null };
         yield return new object[] { null, new EventArgs() };
-        yield return new object[] { new object(), null };
-        yield return new object[] { new object(), new EventArgs() };
+        yield return new object[] { new(), null };
+        yield return new object[] { new(), new EventArgs() };
     }
 
     [WinFormsTheory]
@@ -730,6 +720,8 @@ public class ByteViewerTests
     [WinFormsTheory]
     [InlineData(DisplayMode.Auto)]
     [InlineData(DisplayMode.Hexdump)]
+    [InlineData(DisplayMode.Ansi)]
+    [InlineData(DisplayMode.Unicode)]
     public void ByteViewer_SetDisplayMode_InvokeNoBytes_GetReturnsExpected(DisplayMode value)
     {
         using ByteViewer control = new();
@@ -854,22 +846,6 @@ public class ByteViewerTests
     }
 
     [WinFormsTheory]
-    [InlineData(DisplayMode.Ansi)]
-    [InlineData(DisplayMode.Unicode)]
-    public void ByteViewer_SetDisplayMode_InvokeNoBytes_ThrowsNullReferenceException(DisplayMode value)
-    {
-        using ByteViewer control = new();
-        Assert.Throws<NullReferenceException>(() => control.SetDisplayMode(value));
-        Assert.Equal(value, control.GetDisplayMode());
-        Assert.False(control.IsHandleCreated);
-
-        // Set same.
-        Assert.Throws<NullReferenceException>(() => control.SetDisplayMode(value));
-        Assert.Equal(value, control.GetDisplayMode());
-        Assert.False(control.IsHandleCreated);
-    }
-
-    [WinFormsTheory]
     [InvalidEnumData<DisplayMode>]
     public void ByteViewer_SetDisplayMode_InvokeInvalidMode_ThrowsInvalidEnumArgumentException(DisplayMode value)
     {
@@ -883,7 +859,7 @@ public class ByteViewerTests
         using ByteViewer control = new();
         using TempFile file = TempFile.Create(new byte[] { 1, 2, 3 });
         control.SetFile(file.Path);
-        Assert.Equal(new byte[] { 1, 2, 3, 0 }, control.GetBytes());
+        Assert.Equal(new byte[] { 1, 2, 3 }, control.GetBytes());
     }
 
     [WinFormsFact]
@@ -894,7 +870,7 @@ public class ByteViewerTests
 
         using TempFile file = TempFile.Create(new byte[] { 1, 2, 3 });
         control.SetFile(file.Path);
-        Assert.Equal(new byte[] { 1, 2, 3, 0 }, control.GetBytes());
+        Assert.Equal(new byte[] { 1, 2, 3 }, control.GetBytes());
     }
 
     [WinFormsFact]

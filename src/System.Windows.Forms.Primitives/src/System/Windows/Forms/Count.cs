@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms;
 
@@ -15,7 +14,11 @@ internal readonly struct Count : IEquatable<Count>
 {
     private readonly int _count;
 
-    private Count(int count) => _count = count.OrThrowIfNegative();
+    private Count(int count)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(count);
+        _count = count;
+    }
 
     public static Count Zero { get; } = 0;
     public static Count One { get; } = 1;

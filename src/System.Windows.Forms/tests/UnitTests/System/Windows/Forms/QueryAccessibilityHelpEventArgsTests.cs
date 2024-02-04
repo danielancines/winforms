@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -10,7 +9,7 @@ public class QueryAccessibilityHelpEventArgsTests
     [Fact]
     public void Ctor_Default()
     {
-        var e = new QueryAccessibilityHelpEventArgs();
+        QueryAccessibilityHelpEventArgs e = new();
         Assert.Null(e.HelpNamespace);
         Assert.Null(e.HelpString);
         Assert.Null(e.HelpKeyword);
@@ -22,7 +21,7 @@ public class QueryAccessibilityHelpEventArgsTests
     [InlineData("helpNamespace", "helpString", "helpKeyword")]
     public void Ctor_String_String_String(string helpNamespace, string helpString, string helpKeyword)
     {
-        var e = new QueryAccessibilityHelpEventArgs(helpNamespace, helpString, helpKeyword);
+        QueryAccessibilityHelpEventArgs e = new(helpNamespace, helpString, helpKeyword);
         Assert.Equal(helpNamespace, e.HelpNamespace);
         Assert.Equal(helpString, e.HelpString);
         Assert.Equal(helpKeyword, e.HelpKeyword);
@@ -39,7 +38,7 @@ public class QueryAccessibilityHelpEventArgsTests
     [MemberData(nameof(String_TestData))]
     public void HelpNamespace_Set_GetReturnsExpected(string value)
     {
-        var e = new QueryAccessibilityHelpEventArgs("helpNamespace", "helpString", "helpKeyword")
+        QueryAccessibilityHelpEventArgs e = new("helpNamespace", "helpString", "helpKeyword")
         {
             HelpNamespace = value
         };
@@ -50,7 +49,7 @@ public class QueryAccessibilityHelpEventArgsTests
     [MemberData(nameof(String_TestData))]
     public void HelpString_Set_GetReturnsExpected(string value)
     {
-        var e = new QueryAccessibilityHelpEventArgs("helpNamespace", "helpString", "helpKeyword")
+        QueryAccessibilityHelpEventArgs e = new("helpNamespace", "helpString", "helpKeyword")
         {
             HelpString = value
         };
@@ -61,7 +60,7 @@ public class QueryAccessibilityHelpEventArgsTests
     [MemberData(nameof(String_TestData))]
     public void HelpKeyword_Set_GetReturnsExpected(string value)
     {
-        var e = new QueryAccessibilityHelpEventArgs("helpNamespace", "helpString", "helpKeyword")
+        QueryAccessibilityHelpEventArgs e = new("helpNamespace", "helpString", "helpKeyword")
         {
             HelpKeyword = value
         };

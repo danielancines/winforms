@@ -1,9 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
-using System.ComponentModel;
 using System.ComponentModel.Design;
+using System.Windows.Forms.Design.Tests.Mocks;
 using Moq;
 using Windows.Win32;
 
@@ -14,21 +13,21 @@ public class ControlDesignerTests
     [WinFormsFact]
     public void ControlDesigner_Ctor_Default()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
+        using TestControlDesigner controlDesigner = new();
         Assert.False(controlDesigner.AutoResizeHandles);
-        Assert.Null(controlDesigner.Control);
+        Assert.Throws<InvalidOperationException>(() => controlDesigner.Control);
         Assert.True(controlDesigner.ControlSupportsSnaplines);
-        Assert.Null(controlDesigner.Component);
+        Assert.Throws<InvalidOperationException>(() => controlDesigner.Component);
         Assert.True(controlDesigner.ForceVisible);
-        Assert.Null(controlDesigner.GetParentComponentProperty());
+        Assert.Throws<InvalidOperationException>(() => controlDesigner.GetParentComponentProperty());
         Assert.False(controlDesigner.SerializePerformLayout);
     }
 
     [WinFormsFact]
     public void ControlDesigner_PropertiesTest()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
-        using Button button = new Button();
+        using TestControlDesigner controlDesigner = new();
+        using Button button = new();
         controlDesigner.Initialize(button);
         Assert.Empty(controlDesigner.AssociatedComponents);
         Assert.False(controlDesigner.IsRootDesigner);
@@ -41,42 +40,54 @@ public class ControlDesignerTests
     [Fact]
     public void AccessibleObjectField()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
+        using TestControlDesigner controlDesigner = new();
+        using Button button = new();
+        controlDesigner.Initialize(button);
         Assert.Null(controlDesigner.GetAccessibleObjectField());
     }
 
     [Fact]
     public void BehaviorServiceProperty()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
+        using TestControlDesigner controlDesigner = new();
+        using Button button = new();
+        controlDesigner.Initialize(button);
         Assert.Null(controlDesigner.GetBehaviorServiceProperty());
     }
 
     [Fact]
     public void AccessibilityObjectField()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
+        using TestControlDesigner controlDesigner = new();
+        using Button button = new();
+        controlDesigner.Initialize(button);
         Assert.NotNull(controlDesigner.AccessibilityObject);
     }
 
     [Fact]
     public void EnableDragRectProperty()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
+        using TestControlDesigner controlDesigner = new();
+        using Button button = new();
+        controlDesigner.Initialize(button);
         Assert.False(controlDesigner.GetEnableDragRectProperty());
     }
 
     [Fact]
     public void ParticipatesWithSnapLinesProperty()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
+        using TestControlDesigner controlDesigner = new();
+        using Button button = new();
+        controlDesigner.Initialize(button);
         Assert.True(controlDesigner.ParticipatesWithSnapLines);
     }
 
     [Fact]
     public void AutoResizeHandlesProperty()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
+        using TestControlDesigner controlDesigner = new();
+        using Button button = new();
+        controlDesigner.Initialize(button);
         Assert.True(controlDesigner.AutoResizeHandles = true);
         Assert.True(controlDesigner.AutoResizeHandles);
     }
@@ -84,15 +95,17 @@ public class ControlDesignerTests
     [Fact]
     public void SelectionRulesProperty()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
-        Assert.Equal(SelectionRules.Visible, controlDesigner.SelectionRules);
+        using TestControlDesigner controlDesigner = new();
+        using Button button = new();
+        controlDesigner.Initialize(button);
+        Assert.Equal(SelectionRules.Visible | SelectionRules.AllSizeable | SelectionRules.Moveable, controlDesigner.SelectionRules);
     }
 
     [Fact]
     public void InheritanceAttributeProperty()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
-        using Button button = new Button();
+        using TestControlDesigner controlDesigner = new();
+        using Button button = new();
         controlDesigner.Initialize(button);
         Assert.NotNull(controlDesigner.GetInheritanceAttributeProperty());
     }
@@ -100,14 +113,18 @@ public class ControlDesignerTests
     [Fact]
     public void NumberOfInternalControlDesignersTest()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
+        using TestControlDesigner controlDesigner = new();
+        using Button button = new();
+        controlDesigner.Initialize(button);
         Assert.Equal(0, controlDesigner.NumberOfInternalControlDesigners());
     }
 
     [Fact]
     public void BaseWndProcTest()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
+        using TestControlDesigner controlDesigner = new();
+        using Button button = new();
+        controlDesigner.Initialize(button);
         Message m = default;
         controlDesigner.BaseWndProcMethod(ref m);
     }
@@ -115,32 +132,39 @@ public class ControlDesignerTests
     [Fact]
     public void CanBeParentedToTest()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
-        using Button button = new Button();
+        using TestControlDesigner controlDesigner = new();
+        using Button button = new();
         controlDesigner.Initialize(button);
-        Assert.True(controlDesigner.CanBeParentedTo(new ParentControlDesigner()));
+        using ParentControlDesigner parentDesigner = new();
+        using Button parentButton = new();
+        parentDesigner.Initialize(parentButton);
+        Assert.True(controlDesigner.CanBeParentedTo(parentDesigner));
     }
 
     [Theory]
     [BoolData]
     public void EnableDragDropTest(bool val)
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
+        using TestControlDesigner controlDesigner = new();
+        using Button button = new();
+        controlDesigner.Initialize(button);
         controlDesigner.EnableDragDropMethod(val);
     }
 
     [Fact]
     public void GetHitTest()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
+        using TestControlDesigner controlDesigner = new();
+        using Button button = new();
+        controlDesigner.Initialize(button);
         Assert.False(controlDesigner.GetHitTestMethod(new Drawing.Point()));
     }
 
     [Fact]
     public void HookChildControlsTest()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
-        using Button button = new Button();
+        using TestControlDesigner controlDesigner = new();
+        using Button button = new();
         controlDesigner.Initialize(button);
         controlDesigner.HookChildControlsMethod(new Control());
     }
@@ -148,24 +172,23 @@ public class ControlDesignerTests
     [Fact]
     public void InitializeTest()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
-        using Button button = new Button();
+        using TestControlDesigner controlDesigner = new();
+        using Button button = new();
         controlDesigner.Initialize(button);
     }
 
     [Fact]
-    public void InitializeNewComponentTest()
+    public void UninitializedTest()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
-        using Button button = new Button();
-        controlDesigner.Initialize(button);
+        using TestControlDesigner controlDesigner = new();
+        Assert.Throws<InvalidOperationException>(() => controlDesigner.Control);
     }
 
     [Fact]
     public void OnSetComponentDefaultsTest()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
-        using Button button = new Button();
+        using TestControlDesigner controlDesigner = new();
+        using Button button = new();
         controlDesigner.Initialize(button);
 #pragma warning disable CS0618 // Type or member is obsolete
         controlDesigner.OnSetComponentDefaults();
@@ -175,15 +198,17 @@ public class ControlDesignerTests
     [Fact]
     public void OnContextMenuTest()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
+        using TestControlDesigner controlDesigner = new();
+        using Button button = new();
+        controlDesigner.Initialize(button);
         controlDesigner.OnContextMenuMethod(0, 0);
     }
 
     [Fact]
     public void OnCreateHandleTest()
     {
-        using TestControlDesigner controlDesigner = new TestControlDesigner();
-        using Button button = new Button();
+        using TestControlDesigner controlDesigner = new();
+        using Button button = new();
         controlDesigner.Initialize(button);
         controlDesigner.OnCreateHandleMethod();
     }
@@ -192,6 +217,8 @@ public class ControlDesignerTests
     public void ControlDesigner_WndProc_InvokePaint_Success()
     {
         using ControlDesigner designer = new();
+        using Button button = new();
+        designer.Initialize(button);
         Message m = new Message
         {
             Msg = (int)PInvoke.WM_PAINT
@@ -215,40 +242,6 @@ public class ControlDesignerTests
         Assert.Empty(controlDesigner.AssociatedComponents);
     }
 
-    internal static Mock<ISite> CreateMockSiteWithDesignerHost(object designerHost)
-    {
-        Mock<ISite> mockSite = new(MockBehavior.Strict);
-        mockSite
-            .Setup(s => s.GetService(typeof(IDesignerHost)))
-            .Returns(designerHost);
-        mockSite
-            .Setup(s => s.GetService(typeof(IComponentChangeService)))
-            .Returns(null);
-        mockSite
-            .Setup(s => s.GetService(typeof(IInheritanceService)))
-            .Returns(null);
-        mockSite
-            .Setup(s => s.GetService(typeof(IDictionaryService)))
-            .Returns(null);
-        mockSite
-            .Setup(s => s.GetService(typeof(IExtenderListService)))
-            .Returns(null);
-        mockSite
-            .Setup(s => s.GetService(typeof(ITypeDescriptorFilterService)))
-            .Returns(null);
-        mockSite
-            .Setup(s => s.GetService(typeof(AmbientProperties)))
-            .Returns(null);
-        mockSite
-            .Setup(s => s.GetService(typeof(Control)))
-            .Returns(null);
-        mockSite
-            .SetupGet(s => s.Container)
-            .Returns((IContainer)null);
-
-        return mockSite;
-    }
-
     [WinFormsFact]
     public void ControlDesigner_AssociatedComponentsTest()
     {
@@ -262,7 +255,7 @@ public class ControlDesignerTests
         mockDesignerHost
             .Setup(s => s.GetDesigner(It.IsAny<Control>()))
             .Returns(() => null);
-        var mockSite = CreateMockSiteWithDesignerHost(mockDesignerHost.Object);
+        var mockSite = MockSite.CreateMockSiteWithDesignerHost(mockDesignerHost.Object);
         control.Site = mockSite.Object;
 
         controlDesigner.Initialize(control);

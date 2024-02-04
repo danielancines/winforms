@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace WinformsControlsTest;
 
@@ -32,8 +31,8 @@ partial class DataGridViewTest
     /// </summary>
     private void InitializeComponent()
     {
-        System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-        System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+        System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new();
+        System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new();
         this.dataGridView1 = new System.Windows.Forms.DataGridView();
         this.column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
         this.column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();

@@ -1,12 +1,14 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
+using Com = Windows.Win32.System.Com;
+using ComTypes = System.Runtime.InteropServices.ComTypes;
 
 namespace System.Windows.Forms.Tests;
 
@@ -152,7 +154,7 @@ public class ClipboardTests
     [WinFormsFact]
     public void Clipboard_SetAudio_InvokeByteArray_GetReturnsExpected()
     {
-        byte[] audioBytes = new byte[] { 1, 2, 3 };
+        byte[] audioBytes = [1, 2, 3];
         Clipboard.SetAudio(audioBytes);
         Assert.Equal(audioBytes, Assert.IsType<MemoryStream>(Clipboard.GetAudioStream()).ToArray());
         Assert.Equal(audioBytes, Assert.IsType<MemoryStream>(Clipboard.GetData(DataFormats.WaveAudio)).ToArray());
@@ -180,8 +182,8 @@ public class ClipboardTests
     [WinFormsFact]
     public void Clipboard_SetAudio_InvokeStream_GetReturnsExpected()
     {
-        byte[] audioBytes = new byte[] { 1, 2, 3 };
-        using (var audioStream = new MemoryStream(audioBytes))
+        byte[] audioBytes = [1, 2, 3];
+        using (MemoryStream audioStream = new(audioBytes))
         {
             Clipboard.SetAudio(audioStream);
             Assert.Equal(audioBytes, Assert.IsType<MemoryStream>(Clipboard.GetAudioStream()).ToArray());
@@ -194,7 +196,7 @@ public class ClipboardTests
     [WinFormsFact]
     public void Clipboard_SetAudio_InvokeEmptyStream_GetReturnsExpected()
     {
-        var audioStream = new MemoryStream();
+        MemoryStream audioStream = new();
         Clipboard.SetAudio(audioStream);
         Assert.Null(Clipboard.GetAudioStream());
         Assert.Null(Clipboard.GetData(DataFormats.WaveAudio));
@@ -261,7 +263,7 @@ public class ClipboardTests
     [InlineData("data")]
     public void Clipboard_SetDataObject_InvokeObjectIComDataObject_GetReturnsExpected(object data)
     {
-        var dataObject = new DataObject(data);
+        DataObject dataObject = new(data);
         Clipboard.SetDataObject(dataObject);
         Assert.Equal(data, Clipboard.GetDataObject().GetData(data.GetType()));
         Assert.True(Clipboard.ContainsData(data.GetType().FullName));
@@ -286,7 +288,7 @@ public class ClipboardTests
     [InlineData("data", false, 1, 2)]
     public void Clipboard_SetDataObject_InvokeObjectBoolIComDataObject_GetReturnsExpected(object data, bool copy, int retryTimes, int retryDelay)
     {
-        var dataObject = new DataObject(data);
+        DataObject dataObject = new(data);
         Clipboard.SetDataObject(dataObject, copy, retryTimes, retryDelay);
         Assert.Equal(data, Clipboard.GetDataObject().GetData(data.GetType()));
         Assert.True(Clipboard.ContainsData(data.GetType().FullName));
@@ -335,7 +337,7 @@ public class ClipboardTests
     [WinFormsFact]
     public void Clipboard_SetFileDropList_Invoke_GetReturnsExpected()
     {
-        var filePaths = new StringCollection
+        StringCollection filePaths = new()
         {
             "filePath",
             "filePath2"
@@ -355,7 +357,7 @@ public class ClipboardTests
     [WinFormsFact]
     public void Clipboard_SetFileDropList_EmptyFilePaths_ThrowsArgumentException()
     {
-        var filePaths = new StringCollection();
+        StringCollection filePaths = new();
         Assert.Throws<ArgumentException>(() => Clipboard.SetFileDropList(filePaths));
     }
 
@@ -364,7 +366,7 @@ public class ClipboardTests
     [InlineData("\0")]
     public void Clipboard_SetFileDropList_InvalidFileInPaths_ThrowsArgumentException(string filePath)
     {
-        var filePaths = new StringCollection
+        StringCollection filePaths = new()
         {
             filePath
         };
@@ -374,7 +376,7 @@ public class ClipboardTests
     [Fact] // x-thread
     public void Clipboard_SetFileDropList_NotSta_ThrowsThreadStateException()
     {
-        var filePaths = new StringCollection
+        StringCollection filePaths = new()
         {
             "filePath"
         };
@@ -384,7 +386,7 @@ public class ClipboardTests
     [WinFormsFact]
     public void Clipboard_SetImage_InvokeBitmap_GetReturnsExpected()
     {
-        using (var bitmap = new Bitmap(10, 10))
+        using (Bitmap bitmap = new(10, 10))
         {
             bitmap.SetPixel(1, 2, Color.FromArgb(0x01, 0x02, 0x03, 0x04));
             Clipboard.SetImage(bitmap);
@@ -398,7 +400,7 @@ public class ClipboardTests
     [WinFormsFact]
     public void Clipboard_SetImage_InvokeMetafile_GetReturnsExpected()
     {
-        using (var metafile = new Metafile("bitmaps/telescope_01.wmf"))
+        using (Metafile metafile = new("bitmaps/telescope_01.wmf"))
         {
             Clipboard.SetImage(metafile);
             Assert.Null(Clipboard.GetImage());
@@ -409,7 +411,7 @@ public class ClipboardTests
     [WinFormsFact]
     public void Clipboard_SetImage_InvokeEnhancedMetafile_GetReturnsExpected()
     {
-        using (var metafile = new Metafile("bitmaps/milkmateya01.emf"))
+        using (Metafile metafile = new("bitmaps/milkmateya01.emf"))
         {
             Clipboard.SetImage(metafile);
             Assert.Null(Clipboard.GetImage());
@@ -426,9 +428,9 @@ public class ClipboardTests
     [Fact] // x-thread
     public void Clipboard_SetImage_NotSta_ThrowsThreadStateException()
     {
-        using (var bitmap = new Bitmap(10, 10))
-        using (var metafile = new Metafile("bitmaps/telescope_01.wmf"))
-        using (var enhancedMetafile = new Metafile("bitmaps/milkmateya01.emf"))
+        using (Bitmap bitmap = new(10, 10))
+        using (Metafile metafile = new("bitmaps/telescope_01.wmf"))
+        using (Metafile enhancedMetafile = new("bitmaps/milkmateya01.emf"))
         {
             Assert.Throws<ThreadStateException>(() => Clipboard.SetImage(bitmap));
             Assert.Throws<ThreadStateException>(() => Clipboard.SetImage(metafile));
@@ -512,5 +514,94 @@ public class ClipboardTests
         }
 
         Assert.Fail("Formatting should have failed.");
+    }
+
+    [WinFormsFact]
+    public unsafe void ClipBoard_GetClipboard_ReturnsProxy()
+    {
+        DataObject data = new();
+        using var dataScope = ComHelpers.GetComScope<Com.IDataObject>(data);
+        PInvoke.OleSetClipboard(dataScope).Succeeded.Should().BeTrue();
+
+        using ComScope<Com.IDataObject> proxy = new(null);
+        PInvoke.OleGetClipboard(proxy).Succeeded.Should().BeTrue();
+        ((nint)proxy.Value).Should().NotBe((nint)dataScope.Value);
+
+        using var dataUnknown = dataScope.Query<Com.IUnknown>();
+        using var proxyUnknown = proxy.Query<Com.IUnknown>();
+        ((nint)proxyUnknown.Value).Should().NotBe((nint)dataUnknown.Value);
+
+        // The proxy does not know about this interface, it should give back the real pointer.
+        using var realDataPointer = proxy.Query<Com.IComCallableWrapper>();
+        using var realDataPointerUnknown = realDataPointer.Query<Com.IUnknown>();
+        ((nint)proxyUnknown.Value).Should().NotBe((nint)realDataPointerUnknown.Value);
+        ((nint)dataUnknown.Value).Should().Be((nint)realDataPointerUnknown.Value);
+    }
+
+    [WinFormsFact]
+    public void ClipBoard_Set_DoesNotWrapTwice()
+    {
+        string realDataObject = string.Empty;
+        Clipboard.SetDataObject(realDataObject);
+        IDataObject clipboardDataObject = Clipboard.GetDataObject();
+        clipboardDataObject.Should().BeOfType(typeof(DataObject));
+        ((DataObject)clipboardDataObject).IsWrappedForClipboard.Should().BeTrue();
+
+        Clipboard.SetDataObject(clipboardDataObject);
+        IDataObject clipboardDataObject2 = Clipboard.GetDataObject();
+        clipboardDataObject2.Should().BeSameAs(clipboardDataObject);
+    }
+
+    [WinFormsFact]
+    public void ClipBoard_GetSet_RoundTrip_ReturnsExpected()
+    {
+        CustomDataObject realDataObject = new();
+        Clipboard.SetDataObject(realDataObject);
+        IDataObject clipboardDataObject = Clipboard.GetDataObject();
+        clipboardDataObject.Should().BeSameAs(realDataObject);
+        clipboardDataObject.GetDataPresent("Foo").Should().BeTrue();
+        clipboardDataObject.GetData("Foo").Should().Be("Bar");
+    }
+
+    private class CustomDataObject : IDataObject, ComTypes.IDataObject
+    {
+        [DllImport("shell32.dll")]
+        public static extern int SHCreateStdEnumFmtEtc(uint cfmt, ComTypes.FORMATETC[] afmt, out ComTypes.IEnumFORMATETC ppenumFormatEtc);
+
+        int ComTypes.IDataObject.DAdvise(ref ComTypes.FORMATETC pFormatetc, ComTypes.ADVF advf, ComTypes.IAdviseSink adviseSink, out int connection) => throw new NotImplementedException();
+        void ComTypes.IDataObject.DUnadvise(int connection) => throw new NotImplementedException();
+        int ComTypes.IDataObject.EnumDAdvise(out ComTypes.IEnumSTATDATA enumAdvise) => throw new NotImplementedException();
+        ComTypes.IEnumFORMATETC ComTypes.IDataObject.EnumFormatEtc(ComTypes.DATADIR direction)
+        {
+            if (direction == ComTypes.DATADIR.DATADIR_GET)
+            {
+                // Create enumerator and return it
+                ComTypes.IEnumFORMATETC enumerator;
+                if (SHCreateStdEnumFmtEtc(0, [], out enumerator) == 0)
+                {
+                    return enumerator;
+                }
+            }
+
+            throw new NotImplementedException();
+        }
+
+        int ComTypes.IDataObject.GetCanonicalFormatEtc(ref ComTypes.FORMATETC formatIn, out ComTypes.FORMATETC formatOut) => throw new NotImplementedException();
+        object IDataObject.GetData(string format, bool autoConvert) => format == "Foo" ? "Bar" : null;
+        object IDataObject.GetData(string format) => format == "Foo" ? "Bar" : null;
+        object IDataObject.GetData(Type format) => null;
+        void ComTypes.IDataObject.GetData(ref ComTypes.FORMATETC format, out ComTypes.STGMEDIUM medium) => throw new NotImplementedException();
+        void ComTypes.IDataObject.GetDataHere(ref ComTypes.FORMATETC format, ref ComTypes.STGMEDIUM medium) => throw new NotImplementedException();
+        bool IDataObject.GetDataPresent(string format, bool autoConvert) => format == "Foo";
+        bool IDataObject.GetDataPresent(string format) => format == "Foo";
+        bool IDataObject.GetDataPresent(Type format) => false;
+        string[] IDataObject.GetFormats(bool autoConvert) => ["Foo"];
+        string[] IDataObject.GetFormats() => ["Foo"];
+        int ComTypes.IDataObject.QueryGetData(ref ComTypes.FORMATETC format) => throw new NotImplementedException();
+        void IDataObject.SetData(string format, bool autoConvert, object data) => throw new NotImplementedException();
+        void IDataObject.SetData(string format, object data) => throw new NotImplementedException();
+        void IDataObject.SetData(Type format, object data) => throw new NotImplementedException();
+        void IDataObject.SetData(object data) => throw new NotImplementedException();
+        void ComTypes.IDataObject.SetData(ref ComTypes.FORMATETC formatIn, ref ComTypes.STGMEDIUM medium, bool release) => throw new NotImplementedException();
     }
 }

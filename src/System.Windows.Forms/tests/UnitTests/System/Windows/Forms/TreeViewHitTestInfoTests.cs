@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -22,7 +21,7 @@ public class TreeViewHitTestInfoTests
     [MemberData(nameof(Ctor_TreeNode_TreeViewHitTestLocations_TestData))]
     public void TreeViewHitTestInfo_Ctor_TreeNode_TreeViewHitTestLocations(TreeNode hitNode, TreeViewHitTestLocations hitLocation)
     {
-        var hitTestInfo = new TreeViewHitTestInfo(hitNode, hitLocation);
+        TreeViewHitTestInfo hitTestInfo = new(hitNode, hitLocation);
         Assert.Same(hitNode, hitTestInfo.Node);
         Assert.Equal(hitLocation, hitTestInfo.Location);
     }

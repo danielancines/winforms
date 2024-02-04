@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Windows.Forms.UITests.Input;
 using Windows.Win32.UI.Input.KeyboardAndMouse;
@@ -21,12 +20,12 @@ public class SendInput
     {
         await SendAsync(window, inputSimulator =>
         {
-            foreach (var key in keys)
+            foreach (object key in keys)
             {
                 switch (key)
                 {
                     case string str:
-                        var text = str.Replace("\r\n", "\r").Replace("\n", "\r");
+                        string text = str.Replace("\r\n", "\r").Replace("\n", "\r");
                         int index = 0;
                         while (index < text.Length)
                         {
@@ -79,23 +78,6 @@ public class SendInput
         await Task.Run(() => actions(new InputSimulator()));
 
         await _waitForIdleAsync();
-    }
-
-    private static HWND GetForegroundWindow()
-    {
-        var startTime = DateTime.Now;
-
-        // Attempt to get the foreground window in a loop, as the NativeMethods function can return IntPtr.Zero
-        // in certain circumstances, such as when a window is losing activation.
-        HWND foregroundWindow;
-        do
-        {
-            foregroundWindow = PInvoke.GetForegroundWindow();
-        }
-        while (foregroundWindow == IntPtr.Zero
-            && DateTime.Now - startTime < TimeSpan.FromMilliseconds(500));
-
-        return foregroundWindow;
     }
 
     private static void SetForegroundWindow(Form window)

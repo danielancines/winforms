@@ -1,11 +1,9 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel.Design;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using static Interop;
 
 namespace System.Windows.Forms.Design.Behavior;
 
@@ -74,7 +72,7 @@ public sealed partial class BehaviorService
                     }
 
                     _callBack = MouseHookProc;
-                    var hook = Marshal.GetFunctionPointerForDelegate(_callBack);
+                    IntPtr hook = Marshal.GetFunctionPointerForDelegate(_callBack);
                     _mouseHookHandle = PInvoke.SetWindowsHookEx(
                         WINDOWS_HOOK_ID.WH_MOUSE,
                         (delegate* unmanaged[Stdcall]<int, WPARAM, LPARAM, LRESULT>)hook,

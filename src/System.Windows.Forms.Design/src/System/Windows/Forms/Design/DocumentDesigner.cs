@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 #nullable disable
 
@@ -36,7 +35,7 @@ public partial class DocumentDesigner : ScrollableControlDesigner, IRootDesigner
     private UndoEngine undoEngine;
     private bool initializing;   // is the designer initializing?
 
-    //used to keep the state of the tab order view
+    // used to keep the state of the tab order view
     //
     private bool queriedTabOrder;
     private MenuCommand tabOrderCommand;
@@ -318,7 +317,7 @@ public partial class DocumentDesigner : ScrollableControlDesigner, IRootDesigner
             }
         }
 
-        //ToolStripItems cannot be dropped on any ParentControlDesigners since they have custom DataObject Format.
+        // ToolStripItems cannot be dropped on any ParentControlDesigners since they have custom DataObject Format.
         if (de.Data is ToolStripItemDataObject)
         {
             return false;
@@ -372,7 +371,7 @@ public partial class DocumentDesigner : ScrollableControlDesigner, IRootDesigner
 
         serializationData = dataObject.GetData(OleDragDropHandler.DataFormat, false);
         if (serializationData is not null)
-        {    //backcompat
+        {    // backcompat
             return new OleDragDropHandler.CfCodeToolboxItem(serializationData);
             ;
         }
@@ -392,12 +391,12 @@ public partial class DocumentDesigner : ScrollableControlDesigner, IRootDesigner
 
             if (host is not null)
             {
-                //Remove Adorner Window which hosts DropDowns.
+                // Remove Adorner Window which hosts DropDowns.
                 ToolStripAdornerWindowService toolWindow = (ToolStripAdornerWindowService)GetService(typeof(ToolStripAdornerWindowService));
                 if (toolWindow is not null)
                 {
                     toolWindow.Dispose();
-                    host.RemoveService(typeof(ToolStripAdornerWindowService));
+                    host.RemoveService<ToolStripAdornerWindowService>();
                 }
 
                 host.Activated -= new EventHandler(OnDesignerActivate);
@@ -416,7 +415,7 @@ public partial class DocumentDesigner : ScrollableControlDesigner, IRootDesigner
                         componentTray = null;
                     }
 
-                    host.RemoveService(typeof(ComponentTray));
+                    host.RemoveService<ComponentTray>();
                 }
 
                 IComponentChangeService cs = (IComponentChangeService)GetService(typeof(IComponentChangeService));
@@ -536,14 +535,14 @@ public partial class DocumentDesigner : ScrollableControlDesigner, IRootDesigner
 
             if (host is not null)
             {
-                host.RemoveService(typeof(BehaviorService));
-                host.RemoveService(typeof(ToolStripAdornerWindowService));
-                host.RemoveService(typeof(SelectionManager));
-                host.RemoveService(typeof(IInheritanceService));
-                host.RemoveService(typeof(IEventHandlerService));
-                host.RemoveService(typeof(IOverlayService));
-                host.RemoveService(typeof(ISplitWindowService));
-                host.RemoveService(typeof(InheritanceUI));
+                host.RemoveService<BehaviorService>();
+                host.RemoveService<ToolStripAdornerWindowService>();
+                host.RemoveService<SelectionManager>();
+                host.RemoveService<IInheritanceService>();
+                host.RemoveService<IEventHandlerService>();
+                host.RemoveService<IOverlayService>();
+                host.RemoveService<ISplitWindowService>();
+                host.RemoveService<InheritanceUI>();
             }
         }
 
@@ -559,12 +558,12 @@ public partial class DocumentDesigner : ScrollableControlDesigner, IRootDesigner
     /// </summary>
     public override GlyphCollection GetGlyphs(GlyphSelectionType selectionType)
     {
-        GlyphCollection glyphs = new GlyphCollection();
+        GlyphCollection glyphs = new();
 
         if (selectionType != GlyphSelectionType.NotSelected)
         {
             Point loc = BehaviorService.ControlToAdornerWindow((Control)Component);
-            Rectangle translatedBounds = new Rectangle(loc, ((Control)Component).Size);
+            Rectangle translatedBounds = new(loc, ((Control)Component).Size);
             bool primarySelection = (selectionType == GlyphSelectionType.SelectedPrimary);
 
             bool locked = false;
@@ -595,7 +594,7 @@ public partial class DocumentDesigner : ScrollableControlDesigner, IRootDesigner
                 // the lock glyph
                 glyphs.Add(new LockedHandleGlyph(translatedBounds, primarySelection));
 
-                //the four locked border glyphs
+                // the four locked border glyphs
                 glyphs.Add(new LockedBorderGlyph(translatedBounds, SelectionBorderGlyphType.Top));
                 glyphs.Add(new LockedBorderGlyph(translatedBounds, SelectionBorderGlyphType.Bottom));
                 glyphs.Add(new LockedBorderGlyph(translatedBounds, SelectionBorderGlyphType.Left));
@@ -606,10 +605,10 @@ public partial class DocumentDesigner : ScrollableControlDesigner, IRootDesigner
             // for components that are not Forms.
             else if (autoSize && (mode == AutoSizeMode.GrowAndShrink) && !(Control is Form))
             {
-                //the non-resizeable grab handle
+                // the non-resizeable grab handle
                 glyphs.Add(new NoResizeHandleGlyph(translatedBounds, rules, primarySelection, null));
 
-                //the four resizeable border glyphs
+                // the four resizeable border glyphs
                 glyphs.Add(new NoResizeSelectionBorderGlyph(translatedBounds, rules, SelectionBorderGlyphType.Top, null));
                 glyphs.Add(new NoResizeSelectionBorderGlyph(translatedBounds, rules, SelectionBorderGlyphType.Bottom, null));
                 glyphs.Add(new NoResizeSelectionBorderGlyph(translatedBounds, rules, SelectionBorderGlyphType.Left, null));
@@ -745,8 +744,8 @@ public partial class DocumentDesigner : ScrollableControlDesigner, IRootDesigner
             host.Activated += new EventHandler(OnDesignerActivate);
             host.Deactivated += new EventHandler(OnDesignerDeactivate);
 
-            ServiceCreatorCallback callback = new ServiceCreatorCallback(OnCreateService);
-            host.AddService(typeof(IEventHandlerService), callback);
+            ServiceCreatorCallback callback = new(OnCreateService);
+            host.AddService<IEventHandlerService>(callback);
 
             // M3.2 CONTROL ARRAY IS CUT
 
@@ -757,16 +756,16 @@ public partial class DocumentDesigner : ScrollableControlDesigner, IRootDesigner
             frame = new DesignerFrame(component.Site);
 
             IOverlayService os = frame;
-            host.AddService(typeof(IOverlayService), os);
-            host.AddService(typeof(ISplitWindowService), frame);
+            host.AddService(os);
+            host.AddService<ISplitWindowService>(frame);
 
             behaviorService = new BehaviorService(Component.Site, frame);
-            host.AddService(typeof(BehaviorService), behaviorService);
+            host.AddService(behaviorService);
 
             selectionManager = new SelectionManager(host, behaviorService);
 
-            host.AddService(typeof(SelectionManager), selectionManager);
-            host.AddService(typeof(ToolStripAdornerWindowService), callback);
+            host.AddService(selectionManager);
+            host.AddService<ToolStripAdornerWindowService>(callback);
 
             // And component add and remove events for our tray
             //
@@ -786,10 +785,10 @@ public partial class DocumentDesigner : ScrollableControlDesigner, IRootDesigner
             // scan, assign the variable, and then call OnCreateHandle if needed.
             //
             inheritanceUI = new InheritanceUI();
-            host.AddService(typeof(InheritanceUI), inheritanceUI);
+            host.AddService(inheritanceUI);
 
             InheritanceService isvc = new DocumentInheritanceService(this);
-            host.AddService(typeof(IInheritanceService), isvc);
+            host.AddService<IInheritanceService>(isvc);
 
             manager = host.GetService(typeof(IDesignerSerializationManager)) as IDesignerSerializationManager;
             isvc.AddInheritedComponents(component, component.Site.Container);
@@ -883,7 +882,7 @@ public partial class DocumentDesigner : ScrollableControlDesigner, IRootDesigner
 
     private void OnUndone(object source, EventArgs e)
     {
-        //resume all suspended comps we found earlier
+        // resume all suspended comps we found earlier
         if (suspendedComponents is not null)
         {
             foreach (Control c in suspendedComponents)
@@ -910,8 +909,8 @@ public partial class DocumentDesigner : ScrollableControlDesigner, IRootDesigner
                     if (comp is Control control)
                     {
                         control.SuspendLayout();
-                        //add this control to our suspended components list so we can resume
-                        //later
+                        // add this control to our suspended components list so we can resume
+                        // later
                         suspendedComponents.Add(control);
                     }
                 }
@@ -983,7 +982,7 @@ public partial class DocumentDesigner : ScrollableControlDesigner, IRootDesigner
                         componentTray.ShowLargeIcons = trayLargeIcon;
                         componentTray.AutoArrange = trayAutoArrange;
 
-                        host.AddService(typeof(ComponentTray), componentTray);
+                        host.AddService(componentTray);
                     }
                 }
 
@@ -1027,7 +1026,7 @@ public partial class DocumentDesigner : ScrollableControlDesigner, IRootDesigner
                 {
                     sws.RemoveSplitWindow(componentTray);
                     IDesignerHost host = (IDesignerHost)GetService(typeof(IDesignerHost));
-                    host?.RemoveService(typeof(ComponentTray));
+                    host?.RemoveService<ComponentTray>();
 
                     componentTray.Dispose();
                     componentTray = null;
@@ -1510,8 +1509,8 @@ public partial class DocumentDesigner : ScrollableControlDesigner, IRootDesigner
     /// preparations.
     /// </summary>
 
-    //We can live with this one. We have obsoleted some of the enum values. This method
-    //only takes on argument, so it is pretty obvious what argument is bad.
+    // We can live with this one. We have obsoleted some of the enum values. This method
+    // only takes on argument, so it is pretty obvious what argument is bad.
     [Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2208:InstantiateArgumentExceptionsCorrectly")]
     object IRootDesigner.GetView(ViewTechnology technology)
     {
@@ -1541,7 +1540,7 @@ public partial class DocumentDesigner : ScrollableControlDesigner, IRootDesigner
     /// </summary>
     void IToolboxUser.ToolPicked(ToolboxItem tool)
     {
-        using (DpiHelper.EnterDpiAwarenessScope(DPI_AWARENESS_CONTEXT.DPI_AWARENESS_CONTEXT_SYSTEM_AWARE))
+        using (ScaleHelper.EnterDpiAwarenessScope(DPI_AWARENESS_CONTEXT.DPI_AWARENESS_CONTEXT_SYSTEM_AWARE))
         {
             ToolPicked(tool);
         }

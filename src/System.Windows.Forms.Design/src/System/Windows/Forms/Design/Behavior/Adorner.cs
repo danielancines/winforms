@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 
@@ -14,8 +13,8 @@ namespace System.Windows.Forms.Design.Behavior;
 /// </summary>
 public sealed class Adorner
 {
-    private BehaviorService? _behaviorService; //ptr back to the BehaviorService
-    private readonly GlyphCollection _glyphs; //collection of Glyphs that this particular Adorner manages
+    private BehaviorService? _behaviorService; // ptr back to the BehaviorService
+    private readonly GlyphCollection _glyphs; // collection of Glyphs that this particular Adorner manages
 
     /// <summary>
     ///  Standard constructor.  Creates a new GlyphCollection and by default is enabled.

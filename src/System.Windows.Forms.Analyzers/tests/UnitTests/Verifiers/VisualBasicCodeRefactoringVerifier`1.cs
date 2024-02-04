@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using Microsoft.CodeAnalysis.CodeRefactorings;
 using Microsoft.CodeAnalysis.Testing;
@@ -25,7 +24,7 @@ public static partial class VisualBasicCodeRefactoringVerifier<TCodeRefactoring>
     /// <inheritdoc cref="CodeRefactoringVerifier{TCodeRefactoring, TTest, TVerifier}.VerifyRefactoringAsync(string, DiagnosticResult[], string)"/>
     public static async Task VerifyRefactoringAsync(string source, DiagnosticResult[] expected, string fixedSource)
     {
-        var test = new Test
+        Test test = new()
         {
             TestCode = source,
             FixedCode = fixedSource,

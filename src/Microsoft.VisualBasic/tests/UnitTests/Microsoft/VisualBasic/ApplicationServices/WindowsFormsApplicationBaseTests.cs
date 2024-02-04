@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Reflection;
 using System.Reflection.Emit;
@@ -20,13 +19,13 @@ public class WindowsFormsApplicationBaseTests
     public void GetApplicationInstanceID()
     {
         var assembly = typeof(WindowsFormsApplicationBaseTests).Assembly;
-        var expectedId = assembly.ManifestModule.ModuleVersionId.ToString();
+        string expectedId = assembly.ManifestModule.ModuleVersionId.ToString();
         Assert.Equal(expectedId, GetAppID(assembly));
     }
 
     private static string GetUniqueIDFromAssembly(string guid, Version version)
     {
-        var attributeBuilder = new CustomAttributeBuilder(
+        CustomAttributeBuilder attributeBuilder = new(
             typeof(GuidAttribute).GetConstructor(new[] { typeof(string) }), new[] { guid });
         var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(
             new AssemblyName(Guid.NewGuid().ToString()) { Version = version },
@@ -39,21 +38,21 @@ public class WindowsFormsApplicationBaseTests
     [Fact]
     public void GetApplicationInstanceID_GuidAttribute()
     {
-        var guid = Guid.NewGuid().ToString();
+        string guid = Guid.NewGuid().ToString();
         Assert.Equal($"{guid}1.2", GetUniqueIDFromAssembly(guid, new Version(1, 2, 3, 4)));
     }
 
     [Fact]
     public void GetApplicationInstanceID_GuidAttributeNewVersion()
     {
-        var guid = Guid.NewGuid().ToString();
+        string guid = Guid.NewGuid().ToString();
         Assert.Equal($"{guid}0.0", GetUniqueIDFromAssembly(guid, new Version()));
     }
 
     [Fact]
     public void GetApplicationInstanceID_GuidAttributeNullVersion()
     {
-        var guid = Guid.NewGuid().ToString();
+        string guid = Guid.NewGuid().ToString();
         Assert.Equal($"{guid}0.0", GetUniqueIDFromAssembly(guid, version: null));
     }
 }

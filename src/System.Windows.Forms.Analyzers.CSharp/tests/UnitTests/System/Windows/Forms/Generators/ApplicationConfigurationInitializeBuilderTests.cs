@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Globalization;
 using System.Windows.Forms.Analyzers;
@@ -32,7 +31,7 @@ public partial class ApplicationConfigurationInitializeBuilderTests
     [InlineData(" ", "default_top_level")]
     [InlineData("\t", "default_top_level")]
     [InlineData("MyProject", "default_boilerplate")]
-    public void ApplicationConfigurationInitializeBuilder_GenerateInitialize_can_handle_namespace(string ns, string expectedFileName)
+    public void ApplicationConfigurationInitializeBuilder_GenerateInitialize_can_handle_namespace(string? ns, string expectedFileName)
     {
         string expected = File.ReadAllText($@"System\Windows\Forms\Generators\MockData\{GetType().Name}.{expectedFileName}.cs");
 
@@ -51,7 +50,7 @@ public partial class ApplicationConfigurationInitializeBuilderTests
     {
         foreach (string cultureName in s_locales)
         {
-            CultureInfo culture = new CultureInfo(cultureName);
+            CultureInfo culture = new(cultureName);
 
             // EnableVisualStyles: false, true
             yield return new object[]

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -9,8 +8,8 @@ public class ScreenDcCacheTests
     [Fact(Skip = "Run manually, takes a few minutes and is very resource intensive.")]
     public void StressTest()
     {
-        Random random = new Random();
-        using ScreenDcCache cache = new ScreenDcCache();
+        Random random = new();
+        using ScreenDcCache cache = new();
 
         for (int i = 0; i < 10000; i++)
         {

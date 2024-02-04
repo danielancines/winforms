@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Runtime.InteropServices;
 using Windows.Win32.System.Variant;
@@ -13,7 +12,7 @@ public unsafe class AxHost_PropertyBagStreamTests
     [Fact]
     public void PropertyBagStream_WriteReadRoundTrip_FormatterEnabled()
     {
-        using var formatterScope = new BinaryFormatterScope(enable: true);
+        using BinaryFormatterScope formatterScope = new(enable: true);
         AxHost.PropertyBagStream bag = new();
         HRESULT hr = bag.Write("Integer", (VARIANT)42);
         Assert.True(hr.Succeeded);
@@ -42,7 +41,7 @@ public unsafe class AxHost_PropertyBagStreamTests
     [Fact]
     public void PropertyBagStream_WriteReadRoundTrip_FormatterDisabled()
     {
-        using var formatterScope = new BinaryFormatterScope(enable: false);
+        using BinaryFormatterScope formatterScope = new(enable: false);
         AxHost.PropertyBagStream bag = new();
         HRESULT hr = bag.Write("Integer", (VARIANT)42);
         Assert.True(hr.Succeeded);
@@ -59,7 +58,7 @@ public unsafe class AxHost_PropertyBagStreamTests
     [MemberData(nameof(TestData_PrimitiveValues))]
     public void PropertyBagStream_WriteReadRoundTrip_Primitives_FormatterDisabled(object value)
     {
-        using var formatterScope = new BinaryFormatterScope(enable: false);
+        using BinaryFormatterScope formatterScope = new(enable: false);
 
         AxHost.PropertyBagStream bag = new();
         using VARIANT variant = default;

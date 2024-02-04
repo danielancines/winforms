@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using static System.Windows.Forms.ImageList;
 
@@ -11,7 +10,7 @@ public class ListView_NativeImageListTests
     [WinFormsFact]
     public void NativeImageList_Dispose_releases_native_handle()
     {
-        using var formatterScope = new BinaryFormatterScope(enable: true);
+        using BinaryFormatterScope formatterScope = new(enable: true);
         using ImageListStreamer result = BinarySerialization.EnsureDeserialize<ImageListStreamer>(ClassicImageListStreamer);
 
         NativeImageList nativeImageList = result.GetNativeImageList();

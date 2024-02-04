@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 using System.Drawing;
@@ -226,13 +225,13 @@ internal partial class LayoutUtils
 
         if (rect1.X <= rect2.X && rect1.X + rect1.Width >= rect2.X + rect2.Width)
         {
-            //rect 1 contains rect 2 horizontally
+            // rect 1 contains rect 2 horizontally
             return true;
         }
 
         if (rect2.X <= rect1.X && rect2.X + rect2.Width >= rect1.X + rect1.Width)
         {
-            //rect 2 contains rect 1 horizontally
+            // rect 2 contains rect 1 horizontally
             return true;
         }
 
@@ -248,20 +247,20 @@ internal partial class LayoutUtils
 
         if (rect1.Y <= rect2.Y && rect1.Y + rect1.Width >= rect2.Y + rect2.Width)
         {
-            //rect 1 contains rect 2 vertically
+            // rect 1 contains rect 2 vertically
             return true;
         }
 
         if (rect2.Y <= rect1.Y && rect2.Y + rect2.Width >= rect1.Y + rect1.Width)
         {
-            //rect 2 contains rect 1 vertically
+            // rect 2 contains rect 1 vertically
             return true;
         }
 
         return false;
     }
 
-    //returns anchorStyles, transforms from DockStyle if necessary
+    // returns anchorStyles, transforms from DockStyle if necessary
     internal static AnchorStyles GetUnifiedAnchor(IArrangedElement element)
     {
         DockStyle dockStyle = DefaultLayout.GetDock(element);
@@ -354,7 +353,7 @@ internal partial class LayoutUtils
 
     public static Size Stretch(Size stretchThis, Size withinThis, AnchorStyles anchorStyles)
     {
-        Size stretchedSize = new Size(
+        Size stretchedSize = new(
             (anchorStyles & HorizontalAnchorStyles) == HorizontalAnchorStyles ? withinThis.Width : stretchThis.Width,
             (anchorStyles & VerticalAnchorStyles) == VerticalAnchorStyles ? withinThis.Height : stretchThis.Height);
         if (stretchedSize.Width > withinThis.Width)

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Windows.Forms.Design;
 using Moq;
@@ -490,7 +489,7 @@ public class CollectionFormTests : CollectionEditor
     public static IEnumerable<object[]> InvalidDesignerHost_TestData()
     {
         yield return new object[] { null };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
     }
 
     [Theory]
@@ -560,7 +559,7 @@ public class CollectionFormTests : CollectionEditor
             .Setup(c => c.GetService(typeof(IComponentChangeService)))
             .Returns(null);
         mockHost
-            .Setup(h => h.CreateComponent(typeof(Component), null))
+            .Setup(h => h.CreateComponent(typeof(Component)))
             .Returns(result);
         mockHost
             .Setup(h => h.GetDesigner(result))
@@ -608,7 +607,7 @@ public class CollectionFormTests : CollectionEditor
             .Setup(c => c.GetService(typeof(IComponentChangeService)))
             .Returns(null);
         mockHost
-            .Setup(h => h.CreateComponent(typeof(Component), null))
+            .Setup(h => h.CreateComponent(typeof(Component)))
             .Returns((IComponent)null);
         mockHost
             .Setup(h => h.GetDesigner(null))
@@ -666,7 +665,7 @@ public class CollectionFormTests : CollectionEditor
             .Setup(c => c.GetService(typeof(IComponentChangeService)))
             .Returns(null);
         mockHost
-            .Setup(h => h.CreateComponent(typeof(Component), null))
+            .Setup(h => h.CreateComponent(typeof(Component)))
             .Returns(result);
         mockHost
             .Setup(h => h.GetDesigner(result))
@@ -706,7 +705,7 @@ public class CollectionFormTests : CollectionEditor
     {
         SubCollectionEditor editor = new(null);
         SubCollectionForm form = new(editor);
-        Assert.Throws<ArgumentNullException>("objectType", () => form.CreateInstance(null));
+        Assert.Throws<ArgumentNullException>("itemType", () => form.CreateInstance(null));
     }
 
     [Fact]

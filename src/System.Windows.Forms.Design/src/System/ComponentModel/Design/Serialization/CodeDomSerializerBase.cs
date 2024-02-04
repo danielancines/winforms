@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.CodeDom;
 using System.Collections;
@@ -19,7 +18,7 @@ namespace System.ComponentModel.Design.Serialization;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public abstract partial class CodeDomSerializerBase
 {
-    private static readonly Attribute[] runTimeProperties = new Attribute[] { DesignOnlyAttribute.No };
+    private static readonly Attribute[] runTimeProperties = [DesignOnlyAttribute.No];
     private static readonly TraceSwitch traceSerialization = new("DesignerSerialization", "Trace design time serialization");
 #pragma warning disable CS0649
     private static Stack<string>? traceScope;
@@ -49,13 +48,13 @@ public abstract partial class CodeDomSerializerBase
     /// </summary>
     internal static string GetTypeNameFromCodeTypeReference(IDesignerSerializationManager manager, CodeTypeReference typeref)
     {
-        //we do this to avoid an extra gettype for the usual nongeneric case.
+        // we do this to avoid an extra gettype for the usual nongeneric case.
         if (typeref.TypeArguments is null || typeref.TypeArguments.Count == 0)
         {
             return typeref.BaseType;
         }
 
-        StringBuilder typeName = new StringBuilder();
+        StringBuilder typeName = new();
         GetTypeNameFromCodeTypeReferenceHelper(manager, typeref, typeName);
         return typeName.ToString();
     }
@@ -65,7 +64,7 @@ public abstract partial class CodeDomSerializerBase
         if (typeref.TypeArguments is null || typeref.TypeArguments.Count == 0)
         {
             Type? t = manager.GetType(typeref.BaseType);
-            //we use the assemblyqualifiedname where we can so that GetType will find it correctly.
+            // we use the assemblyqualifiedname where we can so that GetType will find it correctly.
             if (t is not null)
             {
                 // get type which exists in the target framework if any
@@ -78,7 +77,7 @@ public abstract partial class CodeDomSerializerBase
         }
         else
         {
-            //create the MyGeneric`2[ part
+            // create the MyGeneric`2[ part
             if (!typeref.BaseType.Contains('`'))
             {
                 typeName.Append($"`{typeref.TypeArguments.Count}");
@@ -86,7 +85,7 @@ public abstract partial class CodeDomSerializerBase
 
             typeName.Append('[');
 
-            //now create each sub-argument part.
+            // now create each sub-argument part.
             foreach (CodeTypeReference childref in typeref.TypeArguments)
             {
                 typeName.Append('[');
@@ -580,8 +579,8 @@ public abstract partial class CodeDomSerializerBase
         using (TraceScope($"CodeDomSerializerBase::{nameof(DeserializeAssignStatement)}"))
         {
             // Since we're doing an assignment into something, we need to know what that something is.  It can be a property, a variable, or a member. Anything else is invalid.
-            //Perf: is -> as changes, change ordering based on possibility of occurrence
-            CodeExpression? expression = statement.Left;
+            // Perf: is -> as changes, change ordering based on possibility of occurrence
+            CodeExpression expression = statement.Left;
 
             Trace(TraceLevel.Verbose, "Processing LHS");
             if (expression is CodePropertyReferenceExpression propertyReferenceEx)
@@ -658,7 +657,7 @@ public abstract partial class CodeDomSerializerBase
                         }
                         else
                         {
-                            //lets try it as a property:
+                            // lets try it as a property:
                             CodePropertyReferenceExpression propRef = new CodePropertyReferenceExpression
                             {
                                 TargetObject = fieldReferenceEx.TargetObject,
@@ -760,7 +759,7 @@ public abstract partial class CodeDomSerializerBase
                     break;
                 }
                 else if (result is CodeThisReferenceExpression)
-                { //(is -> as doesn't help here, since the cast is different)
+                { // (is -> as doesn't help here, since the cast is different)
                     Trace(TraceLevel.Verbose, "'this' reference");
                     if (manager.TryGetContext(out RootContext? rootExp))
                     {
@@ -909,7 +908,7 @@ public abstract partial class CodeDomSerializerBase
                             }
                             else
                             {
-                                //lets try it as a property:
+                                // lets try it as a property:
                                 CodePropertyReferenceExpression propRef = new CodePropertyReferenceExpression
                                 {
                                     TargetObject = fieldReferenceEx.TargetObject,
@@ -1040,7 +1039,7 @@ public abstract partial class CodeDomSerializerBase
                     break;
                 }
                 else if (result is CodeBaseReferenceExpression)
-                { //(is -> as doesn't help here, since the cast is different)
+                { // (is -> as doesn't help here, since the cast is different)
                     RootContext? rootExp = manager.GetContext<RootContext>();
                     result = rootExp?.Value;
 
@@ -1058,7 +1057,7 @@ public abstract partial class CodeDomSerializerBase
                         {
                             Trace(TraceLevel.Verbose, $"{arrayCreateEx.Initializers.Count} initializers");
                             // Passed an array of initializers.  Use this to create the array.  Note that we use an  ArrayList here and add elements as we create them. It is possible that an element cannot be resolved. This is an error, but we do not want to tank the entire array.  If we kicked out the entire statement, a missing control would cause all controls on a form to vanish.
-                            ArrayList arrayList = new ArrayList(arrayCreateEx.Initializers.Count);
+                            ArrayList arrayList = new(arrayCreateEx.Initializers.Count);
 
                             foreach (CodeExpression initializer in arrayCreateEx.Initializers)
                             {
@@ -1426,8 +1425,8 @@ public abstract partial class CodeDomSerializerBase
         TypeCode rightType = right.GetTypeCode();
 
         // The compatible types are listed in order from lowest bitness to highest.  We must operate on the highest bitness to keep fidelity.
-        ReadOnlySpan<TypeCode> compatibleTypes = new TypeCode[]
-        {
+        ReadOnlySpan<TypeCode> compatibleTypes =
+        [
             TypeCode.Byte,
             TypeCode.Char,
             TypeCode.Int16,
@@ -1436,7 +1435,7 @@ public abstract partial class CodeDomSerializerBase
             TypeCode.UInt32,
             TypeCode.Int64,
             TypeCode.UInt64
-        };
+        ];
 
         int leftTypeIndex = -1;
         int rightTypeIndex = -1;
@@ -1755,12 +1754,12 @@ public abstract partial class CodeDomSerializerBase
                     }
                 }
 
-                //We need to ensure that no virtual types leak into the runtime code
-                //So if we ever assign a property value to a Type -- we make sure that the Type is a
+                // We need to ensure that no virtual types leak into the runtime code
+                // So if we ever assign a property value to a Type -- we make sure that the Type is a
                 // real System.Type.
                 if (rhs is Type rhsType && rhsType.UnderlyingSystemType is not null)
                 {
-                    rhs = rhsType.UnderlyingSystemType; //unwrap this "type" that came because it was not actually a real bcl type.
+                    rhs = rhsType.UnderlyingSystemType; // unwrap this "type" that came because it was not actually a real bcl type.
                 }
 
                 // Next: see if the RHS of this expression was a property reference too.  If it was, then
@@ -1780,8 +1779,8 @@ public abstract partial class CodeDomSerializerBase
 
                         if (rhsProp is not null)
                         {
-                            MemberRelationship source = new MemberRelationship(lhs, p);
-                            MemberRelationship target = new MemberRelationship(rhsPropTarget, rhsProp);
+                            MemberRelationship source = new(lhs, p);
+                            MemberRelationship target = new(rhsPropTarget, rhsProp);
 
                             oldRelation = relationships[source];
 
@@ -2083,7 +2082,7 @@ public abstract partial class CodeDomSerializerBase
         if (manager.TryGetContext(out ExpressionContext? ctx) && ReferenceEquals(ctx.PresetValue, value))
         {
             CodeExpression expression = ctx.Expression;
-            //Okay, we found a preset creation expression. We just need to find if it isComplete.
+            // Okay, we found a preset creation expression. We just need to find if it isComplete.
             if (converter.CanConvertTo(typeof(InstanceDescriptor)))
             {
                 if (converter.ConvertTo(value, typeof(InstanceDescriptor)) is InstanceDescriptor descriptor && descriptor.MemberInfo is not null)
@@ -2196,7 +2195,7 @@ public abstract partial class CodeDomSerializerBase
             }
 
             Type expressionType = descriptor.MemberInfo!.DeclaringType!;
-            CodeTypeReference typeRef = new CodeTypeReference(expressionType);
+            CodeTypeReference typeRef = new(expressionType);
 
             if (descriptor.MemberInfo is ConstructorInfo)
             {
@@ -2204,15 +2203,15 @@ public abstract partial class CodeDomSerializerBase
             }
             else if (descriptor.MemberInfo is MethodInfo methodInfo)
             {
-                CodeTypeReferenceExpression typeRefExp = new CodeTypeReferenceExpression(typeRef);
-                CodeMethodReferenceExpression methodRef = new CodeMethodReferenceExpression(typeRefExp, methodInfo.Name);
+                CodeTypeReferenceExpression typeRefExp = new(typeRef);
+                CodeMethodReferenceExpression methodRef = new(typeRefExp, methodInfo.Name);
                 expression = new CodeMethodInvokeExpression(methodRef, arguments);
                 expressionType = methodInfo.ReturnType;
             }
             else if (descriptor.MemberInfo is PropertyInfo propertyInfo)
             {
-                CodeTypeReferenceExpression typeRefExp = new CodeTypeReferenceExpression(typeRef);
-                CodePropertyReferenceExpression propertyRef = new CodePropertyReferenceExpression(typeRefExp, propertyInfo.Name);
+                CodeTypeReferenceExpression typeRefExp = new(typeRef);
+                CodePropertyReferenceExpression propertyRef = new(typeRefExp, propertyInfo.Name);
                 Debug.Assert(arguments.Length == 0, "Property serialization does not support arguments");
                 expression = propertyRef;
                 expressionType = propertyInfo.PropertyType;
@@ -2220,7 +2219,7 @@ public abstract partial class CodeDomSerializerBase
             else if (descriptor.MemberInfo is FieldInfo fieldInfo)
             {
                 Debug.Assert(arguments.Length == 0, "Field serialization does not support arguments");
-                CodeTypeReferenceExpression typeRefExp = new CodeTypeReferenceExpression(typeRef);
+                CodeTypeReferenceExpression typeRefExp = new(typeRef);
                 expression = new CodeFieldReferenceExpression(typeRefExp, fieldInfo.Name);
                 expressionType = fieldInfo.FieldType;
             }
@@ -2412,11 +2411,11 @@ public abstract partial class CodeDomSerializerBase
                 CodeExpression? target = SerializeToExpression(manager, value);
                 if (target is not null)
                 {
-                    CodePropertyReferenceExpression propertyRef = new CodePropertyReferenceExpression(target, string.Empty);
+                    CodePropertyReferenceExpression propertyRef = new(target, string.Empty);
                     foreach (PropertyDescriptor property in props)
                     {
                         TraceIf(TraceLevel.Warning, property.Attributes.Contains(DesignerSerializationVisibilityAttribute.Content), $"PersistContents property {property.Name} cannot be serialized to resources.");
-                        ExpressionContext tree = new ExpressionContext(propertyRef, property.PropertyType, value);
+                        ExpressionContext tree = new(propertyRef, property.PropertyType, value);
                         manager.Context.Push(tree);
                         try
                         {
@@ -2574,7 +2573,7 @@ public abstract partial class CodeDomSerializerBase
                     object? result = null;
                     try
                     {
-                        result = serializer.Serialize(manager, value);
+                        result = serializer.Serialize(manager, value!);
                     }
                     finally
                     {

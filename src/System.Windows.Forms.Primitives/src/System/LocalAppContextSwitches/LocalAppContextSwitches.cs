@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Runtime.CompilerServices;
 using System.Runtime.Versioning;
@@ -21,12 +20,14 @@ internal static partial class LocalAppContextSwitches
     internal const string ServicePointManagerCheckCrlSwitchName = "System.Windows.Forms.ServicePointManagerCheckCrl";
     internal const string TrackBarModernRenderingSwitchName = "System.Windows.Forms.TrackBarModernRendering";
     private const string DoNotCatchUnhandledExceptionsSwitchName = "System.Windows.Forms.DoNotCatchUnhandledExceptions";
+    internal const string DataGridViewUIAStartRowCountAtZeroSwitchName = "System.Windows.Forms.DataGridViewUIAStartRowCountAtZero";
 
     private static int s_scaleTopLevelFormMinMaxSizeForDpi;
     private static int s_anchorLayoutV2;
     private static int s_servicePointManagerCheckCrl;
     private static int s_trackBarModernRendering;
     private static int s_doNotCatchUnhandledExceptions;
+    private static int s_dataGridViewUIAStartRowCountAtZero;
 
     private static FrameworkName? s_targetFrameworkName;
 
@@ -101,11 +102,6 @@ internal static partial class LocalAppContextSwitches
                     return true;
                 }
 
-                if (switchName == AnchorLayoutV2SwitchName)
-                {
-                    return true;
-                }
-
                 if (switchName == TrackBarModernRenderingSwitchName)
                 {
                     return true;
@@ -125,7 +121,7 @@ internal static partial class LocalAppContextSwitches
     ///  Indicates whether AnchorLayoutV2 feature is enabled.
     /// </summary>
     /// <devdoc>
-    ///  Returns AnchorLayoutV2 switch value from runtimeconfig.json. Defaults to true if application is targeting .NET 8.0 and beyond.
+    ///  Returns AnchorLayoutV2 switch value from runtimeconfig.json. Defaults to false.
     ///  Refer to
     ///  https://github.com/dotnet/winforms/blob/tree/main/docs/design/anchor-layout-changes-in-net80.md for more details.
     /// </devdoc>
@@ -157,4 +153,12 @@ internal static partial class LocalAppContextSwitches
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => GetCachedSwitchValue(ServicePointManagerCheckCrlSwitchName, ref s_servicePointManagerCheckCrl);
     }
+
+    public static bool DataGridViewUIAStartRowCountAtZero
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => GetCachedSwitchValue(DataGridViewUIAStartRowCountAtZeroSwitchName, ref s_dataGridViewUIAStartRowCountAtZero);
+    }
+
+    internal static void SetDataGridViewUIAStartRowCountAtZero(bool value) => s_dataGridViewUIAStartRowCountAtZero = value ? 1 : 0;
 }

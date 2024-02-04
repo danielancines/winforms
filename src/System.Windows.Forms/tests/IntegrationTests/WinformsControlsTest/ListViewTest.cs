@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 
@@ -16,7 +15,7 @@ public partial class ListViewTest : Form
         listView1.LabelEdit = true;
         listView1.View = View.Tile;
 
-        var random = new Random();
+        Random random = new();
         int i = random.Next(100, 300);
 
         listView1.TileSize = new Size(200, 50);
@@ -25,11 +24,11 @@ public partial class ListViewTest : Form
         listView1.Items[2].ImageIndex = 2;
         listView1.Click += (s, e) =>
         {
-            //listView1.TileSize = new Size(random.Next(100, 300), random.Next(25, 50));
+            // listView1.TileSize = new Size(random.Next(100, 300), random.Next(25, 50));
 
             Point pos = Cursor.Position;
             pos = PointToClient(pos);
-            var index = listView1.InsertionMark.NearestIndex(pos);
+            int index = listView1.InsertionMark.NearestIndex(pos);
             Console.WriteLine($"nearest index: {index}");
         };
 
@@ -131,7 +130,7 @@ public partial class ListViewTest : Form
 
     private void AddCollapsibleGroupToListView()
     {
-        var lvgroup1 = new ListViewGroup
+        ListViewGroup lvgroup1 = new()
         {
             Header = "CollapsibleGroup1",
             CollapsedState = ListViewGroupCollapsedState.Expanded
@@ -144,7 +143,7 @@ public partial class ListViewTest : Form
             Group = lvgroup1
         });
 
-        var lvgroup2 = new ListViewGroup
+        ListViewGroup lvgroup2 = new()
         {
             Header = "CollapsibleGroup2",
             CollapsedState = ListViewGroupCollapsedState.Collapsed
@@ -171,7 +170,7 @@ public partial class ListViewTest : Form
         listView1.Groups[0].Subtitle = "Subtitle";
         listView1.GroupTaskLinkClick += listView1_GroupTaskLinkClick;
 
-        var lvgroup1 = new ListViewGroup
+        ListViewGroup lvgroup1 = new()
         {
             Header = "TaskGroup",
             TaskLink = "Task2"
@@ -206,7 +205,7 @@ public partial class ListViewTest : Form
             return;
         }
 
-        var random = new Random();
+        Random random = new();
         listView2.Columns[random.Next(0, listView2.Columns.Count)].ImageIndex = random.Next(0, 2);
     }
 

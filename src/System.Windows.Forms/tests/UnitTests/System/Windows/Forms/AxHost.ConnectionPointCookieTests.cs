@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using Windows.Win32.System.Com;
 using Windows.Win32.System.Ole;
@@ -17,7 +16,7 @@ public class AxHostConnectionPointCookieTests
     {
         Type type = Type.GetTypeFromCLSID(CLSID_WebBrowser);
         object source = Activator.CreateInstance(type);
-        var sink = new CustomPropertyNotifySink();
+        CustomPropertyNotifySink sink = new();
         Type eventType = typeof(IPropertyNotifySink.Interface);
 
         // Just verify that creation succeeded.
@@ -28,7 +27,7 @@ public class AxHostConnectionPointCookieTests
     public static IEnumerable<object[]> Ctor_InvalidSource_TestData()
     {
         yield return new object[] { null };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
     }
 
     [WinFormsTheory]
@@ -62,7 +61,7 @@ public class AxHostConnectionPointCookieTests
     public static IEnumerable<object[]> Ctor_InvalidSink_TestData()
     {
         yield return new object[] { null };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
     }
 
     [WinFormsTheory]
@@ -80,7 +79,7 @@ public class AxHostConnectionPointCookieTests
     {
         Type type = Type.GetTypeFromCLSID(CLSID_WebBrowser);
         object source = Activator.CreateInstance(type);
-        var sink = new CustomPropertyNotifySink();
+        CustomPropertyNotifySink sink = new();
         Type eventType = typeof(IPropertyNotifySink.Interface);
         var cookie = new AxHost.ConnectionPointCookie(source, sink, eventType);
         cookie.Disconnect();

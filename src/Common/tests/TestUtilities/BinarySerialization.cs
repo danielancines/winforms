@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -54,7 +53,7 @@ public static class BinarySerialization
 #pragma warning disable SYSLIB0050 // Type or member is obsolete
     public static T EnsureDeserialize<T>(string blob)
     {
-        var @object = FromBase64String(blob);
+        object @object = FromBase64String(blob);
         Assert.NotNull(@object);
         return Assert.IsType<T>(@object);
 

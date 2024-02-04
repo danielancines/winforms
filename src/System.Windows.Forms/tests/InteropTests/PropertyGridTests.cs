@@ -1,12 +1,10 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using Windows.Win32.System.ApplicationInstallationAndServicing;
 using Windows.Win32.System.Com;
-using static Interop;
 
 namespace System.Windows.Forms.Interop.Tests;
 
@@ -20,15 +18,15 @@ public class PropertyGridTests
             "App.manifest",
             () =>
             {
-                using PropertyGrid propertyGrid = new PropertyGrid();
-                var target = CreateComObjectWithStandardIErrorInfoUsage();
+                using PropertyGrid propertyGrid = new();
+                object target = CreateComObjectWithStandardIErrorInfoUsage();
                 propertyGrid.SelectedObject = target;
                 var entries = propertyGrid.GetCurrentEntries();
                 var encodingEntry = entries[0].Children.First(_ => _.PropertyName == "Int_Property");
                 try
                 {
                     encodingEntry.SetPropertyTextValue("333");
-                    Assert.False(true, "Invalid set values should produce ExternalException which will be presenttted to the user.");
+                    Assert.Fail("Invalid set values should produce ExternalException which will be presented to the user.");
                 }
                 catch (ExternalException ex)
                 {
@@ -54,15 +52,15 @@ public class PropertyGridTests
             "App.manifest",
             () =>
             {
-                using PropertyGrid propertyGrid = new PropertyGrid();
-                var target = CreateComObjectWithRawIErrorInfoUsage();
+                using PropertyGrid propertyGrid = new();
+                object target = CreateComObjectWithRawIErrorInfoUsage();
                 propertyGrid.SelectedObject = target;
                 var entries = propertyGrid.GetCurrentEntries();
                 var encodingEntry = entries[0].Children.First(_ => _.PropertyName == "Int_Property");
                 try
                 {
                     encodingEntry.SetPropertyTextValue("123");
-                    Assert.False(true, "Invalid set values should produce ExternalException which will be presenttted to the user.");
+                    Assert.Fail("Invalid set values should produce ExternalException which will be presenttted to the user.");
                 }
                 catch (ExternalException ex)
                 {
@@ -80,7 +78,7 @@ public class PropertyGridTests
 
     private unsafe void ExecuteWithActivationContext(string applicationManifest, Action action)
     {
-        var context = new ACTCTXW();
+        ACTCTXW context = new();
         HANDLE handle;
         fixed (char* p = applicationManifest)
         {
@@ -121,26 +119,26 @@ public class PropertyGridTests
         }
     }
 
-    private object CreateComObjectWithRawIErrorInfoUsage()
+    private unsafe object CreateComObjectWithRawIErrorInfoUsage()
     {
         Guid clsidRawErrorInfoUsageTest = new("0ED8EE0D-22E3-49EA-850C-E69B20D1F296");
-        Ole32.CoCreateInstance(in clsidRawErrorInfoUsageTest,
-            IntPtr.Zero,
+        PInvokeCore.CoCreateInstance(
+            in clsidRawErrorInfoUsageTest,
+            pUnkOuter: null,
             CLSCTX.CLSCTX_INPROC_SERVER,
-            in IID.GetRef<global::Windows.Win32.System.Com.IUnknown>(),
-            out object result);
-        return result;
+            out IUnknown* result);
+        return ComHelpers.GetObjectForIUnknown(result);
     }
 
-    private object CreateComObjectWithStandardIErrorInfoUsage()
+    private unsafe object CreateComObjectWithStandardIErrorInfoUsage()
     {
         Guid clsidStandardErrorInfoUsageTest = new("EA1FCB3A-277C-4C79-AB85-E2ED3E858201");
-        Ole32.CoCreateInstance(in clsidStandardErrorInfoUsageTest,
-            IntPtr.Zero,
+        PInvokeCore.CoCreateInstance(
+            in clsidStandardErrorInfoUsageTest,
+            pUnkOuter: null,
             CLSCTX.CLSCTX_INPROC_SERVER,
-            in IID.GetRef<global::Windows.Win32.System.Com.IUnknown>(),
-            out object result);
-        return result;
+            out IUnknown* result);
+        return ComHelpers.GetObjectForIUnknown(result);
     }
 
     [DllImport("kernel32", SetLastError = true)]

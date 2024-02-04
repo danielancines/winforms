@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace AxHosts;
 
@@ -32,7 +31,7 @@ partial class AxHosts
     /// </summary>
     private void InitializeComponent()
     {
-        System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AxHosts));
+        System.ComponentModel.ComponentResourceManager resources = new(typeof(AxHosts));
         this.axWindowsMediaPlayer1 = new AxWMPLib.AxWindowsMediaPlayer();
         ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).BeginInit();
         this.SuspendLayout();

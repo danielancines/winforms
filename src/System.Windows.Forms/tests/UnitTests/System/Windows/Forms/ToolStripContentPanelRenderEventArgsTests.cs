@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 
@@ -10,7 +9,7 @@ public class ToolStripContentPanelRenderEventArgsTests
 {
     public static IEnumerable<object[]> Ctor_Null_Graphics_ToolStripContentPanel_TestData()
     {
-        var image = new Bitmap(10, 10);
+        Bitmap image = new(10, 10);
         Graphics graphics = Graphics.FromImage(image);
 
         yield return new object[] { null, null };
@@ -28,10 +27,10 @@ public class ToolStripContentPanelRenderEventArgsTests
     [WinFormsFact]
     public void Ctor_Graphics_ToolStripContentPanel()
     {
-        using var image = new Bitmap(10, 10);
+        using Bitmap image = new(10, 10);
         using Graphics graphics = Graphics.FromImage(image);
-        using var toolStripContentPanel = new ToolStripContentPanel();
-        var e = new ToolStripContentPanelRenderEventArgs(graphics, toolStripContentPanel);
+        using ToolStripContentPanel toolStripContentPanel = new();
+        ToolStripContentPanelRenderEventArgs e = new(graphics, toolStripContentPanel);
         Assert.Equal(graphics, e.Graphics);
         Assert.Equal(toolStripContentPanel, e.ToolStripContentPanel);
         Assert.False(e.Handled);
@@ -42,11 +41,11 @@ public class ToolStripContentPanelRenderEventArgsTests
     [InlineData(false)]
     public void Handled_Set_GetReturnsExpected(bool value)
     {
-        using (var image = new Bitmap(10, 10))
+        using (Bitmap image = new(10, 10))
         using (Graphics graphics = Graphics.FromImage(image))
         {
-            using var panel = new ToolStripContentPanel();
-            var e = new ToolStripContentPanelRenderEventArgs(graphics, panel)
+            using ToolStripContentPanel panel = new();
+            ToolStripContentPanelRenderEventArgs e = new(graphics, panel)
             {
                 Handled = value
             };

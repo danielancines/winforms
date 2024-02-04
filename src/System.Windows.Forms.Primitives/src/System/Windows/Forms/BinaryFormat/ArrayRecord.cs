@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 
@@ -15,19 +14,9 @@ namespace System.Windows.Forms.BinaryFormat;
 ///  can be coalesced into an <see cref="NullRecord.ObjectNullMultiple"/> or <see cref="NullRecord.ObjectNullMultiple256"/>
 ///  record.
 /// </devdoc>
-internal abstract class ArrayRecord : Record, IEnumerable<object>
+internal abstract class ArrayRecord : Record, IEnumerable
 {
     public ArrayInfo ArrayInfo { get; }
-
-    /// <summary>
-    ///  The array items.
-    /// </summary>
-    /// <remarks>
-    ///  <para>
-    ///   Multi-null records are always expanded to individual <see cref="ObjectNull"/> entries when reading.
-    ///  </para>
-    /// </remarks>
-    public IReadOnlyList<object> ArrayObjects { get; }
 
     /// <summary>
     ///  Identifier for the array.
@@ -39,22 +28,44 @@ internal abstract class ArrayRecord : Record, IEnumerable<object>
     /// </summary>
     public Count Length => ArrayInfo.Length;
 
+    public ArrayRecord(ArrayInfo arrayInfo) => ArrayInfo = arrayInfo;
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    private protected abstract IEnumerator GetEnumerator();
+}
+
+/// <summary>
+///  Typed class for array records.
+/// </summary>
+internal abstract class ArrayRecord<T> : ArrayRecord, IEnumerable<T>
+{
+    /// <summary>
+    ///  The array items.
+    /// </summary>
+    /// <remarks>
+    ///  <para>
+    ///   Multi-null records are always expanded to individual <see cref="ObjectNull"/> entries when reading.
+    ///  </para>
+    /// </remarks>
+    public IReadOnlyList<T> ArrayObjects { get; }
+
     /// <summary>
     ///  Returns the item at the given index.
     /// </summary>
-    public object this[int index] => ArrayObjects[index];
+    public T this[int index] => ArrayObjects[index];
 
-    public ArrayRecord(ArrayInfo arrayInfo, IReadOnlyList<object> arrayObjects)
+    public ArrayRecord(ArrayInfo arrayInfo, IReadOnlyList<T> arrayObjects) : base(arrayInfo)
     {
         if (arrayInfo.Length != arrayObjects.Count)
         {
             throw new ArgumentException($"{nameof(arrayInfo)} doesn't match count of {nameof(arrayObjects)}");
         }
 
-        ArrayInfo = arrayInfo;
         ArrayObjects = arrayObjects;
     }
 
-    IEnumerator<object> IEnumerable<object>.GetEnumerator() => ArrayObjects.GetEnumerator();
+    IEnumerator<T> IEnumerable<T>.GetEnumerator() => ArrayObjects.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => ArrayObjects.GetEnumerator();
+    private protected override IEnumerator GetEnumerator() => ArrayObjects.GetEnumerator();
 }

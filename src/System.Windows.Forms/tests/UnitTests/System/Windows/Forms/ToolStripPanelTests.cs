@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Drawing;
@@ -13,7 +12,7 @@ public class ToolStripPanelTests
     [WinFormsFact]
     public void ToolStripPanel_Ctor_Default()
     {
-        using var control = new SubToolStripPanel();
+        using SubToolStripPanel control = new();
         Assert.Null(control.AccessibleDefaultActionDescription);
         Assert.Null(control.AccessibleDescription);
         Assert.Null(control.AccessibleName);
@@ -124,7 +123,7 @@ public class ToolStripPanelTests
     [WinFormsFact]
     public void ToolStripPanel_CreateParams_GetDefault_ReturnsExpected()
     {
-        using var control = new SubToolStripPanel();
+        using SubToolStripPanel control = new();
         CreateParams createParams = control.CreateParams;
         Assert.Null(createParams.Caption);
         Assert.Null(createParams.ClassName);
@@ -144,7 +143,7 @@ public class ToolStripPanelTests
     [BoolData]
     public void ToolStripPanel_AllowDrop_Set_GetReturnsExpected(bool value)
     {
-        using var panel = new ToolStripPanel
+        using ToolStripPanel panel = new()
         {
             AllowDrop = value
         };
@@ -166,7 +165,7 @@ public class ToolStripPanelTests
     [BoolData]
     public void AutoScroll_Set_GetReturnsExpected(bool value)
     {
-        using var panel = new ToolStripPanel
+        using ToolStripPanel panel = new()
         {
             AutoScroll = value
         };
@@ -181,7 +180,7 @@ public class ToolStripPanelTests
     [CommonMemberData(typeof(CommonTestHelper), nameof(CommonTestHelper.GetSizeTheoryData), TestIncludeType.NoNegatives)]
     public void AutoScrollMargin_Set_GetReturnsExpected(Size value)
     {
-        using var panel = new ToolStripPanel
+        using ToolStripPanel panel = new()
         {
             AutoScrollMargin = value
         };
@@ -196,7 +195,7 @@ public class ToolStripPanelTests
     [CommonMemberData(typeof(CommonTestHelper), nameof(CommonTestHelper.GetSizeTheoryData), TestIncludeType.NoPositives)]
     public void AutoScrollMargin_SetInvalid_ThrowsArgumentOutOfRangeException(Size value)
     {
-        using var panel = new ToolStripPanel();
+        using ToolStripPanel panel = new();
         Assert.Throws<ArgumentOutOfRangeException>("value", () => panel.AutoScrollMargin = value);
     }
 
@@ -204,7 +203,7 @@ public class ToolStripPanelTests
     [CommonMemberData(typeof(CommonTestHelper), nameof(CommonTestHelper.GetSizeTheoryData))]
     public void AutoScrollMinSize_Set_GetReturnsExpected(Size value)
     {
-        using var panel = new ToolStripPanel
+        using ToolStripPanel panel = new()
         {
             AutoScrollMinSize = value
         };
@@ -221,7 +220,7 @@ public class ToolStripPanelTests
     [BoolData]
     public void ToolStripPanel_AutoSize_Set_GetReturnsExpected(bool value)
     {
-        using var control = new ToolStripPanel();
+        using ToolStripPanel control = new();
         int layoutCallCount = 0;
         control.Layout += (sender, e) => layoutCallCount++;
 
@@ -246,7 +245,7 @@ public class ToolStripPanelTests
     [WinFormsFact]
     public void ToolStripPanel_AutoSize_SetWithHandler_CallsAutoSizeChanged()
     {
-        using var control = new ToolStripPanel
+        using ToolStripPanel control = new()
         {
             AutoSize = true
         };
@@ -285,7 +284,7 @@ public class ToolStripPanelTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetPaddingTheoryData))]
     public void RowMargin_Set_GetReturnsExpected(Padding value)
     {
-        using var panel = new ToolStripPanel
+        using ToolStripPanel panel = new()
         {
             RowMargin = value
         };
@@ -299,7 +298,7 @@ public class ToolStripPanelTests
     [WinFormsFact]
     public void ToolStripPanel_GetAutoSizeMode_Invoke_ReturnsExpected()
     {
-        using var control = new SubToolStripPanel();
+        using SubToolStripPanel control = new();
         Assert.Equal(AutoSizeMode.GrowOnly, control.GetAutoSizeMode());
     }
 
@@ -326,7 +325,7 @@ public class ToolStripPanelTests
     [InlineData((ControlStyles)(-1), false)]
     public void ToolStripPanel_GetStyle_Invoke_ReturnsExpected(ControlStyles flag, bool expected)
     {
-        using var control = new SubToolStripPanel();
+        using SubToolStripPanel control = new();
         Assert.Equal(expected, control.GetStyle(flag));
 
         // Call again to test caching.
@@ -336,7 +335,7 @@ public class ToolStripPanelTests
     [WinFormsFact]
     public void ToolStripPanel_GetTopLevel_Invoke_ReturnsExpected()
     {
-        using var control = new SubToolStripPanel();
+        using SubToolStripPanel control = new();
         Assert.False(control.GetTopLevel());
     }
 

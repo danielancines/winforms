@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Drawing;
@@ -14,7 +13,7 @@ public class FlowLayoutPanelTests
     [WinFormsFact]
     public void FlowLayoutPanel_Ctor_Default()
     {
-        using var control = new SubFlowLayoutPanel();
+        using SubFlowLayoutPanel control = new();
         Assert.Null(control.AccessibleDefaultActionDescription);
         Assert.Null(control.AccessibleDescription);
         Assert.Null(control.AccessibleName);
@@ -122,7 +121,7 @@ public class FlowLayoutPanelTests
     [WinFormsFact]
     public void FlowLayoutPanel_CreateParams_GetDefault_ReturnsExpected()
     {
-        using var control = new SubFlowLayoutPanel();
+        using SubFlowLayoutPanel control = new();
         CreateParams createParams = control.CreateParams;
         Assert.Null(createParams.Caption);
         Assert.Null(createParams.ClassName);
@@ -146,7 +145,7 @@ public class FlowLayoutPanelTests
     [InlineData(FlowDirection.TopDown, 1)]
     public void FlowLayoutPanel_FlowDirection_Set_GetReturnsExpected(FlowDirection value, int expectedLayoutCallCount)
     {
-        using var control = new FlowLayoutPanel();
+        using FlowLayoutPanel control = new();
         int layoutCallCount = 0;
         control.Layout += (sender, e) =>
         {
@@ -172,7 +171,7 @@ public class FlowLayoutPanelTests
     [InvalidEnumData<FlowDirection>]
     public void FlowLayoutPanel_FlowDirection_SetInvalidValue_ThrowsInvalidEnumArgumentException(FlowDirection value)
     {
-        using var control = new FlowLayoutPanel();
+        using FlowLayoutPanel control = new();
         Assert.Throws<InvalidEnumArgumentException>("value", () => control.FlowDirection = value);
     }
 
@@ -181,7 +180,7 @@ public class FlowLayoutPanelTests
     [InlineData(false, 1)]
     public void FlowLayoutPanel_WrapContents_Set_GetReturnsExpected(bool value, int expectedLayoutCallCount)
     {
-        using var control = new FlowLayoutPanel();
+        using FlowLayoutPanel control = new();
         int layoutCallCount = 0;
         control.Layout += (sender, e) =>
         {
@@ -212,8 +211,8 @@ public class FlowLayoutPanelTests
     [WinFormsFact]
     public void FlowLayoutPanel_CanExtend_InvokeWithParent_ReturnsTrue()
     {
-        using var control = new FlowLayoutPanel();
-        using var extendee = new Control
+        using FlowLayoutPanel control = new();
+        using Control extendee = new()
         {
             Parent = control
         };
@@ -224,16 +223,16 @@ public class FlowLayoutPanelTests
     public static IEnumerable<object[]> CanExtend_TestData()
     {
         yield return new object[] { null };
-        yield return new object[] { new object() };
+        yield return new object[] { new() };
         yield return new object[] { new Control() };
-        yield return new object[] { new Control { Parent = new Control() } };
+        yield return new object[] { new Control { Parent = new() } };
     }
 
     [WinFormsTheory]
     [MemberData(nameof(CanExtend_TestData))]
     public void FlowLayoutPanel_CanExtend_InvokeNoParent_ReturnsFalse(object extendee)
     {
-        using var control = new FlowLayoutPanel();
+        using FlowLayoutPanel control = new();
         IExtenderProvider extenderProvider = control;
         Assert.False(extenderProvider.CanExtend(extendee));
     }
@@ -241,22 +240,22 @@ public class FlowLayoutPanelTests
     [WinFormsFact]
     public void FlowLayoutPanel_GetAutoSizeMode_Invoke_ReturnsExpected()
     {
-        using var control = new SubFlowLayoutPanel();
+        using SubFlowLayoutPanel control = new();
         Assert.Equal(AutoSizeMode.GrowOnly, control.GetAutoSizeMode());
     }
 
     [WinFormsFact]
     public void FlowLayoutPanel_GetFlowBreak_InvokeValidControl_ReturnsExpected()
     {
-        using var child = new Control();
-        using var control = new FlowLayoutPanel();
+        using Control child = new();
+        using FlowLayoutPanel control = new();
         Assert.False(control.GetFlowBreak(child));
     }
 
     [WinFormsFact]
     public void FlowLayoutPanel_GetFlowBreak_NullControl_ThrowsArgumentNullException()
     {
-        using var control = new FlowLayoutPanel();
+        using FlowLayoutPanel control = new();
         Assert.Throws<ArgumentNullException>("control", () => control.GetFlowBreak(null));
     }
 
@@ -271,7 +270,7 @@ public class FlowLayoutPanelTests
     [InlineData((-1), false)]
     public void FlowLayoutPanel_GetScrollState_Invoke_ReturnsExpected(int bit, bool expected)
     {
-        using var control = new SubFlowLayoutPanel();
+        using SubFlowLayoutPanel control = new();
         Assert.Equal(expected, control.GetScrollState(bit));
     }
 
@@ -298,7 +297,7 @@ public class FlowLayoutPanelTests
     [InlineData((ControlStyles)(-1), false)]
     public void FlowLayoutPanel_GetStyle_Invoke_ReturnsExpected(ControlStyles flag, bool expected)
     {
-        using var control = new SubFlowLayoutPanel();
+        using SubFlowLayoutPanel control = new();
         Assert.Equal(expected, control.GetStyle(flag));
 
         // Call again to test caching.
@@ -308,7 +307,7 @@ public class FlowLayoutPanelTests
     [WinFormsFact]
     public void FlowLayoutPanel_GetTopLevel_Invoke_ReturnsExpected()
     {
-        using var control = new SubFlowLayoutPanel();
+        using SubFlowLayoutPanel control = new();
         Assert.False(control.GetTopLevel());
     }
 
@@ -316,8 +315,8 @@ public class FlowLayoutPanelTests
     [BoolData]
     public void FlowLayoutPanel_SetFlowBreak_Invoke_GetFlowBreakReturnsExpected(bool value)
     {
-        using var child = new Control();
-        using var control = new FlowLayoutPanel();
+        using Control child = new();
+        using FlowLayoutPanel control = new();
         int layoutCallCount = 0;
         control.Layout += (sender, e) => layoutCallCount++;
         int childLayoutCallCount = 0;
@@ -352,12 +351,12 @@ public class FlowLayoutPanelTests
     [InlineData(false, 0)]
     public void FlowLayoutPanel_SetFlowBreak_InvokeControlWithParent_GetFlowBreakReturnsExpected(bool value, int expectedParentLayoutCallCount)
     {
-        using var parent = new Control();
-        using var child = new Control
+        using Control parent = new();
+        using Control child = new()
         {
             Parent = parent
         };
-        using var control = new FlowLayoutPanel();
+        using FlowLayoutPanel control = new();
         int layoutCallCount = 0;
         control.Layout += (sender, e) => layoutCallCount++;
         int childLayoutCallCount = 0;
@@ -414,7 +413,7 @@ public class FlowLayoutPanelTests
     [BoolData]
     public void FlowLayoutPanel_SetFlowBreak_NullControl_ThrowsArgumentNullException(bool value)
     {
-        using var control = new FlowLayoutPanel();
+        using FlowLayoutPanel control = new();
         Assert.Throws<ArgumentNullException>("control", () => control.SetFlowBreak(null, value));
     }
 

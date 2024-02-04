@@ -262,11 +262,6 @@
         <target state="translated">Pro požadovanou akci jsou podporována pouze jednorozměrná pole.</target>
         <note />
       </trans-unit>
-      <trans-unit id="ArgumentOutOfRange_NeedNonNegNum">
-        <source>Non-negative number required.</source>
-        <target state="translated">Vyžaduje se nezáporné číslo.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="Argument_IncompatibleArrayType">
         <source>Target array type is not compatible with the type of items in the collection.</source>
         <target state="translated">Typ cílového pole není kompatibilní s typem položek v kolekci.</target>
@@ -4140,8 +4135,8 @@ Chcete-li nahradit toto výchozí dialogové okno, nastavte popisovač události
         <note />
       </trans-unit>
       <trans-unit id="DataGridView_SortedDescr">
-        <source>Occurs when the DataGridView compares two cell values to perform a sort operation.</source>
-        <target state="translated">Vyvolá se v případě, že ovládací prvek DataGridView porovnává dvě hodnoty buňky za účelem provedení operace řazení.</target>
+        <source>Occurs when the DataGridView control completes a sorting operation.</source>
+        <target state="translated">Vyvolá se v případě, že kontrola DataGridView dokončí operaci řazení.</target>
         <note />
       </trans-unit>
       <trans-unit id="DataGridView_StandardTabDescr">
@@ -5210,9 +5205,9 @@ Chcete jej nahradit?</target>
         <target state="translated">Řetězec zobrazený v dialogovém okně nad ovládacím prvkem zobrazení stromu. V řetězci můžete uvést pokyny pro uživatele.</target>
         <note />
       </trans-unit>
-      <trans-unit id="FolderBrowserDialogNoRootFolder">
-        <source>Unable to retrieve the root folder.</source>
-        <target state="translated">Kořenovou složku nelze načíst.</target>
+      <trans-unit id="FolderBrowserDialogMultiSelectDescr">
+        <source>Controls whether multiple folders can be selected in the dialog.</source>
+        <target state="translated">Určuje, zda v dialogovém okně lze vybrat více složek.</target>
         <note />
       </trans-unit>
       <trans-unit id="FolderBrowserDialogOkRequiresInteraction">
@@ -5228,6 +5223,11 @@ Chcete jej nahradit?</target>
       <trans-unit id="FolderBrowserDialogSelectedPath">
         <source>The path of the folder first selected in the dialog or the last one selected by the user.</source>
         <target state="translated">Cesta ke složce, která byla poprvé vybrána v dialogovém okně nebo naposledy označena uživatelem.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="FolderBrowserDialogSelectedPathsDescr">
+        <source>Retrieves the paths of all selected folders in the dialog box.</source>
+        <target state="translated">Načte cesty všech vybraných složek v dialogovém okně.</target>
         <note />
       </trans-unit>
       <trans-unit id="FolderBrowserDialogShowHiddenFiles">
@@ -5859,11 +5859,6 @@ Trasování zásobníku, kde došlo k neplatné operaci:
         <target state="translated">Akce prováděná s tímto ovládacím prvkem je volána z nesprávného vlákna. Chcete-li tuto akci provést, přejděte pomocí funkce Control.Invoke nebo Control.BeginInvoke ke správnému vláknu.</target>
         <note />
       </trans-unit>
-      <trans-unit id="InvalidExBoundArgument">
-        <source>Value of '{1}' is not valid for '{0}'. '{0}' should be greater than {2} and less than {3}.</source>
-        <target state="translated">Hodnota {1} není platnou hodnotou argumentu {0}. Hodnota {0} by měla být větší než {2} a menší než {3}.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="InvalidFileFormat">
         <source>File format is not valid.</source>
         <target state="translated">Formát souboru není platný.</target>
@@ -5882,26 +5877,6 @@ Trasování zásobníku, kde došlo k neplatné operaci:
       <trans-unit id="InvalidHdcType">
         <source>Invalid HDC type: {0}</source>
         <target state="translated">Neplatný typ HDC: {0}</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="InvalidHighBoundArgument">
-        <source>Value of '{1}' is not valid for '{0}'. '{0}' must be less than {2}.</source>
-        <target state="translated">Hodnota {1} není platnou hodnotou argumentu {0}. Hodnota {0} musí být menší než {2}.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="InvalidHighBoundArgumentEx">
-        <source>Value of '{1}' is not valid for '{0}'. '{0}' must be less than or equal to {2}.</source>
-        <target state="translated">Hodnota {1} není platnou hodnotou argumentu {0}. Hodnota {0} musí být menší nebo rovna {2}.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="InvalidLowBoundArgument">
-        <source>Value of '{1}' is not valid for '{0}'. '{0}' must be greater than {2}.</source>
-        <target state="translated">Hodnota {1} není platnou hodnotou argumentu {0}. Hodnota {0} musí být větší než {2}.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="InvalidLowBoundArgumentEx">
-        <source>Value of '{1}' is not valid for '{0}'. '{0}' must be greater than or equal to {2}.</source>
-        <target state="translated">Hodnota {1} není platnou hodnotou argumentu {0}. Hodnota {0} musí být větší nebo rovna {2}.</target>
         <note />
       </trans-unit>
       <trans-unit id="InvalidNullArgument">
@@ -7414,11 +7389,6 @@ Trasování zásobníku, kde došlo k neplatné operaci:
         <target state="translated">Určuje hodnotu, která má být při kliknutí na tlačítko přičtena nebo odečtena.</target>
         <note />
       </trans-unit>
-      <trans-unit id="NumericUpDownLessThanZeroError">
-        <source>Parameter value must be greater than or equal to 0.</source>
-        <target state="translated">Hodnota parametru musí být větší nebo rovna 0.</target>
-        <note />
-      </trans-unit>
       <trans-unit id="NumericUpDownMaximumDescr">
         <source>Indicates the maximum value for the numeric up-down control.</source>
         <target state="translated">Určuje maximální hodnotu číselníku.</target>
@@ -8272,11 +8242,6 @@ Trasování zásobníku, kde došlo k neplatné operaci:
       <trans-unit id="PropertyCategoryText">
         <source>Text</source>
         <target state="translated">Text</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="PropertyGridBadTabIndex">
-        <source>Tab index not valid.</source>
-        <target state="translated">Index karty je neplatný.</target>
         <note />
       </trans-unit>
       <trans-unit id="PropertyGridCanShowCommandsDesc">
@@ -10247,6 +10212,11 @@ Trasování zásobníku, kde došlo k neplatné operaci:
       <trans-unit id="ToolStripItemRightToLeftDescr">
         <source>Indicates whether the item should draw right-to-left for RTL languages.</source>
         <target state="translated">Označuje, zda by se měla položka pro jazyky čtené zprava doleva (RTL) překreslovat zprava doleva.</target>
+        <note />
+      </trans-unit>
+      <trans-unit id="ToolStripItemSelectedChangedDescr">
+        <source>Occurs when the Selected property value changes.</source>
+        <target state="translated">Nastane, když se změní hodnota vybrané vlastnosti.</target>
         <note />
       </trans-unit>
       <trans-unit id="ToolStripItemSize">

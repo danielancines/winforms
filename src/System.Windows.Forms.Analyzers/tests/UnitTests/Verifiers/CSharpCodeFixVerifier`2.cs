@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CodeFixes;
@@ -30,7 +29,7 @@ public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
     /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyAnalyzerAsync(string, DiagnosticResult[])"/>
     public static async Task VerifyAnalyzerAsync(string source, params DiagnosticResult[] expected)
     {
-        var test = new Test
+        Test test = new()
         {
             TestCode = source,
         };
@@ -50,7 +49,7 @@ public static partial class CSharpCodeFixVerifier<TAnalyzer, TCodeFix>
     /// <inheritdoc cref="CodeFixVerifier{TAnalyzer, TCodeFix, TTest, TVerifier}.VerifyCodeFixAsync(string, DiagnosticResult[], string)"/>
     public static async Task VerifyCodeFixAsync(string source, DiagnosticResult[] expected, string fixedSource)
     {
-        var test = new Test
+        Test test = new()
         {
             TestCode = source,
             FixedCode = fixedSource,

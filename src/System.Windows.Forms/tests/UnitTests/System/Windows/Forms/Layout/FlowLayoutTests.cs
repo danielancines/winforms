@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using Size = System.Drawing.Size;
@@ -12,7 +11,7 @@ public partial class FlowLayoutTests
     [WinFormsFact]
     public void LayoutEngine_InitLayout_ValidChild_Nop()
     {
-        using var control = new FlowLayoutPanel();
+        using FlowLayoutPanel control = new();
         LayoutEngine engine = control.LayoutEngine;
         engine.InitLayout(control, BoundsSpecified.All);
     }
@@ -20,7 +19,7 @@ public partial class FlowLayoutTests
     [WinFormsFact]
     public void LayoutEngine_InitLayout_InvalidChild_ThrowsNotSupportedException()
     {
-        using var control = new FlowLayoutPanel();
+        using FlowLayoutPanel control = new();
         LayoutEngine engine = control.LayoutEngine;
         Assert.Throws<NotSupportedException>(() => engine.InitLayout("child", BoundsSpecified.All));
     }
@@ -28,7 +27,7 @@ public partial class FlowLayoutTests
     [WinFormsFact]
     public void LayoutEngine_InitLayout_NullChild_ThrowsArgumentNullException()
     {
-        using var control = new FlowLayoutPanel();
+        using FlowLayoutPanel control = new();
         LayoutEngine engine = control.LayoutEngine;
         Assert.Throws<ArgumentNullException>("child", () => engine.InitLayout(null, BoundsSpecified.All));
     }
@@ -36,38 +35,38 @@ public partial class FlowLayoutTests
     [WinFormsFact]
     public void LayoutEngine_Layout_ValidContainerLeftToRight_Success()
     {
-        using var control = new FlowLayoutPanel();
+        using FlowLayoutPanel control = new();
         control.SuspendLayout();
-        using var child1 = new Control
+        using Control child1 = new()
         {
             Margin = Padding.Empty,
             Size = new Size(10, 20)
         };
-        using var child2 = new Control
+        using Control child2 = new()
         {
             Margin = new Padding(1, 2, 3, 4),
             Size = new Size(10, 20)
         };
-        using var largeChild = new Control
+        using Control largeChild = new()
         {
             Margin = Padding.Empty,
             Size = new Size(100, 200)
         };
-        using var emptyChild = new Control
+        using Control emptyChild = new()
         {
             Size = Size.Empty
         };
-        using var emptyChildWithMargin = new Control
+        using Control emptyChildWithMargin = new()
         {
             Margin = new Padding(1, 2, 3, 4),
             Size = Size.Empty
         };
-        using var child3 = new Control
+        using Control child3 = new()
         {
             Margin = Padding.Empty,
             Size = new Size(50, 100)
         };
-        using var child4 = new Control
+        using Control child4 = new()
         {
             Margin = Padding.Empty,
             Size = new Size(10, 20)
@@ -94,41 +93,41 @@ public partial class FlowLayoutTests
     [WinFormsFact]
     public void LayoutEngine_Layout_ValidContainerRightToLeft_Success()
     {
-        using var control = new FlowLayoutPanel
+        using FlowLayoutPanel control = new()
         {
             FlowDirection = FlowDirection.RightToLeft
         };
         control.SuspendLayout();
-        using var child1 = new Control
+        using Control child1 = new()
         {
             Margin = Padding.Empty,
             Size = new Size(10, 20)
         };
-        using var child2 = new Control
+        using Control child2 = new()
         {
             Margin = new Padding(1, 2, 3, 4),
             Size = new Size(10, 20)
         };
-        using var largeChild = new Control
+        using Control largeChild = new()
         {
             Margin = Padding.Empty,
             Size = new Size(100, 200)
         };
-        using var emptyChild = new Control
+        using Control emptyChild = new()
         {
             Size = Size.Empty
         };
-        using var emptyChildWithMargin = new Control
+        using Control emptyChildWithMargin = new()
         {
             Margin = new Padding(1, 2, 3, 4),
             Size = Size.Empty
         };
-        using var child3 = new Control
+        using Control child3 = new()
         {
             Margin = Padding.Empty,
             Size = new Size(50, 100)
         };
-        using var child4 = new Control
+        using Control child4 = new()
         {
             Margin = Padding.Empty,
             Size = new Size(10, 20)
@@ -155,41 +154,41 @@ public partial class FlowLayoutTests
     [WinFormsFact]
     public void LayoutEngine_Layout_ValidContainerTopDown_Success()
     {
-        using var control = new FlowLayoutPanel
+        using FlowLayoutPanel control = new()
         {
             FlowDirection = FlowDirection.TopDown
         };
         control.SuspendLayout();
-        using var child1 = new Control
+        using Control child1 = new()
         {
             Margin = Padding.Empty,
             Size = new Size(10, 20)
         };
-        using var child2 = new Control
+        using Control child2 = new()
         {
             Margin = new Padding(1, 2, 3, 4),
             Size = new Size(10, 20)
         };
-        using var largeChild = new Control
+        using Control largeChild = new()
         {
             Margin = Padding.Empty,
             Size = new Size(100, 200)
         };
-        using var emptyChild = new Control
+        using Control emptyChild = new()
         {
             Size = Size.Empty
         };
-        using var emptyChildWithMargin = new Control
+        using Control emptyChildWithMargin = new()
         {
             Margin = new Padding(1, 2, 3, 4),
             Size = Size.Empty
         };
-        using var child3 = new Control
+        using Control child3 = new()
         {
             Margin = Padding.Empty,
             Size = new Size(50, 100)
         };
-        using var child4 = new Control
+        using Control child4 = new()
         {
             Margin = Padding.Empty,
             Size = new Size(10, 20)
@@ -216,41 +215,41 @@ public partial class FlowLayoutTests
     [WinFormsFact]
     public void LayoutEngine_Layout_ValidContainerBottomUp_Success()
     {
-        using var control = new FlowLayoutPanel
+        using FlowLayoutPanel control = new()
         {
             FlowDirection = FlowDirection.BottomUp
         };
         control.SuspendLayout();
-        using var child1 = new Control
+        using Control child1 = new()
         {
             Margin = Padding.Empty,
             Size = new Size(10, 20)
         };
-        using var child2 = new Control
+        using Control child2 = new()
         {
             Margin = new Padding(1, 2, 3, 4),
             Size = new Size(10, 20)
         };
-        using var largeChild = new Control
+        using Control largeChild = new()
         {
             Margin = Padding.Empty,
             Size = new Size(100, 200)
         };
-        using var emptyChild = new Control
+        using Control emptyChild = new()
         {
             Size = Size.Empty
         };
-        using var emptyChildWithMargin = new Control
+        using Control emptyChildWithMargin = new()
         {
             Margin = new Padding(1, 2, 3, 4),
             Size = Size.Empty
         };
-        using var child3 = new Control
+        using Control child3 = new()
         {
             Margin = Padding.Empty,
             Size = new Size(50, 100)
         };
-        using var child4 = new Control
+        using Control child4 = new()
         {
             Margin = Padding.Empty,
             Size = new Size(10, 20)
@@ -277,7 +276,7 @@ public partial class FlowLayoutTests
     [WinFormsFact]
     public void LayoutEngine_Layout_InvalidContainer_Nop()
     {
-        using var control = new FlowLayoutPanel();
+        using FlowLayoutPanel control = new();
         LayoutEngine engine = control.LayoutEngine;
         Assert.Throws<NotSupportedException>(() => engine.Layout("container", new LayoutEventArgs(control, "affectedProperty")));
     }
@@ -285,7 +284,7 @@ public partial class FlowLayoutTests
     [WinFormsFact]
     public void LayoutEngine_Layout_NullContainer_ThrowsArgumentNullException()
     {
-        using var control = new FlowLayoutPanel();
+        using FlowLayoutPanel control = new();
         LayoutEngine engine = control.LayoutEngine;
         Assert.Throws<ArgumentNullException>("container", () => engine.Layout(null, new LayoutEventArgs(control, "affectedProperty")));
     }

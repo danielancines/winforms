@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Drawing;
@@ -29,7 +28,7 @@ public class WebBrowserBaseTests
     [MemberData(nameof(Bounds_Set_TestData))]
     public void WebBrowserBase_Bounds_Set_GetReturnsExpected(int x, int y, int width, int height)
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         int layoutCallCount = 0;
         int resizeCallCount = 0;
         int sizeChangedCallCount = 0;
@@ -137,7 +136,7 @@ public class WebBrowserBaseTests
     [MemberData(nameof(Bounds_SetWithHandle_TestData))]
     public void WebBrowserBase_Bounds_SetWithHandle_GetReturnsExpected(bool resizeRedraw, int x, int y, int width, int height, int expectedWidth, int expectedHeight, int expectedInvalidatedCallCount)
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         control.SetStyle(ControlStyles.ResizeRedraw, resizeRedraw);
         int layoutCallCount = 0;
         int resizeCallCount = 0;
@@ -235,8 +234,8 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_CanSelect_GetInPlaceActive_ReturnsExpected()
     {
-        using var parent = new Control();
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2")
+        using Control parent = new();
+        using SubWebBrowserBase control = new()
         {
             Parent = parent
         };
@@ -246,14 +245,14 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_Site_Set_GetReturnsExpected()
     {
-        var mockSite1 = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite1 = new(MockBehavior.Strict);
         mockSite1
             .Setup(s => s.Container)
             .Returns((IContainer)null);
         mockSite1
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2")
+        using SubWebBrowserBase control = new()
         {
             Site = mockSite1.Object
         };
@@ -266,7 +265,7 @@ public class WebBrowserBaseTests
         Assert.False(control.IsHandleCreated);
 
         // Set another.
-        var mockSite2 = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite2 = new(MockBehavior.Strict);
         mockSite2
             .Setup(s => s.Container)
             .Returns((IContainer)null);
@@ -286,7 +285,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_BackColorChanged_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.BackColorChanged += handler);
         control.BackColorChanged -= handler;
@@ -295,7 +294,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_BackgroundImageChanged_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.BackgroundImageChanged += handler);
         control.BackgroundImageChanged -= handler;
@@ -304,7 +303,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_BackgroundImageLayoutChanged_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.BackgroundImageLayoutChanged += handler);
         control.BackgroundImageLayoutChanged -= handler;
@@ -313,7 +312,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_BindingContextChanged_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.BindingContextChanged += handler);
         control.BindingContextChanged -= handler;
@@ -322,7 +321,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_UICuesEventHandler_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         UICuesEventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.ChangeUICues += handler);
         control.ChangeUICues -= handler;
@@ -331,7 +330,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_Click_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.Click += handler);
         control.Click -= handler;
@@ -340,7 +339,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_CursorChanged_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.CursorChanged += handler);
         control.CursorChanged -= handler;
@@ -349,7 +348,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_DoubleClick_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.DoubleClick += handler);
         control.DoubleClick -= handler;
@@ -358,7 +357,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_DragDrop_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         DragEventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.DragDrop += handler);
         control.DragDrop -= handler;
@@ -367,7 +366,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_DragEnter_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         DragEventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.DragEnter += handler);
         control.DragEnter -= handler;
@@ -376,7 +375,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_DragLeave_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.DragLeave += handler);
         control.DragLeave -= handler;
@@ -385,7 +384,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_DragOver_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         DragEventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.DragOver += handler);
         control.DragOver -= handler;
@@ -394,7 +393,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_EnabledChanged_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.EnabledChanged += handler);
         control.EnabledChanged -= handler;
@@ -403,7 +402,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_Enter_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.Enter += handler);
         control.Enter -= handler;
@@ -412,7 +411,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_FontChanged_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.FontChanged += handler);
         control.FontChanged -= handler;
@@ -421,7 +420,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_ForeColorChanged_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.ForeColorChanged += handler);
         control.ForeColorChanged -= handler;
@@ -430,7 +429,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_GiveFeedback_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         GiveFeedbackEventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.GiveFeedback += handler);
         control.GiveFeedback -= handler;
@@ -439,7 +438,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_HelpRequested_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         HelpEventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.HelpRequested += handler);
         control.HelpRequested -= handler;
@@ -448,7 +447,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_ImeModeChanged_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.ImeModeChanged += handler);
         control.ImeModeChanged -= handler;
@@ -457,7 +456,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_KeyDown_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         KeyEventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.KeyDown += handler);
         control.KeyDown -= handler;
@@ -466,7 +465,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_KeyPress_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         KeyPressEventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.KeyPress += handler);
         control.KeyPress -= handler;
@@ -475,7 +474,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_KeyUp_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         KeyEventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.KeyUp += handler);
         control.KeyUp -= handler;
@@ -484,7 +483,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_Layout_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         LayoutEventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.Layout += handler);
         ((Control)control).Layout -= handler;
@@ -493,7 +492,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_Leave_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.Leave += handler);
         control.Leave -= handler;
@@ -502,7 +501,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_MouseCaptureChanged_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.MouseCaptureChanged += handler);
         control.MouseCaptureChanged -= handler;
@@ -511,7 +510,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_MouseClick_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         MouseEventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.MouseClick += handler);
         control.MouseClick -= handler;
@@ -520,7 +519,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_MouseDoubleClick_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         MouseEventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.MouseDoubleClick += handler);
         control.MouseDoubleClick -= handler;
@@ -529,7 +528,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_MouseDown_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         MouseEventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.MouseDown += handler);
         control.MouseDown -= handler;
@@ -538,7 +537,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_MouseEnter_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.MouseEnter += handler);
         control.MouseEnter -= handler;
@@ -547,7 +546,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_MouseHover_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.MouseHover += handler);
         control.MouseHover -= handler;
@@ -556,7 +555,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_MouseLeave_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.MouseLeave += handler);
         control.MouseLeave -= handler;
@@ -565,7 +564,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_MouseMove_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         MouseEventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.MouseMove += handler);
         control.MouseMove -= handler;
@@ -574,7 +573,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_MouseUp_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         MouseEventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.MouseUp += handler);
         control.MouseUp -= handler;
@@ -583,7 +582,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_MouseWheel_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         MouseEventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.MouseWheel += handler);
         control.MouseWheel -= handler;
@@ -592,7 +591,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_Paint_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         PaintEventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.Paint += handler);
         control.Paint -= handler;
@@ -601,7 +600,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_QueryAccessibilityHelp__AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         QueryAccessibilityHelpEventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.QueryAccessibilityHelp += handler);
         control.QueryAccessibilityHelp -= handler;
@@ -610,7 +609,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_QueryContinueDrag__AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         QueryContinueDragEventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.QueryContinueDrag += handler);
         control.QueryContinueDrag -= handler;
@@ -619,7 +618,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_RightToLeftChanged_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.RightToLeftChanged += handler);
         control.RightToLeftChanged -= handler;
@@ -628,7 +627,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_StyleChanged_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.StyleChanged += handler);
         control.StyleChanged -= handler;
@@ -637,7 +636,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_TextChanged_AddRemove_ThrowsNotSupportedException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         EventHandler handler = (sender, e) => { };
         Assert.Throws<NotSupportedException>(() => control.TextChanged += handler);
         control.TextChanged -= handler;
@@ -646,7 +645,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_CreateWebBrowserSiteBase_Invoke_ReturnsExpected()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         WebBrowserSiteBase siteBase = control.CreateWebBrowserSiteBase();
         Assert.NotNull(siteBase);
         Assert.NotSame(siteBase, control.CreateWebBrowserSiteBase());
@@ -665,12 +664,12 @@ public class WebBrowserBaseTests
     [MemberData(nameof(DrawToBitmap_TestData))]
     public void WebBrowserBase_DrawToBitmap_Invoke_Success(Rectangle targetBounds)
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2")
+        using SubWebBrowserBase control = new()
         {
             Width = 20,
             Height = 20,
         };
-        using var bitmap = new Bitmap(20, 20);
+        using Bitmap bitmap = new(20, 20);
         control.DrawToBitmap(bitmap, targetBounds);
         Assert.True(control.IsHandleCreated);
     }
@@ -679,7 +678,7 @@ public class WebBrowserBaseTests
     [MemberData(nameof(DrawToBitmap_TestData))]
     public void WebBrowserBase_DrawToBitmap_InvokeWithHandle_Success(Rectangle rectangle)
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2")
+        using SubWebBrowserBase control = new()
         {
             Width = 20,
             Height = 20,
@@ -692,7 +691,7 @@ public class WebBrowserBaseTests
         int createdCallCount = 0;
         control.HandleCreated += (sender, e) => createdCallCount++;
 
-        using var bitmap = new Bitmap(20, 20);
+        using Bitmap bitmap = new(20, 20);
         control.DrawToBitmap(bitmap, rectangle);
         Assert.True(control.IsHandleCreated);
         Assert.Equal(0, invalidatedCallCount);
@@ -703,7 +702,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_DrawToBitmap_NullBitmap_ThrowsArgumentNullException()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         Assert.Throws<ArgumentNullException>("bitmap", () => control.DrawToBitmap(null, new Rectangle(1, 2, 3, 4)));
     }
 
@@ -716,12 +715,12 @@ public class WebBrowserBaseTests
     [InlineData(0, 0, 1, 0)]
     public void WebBrowserBase_DrawToBitmap_InvalidTargetBounds_ThrowsArgumentException(int x, int y, int width, int height)
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2")
+        using SubWebBrowserBase control = new()
         {
             Width = 20,
             Height = 20
         };
-        using var bitmap = new Bitmap(10, 10);
+        using Bitmap bitmap = new(10, 10);
         Assert.Throws<ArgumentException>(() => control.DrawToBitmap(bitmap, new Rectangle(x, y, width, height)));
     }
 
@@ -730,12 +729,12 @@ public class WebBrowserBaseTests
     [InlineData(0)]
     public void WebBrowserBase_DrawToBitmap_InvokeZeroWidth_ThrowsArgumentException(int width)
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2")
+        using SubWebBrowserBase control = new()
         {
             Width = width,
             Height = 20
         };
-        using var bitmap = new Bitmap(10, 10);
+        using Bitmap bitmap = new(10, 10);
         Assert.Throws<ArgumentException>(() => control.DrawToBitmap(bitmap, new Rectangle(1, 2, 3, 4)));
     }
 
@@ -744,19 +743,19 @@ public class WebBrowserBaseTests
     [InlineData(0)]
     public void WebBrowserBase_DrawToBitmap_InvokeZeroHeight_ThrowsArgumentException(int height)
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2")
+        using SubWebBrowserBase control = new()
         {
             Width = 20,
             Height = height
         };
-        using var bitmap = new Bitmap(10, 10);
+        using Bitmap bitmap = new(10, 10);
         Assert.Throws<ArgumentException>(() => control.DrawToBitmap(bitmap, new Rectangle(1, 2, 3, 4)));
     }
 
     [WinFormsFact]
     public void WebBrowserBase_GetAutoSizeMode_Invoke_ReturnsExpected()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         Assert.Equal(AutoSizeMode.GrowOnly, control.GetAutoSizeMode());
     }
 
@@ -783,7 +782,7 @@ public class WebBrowserBaseTests
     [InlineData((ControlStyles)(-1), false)]
     public void WebBrowserBase_GetStyle_Invoke_ReturnsExpected(ControlStyles flag, bool expected)
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         Assert.Equal(expected, control.GetStyle(flag));
 
         // Call again to test caching.
@@ -793,7 +792,7 @@ public class WebBrowserBaseTests
     [WinFormsFact]
     public void WebBrowserBase_GetTopLevel_Invoke_ReturnsExpected()
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         Assert.False(control.GetTopLevel());
     }
 
@@ -801,7 +800,7 @@ public class WebBrowserBaseTests
     [InlineData(Keys.A)]
     public void WebBrowserBase_ProcessDialogKey_InvokeWithoutParent_ReturnsFalse(Keys keyData)
     {
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2");
+        using SubWebBrowserBase control = new();
         Assert.False(control.ProcessDialogKey(keyData));
         Assert.False(control.IsHandleCreated);
     }
@@ -810,11 +809,11 @@ public class WebBrowserBaseTests
     [InlineData(Keys.A)]
     public void WebBrowserBase_ProcessDialogKey_InvokeWithParent_ReturnsFalse(Keys keyData)
     {
-        using var parent = new Control
+        using Control parent = new()
         {
             Visible = false
         };
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2")
+        using SubWebBrowserBase control = new()
         {
             Parent = parent
         };
@@ -835,18 +834,26 @@ public class WebBrowserBaseTests
             return result;
         }
 
-        using var parent = new CustomProcessControl
+        using CustomProcessControl parent = new()
         {
             ProcessDialogKeyAction = action,
             Visible = false
         };
-        using var control = new SubWebBrowserBase("8856f961-340a-11d0-a96b-00c04fd705a2")
+        using SubWebBrowserBase control = new()
         {
             Parent = parent
         };
         Assert.Equal(result, control.ProcessDialogKey(keyData));
         Assert.Equal(1, callCount);
         Assert.False(control.IsHandleCreated);
+    }
+
+    [WinFormsFact]
+    public void WebBrowserBase_UseWaitCursor_ThrowsNotSupportedException()
+    {
+        using SubWebBrowserBase control = new();
+        Assert.False(control.UseWaitCursor);
+        Assert.Throws<NotSupportedException>(() => control.UseWaitCursor = true);
     }
 
     private class CustomProcessControl : Control
@@ -870,7 +877,9 @@ public class WebBrowserBaseTests
 
     private class SubWebBrowserBase : WebBrowserBase
     {
-        public SubWebBrowserBase(string clsidString) : base(clsidString)
+        private const string clsidString = "8856f961-340a-11d0-a96b-00c04fd705a2";
+
+        public SubWebBrowserBase() : base(clsidString)
         {
         }
 

@@ -1,8 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-#nullable disable
 
 using System.CodeDom;
 
@@ -15,34 +12,26 @@ namespace System.ComponentModel.Design.Serialization;
 internal class ContainerCodeDomSerializer : CodeDomSerializer
 {
     private const string _containerName = "components";
-    private static ContainerCodeDomSerializer s_defaultSerializer;
+    private static ContainerCodeDomSerializer? s_defaultSerializer;
 
     /// <summary>
     ///  Retrieves a default static instance of this serializer.
     /// </summary>
-    internal static new ContainerCodeDomSerializer Default
-    {
-        get
-        {
-            s_defaultSerializer ??= new ContainerCodeDomSerializer();
-
-            return s_defaultSerializer;
-        }
-    }
+    internal static new ContainerCodeDomSerializer Default => s_defaultSerializer ??= new ContainerCodeDomSerializer();
 
     /// <summary>
     ///  We override this so we can always provide the correct container as a reference.
     /// </summary>
-    protected override object DeserializeInstance(IDesignerSerializationManager manager, Type type, object[] parameters, string name, bool addToContainer)
+    protected override object DeserializeInstance(IDesignerSerializationManager manager, Type type, object?[]? parameters, string? name, bool addToContainer)
     {
         if (typeof(IContainer).IsAssignableFrom(type))
         {
-            object obj = manager.GetService(typeof(IContainer));
+            object? obj = manager.GetService(typeof(IContainer));
 
             if (obj is not null)
             {
                 Trace(TraceLevel.Verbose, "Returning IContainer service as container");
-                manager.SetName(obj, name);
+                manager.SetName(obj, name!);
                 return obj;
             }
         }
@@ -57,12 +46,12 @@ internal class ContainerCodeDomSerializer : CodeDomSerializer
     /// </summary>
     public override object Serialize(IDesignerSerializationManager manager, object value)
     {
-        CodeStatementCollection statements = new CodeStatementCollection();
+        CodeStatementCollection statements = new();
         CodeExpression lhs;
 
-        if (manager.Context[typeof(CodeTypeDeclaration)] is CodeTypeDeclaration typeDecl && manager.Context[typeof(RootContext)] is RootContext rootCtx)
+        if (manager.TryGetContext(out CodeTypeDeclaration? typeDecl) && manager.TryGetContext(out RootContext? rootCtx))
         {
-            CodeMemberField field = new CodeMemberField(typeof(IContainer), _containerName)
+            CodeMemberField field = new(typeof(IContainer), _containerName)
             {
                 Attributes = MemberAttributes.Private
             };
@@ -71,7 +60,7 @@ internal class ContainerCodeDomSerializer : CodeDomSerializer
         }
         else
         {
-            CodeVariableDeclarationStatement var = new CodeVariableDeclarationStatement(typeof(IContainer), _containerName);
+            CodeVariableDeclarationStatement var = new(typeof(IContainer), _containerName);
 
             statements.Add(var);
             lhs = new CodeVariableReferenceExpression(_containerName);
@@ -79,8 +68,8 @@ internal class ContainerCodeDomSerializer : CodeDomSerializer
 
         // Now create the container
         SetExpression(manager, value, lhs);
-        CodeObjectCreateExpression objCreate = new CodeObjectCreateExpression(typeof(Container));
-        CodeAssignStatement assign = new CodeAssignStatement(lhs, objCreate);
+        CodeObjectCreateExpression objCreate = new(typeof(Container));
+        CodeAssignStatement assign = new(lhs, objCreate);
 
         assign.UserData[nameof(IContainer)] = nameof(IContainer);
 

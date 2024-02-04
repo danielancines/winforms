@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Windows.Forms;
 
@@ -15,8 +14,8 @@ public partial class CommonControl1 : Form
 
     private void MainForm_Load(object sender, EventArgs e)
     {
-        ImageList imageListSmall = new ImageList();
-        ImageList imageListLarge = new ImageList();
+        ImageList imageListSmall = new();
+        ImageList imageListLarge = new();
         listView1.LargeImageList = imageListLarge;
         listView1.SmallImageList = imageListSmall;
     }

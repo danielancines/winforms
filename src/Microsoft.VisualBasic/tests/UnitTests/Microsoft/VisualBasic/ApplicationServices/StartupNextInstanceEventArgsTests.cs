@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections.ObjectModel;
 
@@ -13,8 +12,8 @@ public class StartupNextInstanceEventArgsTests
     [InlineData(false)]
     public void Ctor_ReadOnlyCollection_Boolean(bool bringToForeground)
     {
-        var collection = new ReadOnlyCollection<string>(new string[] { "a" });
-        var args = new StartupNextInstanceEventArgs(collection, bringToForeground);
+        ReadOnlyCollection<string> collection = new(new string[] { "a" });
+        StartupNextInstanceEventArgs args = new(collection, bringToForeground);
         Assert.Same(collection, args.CommandLine);
         Assert.Equal(bringToForeground, args.BringToForeground);
     }
@@ -30,8 +29,8 @@ public class StartupNextInstanceEventArgsTests
     [InlineData(false)]
     public void BringToForeground_Set_GetReturnsExpected(bool value)
     {
-        var collection = new ReadOnlyCollection<string>(new string[] { "a" });
-        var args = new StartupNextInstanceEventArgs(collection, bringToForegroundFlag: true)
+        ReadOnlyCollection<string> collection = new(new string[] { "a" });
+        StartupNextInstanceEventArgs args = new(collection, bringToForegroundFlag: true)
         {
             BringToForeground = value
         };

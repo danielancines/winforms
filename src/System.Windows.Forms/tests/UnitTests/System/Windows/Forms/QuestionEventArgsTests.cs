@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -10,7 +9,7 @@ public class QuestionEventArgsTests
     [Fact]
     public void Ctor_Default()
     {
-        var e = new QuestionEventArgs();
+        QuestionEventArgs e = new();
         Assert.False(e.Response);
     }
 
@@ -19,7 +18,7 @@ public class QuestionEventArgsTests
     [InlineData(false)]
     public void Ctor_Bool(bool response)
     {
-        var e = new QuestionEventArgs(response);
+        QuestionEventArgs e = new(response);
         Assert.Equal(response, e.Response);
     }
 
@@ -28,7 +27,7 @@ public class QuestionEventArgsTests
     [InlineData(false)]
     public void Response_Set_GetReturnsExpected(bool value)
     {
-        var e = new QuestionEventArgs(!value)
+        QuestionEventArgs e = new(!value)
         {
             Response = value
         };

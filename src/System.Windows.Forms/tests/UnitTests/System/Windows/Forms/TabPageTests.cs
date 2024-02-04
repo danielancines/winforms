@@ -1,15 +1,13 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Windows.Forms.TestUtilities;
 using Microsoft.DotNet.RemoteExecutor;
 using Moq;
-using System.Windows.Forms.TestUtilities;
-using static Interop;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
@@ -20,7 +18,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_Ctor_Default()
     {
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         Assert.Null(control.AccessibleDefaultActionDescription);
         Assert.Null(control.AccessibleDescription);
         Assert.Null(control.AccessibleName);
@@ -129,7 +127,7 @@ public class TabPageTests
     [NormalizedStringData]
     public void TabPage_Ctor_String(string text, string expectedText)
     {
-        using var control = new SubTabPage(text);
+        using SubTabPage control = new(text);
         Assert.Null(control.AccessibleDefaultActionDescription);
         Assert.Null(control.AccessibleDescription);
         Assert.Null(control.AccessibleName);
@@ -237,7 +235,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_CreateParams_GetDefault_ReturnsExpected()
     {
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         CreateParams createParams = control.CreateParams;
         Assert.Null(createParams.Caption);
         Assert.Null(createParams.ClassName);
@@ -258,7 +256,7 @@ public class TabPageTests
     [MemberData(nameof(ControlTests.Anchor_Set_TestData), MemberType = typeof(ControlTests))]
     public void TabPage_Anchor_Set_GetReturnsExpected(AnchorStyles value, AnchorStyles expected)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Anchor = value
         };
@@ -277,7 +275,7 @@ public class TabPageTests
     [MemberData(nameof(ControlTests.Anchor_Set_TestData), MemberType = typeof(ControlTests))]
     public void TabPage_Anchor_SetWithOldValue_GetReturnsExpected(AnchorStyles value, AnchorStyles expected)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Anchor = AnchorStyles.Left
         };
@@ -298,7 +296,7 @@ public class TabPageTests
     [MemberData(nameof(ControlTests.Anchor_SetWithDock_TestData), MemberType = typeof(ControlTests))]
     public void TabPage_Anchor_SetWithDock_GetReturnsExpected(DockStyle dock, AnchorStyles value, AnchorStyles expectedAnchor, DockStyle expectedDock)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Dock = dock
         };
@@ -319,7 +317,7 @@ public class TabPageTests
     [BoolData]
     public void TabPage_AutoSize_Set_GetReturnsExpected(bool value)
     {
-        using var control = new TabPage();
+        using TabPage control = new();
         int layoutCallCount = 0;
         control.Layout += (sender, e) => layoutCallCount++;
 
@@ -344,7 +342,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_AutoSize_SetWithHandler_CallsAutoSizeChanged()
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             AutoSize = true
         };
@@ -384,7 +382,7 @@ public class TabPageTests
     [InvalidEnumData<AutoSizeMode>]
     public void TabPage_AutoSizeMode_Set_GetReturnsExpected(AutoSizeMode value)
     {
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         int layoutCallCount = 0;
         control.Layout += (sender, e) => layoutCallCount++;
 
@@ -407,8 +405,8 @@ public class TabPageTests
     [InvalidEnumData<AutoSizeMode>]
     public void TabPage_AutoSizeMode_SetWithParent_GetReturnsExpected(AutoSizeMode value)
     {
-        using var parent = new TabControl();
-        using var control = new SubTabPage
+        using TabControl parent = new();
+        using SubTabPage control = new()
         {
             Parent = parent
         };
@@ -440,7 +438,7 @@ public class TabPageTests
     [InvalidEnumData<AutoSizeMode>]
     public void TabPage_AutoSizeMode_SetWithHandle_GetReturnsExpected(AutoSizeMode value)
     {
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -472,8 +470,8 @@ public class TabPageTests
     [InvalidEnumData<AutoSizeMode>]
     public void TabPage_AutoSizeMode_SetWithHandleWithParent_GetReturnsExpected(AutoSizeMode value)
     {
-        using var parent = new TabControl();
-        using var control = new SubTabPage
+        using TabControl parent = new();
+        using SubTabPage control = new()
         {
             Parent = parent
         };
@@ -529,7 +527,7 @@ public class TabPageTests
     [BoolData]
     public static void TabPage_BackColor_Get_ReturnsExpected(bool useVisualStyleBackColor)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             UseVisualStyleBackColor = useVisualStyleBackColor
         };
@@ -547,7 +545,7 @@ public class TabPageTests
 
             Application.EnableVisualStyles();
 
-            using var control = new TabPage
+            using TabPage control = new()
             {
                 UseVisualStyleBackColor = useVisualStyleBackColor
             };
@@ -570,11 +568,11 @@ public class TabPageTests
             return;
         }
 
-        using var parent = new TabControl
+        using TabControl parent = new()
         {
             Appearance = parentAppearance
         };
-        using var control = new TabPage
+        using TabPage control = new()
         {
             UseVisualStyleBackColor = useVisualStyleBackColor,
             Parent = parent
@@ -586,11 +584,11 @@ public class TabPageTests
     [WinFormsFact]
     public static void TabPage_BackColor_TabAppearance_Normal_GetWithParent_ReturnsExpected()
     {
-        using var parent = new TabControl
+        using TabControl parent = new()
         {
             Appearance = TabAppearance.Normal
         };
-        using var control = new TabPage
+        using TabPage control = new()
         {
             UseVisualStyleBackColor = true,
             Parent = parent
@@ -629,11 +627,11 @@ public class TabPageTests
 
             Application.EnableVisualStyles();
 
-            using var parent = new TabControl
+            using TabControl parent = new()
             {
                 Appearance = parentAppearance
             };
-            using var control = new TabPage
+            using TabPage control = new()
             {
                 UseVisualStyleBackColor = useVisualStyleBackColor,
                 Parent = parent
@@ -646,7 +644,7 @@ public class TabPageTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetBackColorTheoryData))]
     public void TabPage_BackColor_Set_GetReturnsExpected(Color value, Color expected)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             BackColor = value
         };
@@ -663,7 +661,7 @@ public class TabPageTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetBackColorTheoryData))]
     public void TabPage_BackColor_SetWithUseVisualStyleBackColor_GetReturnsExpected(Color value, Color expected)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             UseVisualStyleBackColor = true,
             BackColor = value
@@ -683,7 +681,7 @@ public class TabPageTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetBackColorTheoryData))]
     public void TabPage_BackColor_SetDesignMode_GetReturnsExpected(Color value, Color expected)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -705,7 +703,7 @@ public class TabPageTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Site = mockSite.Object,
             BackColor = value
@@ -725,7 +723,7 @@ public class TabPageTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetBackColorTheoryData))]
     public void TabPage_BackColor_SetDesignModeWithUseVisualStyleBackColor_GetReturnsExpected(Color value, Color expected)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -747,7 +745,7 @@ public class TabPageTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Site = mockSite.Object,
             UseVisualStyleBackColor = true,
@@ -768,7 +766,7 @@ public class TabPageTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetBackColorTheoryData))]
     public void TabPage_BackColor_SetDesignModeWithInvalidDescriptor_GetReturnsExpected(Color value, Color expected)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -790,16 +788,16 @@ public class TabPageTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Site = mockSite.Object,
             UseVisualStyleBackColor = true,
         };
-        var mockCustomTypeDescriptor = new Mock<ICustomTypeDescriptor>(MockBehavior.Strict);
+        Mock<ICustomTypeDescriptor> mockCustomTypeDescriptor = new(MockBehavior.Strict);
         mockCustomTypeDescriptor
             .Setup(d => d.GetProperties())
             .Returns(PropertyDescriptorCollection.Empty);
-        var mockProvider = new Mock<TypeDescriptionProvider>(MockBehavior.Strict);
+        Mock<TypeDescriptionProvider> mockProvider = new(MockBehavior.Strict);
         mockProvider
             .Setup(p => p.GetCache(control))
             .CallBase();
@@ -833,7 +831,7 @@ public class TabPageTests
     [MemberData(nameof(BackColor_SetWithHandle_TestData))]
     public void TabPage_BackColor_SetWithHandle_GetReturnsExpected(Color value, Color expected, int expectedInvalidatedCallCount)
     {
-        using var control = new TabPage();
+        using TabPage control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -861,7 +859,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_BackColor_SetWithHandler_CallsBackColorChanged()
     {
-        using var control = new TabPage();
+        using TabPage control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -897,7 +895,7 @@ public class TabPageTests
     [EnumData<DockStyle>]
     public void TabPage_Dock_Set_GetReturnsExpected(DockStyle value)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Dock = value
         };
@@ -914,7 +912,7 @@ public class TabPageTests
     [EnumData<DockStyle>]
     public void TabPage_Dock_SetWithOldValue_GetReturnsExpected(DockStyle value)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Dock = DockStyle.Top
         };
@@ -933,7 +931,7 @@ public class TabPageTests
     [MemberData(nameof(ControlTests.Dock_SetWithAnchor_TestData), MemberType = typeof(ControlTests))]
     public void TabPage_Dock_SetWithAnchor_GetReturnsExpected(AnchorStyles anchor, DockStyle value, AnchorStyles expectedAnchor)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Anchor = anchor
         };
@@ -951,7 +949,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_Dock_SetWithHandler_CallsDockChanged()
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Dock = DockStyle.None
         };
@@ -990,7 +988,7 @@ public class TabPageTests
     [InvalidEnumData<DockStyle>]
     public void TabPage_Dock_SetInvalid_ThrowsInvalidEnumArgumentException(DockStyle value)
     {
-        using var control = new TabPage();
+        using TabPage control = new();
         Assert.Throws<InvalidEnumArgumentException>("value", () => control.Dock = value);
     }
 
@@ -998,7 +996,7 @@ public class TabPageTests
     [BoolData]
     public void TabPage_Enabled_Set_GetReturnsExpected(bool value)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Enabled = value
         };
@@ -1023,7 +1021,7 @@ public class TabPageTests
     [InlineData(false, true, 0, 0)]
     public void TabPage_Enabled_SetWithHandle_GetReturnsExpected(bool userPaint, bool value, int expectedInvalidateCallCount1, int expectedInvalidateCallCount2)
     {
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         control.SetStyle(ControlStyles.UserPaint, userPaint);
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
@@ -1061,7 +1059,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_Enabled_SetWithHandler_CallsEnabledChanged()
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Enabled = true
         };
@@ -1102,7 +1100,7 @@ public class TabPageTests
     [InlineData(1)]
     public void TabPage_ImageIndex_Set_GetReturnsExpected(int value)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             ImageIndex = value
         };
@@ -1125,8 +1123,8 @@ public class TabPageTests
     [InlineData(1)]
     public void TabPage_ImageIndex_SetWithParent_GetReturnsExpected(int value)
     {
-        using var parent = new TabControl();
-        using var control = new TabPage
+        using TabControl parent = new();
+        using TabPage control = new()
         {
             Parent = parent,
             ImageIndex = value
@@ -1152,7 +1150,7 @@ public class TabPageTests
     [InlineData(1)]
     public void TabPage_ImageIndex_SetWithDesignModeParent_GetReturnsExpected(int value)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -1162,11 +1160,11 @@ public class TabPageTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var parent = new TabControl
+        using TabControl parent = new()
         {
             Site = mockSite.Object
         };
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Parent = parent,
             ImageIndex = value
@@ -1192,7 +1190,7 @@ public class TabPageTests
     [InlineData(1)]
     public void TabPage_ImageIndex_SetWithImageKey_GetReturnsExpected(int value)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             ImageKey = "imageKey",
             ImageIndex = value
@@ -1216,7 +1214,7 @@ public class TabPageTests
     [InlineData(1)]
     public void TabPage_ImageIndex_SetWithHandle_GetReturnsExpected(int value)
     {
-        using var control = new TabPage();
+        using TabPage control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -1251,8 +1249,8 @@ public class TabPageTests
     [InlineData(1)]
     public void TabPage_ImageIndex_SetWithParentWithHandle_GetReturnsExpected(int value)
     {
-        using var parent = new TabControl();
-        using var control = new TabPage
+        using TabControl parent = new();
+        using TabPage control = new()
         {
             Parent = parent
         };
@@ -1304,7 +1302,7 @@ public class TabPageTests
     [InlineData(1)]
     public void TabPage_ImageIndex_SetWithDesignModeParentWithHandle_GetReturnsExpected(int value)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -1314,11 +1312,11 @@ public class TabPageTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var parent = new TabControl
+        using TabControl parent = new()
         {
             Site = mockSite.Object
         };
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Parent = parent
         };
@@ -1370,14 +1368,14 @@ public class TabPageTests
     [InlineData(1)]
     public unsafe void TabPageCollection_ImageIndex_SetGetItemsWithHandle_Success(int imageIndex)
     {
-        using var owner = new TabControl();
-        using var page1 = new TabPage();
-        using var page2 = new TabPage
+        using TabControl owner = new();
+        using TabPage page1 = new();
+        using TabPage page2 = new()
         {
             Text = "Text",
             ImageIndex = 1
         };
-        using var page3 = new NullTextTabPage();
+        using NullTextTabPage page3 = new();
         owner.TabPages.Add(page1);
         owner.TabPages.Add(page2);
         owner.TabPages.Add(page3);
@@ -1387,7 +1385,7 @@ public class TabPageTests
         Assert.Equal(3, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMCOUNT));
 
         char* buffer = stackalloc char[256];
-        ComCtl32.TCITEMW item = default;
+        TCITEMW item = default;
         item.cchTextMax = int.MaxValue;
         item.pszText = buffer;
         item.dwStateMask = (TAB_CONTROL_ITEM_STATE)uint.MaxValue;
@@ -1396,7 +1394,7 @@ public class TabPageTests
         // Get item 0.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 0, ref item));
         Assert.Equal(TAB_CONTROL_ITEM_STATE.TCIS_BUTTONPRESSED, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Empty(new string(item.pszText));
         Assert.Equal(-1, item.iImage);
@@ -1404,7 +1402,7 @@ public class TabPageTests
         // Get item 1.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 1, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Equal("Text", new string(item.pszText));
         Assert.Equal(imageIndex, item.iImage);
@@ -1412,7 +1410,7 @@ public class TabPageTests
         // Get item 2.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 2, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Empty(new string(item.pszText));
         Assert.Equal(-1, item.iImage);
@@ -1424,7 +1422,7 @@ public class TabPageTests
     [InlineData(1)]
     public unsafe void TabPageCollection_ImageIndex_SetGetItemsWithHandleDesignMode_Success(int imageIndex)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -1434,17 +1432,17 @@ public class TabPageTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var owner = new TabControl
+        using TabControl owner = new()
         {
             Site = mockSite.Object
         };
-        using var page1 = new TabPage();
-        using var page2 = new TabPage
+        using TabPage page1 = new();
+        using TabPage page2 = new()
         {
             Text = "Text",
             ImageIndex = 1
         };
-        using var page3 = new NullTextTabPage();
+        using NullTextTabPage page3 = new();
         owner.TabPages.Add(page1);
         owner.TabPages.Add(page2);
         owner.TabPages.Add(page3);
@@ -1454,7 +1452,7 @@ public class TabPageTests
         Assert.Equal(3, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMCOUNT));
 
         char* buffer = stackalloc char[256];
-        ComCtl32.TCITEMW item = default;
+        TCITEMW item = default;
         item.cchTextMax = int.MaxValue;
         item.pszText = buffer;
         item.dwStateMask = (TAB_CONTROL_ITEM_STATE)uint.MaxValue;
@@ -1463,7 +1461,7 @@ public class TabPageTests
         // Get item 0.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 0, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Empty(new string(item.pszText));
         Assert.Equal(-1, item.iImage);
@@ -1471,7 +1469,7 @@ public class TabPageTests
         // Get item 1.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 1, ref item));
         Assert.Equal(TAB_CONTROL_ITEM_STATE.TCIS_BUTTONPRESSED, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Equal("Text", new string(item.pszText));
         Assert.Equal(imageIndex, item.iImage);
@@ -1479,7 +1477,7 @@ public class TabPageTests
         // Get item 2.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 2, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Empty(new string(item.pszText));
         Assert.Equal(-1, item.iImage);
@@ -1488,7 +1486,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_ImageIndex_SetInvalidValue_ThrowsArgumentOutOfRangeException()
     {
-        using var control = new TabPage();
+        using TabPage control = new();
         Assert.Throws<ArgumentOutOfRangeException>("value", () => control.ImageIndex = -2);
     }
 
@@ -1496,7 +1494,7 @@ public class TabPageTests
     [StringData]
     public void TabPage_ImageKey_Set_GetReturnsExpected(string value)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             ImageKey = value
         };
@@ -1517,8 +1515,8 @@ public class TabPageTests
     [StringData]
     public void TabPage_ImageKey_SetWithParent_GetReturnsExpected(string value)
     {
-        using var parent = new TabControl();
-        using var control = new TabPage
+        using TabControl parent = new();
+        using TabPage control = new()
         {
             ImageKey = value
         };
@@ -1541,7 +1539,7 @@ public class TabPageTests
     [StringData]
     public void TabPage_ImageKey_SetWithDesignModeParent_GetReturnsExpected(string value)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -1551,11 +1549,11 @@ public class TabPageTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var parent = new TabControl
+        using TabControl parent = new()
         {
             Site = mockSite.Object
         };
-        using var control = new TabPage
+        using TabPage control = new()
         {
             ImageKey = value
         };
@@ -1578,7 +1576,7 @@ public class TabPageTests
     [StringData]
     public void TabPage_ImageKey_SetWithImageIndex_GetReturnsExpected(string value)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             ImageIndex = 1,
             ImageKey = value
@@ -1598,7 +1596,7 @@ public class TabPageTests
     [StringData]
     public void TabPage_ImageKey_SetWithHandle_GetReturnsExpected(string value)
     {
-        using var control = new TabPage();
+        using TabPage control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -1631,8 +1629,8 @@ public class TabPageTests
     [StringData]
     public void TabPage_ImageKey_SetWithHandleWithParent_GetReturnsExpected(string value)
     {
-        using var parent = new TabControl();
-        using var control = new TabPage
+        using TabControl parent = new();
+        using TabPage control = new()
         {
             Parent = parent
         };
@@ -1682,7 +1680,7 @@ public class TabPageTests
     [StringData]
     public void TabPage_ImageKey_SetWithDesignModeParentWithHandle_GetReturnsExpected(string value)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -1692,11 +1690,11 @@ public class TabPageTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var parent = new TabControl
+        using TabControl parent = new()
         {
             Site = mockSite.Object
         };
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Parent = parent
         };
@@ -1745,14 +1743,14 @@ public class TabPageTests
     [WinFormsFact]
     public unsafe void TabPageCollection_ImageKey_SetGetItemsWithHandle_Success()
     {
-        using var owner = new TabControl();
-        using var page1 = new TabPage();
-        using var page2 = new TabPage
+        using TabControl owner = new();
+        using TabPage page1 = new();
+        using TabPage page2 = new()
         {
             Text = "Text",
             ImageIndex = 1
         };
-        using var page3 = new NullTextTabPage();
+        using NullTextTabPage page3 = new();
         owner.TabPages.Add(page1);
         owner.TabPages.Add(page2);
         owner.TabPages.Add(page3);
@@ -1762,7 +1760,7 @@ public class TabPageTests
         Assert.Equal(3, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMCOUNT));
 
         char* buffer = stackalloc char[256];
-        ComCtl32.TCITEMW item = default;
+        TCITEMW item = default;
         item.cchTextMax = int.MaxValue;
         item.pszText = buffer;
         item.dwStateMask = (TAB_CONTROL_ITEM_STATE)uint.MaxValue;
@@ -1771,7 +1769,7 @@ public class TabPageTests
         // Get item 0.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 0, ref item));
         Assert.Equal(TAB_CONTROL_ITEM_STATE.TCIS_BUTTONPRESSED, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Empty(new string(item.pszText));
         Assert.Equal(-1, item.iImage);
@@ -1779,7 +1777,7 @@ public class TabPageTests
         // Get item 1.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 1, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Equal("Text", new string(item.pszText));
         Assert.Equal(-1, item.iImage);
@@ -1787,7 +1785,7 @@ public class TabPageTests
         // Get item 2.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 2, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Empty(new string(item.pszText));
         Assert.Equal(-1, item.iImage);
@@ -1796,7 +1794,7 @@ public class TabPageTests
     [WinFormsFact]
     public unsafe void TabPageCollection_ImageKey_SetGetItemsWithHandleDesignMode_Success()
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -1806,17 +1804,17 @@ public class TabPageTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var owner = new TabControl
+        using TabControl owner = new()
         {
             Site = mockSite.Object
         };
-        using var page1 = new TabPage();
-        using var page2 = new TabPage
+        using TabPage page1 = new();
+        using TabPage page2 = new()
         {
             Text = "Text",
             ImageIndex = 1
         };
-        using var page3 = new NullTextTabPage();
+        using NullTextTabPage page3 = new();
         owner.TabPages.Add(page1);
         owner.TabPages.Add(page2);
         owner.TabPages.Add(page3);
@@ -1826,7 +1824,7 @@ public class TabPageTests
         Assert.Equal(3, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMCOUNT));
 
         char* buffer = stackalloc char[256];
-        ComCtl32.TCITEMW item = default;
+        TCITEMW item = default;
         item.cchTextMax = int.MaxValue;
         item.pszText = buffer;
         item.dwStateMask = (TAB_CONTROL_ITEM_STATE)uint.MaxValue;
@@ -1835,7 +1833,7 @@ public class TabPageTests
         // Get item 0.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 0, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Empty(new string(item.pszText));
         Assert.Equal(-1, item.iImage);
@@ -1843,7 +1841,7 @@ public class TabPageTests
         // Get item 1.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 1, ref item));
         Assert.Equal(TAB_CONTROL_ITEM_STATE.TCIS_BUTTONPRESSED, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Equal("Text", new string(item.pszText));
         Assert.Equal(-1, item.iImage);
@@ -1851,7 +1849,7 @@ public class TabPageTests
         // Get item 2.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 2, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Empty(new string(item.pszText));
         Assert.Equal(-1, item.iImage);
@@ -1870,7 +1868,7 @@ public class TabPageTests
     [MemberData(nameof(Location_Set_TestData))]
     public void TabPage_Location_Set_GetReturnsExpected(Point value, int expectedLocationChangedCallCount)
     {
-        using var control = new TabPage();
+        using TabPage control = new();
         int moveCallCount = 0;
         int locationChangedCallCount = 0;
         int layoutCallCount = 0;
@@ -1944,8 +1942,8 @@ public class TabPageTests
     [MemberData(nameof(Location_Set_TestData))]
     public void TabPage_Location_SetWithParent_GetReturnsExpected(Point value, int expectedLocationChangedCallCount)
     {
-        using var parent = new TabControl();
-        using var control = new SubTabPage
+        using TabControl parent = new();
+        using SubTabPage control = new()
         {
             Parent = parent
         };
@@ -2053,7 +2051,7 @@ public class TabPageTests
     [MemberData(nameof(Location_SetWithHandle_TestData))]
     public void TabPage_Location_SetWithHandle_GetReturnsExpected(bool resizeRedraw, Point value, int expectedLocationChangedCallCount)
     {
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         control.SetStyle(ControlStyles.ResizeRedraw, resizeRedraw);
         int moveCallCount = 0;
         int locationChangedCallCount = 0;
@@ -2153,8 +2151,8 @@ public class TabPageTests
     [MemberData(nameof(Location_SetWithParentWithHandle_TestData))]
     public void TabPage_Location_SetWithParentWithHandle_GetReturnsExpected(bool resizeRedraw, Point value)
     {
-        using var parent = new TabControl();
-        using var control = new SubTabPage
+        using TabControl parent = new();
+        using SubTabPage control = new()
         {
             Parent = parent
         };
@@ -2281,7 +2279,7 @@ public class TabPageTests
     [InlineData(false, 0)]
     public void TabPage_Location_SetWithHandleWithTransparentBackColor_DoesNotCallInvalidate(bool supportsTransparentBackgroundColor, int expectedInvalidatedCallCount)
     {
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         control.SetStyle(ControlStyles.SupportsTransparentBackColor, true);
         control.BackColor = Color.FromArgb(254, 255, 255, 255);
         control.SetStyle(ControlStyles.SupportsTransparentBackColor, supportsTransparentBackgroundColor);
@@ -2309,7 +2307,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_Location_SetWithHandler_CallsLocationChanged()
     {
-        using var control = new TabPage();
+        using TabPage control = new();
         int locationChangedCallCount = 0;
         EventHandler locationChangedHandler = (sender, e) =>
         {
@@ -2364,7 +2362,7 @@ public class TabPageTests
     public void TabPage_Location_ResetValue_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(TabPage))[nameof(TabPage.Location)];
-        using var control = new TabPage();
+        using TabPage control = new();
         Assert.False(property.CanResetValue(control));
 
         control.Location = new Point(1, 0);
@@ -2392,7 +2390,7 @@ public class TabPageTests
     public void TabPage_Location_ShouldSerializeValue_Success()
     {
         PropertyDescriptor property = TypeDescriptor.GetProperties(typeof(TabPage))[nameof(TabPage.Location)];
-        using var control = new TabPage();
+        using TabPage control = new();
         Assert.False(property.ShouldSerializeValue(control));
 
         control.Location = new Point(1, 0);
@@ -2420,7 +2418,7 @@ public class TabPageTests
     [MemberData(nameof(ControlTests.MaximumSize_Set_TestData), MemberType = typeof(ControlTests))]
     public void TabPage_MaximumSize_Set_GetReturnsExpected(Size value)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Size = Size.Empty
         };
@@ -2445,7 +2443,7 @@ public class TabPageTests
     [MemberData(nameof(ControlTests.MinimumSize_Set_TestData), MemberType = typeof(ControlTests))]
     public void TabPage_MinimumSize_Set_GetReturnsExpected(Size value, Size expectedSize, int expectedLayoutCallCount)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Size = Size.Empty
         };
@@ -2482,7 +2480,7 @@ public class TabPageTests
     [MemberData(nameof(Parent_Set_TestData))]
     public void TabPage_Parent_Set_GetReturnsExpected(Control value)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Parent = value
         };
@@ -2499,8 +2497,8 @@ public class TabPageTests
     [MemberData(nameof(Parent_Set_TestData))]
     public void TabPage_Parent_SetWithNonNullOldParent_GetReturnsExpected(Control value)
     {
-        using var oldParent = new TabControl();
-        using var control = new TabPage
+        using TabControl oldParent = new();
+        using TabPage control = new()
         {
             Parent = oldParent
         };
@@ -2520,8 +2518,8 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_Parent_SetNonNull_AddsToControls()
     {
-        using var parent = new TabControl();
-        using var control = new TabPage
+        using TabControl parent = new();
+        using TabPage control = new()
         {
             Parent = parent
         };
@@ -2540,7 +2538,7 @@ public class TabPageTests
     [MemberData(nameof(Parent_Set_TestData))]
     public void TabPage_Parent_SetWithHandle_GetReturnsExpected(Control value)
     {
-        using var control = new TabPage();
+        using TabPage control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -2568,8 +2566,8 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_Parent_SetWithHandler_CallsParentChanged()
     {
-        using var parent = new TabControl();
-        using var control = new TabPage();
+        using TabControl parent = new();
+        using TabPage control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -2604,7 +2602,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_Parent_SetSame_ThrowsArgumentException()
     {
-        using var control = new TabPage();
+        using TabPage control = new();
         Assert.Throws<ArgumentException>(() => control.Parent = control);
         Assert.Null(control.Parent);
     }
@@ -2612,8 +2610,8 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_Parent_SetNonTabControl_ThrowsArgumentException()
     {
-        using var parent = new Control();
-        using var control = new TabPage();
+        using Control parent = new();
+        using TabPage control = new();
         Assert.Throws<ArgumentException>(() => control.Parent = parent);
         Assert.Null(control.Parent);
     }
@@ -2624,7 +2622,7 @@ public class TabPageTests
     [InlineData(2)]
     public void TabPage_TabIndex_Set_GetReturnsExpected(int value)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             TabIndex = value
         };
@@ -2640,7 +2638,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_TabIndex_SetWithHandler_CallsTabIndexChanged()
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             TabIndex = 0
         };
@@ -2678,7 +2676,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_TabIndex_SetNegative_CallsArgumentOutOfRangeException()
     {
-        using var control = new TabPage();
+        using TabPage control = new();
         Assert.Throws<ArgumentOutOfRangeException>("value", () => control.TabIndex = -1);
     }
 
@@ -2686,7 +2684,7 @@ public class TabPageTests
     [BoolData]
     public void TabPage_TabStop_Set_GetReturnsExpected(bool value)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             TabStop = value
         };
@@ -2708,7 +2706,7 @@ public class TabPageTests
     [BoolData]
     public void TabPage_TabStop_SetWithHandle_GetReturnsExpected(bool value)
     {
-        using var control = new TabPage();
+        using TabPage control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -2744,7 +2742,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_TabStop_SetWithHandler_CallsTabStopChanged()
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             TabStop = true
         };
@@ -2783,7 +2781,7 @@ public class TabPageTests
     [NormalizedStringData]
     public void TabPage_Text_Set_GetReturnsExpected(string value, string expected)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Text = value
         };
@@ -2800,8 +2798,8 @@ public class TabPageTests
     [NormalizedStringData]
     public void TabPage_Text_SetWithParent_GetReturnsExpected(string value, string expected)
     {
-        using var parent = new TabControl();
-        using var control = new TabPage
+        using TabControl parent = new();
+        using TabPage control = new()
         {
             Parent = parent,
             Text = value
@@ -2823,7 +2821,7 @@ public class TabPageTests
     [NormalizedStringData]
     public void TabPage_Text_SetWithDesignModeParent_GetReturnsExpected(string value, string expected)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -2833,11 +2831,11 @@ public class TabPageTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var parent = new TabControl
+        using TabControl parent = new()
         {
             Site = mockSite.Object
         };
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Parent = parent,
             Text = value
@@ -2859,7 +2857,7 @@ public class TabPageTests
     [NormalizedStringData]
     public void TabPage_Text_SetWithHandle_GetReturnsExpected(string value, string expected)
     {
-        using var control = new TabPage();
+        using TabPage control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -2888,8 +2886,8 @@ public class TabPageTests
     [NormalizedStringData]
     public void TabPage_Text_SetWithParentWithHandle_GetReturnsExpected(string value, string expected)
     {
-        using var parent = new TabControl();
-        using var control = new TabPage
+        using TabControl parent = new();
+        using TabPage control = new()
         {
             Parent = parent
         };
@@ -2937,7 +2935,7 @@ public class TabPageTests
     [NormalizedStringData]
     public void TabPage_Text_SetWithDesignModeParentWithHandle_GetReturnsExpected(string value, string expected)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -2947,11 +2945,11 @@ public class TabPageTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var parent = new TabControl
+        using TabControl parent = new()
         {
             Site = mockSite.Object
         };
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Parent = parent
         };
@@ -3002,13 +3000,13 @@ public class TabPageTests
     [InlineData("&Text", "&&Text")]
     public unsafe void TabPageCollection_Text_SetGetItemsWithHandle_Success(string text, string expectedText)
     {
-        using var owner = new TabControl();
-        using var page1 = new TabPage();
-        using var page2 = new TabPage
+        using TabControl owner = new();
+        using TabPage page1 = new();
+        using TabPage page2 = new()
         {
             ImageIndex = 1
         };
-        using var page3 = new NullTextTabPage();
+        using NullTextTabPage page3 = new();
         owner.TabPages.Add(page1);
         owner.TabPages.Add(page2);
         owner.TabPages.Add(page3);
@@ -3018,7 +3016,7 @@ public class TabPageTests
         Assert.Equal(3, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMCOUNT));
 
         char* buffer = stackalloc char[256];
-        ComCtl32.TCITEMW item = default;
+        TCITEMW item = default;
         item.cchTextMax = int.MaxValue;
         item.pszText = buffer;
         item.dwStateMask = (TAB_CONTROL_ITEM_STATE)uint.MaxValue;
@@ -3027,7 +3025,7 @@ public class TabPageTests
         // Get item 0.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 0, ref item));
         Assert.Equal(TAB_CONTROL_ITEM_STATE.TCIS_BUTTONPRESSED, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Empty(new string(item.pszText));
         Assert.Equal(-1, item.iImage);
@@ -3035,7 +3033,7 @@ public class TabPageTests
         // Get item 1.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 1, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Equal(expectedText, new string(item.pszText));
         Assert.Equal(1, item.iImage);
@@ -3043,7 +3041,7 @@ public class TabPageTests
         // Get item 2.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 2, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Empty(new string(item.pszText));
         Assert.Equal(-1, item.iImage);
@@ -3056,7 +3054,7 @@ public class TabPageTests
     [InlineData("&Text", "&&Text")]
     public unsafe void TabPageCollection_Text_SetGetItemsWithHandleDesignMode_Success(string text, string expectedText)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -3066,16 +3064,16 @@ public class TabPageTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var owner = new TabControl
+        using TabControl owner = new()
         {
             Site = mockSite.Object
         };
-        using var page1 = new TabPage();
-        using var page2 = new TabPage
+        using TabPage page1 = new();
+        using TabPage page2 = new()
         {
             ImageIndex = 1
         };
-        using var page3 = new NullTextTabPage();
+        using NullTextTabPage page3 = new();
         owner.TabPages.Add(page1);
         owner.TabPages.Add(page2);
         owner.TabPages.Add(page3);
@@ -3085,7 +3083,7 @@ public class TabPageTests
         Assert.Equal(3, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMCOUNT));
 
         char* buffer = stackalloc char[256];
-        ComCtl32.TCITEMW item = default;
+        TCITEMW item = default;
         item.cchTextMax = int.MaxValue;
         item.pszText = buffer;
         item.dwStateMask = (TAB_CONTROL_ITEM_STATE)uint.MaxValue;
@@ -3094,7 +3092,7 @@ public class TabPageTests
         // Get item 0.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 0, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Empty(new string(item.pszText));
         Assert.Equal(-1, item.iImage);
@@ -3102,7 +3100,7 @@ public class TabPageTests
         // Get item 1.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 1, ref item));
         Assert.Equal(TAB_CONTROL_ITEM_STATE.TCIS_BUTTONPRESSED, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Equal(expectedText, new string(item.pszText));
         Assert.Equal(1, item.iImage);
@@ -3110,7 +3108,7 @@ public class TabPageTests
         // Get item 2.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 2, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Empty(new string(item.pszText));
         Assert.Equal(-1, item.iImage);
@@ -3119,7 +3117,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_Text_SetWithHandler_CallsTextChanged()
     {
-        using var control = new TabPage();
+        using TabPage control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -3155,7 +3153,7 @@ public class TabPageTests
     [NormalizedStringData]
     public void TabPage_ToolTipText_Set_GetReturnsExpected(string value, string expected)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             ToolTipText = value
         };
@@ -3172,8 +3170,8 @@ public class TabPageTests
     [NormalizedStringData]
     public void TabPage_ToolTipText_SetWithParent_GetReturnsExpected(string value, string expected)
     {
-        using var parent = new TabControl();
-        using var control = new TabPage
+        using TabControl parent = new();
+        using TabPage control = new()
         {
             Parent = parent,
             ToolTipText = value
@@ -3195,7 +3193,7 @@ public class TabPageTests
     [NormalizedStringData]
     public void TabPage_ToolTipText_SetWithDesignModeParent_GetReturnsExpected(string value, string expected)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -3205,11 +3203,11 @@ public class TabPageTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var parent = new TabControl
+        using TabControl parent = new()
         {
             Site = mockSite.Object
         };
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Parent = parent,
             ToolTipText = value
@@ -3231,7 +3229,7 @@ public class TabPageTests
     [NormalizedStringData]
     public void TabPage_ToolTipText_SetWithHandle_GetReturnsExpected(string value, string expected)
     {
-        using var control = new TabPage();
+        using TabPage control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -3262,8 +3260,8 @@ public class TabPageTests
     [InlineData("text", "text", 1)]
     public void TabPage_ToolTipText_SetWithParentWithHandle_GetReturnsExpected(string value, string expected, int expectedInvalidateCallCount)
     {
-        using var parent = new TabControl();
-        using var control = new TabPage
+        using TabControl parent = new();
+        using TabPage control = new()
         {
             Parent = parent
         };
@@ -3313,7 +3311,7 @@ public class TabPageTests
     [InlineData("text", "text", 1)]
     public void TabPage_ToolTipText_SetWithDesignModeParentWithHandle_GetReturnsExpected(string value, string expected, int expectedInvalidateCallCount)
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -3323,11 +3321,11 @@ public class TabPageTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var parent = new TabControl
+        using TabControl parent = new()
         {
             Site = mockSite.Object
         };
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Parent = parent
         };
@@ -3374,14 +3372,14 @@ public class TabPageTests
     [WinFormsFact]
     public unsafe void TabPageCollection_ToolTipText_SetGetItemsWithHandle_Success()
     {
-        using var owner = new TabControl();
-        using var page1 = new TabPage();
-        using var page2 = new TabPage
+        using TabControl owner = new();
+        using TabPage page1 = new();
+        using TabPage page2 = new()
         {
             Text = "Text",
             ImageIndex = 1
         };
-        using var page3 = new NullTextTabPage();
+        using NullTextTabPage page3 = new();
         owner.TabPages.Add(page1);
         owner.TabPages.Add(page2);
         owner.TabPages.Add(page3);
@@ -3391,7 +3389,7 @@ public class TabPageTests
         Assert.Equal(3, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMCOUNT));
 
         char* buffer = stackalloc char[256];
-        ComCtl32.TCITEMW item = default;
+        TCITEMW item = default;
         item.cchTextMax = int.MaxValue;
         item.pszText = buffer;
         item.dwStateMask = (TAB_CONTROL_ITEM_STATE)uint.MaxValue;
@@ -3400,7 +3398,7 @@ public class TabPageTests
         // Get item 0.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 0, ref item));
         Assert.Equal(TAB_CONTROL_ITEM_STATE.TCIS_BUTTONPRESSED, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Empty(new string(item.pszText));
         Assert.Equal(-1, item.iImage);
@@ -3408,7 +3406,7 @@ public class TabPageTests
         // Get item 1.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 1, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Equal("Text", new string(item.pszText));
         Assert.Equal(1, item.iImage);
@@ -3416,7 +3414,7 @@ public class TabPageTests
         // Get item 2.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 2, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Empty(new string(item.pszText));
         Assert.Equal(-1, item.iImage);
@@ -3425,7 +3423,7 @@ public class TabPageTests
     [WinFormsFact]
     public unsafe void TabPageCollection_ToolTipText_SetGetItemsWithHandleDesignMode_Success()
     {
-        var mockSite = new Mock<ISite>(MockBehavior.Strict);
+        Mock<ISite> mockSite = new(MockBehavior.Strict);
         mockSite
             .Setup(s => s.GetService(typeof(AmbientProperties)))
             .Returns(null);
@@ -3435,17 +3433,17 @@ public class TabPageTests
         mockSite
             .Setup(s => s.Container)
             .Returns((IContainer)null);
-        using var owner = new TabControl
+        using TabControl owner = new()
         {
             Site = mockSite.Object
         };
-        using var page1 = new TabPage();
-        using var page2 = new TabPage
+        using TabPage page1 = new();
+        using TabPage page2 = new()
         {
             Text = "Text",
             ImageIndex = 1
         };
-        using var page3 = new NullTextTabPage();
+        using NullTextTabPage page3 = new();
         owner.TabPages.Add(page1);
         owner.TabPages.Add(page2);
         owner.TabPages.Add(page3);
@@ -3455,7 +3453,7 @@ public class TabPageTests
         Assert.Equal(3, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMCOUNT));
 
         char* buffer = stackalloc char[256];
-        ComCtl32.TCITEMW item = default;
+        TCITEMW item = default;
         item.cchTextMax = int.MaxValue;
         item.pszText = buffer;
         item.dwStateMask = (TAB_CONTROL_ITEM_STATE)uint.MaxValue;
@@ -3464,7 +3462,7 @@ public class TabPageTests
         // Get item 0.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 0, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Empty(new string(item.pszText));
         Assert.Equal(-1, item.iImage);
@@ -3472,7 +3470,7 @@ public class TabPageTests
         // Get item 1.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 1, ref item));
         Assert.Equal(TAB_CONTROL_ITEM_STATE.TCIS_BUTTONPRESSED, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Equal("Text", new string(item.pszText));
         Assert.Equal(1, item.iImage);
@@ -3480,7 +3478,7 @@ public class TabPageTests
         // Get item 2.
         Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 2, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
-        Assert.Equal(IntPtr.Zero, item.lParam);
+        Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
         Assert.Empty(new string(item.pszText));
         Assert.Equal(-1, item.iImage);
@@ -3490,7 +3488,7 @@ public class TabPageTests
     [BoolData]
     public void TabPage_UseVisualStyleBackColor_Set_GetReturnsExpected(bool value)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             UseVisualStyleBackColor = value
         };
@@ -3513,7 +3511,7 @@ public class TabPageTests
     [InlineData(false, 0)]
     public void TabPage_UseVisualStyleBackColor_SetWithHandle_GetReturnsExpected(bool value, int expectedInvalidatedCallCount)
     {
-        using var control = new TabPage();
+        using TabPage control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
         control.Invalidated += (sender, e) => invalidatedCallCount++;
@@ -3550,7 +3548,7 @@ public class TabPageTests
     [BoolData]
     public void TabPage_Visible_Set_GetReturnsExpected(bool value)
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Visible = value
         };
@@ -3572,8 +3570,8 @@ public class TabPageTests
     [BoolData]
     public void TabPage_Visible_SetWithParent_GetReturnsExpected(bool value)
     {
-        using var parent = new TabControl();
-        using var control = new TabPage
+        using TabControl parent = new();
+        using TabPage control = new()
         {
             Parent = parent,
             Visible = value
@@ -3608,7 +3606,7 @@ public class TabPageTests
     [MemberData(nameof(Visible_SetWithHandle_TestData))]
     public void TabPage_Visible_SetWithHandle_GetReturnsExpected(bool userPaint, bool value)
     {
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         control.SetStyle(ControlStyles.UserPaint, userPaint);
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
@@ -3646,8 +3644,8 @@ public class TabPageTests
     [BoolData]
     public void TabPage_Visible_SetWithParentWithHandle_GetReturnsExpected(bool value)
     {
-        using var parent = new TabControl();
-        using var control = new TabPage
+        using TabControl parent = new();
+        using TabPage control = new()
         {
             Parent = parent
         };
@@ -3704,7 +3702,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_Visible_SetWithHandler_CallsVisibleChanged()
     {
-        using var control = new TabPage
+        using TabPage control = new()
         {
             Visible = true
         };
@@ -3742,7 +3740,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_CreateControlsInstance_Invoke_ReturnsExpected()
     {
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         Control.ControlCollection controls = Assert.IsType<TabPage.TabPageControlCollection>(control.CreateControlsInstance());
         Assert.Empty(controls);
         Assert.Same(control, controls.Owner);
@@ -3753,7 +3751,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_GetAutoSizeMode_Invoke_ReturnsExpected()
     {
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         Assert.Equal(AutoSizeMode.GrowOnly, control.GetAutoSizeMode());
     }
 
@@ -3768,7 +3766,7 @@ public class TabPageTests
     [InlineData((-1), false)]
     public void TabPage_GetScrollState_Invoke_ReturnsExpected(int bit, bool expected)
     {
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         Assert.Equal(expected, control.GetScrollState(bit));
     }
 
@@ -3795,7 +3793,7 @@ public class TabPageTests
     [InlineData((ControlStyles)(-1), false)]
     public void TabPage_GetStyle_Invoke_ReturnsExpected(ControlStyles flag, bool expected)
     {
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         Assert.Equal(expected, control.GetStyle(flag));
 
         // Call again to test caching.
@@ -3805,19 +3803,19 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_GetTopLevel_Invoke_ReturnsExpected()
     {
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         Assert.False(control.GetTopLevel());
     }
 
     [WinFormsFact]
     public void TabPage_GetTabPageOfComponent_InvokeTabPageInHierarchy_ReturnsExpected()
     {
-        using var grandparent = new TabPage();
-        using var parent = new Control
+        using TabPage grandparent = new();
+        using Control parent = new()
         {
             Parent = grandparent
         };
-        using var control = new Control
+        using Control control = new()
         {
             Parent = parent
         };
@@ -3829,12 +3827,12 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_GetTabPageOfComponent_InvokeNoTabPageInHierarchy_ReturnsNull()
     {
-        using var grandparent = new Control();
-        using var parent = new Control
+        using Control grandparent = new();
+        using Control parent = new()
         {
             Parent = grandparent
         };
-        using var control = new Control
+        using Control control = new()
         {
             Parent = parent
         };
@@ -3855,7 +3853,7 @@ public class TabPageTests
     [NewAndDefaultData<EventArgs>]
     public void TabPage_OnEnter_Invoke_DoesNotCallEnter(EventArgs eventArgs)
     {
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -3879,8 +3877,8 @@ public class TabPageTests
     [NewAndDefaultData<EventArgs>]
     public void TabPage_OnEnter_InvokeWithParent_DoesNotCallEnter(EventArgs eventArgs)
     {
-        using var parent = new TabControl();
-        using var control = new SubTabPage
+        using TabControl parent = new();
+        using SubTabPage control = new()
         {
             Parent = parent
         };
@@ -3907,7 +3905,7 @@ public class TabPageTests
     [NewAndDefaultData<EventArgs>]
     public void TabPage_OnLeave_Invoke_DoesNotCallLeave(EventArgs eventArgs)
     {
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -3931,8 +3929,8 @@ public class TabPageTests
     [NewAndDefaultData<EventArgs>]
     public void TabPage_OnLeave_InvokeWithParent_DoesNotCallLeave(EventArgs eventArgs)
     {
-        using var parent = new TabControl();
-        using var control = new SubTabPage
+        using TabControl parent = new();
+        using SubTabPage control = new()
         {
             Parent = parent
         };
@@ -3975,11 +3973,11 @@ public class TabPageTests
     [MemberData(nameof(OnPaintBackground_TestData))]
     public void TabPage_OnPaintBackground_Invoke_Success(bool supportsTransparentBackColor, Color backColor, Image backgroundImage, ImageLayout backgroundImageLayout)
     {
-        using var image = new Bitmap(10, 10);
+        using Bitmap image = new(10, 10);
         using Graphics graphics = Graphics.FromImage(image);
-        using var eventArgs = new PaintEventArgs(graphics, new Rectangle(1, 2, 3, 4));
+        using PaintEventArgs eventArgs = new(graphics, new Rectangle(1, 2, 3, 4));
 
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         control.SetStyle(ControlStyles.SupportsTransparentBackColor, supportsTransparentBackColor);
         control.BackColor = backColor;
         control.BackgroundImage = backgroundImage;
@@ -4045,16 +4043,16 @@ public class TabPageTests
     [MemberData(nameof(OnPaintBackground_WithParent_TestData))]
     public void TabPage_OnPaintBackground_InvokeWithParent_CallsPaint(TabAppearance appearance, bool useVisualStyleBackColor, bool supportsTransparentBackColor, Color backColor, Image backgroundImage, ImageLayout backgroundImageLayout, int expectedPaintCallCount)
     {
-        using var image = new Bitmap(10, 10);
+        using Bitmap image = new(10, 10);
         using Graphics graphics = Graphics.FromImage(image);
-        using var eventArgs = new PaintEventArgs(graphics, new Rectangle(1, 2, 3, 4));
+        using PaintEventArgs eventArgs = new(graphics, new Rectangle(1, 2, 3, 4));
 
-        using var parent = new TabControl
+        using TabControl parent = new()
         {
             Bounds = new Rectangle(1, 2, 30, 40),
             Appearance = appearance
         };
-        using var control = new SubTabPage
+        using SubTabPage control = new()
         {
             Bounds = new Rectangle(1, 2, 10, 20),
             Parent = parent,
@@ -4101,11 +4099,11 @@ public class TabPageTests
     [MemberData(nameof(OnPaintBackground_TestData))]
     public void TabPage_OnPaintBackground_InvokeWithHandle_Success(bool supportsTransparentBackColor, Color backColor, Image backgroundImage, ImageLayout backgroundImageLayout)
     {
-        using var image = new Bitmap(10, 10);
+        using Bitmap image = new(10, 10);
         using Graphics graphics = Graphics.FromImage(image);
-        using var eventArgs = new PaintEventArgs(graphics, new Rectangle(1, 2, 3, 4));
+        using PaintEventArgs eventArgs = new(graphics, new Rectangle(1, 2, 3, 4));
 
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         control.SetStyle(ControlStyles.SupportsTransparentBackColor, supportsTransparentBackColor);
         control.BackColor = backColor;
         control.BackgroundImage = backgroundImage;
@@ -4184,16 +4182,16 @@ public class TabPageTests
     [MemberData(nameof(OnPaintBackground_WithParentWithHandle_TestData))]
     public void TabPage_OnPaintBackground_InvokeWithParentWithHandle_CallsPaint(TabAppearance appearance, bool useVisualStyleBackColor, bool supportsTransparentBackColor, Color backColor, Image backgroundImage, ImageLayout backgroundImageLayout, int expectedPaintCallCount)
     {
-        using var image = new Bitmap(10, 10);
+        using Bitmap image = new(10, 10);
         using Graphics graphics = Graphics.FromImage(image);
-        using var eventArgs = new PaintEventArgs(graphics, new Rectangle(1, 2, 3, 4));
+        using PaintEventArgs eventArgs = new(graphics, new Rectangle(1, 2, 3, 4));
 
-        using var parent = new TabControl
+        using TabControl parent = new()
         {
             Bounds = new Rectangle(1, 2, 30, 40),
             Appearance = appearance,
         };
-        using var control = new SubTabPage
+        using SubTabPage control = new()
         {
             Bounds = new Rectangle(1, 2, 10, 20),
             Parent = parent,
@@ -4252,7 +4250,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_OnPaintBackground_NullEventArgs_ThrowsArgumentNullException()
     {
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         Assert.Throws<ArgumentNullException>(() => control.OnPaintBackground(null));
     }
 
@@ -4276,7 +4274,7 @@ public class TabPageTests
     [MemberData(nameof(SetBoundsCore_TestData))]
     public void TabPage_SetBoundsCore_Invoke_Success(int x, int y, int width, int height, BoundsSpecified specified, int expectedLocationChangedCallCount)
     {
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         int moveCallCount = 0;
         int locationChangedCallCount = 0;
         int layoutCallCount = 0;
@@ -4389,8 +4387,8 @@ public class TabPageTests
     [MemberData(nameof(SetBoundsCore_TestData))]
     public void TabPage_SetBoundsCore_InvokeWithParent_Success(int x, int y, int width, int height, BoundsSpecified specified, int expectedLocationChangedCallCount)
     {
-        using var parent = new TabControl();
-        using var control = new SubTabPage
+        using TabControl parent = new();
+        using SubTabPage control = new()
         {
             Parent = parent
         };
@@ -4559,7 +4557,7 @@ public class TabPageTests
     [MemberData(nameof(SetBoundsCore_WithHandle_TestData))]
     public void TabPage_SetBoundsCore_InvokeWithHandle_Success(bool resizeRedraw, int x, int y, int width, int height, BoundsSpecified specified, int expectedWidth, int expectedHeight, int expectedLocationChangedCallCount, int expectedInvalidatedCallCount)
     {
-        using var control = new SubTabPage();
+        using SubTabPage control = new();
         control.SetStyle(ControlStyles.ResizeRedraw, resizeRedraw);
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
@@ -4706,8 +4704,8 @@ public class TabPageTests
     [MemberData(nameof(SetBoundsCore_WithParentWithHandle_TestData))]
     public void TabPage_SetBoundsCore_InvokeWithParentWithHandle_Success(bool resizeRedraw, int x, int y, int width, int height, BoundsSpecified specified)
     {
-        using var parent = new TabControl();
-        using var control = new SubTabPage
+        using TabControl parent = new();
+        using SubTabPage control = new()
         {
             Parent = parent
         };
@@ -4881,31 +4879,31 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_ToString_Invoke_ReturnsExpected()
     {
-        using var control = new TabPage();
+        using TabPage control = new();
         Assert.Equal("TabPage: {}", control.ToString());
     }
 
     [WinFormsFact]
     public void TabPage_ToString_InvokeWithText_ReturnsExpected()
     {
-        using var control = new TabPage("text");
+        using TabPage control = new("text");
         Assert.Equal("TabPage: {text}", control.ToString());
     }
 
     [WinFormsFact]
     public void TabPage_ToString_InvokeWithNullText_ReturnsExpected()
     {
-        using var control = new NullTextTabPage();
+        using NullTextTabPage control = new();
         Assert.Equal("TabPage: {}", control.ToString());
     }
 
     [WinFormsFact]
     public void TabPage_GetCaptionForTool_ReturnsToolTipText_IfToolTipTextIsSet()
     {
-        using TabPage control = new TabPage();
+        using TabPage control = new();
         string text = "Some test text";
         control.ToolTipText = text;
-        using ToolTip toolTip = new ToolTip();
+        using ToolTip toolTip = new();
 
         string actual = ((IKeyboardToolTip)control).GetCaptionForTool(toolTip);
 
@@ -4915,8 +4913,8 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_GetCaptionForTool_ReturnsExternalToolTipText_IfInternalsAreNotSet()
     {
-        using TabPage control = new TabPage();
-        using ToolTip toolTip = new ToolTip();
+        using TabPage control = new();
+        using ToolTip toolTip = new();
         control.CreateControl();
 
         Assert.NotEqual(IntPtr.Zero, toolTip.Handle); // A workaround to create the tooltip native window Handle
@@ -4932,8 +4930,8 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_GetCaptionForTool_ReturnsNull_IfNoToolTipIsSet()
     {
-        using TabPage control = new TabPage();
-        using ToolTip toolTip = new ToolTip();
+        using TabPage control = new();
+        using ToolTip toolTip = new();
 
         string actual = ((IKeyboardToolTip)control).GetCaptionForTool(toolTip);
 
@@ -4943,7 +4941,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_GetNeighboringToolsRectangles_ReturnsEmptyCollection_IfPageDoesntHaveTabControl()
     {
-        using TabPage control = new TabPage();
+        using TabPage control = new();
 
         IList<Rectangle> actual = ((IKeyboardToolTip)control).GetNeighboringToolsRectangles();
 
@@ -4958,7 +4956,7 @@ public class TabPageTests
     [InlineData(4)]
     public void TabPage_GetNeighboringToolsRectangles_ReturnsCorrect(int index)
     {
-        using TabControl tabControl = new TabControl();
+        using TabControl tabControl = new();
         const int pagesCount = 5;
 
         for (int i = 0; i < pagesCount; i++)
@@ -4998,7 +4996,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_InternalToolTip_IsSet_IfNoExternalIsSet()
     {
-        using TabPage control = new TabPage();
+        using TabPage control = new();
         string text = "Some test text";
         control.ToolTipText = text;
 
@@ -5011,8 +5009,8 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_InternalToolTip_IsNotSet_IfExternalIsSet()
     {
-        using TabPage control = new TabPage();
-        using ToolTip toolTip = new ToolTip();
+        using TabPage control = new();
+        using ToolTip toolTip = new();
         string text = "Some test text";
         control.ToolTipText = text;
         control.CreateControl();
@@ -5029,8 +5027,8 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_GetToolNativeScreenRectangle_ReturnsExpected()
     {
-        using TabControl tabControl = new TabControl();
-        using TabPage page = new TabPage();
+        using TabControl tabControl = new();
+        using TabPage page = new();
         tabControl.TabPages.Add(page);
 
         Rectangle expected = tabControl.RectangleToScreen(tabControl.GetTabRect(0));
@@ -5042,7 +5040,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_GetToolNativeScreenRectangle_ReturnsEmpty_WithoutParent()
     {
-        using TabPage control = new TabPage();
+        using TabPage control = new();
 
         Rectangle actual = control.GetToolNativeScreenRectangle();
 
@@ -5054,7 +5052,7 @@ public class TabPageTests
     [InlineData(false, "Some test text")]
     public void TabPage_SetToolTip_ManagesAssociatedToolTips_ForOneToolTipInstance(bool createToolTip, string expectedText)
     {
-        using TabPage control = new TabPage();
+        using TabPage control = new();
         string text = "Some test text";
         control.ToolTipText = text;
 
@@ -5086,7 +5084,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_SetToolTip_ManagesInternalAndAssociatedToolTips_ForTwoToolTipInstances()
     {
-        using TabPage control = new TabPage();
+        using TabPage control = new();
         string text = "Some test text";
         control.ToolTipText = text;
 
@@ -5100,8 +5098,8 @@ public class TabPageTests
         Assert.Null(externalToolTip);
         Assert.Null(associatedToolTips);
 
-        using ToolTip toolTip1 = new ToolTip();
-        using ToolTip toolTip2 = new ToolTip();
+        using ToolTip toolTip1 = new();
+        using ToolTip toolTip2 = new();
 
         control.SetToolTip(toolTip1);
         control.SetToolTip(toolTip2);
@@ -5122,7 +5120,7 @@ public class TabPageTests
     [InlineData(false, false)]
     public void TabPage_RemoveToolTip_ManagesAssociatedToolTips_ForOneToolTipInstance(bool createToolTip, bool setToolTip)
     {
-        using TabPage control = new TabPage();
+        using TabPage control = new();
         string text = "Some test text";
         control.ToolTipText = text;
 
@@ -5153,15 +5151,15 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_RemoveToolTip_ManagesAssociatedToolTips_ForTwoToolTipInstances()
     {
-        using TabPage control = new TabPage();
+        using TabPage control = new();
         string text = "Some test text";
         control.ToolTipText = text;
 
         dynamic tabPageDynamic = control.TestAccessor().Dynamic;
         ToolTip internalToolTip = tabPageDynamic._internalToolTip;
 
-        using ToolTip toolTip1 = new ToolTip();
-        using ToolTip toolTip2 = new ToolTip();
+        using ToolTip toolTip1 = new();
+        using ToolTip toolTip2 = new();
 
         // A simple workaround in the test to set expected states for fields
         control.SetToolTip(toolTip1);
@@ -5179,7 +5177,7 @@ public class TabPageTests
     [WinFormsFact]
     public void TabPage_RemoveToolTip_ManagesAssociatedToolTips_ForThreeToolTipInstances()
     {
-        using TabPage control = new TabPage();
+        using TabPage control = new();
         string text = "Some test text";
         control.ToolTipText = text;
 
@@ -5187,9 +5185,9 @@ public class TabPageTests
         ToolTip internalToolTip = tabPageDynamic._internalToolTip;
         ToolTip externalToolTip = tabPageDynamic._externalToolTip;
 
-        using ToolTip toolTip1 = new ToolTip();
-        using ToolTip toolTip2 = new ToolTip();
-        using ToolTip toolTip3 = new ToolTip();
+        using ToolTip toolTip1 = new();
+        using ToolTip toolTip2 = new();
+        using ToolTip toolTip3 = new();
 
         // A simple workaround in the test to set expected states for fields
         control.SetToolTip(toolTip1);

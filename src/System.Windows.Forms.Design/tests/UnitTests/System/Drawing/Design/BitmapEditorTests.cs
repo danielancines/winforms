@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Drawing.Imaging;
@@ -71,7 +70,7 @@ public class BitmapEditorTests
     public void BitmapEditor_LoadFromStream_BitmapStream_ReturnsExpected()
     {
         SubBitmapEditor editor = new();
-        using (MemoryStream stream = new MemoryStream())
+        using (MemoryStream stream = new())
         using (Bitmap image = new(10, 10))
         {
             image.Save(stream, ImageFormat.Bmp);

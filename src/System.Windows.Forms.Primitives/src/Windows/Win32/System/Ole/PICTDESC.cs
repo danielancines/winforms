@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -29,7 +28,7 @@ internal partial struct PICTDESC
         };
 
         desc.Anonymous.icon.hicon = copy ?
-            (HICON)PInvoke.CopyImage(
+            (HICON)PInvokeCore.CopyImage(
                 (HANDLE)icon.Handle,
                 GDI_IMAGE_TYPE.IMAGE_ICON,
                 icon.Width,

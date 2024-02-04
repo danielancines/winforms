@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 
@@ -23,7 +22,7 @@ public class PrintPreviewControlTests
     [InlineData(greenColorArgb, true, greenColorArgb)]
     public void ShowPrintPreviewControl_BackColorIsCorrect(int customBackColorArgb, bool isHighContrast, int expectedBackColorArgb)
     {
-        var control = new PrintPreviewControl();
+        PrintPreviewControl control = new();
 
         if (customBackColorArgb != emptyColorArgb)
         {

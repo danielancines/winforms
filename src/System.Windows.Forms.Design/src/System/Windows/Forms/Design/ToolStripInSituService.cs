@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 #nullable disable
 
@@ -16,7 +15,7 @@ internal class ToolStripInSituService : ISupportInSituService, IDisposable
 {
     private readonly IServiceProvider _sp;
     private readonly IDesignerHost _designerHost;
-    private IComponentChangeService _componentChangeSvc;
+    private IComponentChangeService _componentChangeService;
     private ToolStripDesigner _toolDesigner;
     private ToolStripItemDesigner _toolItemDesigner;
     private ToolStripKeyboardHandlingService _toolStripKeyBoardService;
@@ -29,13 +28,13 @@ internal class ToolStripInSituService : ISupportInSituService, IDisposable
         _sp = provider;
         _designerHost = (IDesignerHost)provider.GetService(typeof(IDesignerHost));
         Debug.Assert(_designerHost is not null, "ToolStripKeyboardHandlingService relies on the selection service, which is unavailable.");
-        _designerHost?.AddService(typeof(ISupportInSituService), this);
+        _designerHost?.AddService<ISupportInSituService>(this);
 
-        _componentChangeSvc = (IComponentChangeService)_designerHost.GetService(typeof(IComponentChangeService));
-        Debug.Assert(_componentChangeSvc is not null, "ToolStripKeyboardHandlingService relies on the componentChange service, which is unavailable.");
-        if (_componentChangeSvc is not null)
+        _componentChangeService = (IComponentChangeService)_designerHost.GetService(typeof(IComponentChangeService));
+        Debug.Assert(_componentChangeService is not null, "ToolStripKeyboardHandlingService relies on the componentChange service, which is unavailable.");
+        if (_componentChangeService is not null)
         {
-            _componentChangeSvc.ComponentRemoved += new ComponentEventHandler(OnComponentRemoved);
+            _componentChangeService.ComponentRemoved += new ComponentEventHandler(OnComponentRemoved);
         }
     }
 
@@ -56,10 +55,10 @@ internal class ToolStripInSituService : ISupportInSituService, IDisposable
             _toolItemDesigner = null;
         }
 
-        if (_componentChangeSvc is not null)
+        if (_componentChangeService is not null)
         {
-            _componentChangeSvc.ComponentRemoved -= new ComponentEventHandler(OnComponentRemoved);
-            _componentChangeSvc = null;
+            _componentChangeService.ComponentRemoved -= new ComponentEventHandler(OnComponentRemoved);
+            _componentChangeService = null;
         }
     }
 
@@ -125,7 +124,7 @@ internal class ToolStripInSituService : ISupportInSituService, IDisposable
                             }
                         }
                     }
-                    else if (comp is ToolStripDropDown) //case for ToolStripDropDown..
+                    else if (comp is ToolStripDropDown) // case for ToolStripDropDown..
                     {
                         if (host.GetDesigner(comp) is ToolStripDropDownDesigner designer)
                         {
@@ -243,8 +242,8 @@ internal class ToolStripInSituService : ISupportInSituService, IDisposable
             ToolStripInSituService inSituService = (ToolStripInSituService)_sp.GetService(typeof(ISupportInSituService));
             if (inSituService is not null)
             {
-                //since we are going away .. restore the old commands.
-                _designerHost.RemoveService(typeof(ISupportInSituService));
+                // since we are going away .. restore the old commands.
+                _designerHost.RemoveService<ISupportInSituService>();
             }
         }
     }

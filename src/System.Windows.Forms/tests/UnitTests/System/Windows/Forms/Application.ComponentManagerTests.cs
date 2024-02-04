@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Runtime.InteropServices;
 using Moq;
@@ -40,7 +39,7 @@ public unsafe class IMsoComponentManagerTests
     public void FRegisterComponent_HandlesNull()
     {
         var manager = CreateComponentManager();
-        var mock = new Mock<IMsoComponent>(MockBehavior.Strict);
+        Mock<IMsoComponent> mock = new(MockBehavior.Strict);
         MSOCRINFO info = default;
         UIntPtr id = default;
 
@@ -53,7 +52,7 @@ public unsafe class IMsoComponentManagerTests
     public void FRegisterComponent_RejectsUnsized()
     {
         var manager = CreateComponentManager();
-        var mock = new Mock<IMsoComponent>(MockBehavior.Strict);
+        Mock<IMsoComponent> mock = new(MockBehavior.Strict);
         MSOCRINFO info = default;
         UIntPtr id = default;
 
@@ -65,7 +64,7 @@ public unsafe class IMsoComponentManagerTests
     public void FRegisterComponent_Cookies()
     {
         var manager = CreateComponentManager();
-        var mock = new Mock<IMsoComponent>(MockBehavior.Strict);
+        Mock<IMsoComponent> mock = new(MockBehavior.Strict);
         MSOCRINFO info = new MSOCRINFO { cbSize = (uint)sizeof(MSOCRINFO) };
         UIntPtr id = default;
 
@@ -83,7 +82,7 @@ public unsafe class IMsoComponentManagerTests
     public void FRevokeComponent()
     {
         var manager = CreateComponentManager();
-        var mock = new Mock<IMsoComponent>(MockBehavior.Strict);
+        Mock<IMsoComponent> mock = new(MockBehavior.Strict);
         MSOCRINFO info = new MSOCRINFO { cbSize = (uint)sizeof(MSOCRINFO) };
         UIntPtr id = default;
 
@@ -97,7 +96,7 @@ public unsafe class IMsoComponentManagerTests
     public void FUpdateComponentRegistration_HandlesNull()
     {
         var manager = CreateComponentManager();
-        var mock = new Mock<IMsoComponent>(MockBehavior.Strict);
+        Mock<IMsoComponent> mock = new(MockBehavior.Strict);
         MSOCRINFO info = new MSOCRINFO { cbSize = (uint)sizeof(MSOCRINFO) };
         UIntPtr id = default;
 
@@ -109,7 +108,7 @@ public unsafe class IMsoComponentManagerTests
     public void FUpdateComponentRegistration()
     {
         var manager = CreateComponentManager();
-        var mock = new Mock<IMsoComponent>(MockBehavior.Strict);
+        Mock<IMsoComponent> mock = new(MockBehavior.Strict);
         MSOCRINFO info = new MSOCRINFO { cbSize = (uint)sizeof(MSOCRINFO) };
         UIntPtr id = default;
 
@@ -138,7 +137,7 @@ public unsafe class IMsoComponentManagerTests
     {
         var manager = CreateComponentManager();
 
-        var mock = new Mock<IMsoComponent>(MockBehavior.Strict);
+        Mock<IMsoComponent> mock = new(MockBehavior.Strict);
         MSOCRINFO info = new MSOCRINFO { cbSize = (uint)sizeof(MSOCRINFO) };
         UIntPtr id = default;
 
@@ -167,7 +166,7 @@ public unsafe class IMsoComponentManagerTests
     public void OnComponentEnterState_Notification()
     {
         var manager = CreateComponentManager();
-        var mock = new Mock<IMsoComponent>(MockBehavior.Strict);
+        Mock<IMsoComponent> mock = new(MockBehavior.Strict);
         mock.Setup(m => m.OnEnterState(msocstate.Modal, true));
 
         MSOCRINFO info = new MSOCRINFO { cbSize = (uint)sizeof(MSOCRINFO) };
@@ -196,7 +195,7 @@ public unsafe class IMsoComponentManagerTests
     public void FOnComponentExitState_Notification()
     {
         var manager = CreateComponentManager();
-        var mock = new Mock<IMsoComponent>(MockBehavior.Strict);
+        Mock<IMsoComponent> mock = new(MockBehavior.Strict);
         mock.Setup(m => m.OnEnterState(msocstate.Modal, false));
 
         MSOCRINFO info = new MSOCRINFO { cbSize = (uint)sizeof(MSOCRINFO) };
@@ -277,8 +276,8 @@ public unsafe class IMsoComponentManagerTests
         var manager = CreateComponentManager();
         Assert.False(manager.FGetActiveComponent(msogac.Active, null, null, 0));
 
-        var mock1 = new Mock<IMsoComponent>(MockBehavior.Strict);
-        var mock2 = new Mock<IMsoComponent>(MockBehavior.Strict);
+        Mock<IMsoComponent> mock1 = new(MockBehavior.Strict);
+        Mock<IMsoComponent> mock2 = new(MockBehavior.Strict);
 
         MSOCRINFO info = new MSOCRINFO
         {

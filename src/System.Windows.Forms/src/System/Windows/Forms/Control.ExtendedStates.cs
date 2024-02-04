@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms;
 
@@ -21,11 +20,6 @@ public partial class Control
         HaveInvoked = 0x00000001,
 
         SetScrollPosition = 0x00000002,
-
-        /// <summary>
-        ///  Set when the control is listening to SystemEvents.UserPreferenceChanged.
-        /// </summary>
-        ListeningToUserPreferenceChanged = 0x00000004,
 
         /// <summary>
         ///  If set, the control will listen to SystemEvents.UserPreferenceChanged when TopLevel is true and handle is created.

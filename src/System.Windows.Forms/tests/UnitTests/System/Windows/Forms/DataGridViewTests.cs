@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Data;
@@ -22,7 +21,7 @@ public partial class DataGridViewTests
     [WinFormsFact]
     public void DataGridView_Ctor_Default()
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         Assert.Equal(23, control.ColumnHeadersHeight);
         Assert.Equal(DataGridViewColumnHeadersHeightSizeMode.EnableResizing, control.ColumnHeadersHeightSizeMode);
         Assert.Equal(41, control.RowHeadersWidth);
@@ -57,7 +56,7 @@ public partial class DataGridViewTests
     [MemberData(nameof(ColumnHeadersHeight_Set_TestData))]
     public void DataGridView_ColumnHeadersHeight_Set_GetReturnsExpected(DataGridViewColumnHeadersHeightSizeMode columnHeadersWidthSizeMode, bool columnHeadersVisible, bool autoSize, int value, int expectedValue)
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = columnHeadersWidthSizeMode,
             ColumnHeadersVisible = columnHeadersVisible,
@@ -105,8 +104,8 @@ public partial class DataGridViewTests
     [MemberData(nameof(ColumnHeadersHeight_SetWithParent_TestData))]
     public void DataGridView_ColumnHeadersHeight_SetWithParent_GetReturnsExpected(DataGridViewColumnHeadersHeightSizeMode columnHeadersWidthSizeMode, bool columnHeadersVisible, bool autoSize, int value, int expectedValue, int expectedLayoutCallCount, int expectedParentLayoutCallCount)
     {
-        using var parent = new Control();
-        using var control = new DataGridView
+        using Control parent = new();
+        using DataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = columnHeadersWidthSizeMode,
             ColumnHeadersVisible = columnHeadersVisible,
@@ -182,7 +181,7 @@ public partial class DataGridViewTests
     {
         // Invalidation checks are omitted due to https://github.com/dotnet/winforms/issues/7799
 
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = columnHeadersWidthSizeMode,
             ColumnHeadersVisible = columnHeadersVisible,
@@ -247,8 +246,8 @@ public partial class DataGridViewTests
     {
         // Invalidation checks are omitted due to https://github.com/dotnet/winforms/issues/7799
 
-        using var parent = new Control();
-        using var control = new DataGridView
+        using Control parent = new();
+        using DataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = columnHeadersWidthSizeMode,
             ColumnHeadersVisible = columnHeadersVisible,
@@ -304,7 +303,7 @@ public partial class DataGridViewTests
     [InlineData(DataGridViewColumnHeadersHeightSizeMode.AutoSize, 0)]
     public void DataGridView_ColumnHeadersHeight_SetWithHandler_CallsColumnHeadersHeightChanged(DataGridViewColumnHeadersHeightSizeMode columnHeadersWidthSizeMode, int expectedCallCount)
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = columnHeadersWidthSizeMode
         };
@@ -343,7 +342,7 @@ public partial class DataGridViewTests
     [EnumData<DataGridViewColumnHeadersHeightSizeMode>]
     public void DataGridView_ColumnHeadersHeight_SetWithHandlerDisposed_DoesNotCallColumnHeadersHeightChanged(DataGridViewColumnHeadersHeightSizeMode columnHeadersWidthSizeMode)
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = columnHeadersWidthSizeMode
         };
@@ -381,7 +380,7 @@ public partial class DataGridViewTests
     [InlineData(DataGridViewColumnHeadersHeightSizeMode.AutoSize, 0)]
     public void DataGridView_ColumnHeadersHeight_SetWithHandlerInDisposing_CallsColumnHeadersHeightChanged(DataGridViewColumnHeadersHeightSizeMode columnHeadersWidthSizeMode, int expectedCallCount)
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = columnHeadersWidthSizeMode
         };
@@ -431,12 +430,12 @@ public partial class DataGridViewTests
     [EnumData<DataGridViewColumnHeadersHeightSizeMode>]
     public void DataGridView_ColumnHeadersHeight_SetWithHandlerInColumnDisposing_DoesNotCallColumnHeadersHeightChanged(DataGridViewColumnHeadersHeightSizeMode columnHeadersWidthSizeMode)
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = columnHeadersWidthSizeMode
         };
-        using var cellTemplate = new SubDataGridViewCell();
-        using var column = new DataGridViewColumn
+        using SubDataGridViewCell cellTemplate = new();
+        using DataGridViewColumn column = new()
         {
             CellTemplate = cellTemplate
         };
@@ -482,7 +481,7 @@ public partial class DataGridViewTests
     [InlineData(32769)]
     public void DataGridView_ColumnHeadersHeight_SetInvalidValue_ThrowsArgumentOutOfRangeException(int value)
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         Assert.Throws<ArgumentOutOfRangeException>("value", () => control.ColumnHeadersHeight = value);
     }
 
@@ -501,7 +500,7 @@ public partial class DataGridViewTests
     [MemberData(nameof(ColumnHeadersHeightSizeMode_Set_TestData))]
     public void DataGridView_ColumnHeadersHeightSizeMode_Set_GetReturnsExpected(bool columnHeadersVisible, DataGridViewColumnHeadersHeightSizeMode value)
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             ColumnHeadersVisible = columnHeadersVisible,
             ColumnHeadersHeightSizeMode = value
@@ -533,7 +532,7 @@ public partial class DataGridViewTests
     {
         // Invalidation checks are omitted due to https://github.com/dotnet/winforms/issues/7799
 
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             ColumnHeadersVisible = columnHeadersVisible
         };
@@ -566,7 +565,7 @@ public partial class DataGridViewTests
     {
         // Invalidation checks are omitted due to https://github.com/dotnet/winforms/issues/7799
 
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = originalColumnHeadersHeightSizeMode,
             ColumnHeadersHeight = 30
@@ -601,7 +600,7 @@ public partial class DataGridViewTests
     [InlineData(DataGridViewColumnHeadersHeightSizeMode.AutoSize, true)]
     public void DataGridView_ColumnHeadersHeightSizeMode_SetWithHandler_CallsColumnHeadersHeightSizeModeChanged(DataGridViewColumnHeadersHeightSizeMode value, bool expectedPreviousModeAutoSized)
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         int callCount = 0;
         object expected = false;
         DataGridViewAutoSizeModeEventHandler handler = (sender, e) =>
@@ -640,7 +639,7 @@ public partial class DataGridViewTests
     [InlineData(DataGridViewColumnHeadersHeightSizeMode.AutoSize)]
     public void DataGridView_ColumnHeadersHeightSizeMode_SetWithHandlerDisposed_DoesNotCallColumnHeadersHeightSizeModeChanged(DataGridViewColumnHeadersHeightSizeMode value)
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         control.Dispose();
         int callCount = 0;
         DataGridViewAutoSizeModeEventHandler handler = (sender, e) => callCount++;
@@ -673,9 +672,9 @@ public partial class DataGridViewTests
     [InlineData(DataGridViewColumnHeadersHeightSizeMode.AutoSize)]
     public void DataGridView_ColumnHeadersHeightSizeMode_SetWithHandlerInDisposing_DoesNotCallColumnHeadersHeightSizeModeChanged(DataGridViewColumnHeadersHeightSizeMode value)
     {
-        using var control = new DataGridView();
-        using var cellTemplate = new SubDataGridViewCell();
-        using var column = new DataGridViewColumn
+        using DataGridView control = new();
+        using SubDataGridViewCell cellTemplate = new();
+        using DataGridViewColumn column = new()
         {
             CellTemplate = cellTemplate
         };
@@ -727,9 +726,9 @@ public partial class DataGridViewTests
     [InlineData(DataGridViewColumnHeadersHeightSizeMode.AutoSize)]
     public void DataGridView_ColumnHeadersHeightSizeMode_SetWithHandlerInColumnDisposing_DoesNotCallColumnHeadersHeightSizeModeChanged(DataGridViewColumnHeadersHeightSizeMode value)
     {
-        using var control = new DataGridView();
-        using var cellTemplate = new SubDataGridViewCell();
-        using var column = new DataGridViewColumn
+        using DataGridView control = new();
+        using SubDataGridViewCell cellTemplate = new();
+        using DataGridViewColumn column = new()
         {
             CellTemplate = cellTemplate
         };
@@ -772,7 +771,7 @@ public partial class DataGridViewTests
     [InvalidEnumData<DataGridViewColumnHeadersHeightSizeMode>]
     public void DataGridView_ColumnHeadersHeightSizeMode_SetInvalidValue_ThrowsInvalidEnumArgumentException(DataGridViewColumnHeadersHeightSizeMode value)
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         Assert.Throws<InvalidEnumArgumentException>("value", () => control.ColumnHeadersHeightSizeMode = value);
     }
 
@@ -814,7 +813,7 @@ public partial class DataGridViewTests
     [MemberData(nameof(Parent_Set_TestData))]
     public void DataGridView_Parent_Set_GetReturnsExpected(Control value)
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             Parent = value
         };
@@ -831,8 +830,8 @@ public partial class DataGridViewTests
     [MemberData(nameof(Parent_Set_TestData))]
     public void DataGridView_Parent_SetWithNonNullOldParent_GetReturnsExpected(Control value)
     {
-        using var oldParent = new Control();
-        using var control = new DataGridView
+        using Control oldParent = new();
+        using DataGridView control = new()
         {
             Parent = oldParent
         };
@@ -852,8 +851,8 @@ public partial class DataGridViewTests
     [WinFormsFact]
     public void DataGridView_Parent_SetNonNull_AddsToControls()
     {
-        using var parent = new Control();
-        using var control = new DataGridView
+        using Control parent = new();
+        using DataGridView control = new()
         {
             Parent = parent
         };
@@ -874,7 +873,7 @@ public partial class DataGridViewTests
     {
         // Invalidation checks are omitted due to https://github.com/dotnet/winforms/issues/7799
 
-        using var control = new DataGridView();
+        using DataGridView control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int styleChangedCallCount = 0;
         control.StyleChanged += (sender, e) => styleChangedCallCount++;
@@ -898,8 +897,8 @@ public partial class DataGridViewTests
     [WinFormsFact]
     public void DataGridView_Parent_SetWithHandler_CallsParentChanged()
     {
-        using var parent = new Control();
-        using var control = new DataGridView();
+        using Control parent = new();
+        using DataGridView control = new();
         int callCount = 0;
         EventHandler handler = (sender, e) =>
         {
@@ -934,7 +933,7 @@ public partial class DataGridViewTests
     [WinFormsFact]
     public void DataGridView_Parent_SetSame_ThrowsArgumentException()
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         Assert.Throws<ArgumentException>(() => control.Parent = control);
         Assert.Null(control.Parent);
     }
@@ -968,7 +967,7 @@ public partial class DataGridViewTests
     [MemberData(nameof(RowHeadersWidth_Set_TestData))]
     public void DataGridView_RowHeadersWidth_Set_GetReturnsExpected(DataGridViewRowHeadersWidthSizeMode rowHeadersWidthSizeMode, bool rowHeadersVisible, bool autoSize, int value, int expectedValue)
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowHeadersWidthSizeMode = rowHeadersWidthSizeMode,
             RowHeadersVisible = rowHeadersVisible,
@@ -1019,8 +1018,8 @@ public partial class DataGridViewTests
     [MemberData(nameof(RowHeadersWidth_SetWithParent_TestData))]
     public void DataGridView_RowHeadersWidth_SetWithParent_GetReturnsExpected(DataGridViewRowHeadersWidthSizeMode rowHeadersWidthSizeMode, bool rowHeadersVisible, bool autoSize, int value, int expectedValue, int expectedLayoutCallCount, int expectedParentLayoutCallCount)
     {
-        using var parent = new Control();
-        using var control = new DataGridView
+        using Control parent = new();
+        using DataGridView control = new()
         {
             RowHeadersWidthSizeMode = rowHeadersWidthSizeMode,
             RowHeadersVisible = rowHeadersVisible,
@@ -1099,7 +1098,7 @@ public partial class DataGridViewTests
     {
         // Invalidation checks are omitted due to https://github.com/dotnet/winforms/issues/7799
 
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowHeadersWidthSizeMode = rowHeadersWidthSizeMode,
             RowHeadersVisible = rowHeadersVisible,
@@ -1168,8 +1167,8 @@ public partial class DataGridViewTests
     {
         // Invalidation checks are omitted due to https://github.com/dotnet/winforms/issues/7799
 
-        using var parent = new Control();
-        using var control = new DataGridView
+        using Control parent = new();
+        using DataGridView control = new()
         {
             RowHeadersWidthSizeMode = rowHeadersWidthSizeMode,
             RowHeadersVisible = rowHeadersVisible,
@@ -1227,7 +1226,7 @@ public partial class DataGridViewTests
     [InlineData(DataGridViewRowHeadersWidthSizeMode.AutoSizeToFirstHeader, 0)]
     public void DataGridView_RowHeadersWidth_SetWithHandler_CallsRowHeadersWidthChanged(DataGridViewRowHeadersWidthSizeMode rowHeadersWidthSizeMode, int expectedCallCount)
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowHeadersWidthSizeMode = rowHeadersWidthSizeMode
         };
@@ -1266,7 +1265,7 @@ public partial class DataGridViewTests
     [EnumData<DataGridViewRowHeadersWidthSizeMode>]
     public void DataGridView_RowHeadersWidth_SetWithHandlerDisposed_DoesNotCallRowHeadersWidthChanged(DataGridViewRowHeadersWidthSizeMode rowHeadersWidthSizeMode)
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowHeadersWidthSizeMode = rowHeadersWidthSizeMode
         };
@@ -1306,7 +1305,7 @@ public partial class DataGridViewTests
     [InlineData(DataGridViewRowHeadersWidthSizeMode.AutoSizeToFirstHeader, 0)]
     public void DataGridView_RowHeadersWidth_SetWithHandlerInDisposing_CallsRowHeadersWidthChanged(DataGridViewRowHeadersWidthSizeMode rowHeadersWidthSizeMode, int expectedCallCount)
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowHeadersWidthSizeMode = rowHeadersWidthSizeMode
         };
@@ -1356,12 +1355,12 @@ public partial class DataGridViewTests
     [EnumData<DataGridViewRowHeadersWidthSizeMode>]
     public void DataGridView_RowHeadersWidth_SetWithHandlerInColumnDisposing_DoesNotCallRowHeadersWidthChanged(DataGridViewRowHeadersWidthSizeMode rowHeadersWidthSizeMode)
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowHeadersWidthSizeMode = rowHeadersWidthSizeMode
         };
-        using var cellTemplate = new SubDataGridViewCell();
-        using var column = new DataGridViewColumn
+        using SubDataGridViewCell cellTemplate = new();
+        using DataGridViewColumn column = new()
         {
             CellTemplate = cellTemplate
         };
@@ -1407,7 +1406,7 @@ public partial class DataGridViewTests
     [InlineData(32769)]
     public void DataGridView_RowHeadersWidth_SetInvalidValue_ThrowsArgumentOutOfRangeException(int value)
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         Assert.Throws<ArgumentOutOfRangeException>("value", () => control.RowHeadersWidth = value);
     }
 
@@ -1426,7 +1425,7 @@ public partial class DataGridViewTests
     [MemberData(nameof(RowHeadersWidthSizeMode_Set_TestData))]
     public void DataGridView_RowHeadersWidthSizeMode_Set_GetReturnsExpected(bool rowHeadersVisible, DataGridViewRowHeadersWidthSizeMode value)
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowHeadersVisible = rowHeadersVisible,
             RowHeadersWidthSizeMode = value
@@ -1462,7 +1461,7 @@ public partial class DataGridViewTests
     {
         // Invalidation checks are omitted due to https://github.com/dotnet/winforms/issues/7799
 
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowHeadersVisible = rowHeadersVisible
         };
@@ -1499,7 +1498,7 @@ public partial class DataGridViewTests
     {
         // Invalidation checks are omitted due to https://github.com/dotnet/winforms/issues/7799
 
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowHeadersWidthSizeMode = originalRowHeadersWidthSizeMode,
             RowHeadersWidth = 30
@@ -1536,7 +1535,7 @@ public partial class DataGridViewTests
     [InlineData(DataGridViewRowHeadersWidthSizeMode.AutoSizeToFirstHeader, true)]
     public void DataGridView_RowHeadersWidthSizeMode_SetWithHandler_CallsRowHeadersWidthSizeModeChanged(DataGridViewRowHeadersWidthSizeMode value, object expectedPreviousModeAutoSized)
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         int callCount = 0;
         object expected = false;
         DataGridViewAutoSizeModeEventHandler handler = (sender, e) =>
@@ -1577,7 +1576,7 @@ public partial class DataGridViewTests
     [InlineData(DataGridViewRowHeadersWidthSizeMode.AutoSizeToFirstHeader)]
     public void DataGridView_RowHeadersWidthSizeMode_SetWithHandlerDisposed_DoesNotCallRowHeadersWidthSizeModeChanged(DataGridViewRowHeadersWidthSizeMode value)
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         control.Dispose();
         int callCount = 0;
         DataGridViewAutoSizeModeEventHandler handler = (sender, e) => callCount++;
@@ -1612,9 +1611,9 @@ public partial class DataGridViewTests
     [InlineData(DataGridViewRowHeadersWidthSizeMode.AutoSizeToFirstHeader)]
     public void DataGridView_RowHeadersWidthSizeMode_SetWithHandlerInDisposing_DoesNotCallRowHeadersWidthSizeModeChanged(DataGridViewRowHeadersWidthSizeMode value)
     {
-        using var control = new DataGridView();
-        using var cellTemplate = new SubDataGridViewCell();
-        using var column = new DataGridViewColumn
+        using DataGridView control = new();
+        using SubDataGridViewCell cellTemplate = new();
+        using DataGridViewColumn column = new()
         {
             CellTemplate = cellTemplate
         };
@@ -1668,9 +1667,9 @@ public partial class DataGridViewTests
     [InlineData(DataGridViewRowHeadersWidthSizeMode.AutoSizeToFirstHeader)]
     public void DataGridView_RowHeadersWidthSizeMode_SetWithHandlerInColumnDisposing_DoesNotCallRowHeadersWidthSizeModeChanged(DataGridViewRowHeadersWidthSizeMode value)
     {
-        using var control = new DataGridView();
-        using var cellTemplate = new SubDataGridViewCell();
-        using var column = new DataGridViewColumn
+        using DataGridView control = new();
+        using SubDataGridViewCell cellTemplate = new();
+        using DataGridViewColumn column = new()
         {
             CellTemplate = cellTemplate
         };
@@ -1713,7 +1712,7 @@ public partial class DataGridViewTests
     [InvalidEnumData<DataGridViewRowHeadersWidthSizeMode>]
     public void DataGridView_RowHeadersWidthSizeMode_SetInvalidValue_ThrowsInvalidEnumArgumentException(DataGridViewRowHeadersWidthSizeMode value)
     {
-        using var control = new DataGridView();
+        using DataGridView control = new();
         Assert.Throws<InvalidEnumArgumentException>("value", () => control.RowHeadersWidthSizeMode = value);
     }
 
@@ -1724,8 +1723,8 @@ public partial class DataGridViewTests
     [InlineData(false, false)]
     public void DataGridView_TopLeftHeaderCell_Set_GetReturnsExpected(bool rowHeadersVisible, bool columnHeadersVisible)
     {
-        using var cell1 = new DataGridViewHeaderCell();
-        using var control = new DataGridView
+        using DataGridViewHeaderCell cell1 = new();
+        using DataGridView control = new()
         {
             RowHeadersVisible = rowHeadersVisible,
             ColumnHeadersVisible = columnHeadersVisible,
@@ -1746,7 +1745,7 @@ public partial class DataGridViewTests
         Assert.False(control.IsHandleCreated);
 
         // Set different.
-        using var cell2 = new DataGridViewHeaderCell();
+        using DataGridViewHeaderCell cell2 = new();
         control.TopLeftHeaderCell = cell2;
         Assert.Same(cell2, control.TopLeftHeaderCell);
         Assert.Null(cell1.DataGridView);
@@ -1782,8 +1781,8 @@ public partial class DataGridViewTests
     {
         // Invalidation checks are omitted due to https://github.com/dotnet/winforms/issues/7799
 
-        using var cell1 = new DataGridViewHeaderCell();
-        using var control = new DataGridView
+        using DataGridViewHeaderCell cell1 = new();
+        using DataGridView control = new()
         {
             RowHeadersVisible = rowHeadersVisible,
             ColumnHeadersVisible = columnHeadersVisible
@@ -1814,7 +1813,7 @@ public partial class DataGridViewTests
         Assert.Equal(0, createdCallCount);
 
         // Set different.
-        using var cell2 = new DataGridViewHeaderCell();
+        using DataGridViewHeaderCell cell2 = new();
         control.TopLeftHeaderCell = cell2;
         Assert.Same(cell2, control.TopLeftHeaderCell);
         Assert.Null(cell1.DataGridView);
@@ -1852,7 +1851,7 @@ public partial class DataGridViewTests
     [InlineData(false, false)]
     public void DataGridView_TopLeftHeaderCell_Get_ReturnsExpected(bool rowHeadersVisible, bool columnHeadersVisible)
     {
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowHeadersVisible = rowHeadersVisible,
             ColumnHeadersVisible = columnHeadersVisible
@@ -1874,7 +1873,7 @@ public partial class DataGridViewTests
     {
         // Invalidation checks are omitted due to https://github.com/dotnet/winforms/issues/7799
 
-        using var control = new DataGridView
+        using DataGridView control = new()
         {
             RowHeadersVisible = rowHeadersVisible,
             ColumnHeadersVisible = columnHeadersVisible
@@ -1911,7 +1910,7 @@ public partial class DataGridViewTests
     [MemberData(nameof(OnColumnHeadersHeightChanged_TestData))]
     public void DataGridView_OnColumnHeadersHeightChanged_Invoke_CallsColumnHeadersHeightChanged(DataGridViewColumnHeadersHeightSizeMode columnHeadersWidthSizeMode, bool columnHeadersVisible, EventArgs eventArgs)
     {
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = columnHeadersWidthSizeMode,
             ColumnHeadersVisible = columnHeadersVisible
@@ -1943,7 +1942,7 @@ public partial class DataGridViewTests
     {
         // Invalidation checks are omitted due to https://github.com/dotnet/winforms/issues/7799
 
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = columnHeadersWidthSizeMode,
             ColumnHeadersVisible = columnHeadersVisible
@@ -1983,7 +1982,7 @@ public partial class DataGridViewTests
     [MemberData(nameof(OnColumnHeadersHeightChanged_TestData))]
     public void DataGridView_OnColumnHeadersHeightChanged_InvokeDisposed_DoesNotCallColumnHeadersHeightChanged(DataGridViewColumnHeadersHeightSizeMode columnHeadersWidthSizeMode, bool columnHeadersVisible, EventArgs eventArgs)
     {
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = columnHeadersWidthSizeMode,
             ColumnHeadersVisible = columnHeadersVisible
@@ -2009,7 +2008,7 @@ public partial class DataGridViewTests
     [MemberData(nameof(OnColumnHeadersHeightChanged_TestData))]
     public void DataGridView_OnColumnHeadersHeightChanged_InvokeInDisposing_CallsColumnHeadersHeightChanged(DataGridViewColumnHeadersHeightSizeMode columnHeadersWidthSizeMode, bool columnHeadersVisible, EventArgs eventArgs)
     {
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = columnHeadersWidthSizeMode,
             ColumnHeadersVisible = columnHeadersVisible
@@ -2049,13 +2048,13 @@ public partial class DataGridViewTests
     [MemberData(nameof(OnColumnHeadersHeightChanged_TestData))]
     public void DataGridView_OnColumnHeadersHeightChanged_InvokeInColumnDisposing_DoesNotCallColumnHeadersHeightChanged(DataGridViewColumnHeadersHeightSizeMode columnHeadersWidthSizeMode, bool columnHeadersVisible, EventArgs eventArgs)
     {
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = columnHeadersWidthSizeMode,
             ColumnHeadersVisible = columnHeadersVisible
         };
-        using var cellTemplate = new SubDataGridViewCell();
-        using var column = new DataGridViewColumn
+        using SubDataGridViewCell cellTemplate = new();
+        using DataGridViewColumn column = new()
         {
             CellTemplate = cellTemplate
         };
@@ -2095,7 +2094,7 @@ public partial class DataGridViewTests
     [MemberData(nameof(OnColumnHeadersHeightSizeModeChanged_TestData))]
     public void DataGridView_OnColumnHeadersHeightSizeModeChanged_Invoke_CallsColumnHeadersHeightSizeModeChanged(DataGridViewColumnHeadersHeightSizeMode columnHeadersWidthSizeMode, DataGridViewAutoSizeModeEventArgs eventArgs)
     {
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = columnHeadersWidthSizeMode
         };
@@ -2136,7 +2135,7 @@ public partial class DataGridViewTests
     {
         // Invalidation checks are omitted due to https://github.com/dotnet/winforms/issues/7799
 
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = columnHeadersWidthSizeMode
         };
@@ -2177,11 +2176,11 @@ public partial class DataGridViewTests
     [InlineData(DataGridViewColumnHeadersHeightSizeMode.DisableResizing)]
     public void DataGridView_OnColumnHeadersHeightSizeModeChanged_InvalidEnableDisableResizingPreviousAutoModeSize_ThrowsArgumentOutOfRangeException(DataGridViewColumnHeadersHeightSizeMode columnHeadersWidthSizeMode)
     {
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = columnHeadersWidthSizeMode
         };
-        var eventArgs = new DataGridViewAutoSizeModeEventArgs(true);
+        DataGridViewAutoSizeModeEventArgs eventArgs = new(true);
         Assert.Throws<ArgumentOutOfRangeException>("value", () => control.OnColumnHeadersHeightSizeModeChanged(eventArgs));
     }
 
@@ -2189,7 +2188,7 @@ public partial class DataGridViewTests
     [MemberData(nameof(OnColumnHeadersHeightSizeModeChanged_TestData))]
     public void DataGridView_OnColumnHeadersHeightSizeModeChanged_InvokeDisposed_DoesNotCallColumnHeadersHeightSizeModeChanged(DataGridViewColumnHeadersHeightSizeMode columnHeadersWidthSizeMode, DataGridViewAutoSizeModeEventArgs eventArgs)
     {
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = columnHeadersWidthSizeMode
         };
@@ -2216,7 +2215,7 @@ public partial class DataGridViewTests
     [MemberData(nameof(OnColumnHeadersHeightSizeModeChanged_TestData))]
     public void DataGridView_OnColumnHeadersHeightSizeModeChanged_InvokeInDisposing_CallsColumnHeadersHeightSizeModeChanged(DataGridViewColumnHeadersHeightSizeMode columnHeadersWidthSizeMode, DataGridViewAutoSizeModeEventArgs eventArgs)
     {
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = columnHeadersWidthSizeMode
         };
@@ -2255,12 +2254,12 @@ public partial class DataGridViewTests
     [MemberData(nameof(OnColumnHeadersHeightSizeModeChanged_TestData))]
     public void DataGridView_OnColumnHeadersHeightSizeModeChanged_InvokeInColumnDisposing_DoesNotCallColumnHeadersHeightSizeModeChanged(DataGridViewColumnHeadersHeightSizeMode columnHeadersWidthSizeMode, DataGridViewAutoSizeModeEventArgs eventArgs)
     {
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             ColumnHeadersHeightSizeMode = columnHeadersWidthSizeMode
         };
-        using var cellTemplate = new SubDataGridViewCell();
-        using var column = new DataGridViewColumn
+        using SubDataGridViewCell cellTemplate = new();
+        using DataGridViewColumn column = new()
         {
             CellTemplate = cellTemplate
         };
@@ -2294,7 +2293,7 @@ public partial class DataGridViewTests
     [WinFormsFact]
     public void DataGridView_OnColumnHeadersHeightSizeModeChanged_NullE_ThrowsNullReferenceException()
     {
-        using var control = new SubDataGridView();
+        using SubDataGridView control = new();
         Assert.Throws<NullReferenceException>(() => control.OnColumnHeadersHeightSizeModeChanged(null));
     }
 
@@ -2302,17 +2301,17 @@ public partial class DataGridViewTests
     [Trait("Issue", "https://github.com/dotnet/winforms/issues/3033")]
     public void DataGridView_OnFontChanged_does_not_change_user_fonts()
     {
-        using Font formFont1 = new Font("Times New Roman", 12F, FontStyle.Regular);
+        using Font formFont1 = new("Times New Roman", 12F, FontStyle.Regular);
         using Form form = new Form
         {
             Font = formFont1
         };
 
-        using Font customFont1 = new Font("Tahoma", 8.25F, FontStyle.Regular);
-        using Font customFont2 = new Font("Consolas", 14F, FontStyle.Italic);
-        using Font customFont3 = new Font("Arial", 9F, FontStyle.Bold);
+        using Font customFont1 = new("Tahoma", 8.25F, FontStyle.Regular);
+        using Font customFont2 = new("Consolas", 14F, FontStyle.Italic);
+        using Font customFont3 = new("Arial", 9F, FontStyle.Bold);
 
-        var defaultCellStyle = new DataGridViewCellStyle
+        DataGridViewCellStyle defaultCellStyle = new()
         {
             Font = customFont1,
 
@@ -2351,7 +2350,7 @@ public partial class DataGridViewTests
         Assert.Same(customFont3, dataGridView.RowHeadersDefaultCellStyle.Font);
 
         // Force another global font change
-        using Font formFont2 = new Font("Arial Black", 10F, FontStyle.Italic);
+        using Font formFont2 = new("Arial Black", 10F, FontStyle.Italic);
         form.Font = formFont2;
 
         // Ensure custom fonts are preserved
@@ -2385,7 +2384,7 @@ public partial class DataGridViewTests
     [MemberData(nameof(OnRowHeadersWidthChanged_TestData))]
     public void DataGridView_OnRowHeadersWidthChanged_Invoke_CallsRowHeadersWidthChanged(DataGridViewRowHeadersWidthSizeMode rowHeadersWidthSizeMode, bool rowHeadersVisible, EventArgs eventArgs)
     {
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             RowHeadersWidthSizeMode = rowHeadersWidthSizeMode,
             RowHeadersVisible = rowHeadersVisible
@@ -2417,7 +2416,7 @@ public partial class DataGridViewTests
     {
         // Invalidation checks are omitted due to https://github.com/dotnet/winforms/issues/7799
 
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             RowHeadersWidthSizeMode = rowHeadersWidthSizeMode,
             RowHeadersVisible = rowHeadersVisible
@@ -2456,7 +2455,7 @@ public partial class DataGridViewTests
     [MemberData(nameof(OnRowHeadersWidthChanged_TestData))]
     public void DataGridView_OnRowHeadersWidthChanged_InvokeDisposed_DoesNotCallRowHeadersWidthChanged(DataGridViewRowHeadersWidthSizeMode rowHeadersWidthSizeMode, bool rowHeadersVisible, EventArgs eventArgs)
     {
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             RowHeadersWidthSizeMode = rowHeadersWidthSizeMode,
             RowHeadersVisible = rowHeadersVisible
@@ -2482,7 +2481,7 @@ public partial class DataGridViewTests
     [MemberData(nameof(OnRowHeadersWidthChanged_TestData))]
     public void DataGridView_OnRowHeadersWidthChanged_InvokeInDisposing_CallsRowHeadersWidthChanged(DataGridViewRowHeadersWidthSizeMode rowHeadersWidthSizeMode, bool rowHeadersVisible, EventArgs eventArgs)
     {
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             RowHeadersWidthSizeMode = rowHeadersWidthSizeMode,
             RowHeadersVisible = rowHeadersVisible
@@ -2522,13 +2521,13 @@ public partial class DataGridViewTests
     [MemberData(nameof(OnRowHeadersWidthChanged_TestData))]
     public void DataGridView_OnRowHeadersWidthChanged_InvokeInColumnDisposing_DoesNotCallRowHeadersWidthChanged(DataGridViewRowHeadersWidthSizeMode rowHeadersWidthSizeMode, bool rowHeadersVisible, EventArgs eventArgs)
     {
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             RowHeadersWidthSizeMode = rowHeadersWidthSizeMode,
             RowHeadersVisible = rowHeadersVisible
         };
-        using var cellTemplate = new SubDataGridViewCell();
-        using var column = new DataGridViewColumn
+        using SubDataGridViewCell cellTemplate = new();
+        using DataGridViewColumn column = new()
         {
             CellTemplate = cellTemplate
         };
@@ -2572,7 +2571,7 @@ public partial class DataGridViewTests
     [MemberData(nameof(OnRowHeadersWidthSizeModeChanged_TestData))]
     public void DataGridView_OnRowHeadersWidthSizeModeChanged_Invoke_CallsRowHeadersWidthSizeModeChanged(DataGridViewRowHeadersWidthSizeMode rowHeadersWidthSizeMode, DataGridViewAutoSizeModeEventArgs eventArgs)
     {
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             RowHeadersWidthSizeMode = rowHeadersWidthSizeMode
         };
@@ -2617,7 +2616,7 @@ public partial class DataGridViewTests
     {
         // Invalidation checks are omitted due to https://github.com/dotnet/winforms/issues/7799
 
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             RowHeadersWidthSizeMode = rowHeadersWidthSizeMode
         };
@@ -2658,11 +2657,11 @@ public partial class DataGridViewTests
     [InlineData(DataGridViewRowHeadersWidthSizeMode.DisableResizing)]
     public void DataGridView_OnRowHeadersWidthSizeModeChanged_InvalidEnableDisableResizingPreviousAutoModeSize_ThrowsArgumentOutOfRangeException(DataGridViewRowHeadersWidthSizeMode rowHeadersWidthSizeMode)
     {
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             RowHeadersWidthSizeMode = rowHeadersWidthSizeMode
         };
-        var eventArgs = new DataGridViewAutoSizeModeEventArgs(true);
+        DataGridViewAutoSizeModeEventArgs eventArgs = new(true);
         Assert.Throws<ArgumentOutOfRangeException>("value", () => control.OnRowHeadersWidthSizeModeChanged(eventArgs));
     }
 
@@ -2670,7 +2669,7 @@ public partial class DataGridViewTests
     [MemberData(nameof(OnRowHeadersWidthSizeModeChanged_TestData))]
     public void DataGridView_OnRowHeadersWidthSizeModeChanged_InvokeDisposed_DoesNotCallRowHeadersWidthSizeModeChanged(DataGridViewRowHeadersWidthSizeMode rowHeadersWidthSizeMode, DataGridViewAutoSizeModeEventArgs eventArgs)
     {
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             RowHeadersWidthSizeMode = rowHeadersWidthSizeMode
         };
@@ -2697,7 +2696,7 @@ public partial class DataGridViewTests
     [MemberData(nameof(OnRowHeadersWidthSizeModeChanged_TestData))]
     public void DataGridView_OnRowHeadersWidthSizeModeChanged_InvokeInDisposing_CallsRowHeadersWidthSizeModeChanged(DataGridViewRowHeadersWidthSizeMode rowHeadersWidthSizeMode, DataGridViewAutoSizeModeEventArgs eventArgs)
     {
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             RowHeadersWidthSizeMode = rowHeadersWidthSizeMode
         };
@@ -2736,12 +2735,12 @@ public partial class DataGridViewTests
     [MemberData(nameof(OnRowHeadersWidthSizeModeChanged_TestData))]
     public void DataGridView_OnRowHeadersWidthSizeModeChanged_InvokeInColumnDisposing_DoesNotCallRowHeadersWidthSizeModeChanged(DataGridViewRowHeadersWidthSizeMode rowHeadersWidthSizeMode, DataGridViewAutoSizeModeEventArgs eventArgs)
     {
-        using var control = new SubDataGridView
+        using SubDataGridView control = new()
         {
             RowHeadersWidthSizeMode = rowHeadersWidthSizeMode
         };
-        using var cellTemplate = new SubDataGridViewCell();
-        using var column = new DataGridViewColumn
+        using SubDataGridViewCell cellTemplate = new();
+        using DataGridViewColumn column = new()
         {
             CellTemplate = cellTemplate
         };
@@ -2775,17 +2774,17 @@ public partial class DataGridViewTests
     [WinFormsFact]
     public void DataGridView_OnRowHeadersWidthSizeModeChanged_NullE_ThrowsNullReferenceException()
     {
-        using var control = new SubDataGridView();
+        using SubDataGridView control = new();
         Assert.Throws<NullReferenceException>(() => control.OnRowHeadersWidthSizeModeChanged(null));
     }
 
     [WinFormsFact]
     public void DataGridView_UpdatesItsItems_AfterDataSourceDisposing()
     {
-        using DataGridView control = new DataGridView();
+        using DataGridView control = new();
         int rowsCount = 5;
         BindingSource bindingSource = GetTestBindingSource(rowsCount);
-        BindingContext context = new BindingContext();
+        BindingContext context = new();
         context.Add(bindingSource, bindingSource.CurrencyManager);
         control.BindingContext = context;
         control.DataSource = bindingSource;
@@ -2805,7 +2804,7 @@ public partial class DataGridViewTests
     [WinFormsFact]
     public void DataGridView_DataSource_IsNull_AfterDisposing()
     {
-        using DataGridView control = new DataGridView();
+        using DataGridView control = new();
         BindingSource bindingSource = GetTestBindingSource(5);
         control.DataSource = bindingSource;
 
@@ -2819,12 +2818,12 @@ public partial class DataGridViewTests
     [WinFormsFact]
     public void DataGridView_DataSource_IsActual_AfterOldOneIsDisposed()
     {
-        using DataGridView control = new DataGridView();
+        using DataGridView control = new();
         int rowsCount1 = 3;
         BindingSource bindingSource1 = GetTestBindingSource(rowsCount1);
         int rowsCount2 = 5;
         BindingSource bindingSource2 = GetTestBindingSource(rowsCount2);
-        BindingContext context = new BindingContext();
+        BindingContext context = new();
         context.Add(bindingSource1, bindingSource1.CurrencyManager);
         control.BindingContext = context;
         control.DataSource = bindingSource1;
@@ -2850,7 +2849,7 @@ public partial class DataGridViewTests
 
     private BindingSource GetTestBindingSource(int rowsCount)
     {
-        DataTable dt = new DataTable();
+        DataTable dt = new();
         dt.Columns.Add("Name");
         dt.Columns.Add("Age");
 
@@ -2883,7 +2882,7 @@ public partial class DataGridViewTests
     [WinFormsFact]
     public void DataGridView_GridColor()
     {
-        using var dataGrid = new DataGridView();
+        using DataGridView dataGrid = new();
 
         int changedCount = 0;
         dataGrid.GridColorChanged += (object sender, EventArgs e) =>

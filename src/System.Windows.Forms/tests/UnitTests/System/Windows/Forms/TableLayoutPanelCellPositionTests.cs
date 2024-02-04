@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 using System.ComponentModel;
@@ -15,7 +14,7 @@ public class TableLayoutPanelCellPositionTests
     [Fact]
     public void TableLayoutPanelCellPosition_Ctor_Default()
     {
-        var style = new TableLayoutPanelCellPosition();
+        TableLayoutPanelCellPosition style = new();
         Assert.Equal(0, style.Column);
         Assert.Equal(0, style.Row);
     }
@@ -26,7 +25,7 @@ public class TableLayoutPanelCellPositionTests
     [InlineData(1, 2)]
     public void TableLayoutPanelCellPosition_Ctor_Int_int(int column, int row)
     {
-        var style = new TableLayoutPanelCellPosition(column, row);
+        TableLayoutPanelCellPosition style = new(column, row);
         Assert.Equal(column, style.Column);
         Assert.Equal(row, style.Row);
     }
@@ -47,7 +46,7 @@ public class TableLayoutPanelCellPositionTests
     [IntegerData<int>]
     public void TableLayoutPanelCellPosition_Column_Set_GetReturnsExpected(int value)
     {
-        var style = new TableLayoutPanelCellPosition
+        TableLayoutPanelCellPosition style = new()
         {
             Column = value
         };
@@ -58,7 +57,7 @@ public class TableLayoutPanelCellPositionTests
     [IntegerData<int>]
     public void TableLayoutPanelCellPosition_Row_Set_GetReturnsExpected(int value)
     {
-        var style = new TableLayoutPanelCellPosition
+        TableLayoutPanelCellPosition style = new()
         {
             Row = value
         };
@@ -71,7 +70,7 @@ public class TableLayoutPanelCellPositionTests
         yield return new object[] { new TableLayoutPanelCellPosition(1, 2), new TableLayoutPanelCellPosition(2, 2), false };
         yield return new object[] { new TableLayoutPanelCellPosition(1, 2), new TableLayoutPanelCellPosition(1, 3), false };
 
-        yield return new object[] { new TableLayoutPanelCellPosition(1, 2), new object(), false };
+        yield return new object[] { new TableLayoutPanelCellPosition(1, 2), new(), false };
         yield return new object[] { new TableLayoutPanelCellPosition(1, 2), null, false };
     }
 
@@ -92,7 +91,7 @@ public class TableLayoutPanelCellPositionTests
     [Fact]
     public void TableLayoutPanelCellPosition_ToString_Invoke_ReturnsExpected()
     {
-        var position = new TableLayoutPanelCellPosition(1, 2);
+        TableLayoutPanelCellPosition position = new(1, 2);
         Assert.Equal("1,2", position.ToString());
     }
 

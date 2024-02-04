@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 
@@ -20,7 +19,7 @@ public class ContentsResizedEventArgsTests
     [MemberData(nameof(Ctor_Rectangle_TestData))]
     public void Ctor_Rectangle(Rectangle newRectangle)
     {
-        var e = new ContentsResizedEventArgs(newRectangle);
+        ContentsResizedEventArgs e = new(newRectangle);
         Assert.Equal(newRectangle, e.NewRectangle);
     }
 }

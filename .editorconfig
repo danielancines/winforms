@@ -14,6 +14,11 @@ indent_size = 4
 [*.json]
 indent_size = 2
 
+# Bvc.dll crashed in the CI build when this rule is enabled for VB.
+# C# files
+[src/**/*.cs]
+file_header_template = Licensed to the .NET Foundation under one or more agreements.\nThe .NET Foundation licenses this file to you under the MIT license.
+
 # C# and VB files
 [*.{cs,vb}]
 charset = utf-8-bom
@@ -85,6 +90,7 @@ tab_width = 4
 end_of_line = crlf
 dotnet_style_allow_multiple_blank_lines_experimental = true:silent
 dotnet_style_allow_statement_immediately_after_block_experimental = true:silent
+dotnet_style_prefer_collection_expression = true:suggestion
 
 # C# files
 [*.cs]
@@ -158,16 +164,13 @@ csharp_space_between_method_declaration_name_and_open_parenthesis = false
 csharp_space_between_method_declaration_parameter_list_parentheses = false
 csharp_space_between_parentheses = false
 csharp_space_between_square_brackets = false
-
-# IDE0008: Use explicit type
-dotnet_diagnostic.IDE0008.severity = silent
 csharp_using_directive_placement = outside_namespace:silent
 csharp_prefer_simple_using_statement = true:suggestion
 csharp_prefer_braces = true:silent
-csharp_style_namespace_declarations = block_scoped:silent
+csharp_style_namespace_declarations = file_scoped:silent
 csharp_style_prefer_method_group_conversion = true:silent
 csharp_style_prefer_top_level_statements = true:silent
-csharp_style_prefer_primary_constructors = true:suggestion
+csharp_style_prefer_primary_constructors = true:silent
 csharp_style_expression_bodied_lambdas = true:silent
 csharp_style_expression_bodied_local_functions = false:silent
 csharp_style_allow_embedded_statements_on_same_line_experimental = true:silent
@@ -175,11 +178,12 @@ csharp_style_allow_blank_lines_between_consecutive_braces_experimental = true:si
 csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimental = true:silent
 csharp_style_allow_blank_line_after_token_in_conditional_expression_experimental = true:silent
 csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimental = true:silent
-# IDE0090: Use new()
-dotnet_diagnostic.IDE0090.severity = error
 csharp_style_deconstructed_variable_declaration = true:suggestion
 
 # Visual Basic files
+
+# SYSLIB1054: Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
+dotnet_diagnostic.SYSLIB1054.severity = none
 
 [*.vb]
 # Modifier preferences

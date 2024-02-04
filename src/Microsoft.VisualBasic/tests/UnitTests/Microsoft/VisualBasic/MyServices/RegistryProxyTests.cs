@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using Microsoft.VisualBasic.Devices;
 
@@ -23,7 +22,7 @@ public class RegistryProxyTests
     [Fact]
     public void GetValue_ArgumentException()
     {
-        var keyName = GetUniqueName();
+        string keyName = GetUniqueName();
         var registry = (new ServerComputer()).Registry;
         Assert.Throws<ArgumentException>(() => registry.GetValue(keyName, "", null));
     }
@@ -31,8 +30,8 @@ public class RegistryProxyTests
     [Fact]
     public void SetValue_ArgumentException()
     {
-        var keyName = GetUniqueName();
-        var valueName = GetUniqueName();
+        string keyName = GetUniqueName();
+        string valueName = GetUniqueName();
         var registry = (new ServerComputer()).Registry;
         Assert.Throws<ArgumentException>(() => registry.SetValue(keyName, valueName, ""));
         Assert.Throws<ArgumentException>(() => registry.SetValue(keyName, valueName, "", Microsoft.Win32.RegistryValueKind.String));

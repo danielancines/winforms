@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -18,7 +17,6 @@ internal sealed partial class DesignerActionPanel
         {
             private bool _mouseOver;
             private bool _mouseDown;
-            private bool _ellipsis;
 
             protected override void OnMouseDown(MouseEventArgs e)
             {
@@ -52,16 +50,12 @@ internal sealed partial class DesignerActionPanel
                 }
             }
 
-            public bool Ellipsis
-            {
-                get => _ellipsis;
-                set => _ellipsis = value;
-            }
+            public bool Ellipsis { get; set; }
 
             protected override void OnPaint(PaintEventArgs e)
             {
                 Graphics g = e.Graphics;
-                if (_ellipsis)
+                if (Ellipsis)
                 {
                     PushButtonState buttonState = PushButtonState.Normal;
                     if (_mouseDown)
@@ -121,14 +115,14 @@ internal sealed partial class DesignerActionPanel
                         // Draw the arrow icon
                         try
                         {
-                            Icon icon = new Icon(typeof(DesignerActionPanel), "Arrow.ico");
+                            Icon icon = new(typeof(DesignerActionPanel), "Arrow.ico");
                             try
                             {
                                 Bitmap arrowBitmap = icon.ToBitmap();
 
                                 // Make sure we draw properly under high contrast by re-mapping
                                 // the arrow color to the WindowText color
-                                ImageAttributes attrs = new ImageAttributes();
+                                ImageAttributes attrs = new();
                                 try
                                 {
                                     ColorMap cm = new ColorMap
@@ -162,7 +156,7 @@ internal sealed partial class DesignerActionPanel
                             }
                             finally
                             {
-                                icon?.Dispose();
+                                icon.Dispose();
                             }
                         }
                         catch

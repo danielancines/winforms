@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Runtime.InteropServices;
 
@@ -19,7 +18,7 @@ public partial class MdiParent : Form
         ToolStripMenuItem menu = new() { Text = "Open new child" };
         menu.Click += (s, e) =>
         {
-            var child = new Form();
+            Form child = new();
             child.MdiParent = this;
             child.WindowState = FormWindowState.Maximized;
             child.Show();
@@ -45,7 +44,7 @@ public partial class MdiParent : Form
     {
         base.OnLoad(e);
 
-        MdiChild frm = new MdiChild();
+        MdiChild frm = new();
         frm.MdiParent = this;
         frm.WindowState = FormWindowState.Maximized;
         frm.Show();

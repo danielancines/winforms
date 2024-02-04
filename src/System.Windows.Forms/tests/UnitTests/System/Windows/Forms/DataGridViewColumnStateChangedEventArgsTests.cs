@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -10,8 +9,8 @@ public class DataGridViewColumnStateChangedEventArgsTests
     [Fact]
     public void Ctor_DataGridViewColumn_DataGridViewElementStates()
     {
-        using var dataGridViewColumn = new DataGridViewColumn();
-        var e = new DataGridViewColumnStateChangedEventArgs(dataGridViewColumn, DataGridViewElementStates.Displayed);
+        using DataGridViewColumn dataGridViewColumn = new();
+        DataGridViewColumnStateChangedEventArgs e = new(dataGridViewColumn, DataGridViewElementStates.Displayed);
         Assert.Equal(dataGridViewColumn, e.Column);
         Assert.Equal(DataGridViewElementStates.Displayed, e.StateChanged);
     }

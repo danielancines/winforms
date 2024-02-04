@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Collections;
 using System.Drawing;
@@ -146,7 +145,7 @@ public class ListTests
         classInfo["_size"].Should().Be(0);
         classInfo["_version"].Should().Be(0);
 
-        ArraySinglePrimitive array = (ArraySinglePrimitive)format[2];
+        ArraySinglePrimitive<int> array = (ArraySinglePrimitive<int>)format[2];
         array.Length.Should().Be(0);
     }
 
@@ -171,7 +170,7 @@ public class ListTests
         BinaryFormatWriter.TryWritePrimitiveList(stream, list).Should().BeTrue();
         stream.Position = 0;
 
-        using var formatterScope = new BinaryFormatterScope(enable: true);
+        using BinaryFormatterScope formatterScope = new(enable: true);
 #pragma warning disable SYSLIB0011 // Type or member is obsolete
         BinaryFormatter formatter = new();
         IList deserialized = (IList)formatter.Deserialize(stream);

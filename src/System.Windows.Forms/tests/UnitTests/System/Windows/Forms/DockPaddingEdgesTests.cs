@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 
@@ -20,7 +19,7 @@ public class DockPaddingEdgesTests
     [InlineData(1, 2, 3, 4, 0, 1, 2, 3, 4)]
     public void DockPaddingEdges_Properties_Get_ReturnsExpected(int left, int top, int right, int bottom, int expectedAll, int expectedLeft, int expectedTop, int expectedRight, int expectedBottom)
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(left, top, right, bottom)
         };
@@ -39,7 +38,7 @@ public class DockPaddingEdgesTests
     [InlineData(1, 1, 1)]
     public void DockPaddingEdges_All_SetWithOwner_GetReturnsExpected(int value, int expectedValue, int expectedPaddingAll)
     {
-        using var owner = new ScrollableControl();
+        using ScrollableControl owner = new();
         ScrollableControl.DockPaddingEdges padding = owner.DockPadding;
         padding.All = value;
         Assert.Equal(expectedValue, padding.All);
@@ -58,7 +57,7 @@ public class DockPaddingEdgesTests
     [IntegerData<int>]
     public void DockPaddingEdges_All_SetWithoutOwner_GetReturnsExpected(int value)
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -79,7 +78,7 @@ public class DockPaddingEdgesTests
     [InlineData(1, 1)]
     public void DockPaddingEdges_Left_SetWithOwner_GetReturnsExpected(int value, int expectedLeft)
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -101,7 +100,7 @@ public class DockPaddingEdgesTests
     [IntegerData<int>]
     public void DockPaddingEdges_Left_SetWithoutOwner_GetReturnsExpected(int value)
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -122,7 +121,7 @@ public class DockPaddingEdgesTests
     [InlineData(1, 1)]
     public void DockPaddingEdges_Top_SetWithOwner_GetReturnsExpected(int value, int expectedTop)
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -144,7 +143,7 @@ public class DockPaddingEdgesTests
     [IntegerData<int>]
     public void DockPaddingEdges_Top_SetWithoutOwner_GetReturnsExpected(int value)
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -165,7 +164,7 @@ public class DockPaddingEdgesTests
     [InlineData(1, 1)]
     public void DockPaddingEdges_Right_SetWithOwner_GetReturnsExpected(int value, int expectedRight)
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -187,7 +186,7 @@ public class DockPaddingEdgesTests
     [IntegerData<int>]
     public void DockPaddingEdges_Right_SetWithoutOwner_GetReturnsExpected(int value)
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -208,7 +207,7 @@ public class DockPaddingEdgesTests
     [InlineData(1, 1)]
     public void DockPaddingEdges_Bottom_SetWithOwner_GetReturnsExpected(int value, int expectedBottom)
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -230,7 +229,7 @@ public class DockPaddingEdgesTests
     [IntegerData<int>]
     public void DockPaddingEdges_Bottom_SetWithoutOwner_GetReturnsExpected(int value)
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -248,7 +247,7 @@ public class DockPaddingEdgesTests
     {
         ScrollableControl.DockPaddingEdges CreatePadding(int left, int top, int right, int bottom)
         {
-            var owner = new ScrollableControl
+            ScrollableControl owner = new()
             {
                 Padding = new Padding(left, top, right, bottom)
             };
@@ -279,8 +278,8 @@ public class DockPaddingEdgesTests
         yield return new object[] { CreateClonedPadding(1, 2, 3, 4), CreatePadding(1, 2, 3, 5), false };
         yield return new object[] { CreateClonedPadding(1, 2, 3, 4), CreateClonedPadding(1, 2, 3, 5), false };
 
-        yield return new object[] { CreatePadding(1, 2, 3, 4), new object(), false };
-        yield return new object[] { CreateClonedPadding(1, 2, 3, 4), new object(), false };
+        yield return new object[] { CreatePadding(1, 2, 3, 4), new(), false };
+        yield return new object[] { CreateClonedPadding(1, 2, 3, 4), new(), false };
         yield return new object[] { CreatePadding(1, 2, 3, 4), null, false };
         yield return new object[] { CreateClonedPadding(1, 2, 3, 4), null, false };
     }
@@ -300,7 +299,7 @@ public class DockPaddingEdgesTests
     [WinFormsFact]
     public void DockPaddingEdges_GetHashCode_InvokeWithOwner_ReturnsExpected()
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -312,7 +311,7 @@ public class DockPaddingEdgesTests
     [WinFormsFact]
     public void DockPaddingEdges_GetHashCode_InvokeWithoutOwner_ReturnsExpected()
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -325,7 +324,7 @@ public class DockPaddingEdgesTests
     [WinFormsFact]
     public void DockPaddingEdges_Clone_InvokeWithOwner_ReturnsExpected()
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -341,7 +340,7 @@ public class DockPaddingEdgesTests
     [WinFormsFact]
     public void DockPaddingEdges_Clone_InvokeWithoutOwner_ReturnsExpected()
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -358,7 +357,7 @@ public class DockPaddingEdgesTests
     [WinFormsFact]
     public void DockPaddingEdges_ToString_InvokeWithOwner_ReturnsExpected()
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -369,7 +368,7 @@ public class DockPaddingEdgesTests
     [WinFormsFact]
     public void DockPaddingEdges_ToString_InvokeWithoutOwner_ReturnsExpected()
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -381,7 +380,7 @@ public class DockPaddingEdgesTests
     [WinFormsFact]
     public void DockPaddingEdges_AllPropertyDescriptor_ResetValue_SetsToZero()
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -402,7 +401,7 @@ public class DockPaddingEdgesTests
     [WinFormsFact]
     public void DockPaddingEdges_LeftPropertyDescriptor_ResetValue_SetsToZero()
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -423,7 +422,7 @@ public class DockPaddingEdgesTests
     [WinFormsFact]
     public void DockPaddingEdges_TopPropertyDescriptor_ResetValue_SetsToZero()
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -444,7 +443,7 @@ public class DockPaddingEdgesTests
     [WinFormsFact]
     public void DockPaddingEdges_RightPropertyDescriptor_ResetValue_SetsToZero()
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };
@@ -465,7 +464,7 @@ public class DockPaddingEdgesTests
     [WinFormsFact]
     public void DockPaddingEdges_BottomPropertyDescriptor_ResetValue_SetsToZero()
     {
-        using var owner = new ScrollableControl
+        using ScrollableControl owner = new()
         {
             Padding = new Padding(1, 2, 3, 4)
         };

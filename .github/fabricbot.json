@@ -575,17 +575,6 @@
     },
     {
       "taskType": "trigger",
-      "capabilityId": "ReleaseAnnouncement",
-      "subCapability": "ReleaseAnnouncement",
-      "version": "1.0",
-      "config": {
-        "taskName": "Release announcement",
-        "prReply": "The fix is included in ${pkgName} ${version}.",
-        "issueReply": "Fixed in ${pkgName} ${version}."
-      }
-    },
-    {
-      "taskType": "trigger",
       "capabilityId": "InPrLabel",
       "subCapability": "InPrLabel",
       "version": "1.0",
@@ -645,7 +634,7 @@
           {
             "name": "addMilestone",
             "parameters": {
-              "milestoneName": "8.0 RC1"
+              "milestoneName": "9.0 Preview2"
             }
           }
         ],
@@ -930,7 +919,8 @@
             "parameters": {}
           }
         ]
-      }
+      },
+      "disabled": true
     },
     {
       "taskType": "trigger",
@@ -1335,112 +1325,6 @@
       "disabled": true
     },
     {
-      "taskType": "scheduled",
-      "capabilityId": "ScheduledSearch",
-      "subCapability": "ScheduledSearch",
-      "version": "1.1",
-      "config": {
-        "frequency": [
-          {
-            "weekDay": 0,
-            "hours": [
-              1,
-              7,
-              13,
-              19
-            ],
-            "timezoneOffset": 0
-          },
-          {
-            "weekDay": 1,
-            "hours": [
-              1,
-              7,
-              13,
-              19
-            ],
-            "timezoneOffset": 0
-          },
-          {
-            "weekDay": 2,
-            "hours": [
-              1,
-              7,
-              13,
-              19
-            ],
-            "timezoneOffset": 0
-          },
-          {
-            "weekDay": 3,
-            "hours": [
-              1,
-              7,
-              13,
-              19
-            ],
-            "timezoneOffset": 0
-          },
-          {
-            "weekDay": 4,
-            "hours": [
-              1,
-              7,
-              13,
-              19
-            ],
-            "timezoneOffset": 0
-          },
-          {
-            "weekDay": 5,
-            "hours": [
-              1,
-              7,
-              13,
-              19
-            ],
-            "timezoneOffset": 0
-          },
-          {
-            "weekDay": 6,
-            "hours": [
-              1,
-              7,
-              13,
-              19
-            ],
-            "timezoneOffset": 0
-          }
-        ],
-        "searchTerms": [
-          {
-            "name": "isClosed",
-            "parameters": {}
-          },
-          {
-            "name": "noActivitySince",
-            "parameters": {
-              "days": 30
-            }
-          },
-          {
-            "name": "isUnlocked",
-            "parameters": {}
-          }
-        ],
-        "actions": [
-          {
-            "name": "lockIssue",
-            "parameters": {
-              "reason": "resolved",
-              "label": "will_lock_this"
-            }
-          }
-        ],
-        "taskName": "Lock stale issues and PRs"
-      }
-    },
-    {
       "taskType": "trigger",
       "capabilityId": "IssueResponder",
       "subCapability": "PullRequestResponder",
@@ -1806,6 +1690,116 @@
             "name": "removeLabel",
             "parameters": {
               "label": ":mailbox_with_mail: waiting-for-testing"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "taskType": "scheduled",
+      "capabilityId": "ScheduledSearch",
+      "subCapability": "ScheduledSearch",
+      "version": "1.1",
+      "config": {
+        "frequency": [
+          {
+            "weekDay": 0,
+            "hours": [
+              8,
+              20
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 1,
+            "hours": [
+              8,
+              20
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 2,
+            "hours": [
+              8,
+              20
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 3,
+            "hours": [
+              8,
+              20
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 4,
+            "hours": [
+              8,
+              20
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 5,
+            "hours": [
+              8,
+              20
+            ],
+            "timezoneOffset": -7
+          },
+          {
+            "weekDay": 6,
+            "hours": [
+              8,
+              20
+            ],
+            "timezoneOffset": -7
+          }
+        ],
+        "searchTerms": [
+          {
+            "name": "isDraftPr",
+            "parameters": {
+              "value": "true"
+            }
+          },
+          {
+            "name": "created",
+            "parameters": {
+              "operator": "<",
+              "days": 180
+            }
+          },
+          {
+            "name": "isOpen",
+            "parameters": {}
+          },
+          {
+            "name": "noActivitySince",
+            "parameters": {
+              "days": 180
+            }
+          }
+        ],
+        "taskName": "Close OLD draft PRs",
+        "actions": [
+          {
+            "name": "closeIssue",
+            "parameters": {}
+          },
+          {
+            "name": "addReply",
+            "parameters": {
+              "comment": "The current status of this \"draft\" PR has persisted for over 180 days, making it highly probable that it is no longer aligned with the latest codebase. Our repository is set up to automatically close draft PRs that have become outdated, and it requests the author to revisit and reopen them if they deem it necessary, thereby bringing them to the team's attention."
+            }
+          },
+          {
+            "name": "addLabel",
+            "parameters": {
+              "label": "draft"
             }
           }
         ]

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 
@@ -11,15 +10,15 @@ public class NativeWindowTests
     [WinFormsFact]
     public void NativeWindow_Ctor_Default()
     {
-        var window = new NativeWindow();
+        NativeWindow window = new();
         Assert.Equal(IntPtr.Zero, window.Handle);
     }
 
     [WinFormsFact]
     public void NativeWindow_AssignHandle_ControlHandle_Success()
     {
-        using var control = new Control();
-        var window = new NativeWindow();
+        using Control control = new();
+        NativeWindow window = new();
         window.AssignHandle(control.Handle);
         Assert.Equal(control.Handle, window.Handle);
     }
@@ -27,8 +26,8 @@ public class NativeWindowTests
     [WinFormsFact]
     public void NativeWindow_AssignHandle_TwoNativeWindows_Success()
     {
-        using Form control = new Form();
-        var window1 = new NativeWindow();
+        using Form control = new();
+        NativeWindow window1 = new();
 
         // ControlNativeWindow (via Form) will be registered with the Handle (by calling .Handle) already.
         // Invoking AssignHandle on it will set ControlNativeWindow to Previous and assign window1
@@ -38,7 +37,7 @@ public class NativeWindowTests
 
         // This will further chain window2, putting window1, then ControlNativeWindow as previous
         // (Previous) entries in the chain.
-        NativeWindow window2 = new NativeWindow();
+        NativeWindow window2 = new();
         window2.AssignHandle(control.Handle);
         Assert.Equal(control.Handle, window1.Handle);
         Assert.Equal(control.Handle, window2.Handle);
@@ -47,8 +46,8 @@ public class NativeWindowTests
     [WinFormsFact]
     public void NativeWindow_AssignHandle_ControlHandleAfterRelease_Success()
     {
-        using var control = new Control();
-        var window = new NativeWindow();
+        using Control control = new();
+        NativeWindow window = new();
         window.AssignHandle(control.Handle);
         Assert.Equal(control.Handle, window.Handle);
 
@@ -64,7 +63,7 @@ public class NativeWindowTests
     {
         using (new NoAssertContext())
         {
-            var window = new NativeWindow();
+            NativeWindow window = new();
             window.AssignHandle(IntPtr.Zero);
             Assert.Equal(IntPtr.Zero, window.Handle);
         }
@@ -75,7 +74,7 @@ public class NativeWindowTests
     {
         using (new NoAssertContext())
         {
-            var window = new NativeWindow();
+            NativeWindow window = new();
             window.AssignHandle((IntPtr)250);
             Assert.Equal((IntPtr)250, window.Handle);
         }
@@ -84,8 +83,8 @@ public class NativeWindowTests
     [WinFormsFact]
     public void NativeWindow_AssignHandle_AlreadyHasHandle_Success()
     {
-        using var control = new Control();
-        var window = new NativeWindow();
+        using Control control = new();
+        NativeWindow window = new();
         window.AssignHandle(control.Handle);
         Assert.Equal(control.Handle, window.Handle);
         Assert.Throws<InvalidOperationException>(() => window.AssignHandle((IntPtr)250));
@@ -98,8 +97,8 @@ public class NativeWindowTests
     [InlineData("SysTabControl32", 100)]
     public void NativeWindow_CreateHandle_Invoke_Success(string className, int classStyle)
     {
-        var window1 = new NativeWindow();
-        var cp = new CreateParams
+        NativeWindow window1 = new();
+        CreateParams cp = new()
         {
             ClassName = className,
             ClassStyle = classStyle
@@ -111,7 +110,7 @@ public class NativeWindowTests
             Assert.Null(cp.Caption);
 
             // Call again on another class to test caching.
-            var window2 = new NativeWindow();
+            NativeWindow window2 = new();
             window2.CreateHandle(cp);
             try
             {
@@ -141,9 +140,9 @@ public class NativeWindowTests
     [MemberData(nameof(CreateHandle_Caption_TestData))]
     public void NativeWindow_CreateHandle_InvokeWithCaption_Success(string caption, string expectedCaption)
     {
-        using var control = new Control();
-        var window = new NativeWindow();
-        var cp = new CreateParams
+        using Control control = new();
+        NativeWindow window = new();
+        CreateParams cp = new()
         {
             Caption = caption
         };
@@ -162,7 +161,7 @@ public class NativeWindowTests
     [WinFormsFact]
     public void NativeWindow_CreateHandle_NullCp_ThrowsNullReferenceException()
     {
-        var window = new NativeWindow();
+        NativeWindow window = new();
         Assert.Throws<NullReferenceException>(() => window.CreateHandle(null));
         Assert.Equal(IntPtr.Zero, window.Handle);
     }
@@ -170,12 +169,12 @@ public class NativeWindowTests
     [WinFormsFact]
     public void NativeWindow_CreateHandle_AlreadyHasHandle_ThrowsInvalidOperationException()
     {
-        using var control = new Control();
-        var window = new NativeWindow();
+        using Control control = new();
+        NativeWindow window = new();
         window.AssignHandle(control.Handle);
         IntPtr handle = window.Handle;
 
-        var cp = new CreateParams();
+        CreateParams cp = new();
         Assert.Throws<InvalidOperationException>(() => window.CreateHandle(cp));
         Assert.Equal(handle, window.Handle);
     }
@@ -185,8 +184,8 @@ public class NativeWindowTests
     [InlineData("noSuchClassName")]
     public void NativeWindow_CreateHandle_InvalidWindowClassName_ThrowsWin32Exception(string className)
     {
-        var window = new NativeWindow();
-        var cp = new CreateParams
+        NativeWindow window = new();
+        CreateParams cp = new()
         {
             ClassName = className
         };
@@ -197,8 +196,8 @@ public class NativeWindowTests
     [WinFormsFact]
     public void NativeWindow_CreateHandle_InvokeAlreadyExists_ThrowsWin32Exception()
     {
-        var window1 = new NativeWindow();
-        var cp1 = new CreateParams
+        NativeWindow window1 = new();
+        CreateParams cp1 = new()
         {
             ClassName = "SysTabControl32"
         };
@@ -207,8 +206,8 @@ public class NativeWindowTests
         {
             Assert.NotEqual(IntPtr.Zero, window1.Handle);
 
-            var window2 = new NativeWindow();
-            var cp2 = new CreateParams
+            NativeWindow window2 = new();
+            CreateParams cp2 = new()
             {
                 ClassName = "systabcontrol32"
             };
@@ -224,8 +223,8 @@ public class NativeWindowTests
     [WinFormsFact]
     public void NativeWindow_DestroyHandle_InvokeWithCreatedHandle_Success()
     {
-        var window = new NativeWindow();
-        var cp = new CreateParams();
+        NativeWindow window = new();
+        CreateParams cp = new();
         window.CreateHandle(cp);
         window.DestroyHandle();
         Assert.Equal(IntPtr.Zero, window.Handle);
@@ -234,8 +233,8 @@ public class NativeWindowTests
     [WinFormsFact]
     public void NativeWindow_DestroyHandle_InvokeWithValidAssignedHandle_Success()
     {
-        using var control = new Control();
-        var window = new NativeWindow();
+        using Control control = new();
+        NativeWindow window = new();
         window.AssignHandle(control.Handle);
         window.DestroyHandle();
         Assert.Equal(IntPtr.Zero, window.Handle);
@@ -246,7 +245,7 @@ public class NativeWindowTests
     {
         using (new NoAssertContext())
         {
-            var window = new NativeWindow();
+            NativeWindow window = new();
             window.AssignHandle((IntPtr)250);
             window.DestroyHandle();
             Assert.Equal(IntPtr.Zero, window.Handle);
@@ -256,7 +255,7 @@ public class NativeWindowTests
     [WinFormsFact]
     public void NativeWindow_DestroyHandle_InvokeWithoutHandle_Nop()
     {
-        var window = new NativeWindow();
+        NativeWindow window = new();
         window.DestroyHandle();
         Assert.Equal(IntPtr.Zero, window.Handle);
     }
@@ -267,11 +266,11 @@ public class NativeWindowTests
     [InlineData((int)PInvoke.WM_NCDESTROY)]
     public void NativeWindow_DefWndProc_InvokeWithCreatedHandle_Nop(int msg)
     {
-        var window = new WndProcTrackingNativeWindow();
+        WndProcTrackingNativeWindow window = new();
         window.CreateHandle(new CreateParams());
         try
         {
-            var m = new Message
+            Message m = new()
             {
                 Msg = msg,
                 Result = (IntPtr)1
@@ -291,13 +290,13 @@ public class NativeWindowTests
     [InlineData(1234)]
     public void NativeWindow_DefWndProc_InvokeWithValidAssignedHandle_Nop(int msg)
     {
-        using var control = new Control();
-        var window = new WndProcTrackingNativeWindow();
+        using Control control = new();
+        WndProcTrackingNativeWindow window = new();
         window.AssignHandle(control.Handle);
 
         try
         {
-            var m = new Message
+            Message m = new()
             {
                 Msg = msg,
                 Result = (IntPtr)1
@@ -320,9 +319,9 @@ public class NativeWindowTests
     {
         using (new NoAssertContext())
         {
-            var window = new WndProcTrackingNativeWindow();
+            WndProcTrackingNativeWindow window = new();
             window.AssignHandle((IntPtr)250);
-            var m = new Message
+            Message m = new()
             {
                 Msg = msg,
                 Result = (IntPtr)1
@@ -336,8 +335,8 @@ public class NativeWindowTests
     [WinFormsFact]
     public void NativeWindow_DefWindProc_InvokeAfterAssignHandle_Success()
     {
-        using var control = new Control();
-        var window1 = new WndProcTrackingNativeWindow
+        using Control control = new();
+        WndProcTrackingNativeWindow window1 = new()
         {
             MessageTypePredicate = (msg) => msg == 123456
         };
@@ -358,7 +357,7 @@ public class NativeWindowTests
         // call chain is like this:
         //
         //   DefWndProc() -> PreviousWindow.CallBack() -> WndProc() -> DefWndProc()
-        var window2 = new WndProcTrackingNativeWindow
+        WndProcTrackingNativeWindow window2 = new()
         {
             MessageTypePredicate = (msg) => msg == 123456
         };
@@ -368,7 +367,7 @@ public class NativeWindowTests
         Assert.Empty(window2.Messages);
 
         // Check that the message continues to work back.
-        var window3 = new WndProcTrackingNativeWindow
+        WndProcTrackingNativeWindow window3 = new()
         {
             MessageTypePredicate = (msg) => msg == 123456
         };
@@ -387,8 +386,8 @@ public class NativeWindowTests
     {
         using (new NoAssertContext())
         {
-            var window = new WndProcTrackingNativeWindow();
-            var m = new Message
+            WndProcTrackingNativeWindow window = new();
+            Message m = new()
             {
                 Msg = msg,
                 Result = (IntPtr)1
@@ -402,8 +401,8 @@ public class NativeWindowTests
     [WinFormsFact]
     public void NativeWindow_ReleaseHandle_InvokeWithCreatedHandle_Success()
     {
-        using var control = new Control();
-        var window = new NativeWindow();
+        using Control control = new();
+        NativeWindow window = new();
         window.AssignHandle(control.Handle);
         window.ReleaseHandle();
         Assert.Equal(IntPtr.Zero, window.Handle);
@@ -412,8 +411,8 @@ public class NativeWindowTests
     [WinFormsFact]
     public void NativeWindow_ReleaseHandle_InvokeWithValidAssignedHandle_Success()
     {
-        using var control = new Control();
-        var window = new NativeWindow();
+        using Control control = new();
+        NativeWindow window = new();
         window.AssignHandle(control.Handle);
         window.ReleaseHandle();
         Assert.Equal(IntPtr.Zero, window.Handle);
@@ -424,8 +423,8 @@ public class NativeWindowTests
     {
         using (new NoAssertContext())
         {
-            using var control = new Control();
-            var window = new NativeWindow();
+            using Control control = new();
+            NativeWindow window = new();
             window.AssignHandle((IntPtr)250);
             window.ReleaseHandle();
             Assert.Equal(IntPtr.Zero, window.Handle);
@@ -435,7 +434,7 @@ public class NativeWindowTests
     [WinFormsFact]
     public void NativeWindow_ReleaseHandle_InvokeWithoutHandle_Nop()
     {
-        var window = new NativeWindow();
+        NativeWindow window = new();
         window.ReleaseHandle();
         Assert.Equal(IntPtr.Zero, window.Handle);
     }
@@ -446,12 +445,12 @@ public class NativeWindowTests
     [InlineData((int)PInvoke.WM_NCDESTROY)]
     public void NativeWindow_WndProc_InvokeWithCreatedHandle_Success(int msg)
     {
-        var window = new SubNativeWindow();
+        SubNativeWindow window = new();
         window.CreateHandle(new CreateParams());
 
         try
         {
-            var m = new Message
+            Message m = new()
             {
                 Msg = msg,
                 Result = (IntPtr)1
@@ -470,13 +469,13 @@ public class NativeWindowTests
     [InlineData(1234)]
     public void NativeWindow_WndProc_InvokeWithValidAssignedHandle_Success(int msg)
     {
-        using var control = new Control();
-        var window = new SubNativeWindow();
+        using Control control = new();
+        SubNativeWindow window = new();
         window.AssignHandle(control.Handle);
 
         try
         {
-            var m = new Message
+            Message m = new()
             {
                 Msg = msg,
                 Result = (IntPtr)1
@@ -499,9 +498,9 @@ public class NativeWindowTests
     {
         using (new NoAssertContext())
         {
-            var window = new SubNativeWindow();
+            SubNativeWindow window = new();
             window.AssignHandle((IntPtr)250);
-            var m = new Message
+            Message m = new()
             {
                 Msg = msg,
                 Result = (IntPtr)1
@@ -520,8 +519,8 @@ public class NativeWindowTests
     {
         using (new NoAssertContext())
         {
-            var window = new SubNativeWindow();
-            var m = new Message
+            SubNativeWindow window = new();
+            Message m = new()
             {
                 Msg = msg,
                 Result = (IntPtr)1
@@ -540,7 +539,7 @@ public class NativeWindowTests
     {
         public Predicate<int> MessageTypePredicate { get; set; }
 
-        public List<Message> Messages { get; } = new List<Message>();
+        public List<Message> Messages { get; } = new();
 
         protected override void WndProc(ref Message m)
         {

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.BinaryFormat;
 
@@ -14,7 +13,7 @@ namespace System.Windows.Forms.BinaryFormat;
 ///   </see>
 ///  </para>
 /// </remarks>
-internal sealed class BinaryArray : ArrayRecord, IRecord<BinaryArray>
+internal sealed class BinaryArray : ArrayRecord<object>, IRecord<BinaryArray>
 {
     public Count Rank { get; }
     public BinaryArrayType Type { get; }

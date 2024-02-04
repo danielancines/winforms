@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Drawing;
@@ -49,7 +48,7 @@ internal sealed partial class SelectionUIService
             Cursors.SizeNESW,   Cursors.SizeNS,   Cursors.SizeNWSE
         };
 
-        internal static readonly int[] s_inactiveSizeArray = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+        internal static readonly int[] s_inactiveSizeArray = [0, 0, 0, 0, 0, 0, 0, 0];
         internal static readonly Cursor[] s_inactiveCursorArray = new Cursor[]
         {
             Cursors.Arrow,   Cursors.Arrow,   Cursors.Arrow,
@@ -67,7 +66,7 @@ internal sealed partial class SelectionUIService
         private readonly Control? _control;
         private SelectionStyles _selectionStyle; // how do we draw this thing?
         private SelectionRules _selectionRules;
-        private readonly ISelectionUIHandler _handler; // the components selection UI handler (can be null)
+        private readonly ISelectionUIHandler? _handler; // the components selection UI handler (can be null)
 
         ///  Its ok to call virtual method as this is a private class.
         public SelectionUIItem(SelectionUIService selUIsvc, object component)
@@ -149,7 +148,7 @@ internal sealed partial class SelectionUIService
             brush.Dispose();
             graphics.Clip = oldClip;
             ControlPaint.DrawSelectionFrame(graphics, false, outer, inner, borderColor);
-            //if it's not locked & it is sizeable...
+            // if it's not locked & it is sizeable...
             if (((GetRules() & SelectionRules.Locked) == SelectionRules.None) && (GetRules() & SelectionRules.AllSizeable) != SelectionRules.None)
             {
                 // upper left

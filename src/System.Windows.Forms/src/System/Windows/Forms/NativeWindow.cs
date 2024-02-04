@@ -1,11 +1,9 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
-using static Interop;
 
 namespace System.Windows.Forms;
 
@@ -57,7 +55,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
     private bool _suppressedGC;
     private bool _ownHandle;
     private NativeWindow? _nextWindow;
-    private readonly WeakReference _weakThisPtr;
+    private readonly WeakReference<NativeWindow> _weakThisPtr;
 
     static NativeWindow()
     {
@@ -66,7 +64,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
 
     public NativeWindow()
     {
-        _weakThisPtr = new WeakReference(this);
+        _weakThisPtr = new(this);
     }
 
     /// <summary>
@@ -368,7 +366,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
 
         try
         {
-            if (_weakThisPtr.IsAlive && _weakThisPtr.Target is not null)
+            if (_weakThisPtr.TryGetTarget(out _))
             {
                 WndProc(ref m);
             }
@@ -443,7 +441,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
 
                     // Parking window dpi awareness context need to match with dpi awareness context of control being
                     // parented to this parking window. Otherwise, reparenting of control will fail.
-                    using (DpiHelper.EnterDpiAwarenessScope(DpiAwarenessContext, DPI_HOSTING_BEHAVIOR.DPI_HOSTING_BEHAVIOR_MIXED))
+                    using (ScaleHelper.EnterDpiAwarenessScope(DpiAwarenessContext, DPI_HOSTING_BEHAVIOR.DPI_HOSTING_BEHAVIOR_MIXED))
                     {
                         HINSTANCE modHandle = PInvoke.GetModuleHandle((PCWSTR)null);
                         // Older versions of Windows AV rather than returning E_OUTOFMEMORY.
@@ -501,7 +499,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
                     // based on the window properties and the behavior of the thread. For additional information, please refer to
                     // https://microsoft.visualstudio.com/OS/_git/os.2020?path=/clientcore/windows/Core/ntuser/kernel/windows/createw.cxx&version=GBofficial/main&line=881&lineEnd=882&lineStartColumn=1&lineEndColumn=1&lineStyle=plain&_a=contents
                     DPI_AWARENESS_CONTEXT controlHandleDpiContext = PInvoke.GetWindowDpiAwarenessContext(HWND);
-                    Debug.Assert(PInvoke.AreDpiAwarenessContextsEqualInternal(DpiAwarenessContext, controlHandleDpiContext),
+                    Debug.Assert(DpiAwarenessContext.IsEquivalent(controlHandleDpiContext),
                         $"Control's expected DpiAwarenessContext - {DpiAwarenessContext} is different from the DpiAwarenessContext on the Handle created for the control - {controlHandleDpiContext}");
                 }
 #endif
@@ -715,7 +713,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
 
             HWND = HWND.Null;
 
-            if (_weakThisPtr.IsAlive && _weakThisPtr.Target is not null)
+            if (_weakThisPtr.TryGetTarget(out _))
             {
                 // We're not already finalizing.
                 OnHandleChange();
@@ -866,10 +864,9 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
     /// </summary>
     private unsafe void UnSubclass()
     {
-        bool finalizing = !_weakThisPtr.IsAlive || _weakThisPtr.Target is null;
+        bool finalizing = !_weakThisPtr.TryGetTarget(out _);
 
         // Don't touch if the current window proc is not ours.
-
         void* currentWindowProc = (void*)PInvoke.GetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC);
         if (_windowProcHandle == currentWindowProc)
         {

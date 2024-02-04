@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 
@@ -19,7 +18,7 @@ public class PopupEventArgsTests
     [MemberData(nameof(Ctor_IWin32Window_Control_Bool_Size_TestData))]
     public void Ctor_IWin32Window_Control_Bool_Size(IWin32Window associatedWindow, Control associatedControl, bool isBalloon, Size size)
     {
-        var e = new PopupEventArgs(associatedWindow, associatedControl, isBalloon, size);
+        PopupEventArgs e = new(associatedWindow, associatedControl, isBalloon, size);
         Assert.Equal(associatedWindow, e.AssociatedWindow);
         Assert.Equal(associatedControl, e.AssociatedControl);
         Assert.Equal(isBalloon, e.IsBalloon);
@@ -38,7 +37,7 @@ public class PopupEventArgsTests
     [MemberData(nameof(ToolTipSize_TestData))]
     public void ToolTipSize_Set_GetReturnsExpected(Size value)
     {
-        var e = new PopupEventArgs(new SubWin32Window(), new Button(), true, new Size(1, 2))
+        PopupEventArgs e = new(new SubWin32Window(), new Button(), true, new Size(1, 2))
         {
             ToolTipSize = value
         };

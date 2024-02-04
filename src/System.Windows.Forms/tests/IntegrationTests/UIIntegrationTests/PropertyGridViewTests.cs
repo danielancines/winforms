@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using System.Windows.Forms.PropertyGridInternal;
@@ -24,7 +23,7 @@ public class PropertyGridViewTests : ControlTestBase
             propertyGrid.Size = new Size(223, 244);
             form.ClientSize = new Size(508, 367);
             propertyGrid.SelectedObject = domainUpDown;
-            GridEntryCollection entries = propertyGrid.GetCurrentEntries();
+            GridEntryCollection entries = propertyGrid.GetCurrentEntries()!;
             PropertyGridView propertyGridView = (PropertyGridView)propertyGrid.Controls[2];
 
             int borderHeight = 2;

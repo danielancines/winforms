@@ -1,10 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Reflection;
 using System.Text;
-using System.Windows.Forms;
 using System.Xml;
 
 namespace System.Resources;
@@ -181,7 +179,7 @@ public class ResXResourceWriter : IResourceWriter
         }
 
         _xmlTextWriter.WriteStartElement("root");
-        XmlTextReader reader = new XmlTextReader(new StringReader(ResourceSchema))
+        XmlTextReader reader = new(new StringReader(ResourceSchema))
         {
             WhitespaceHandling = WhitespaceHandling.None
         };
@@ -354,7 +352,7 @@ public class ResXResourceWriter : IResourceWriter
                 break;
             case ResXFileRef fileRef:
                 {
-                    ResXDataNode node = new ResXDataNode(name, fileRef, _typeNameConverter);
+                    ResXDataNode node = new(name, fileRef, _typeNameConverter);
                     DataNodeInfo info = node.GetDataNodeInfo();
                     AddDataRow(elementName, info.Name, info.ValueData, info.TypeName, info.MimeType, info.Comment);
                     break;
@@ -362,7 +360,7 @@ public class ResXResourceWriter : IResourceWriter
 
             default:
                 {
-                    ResXDataNode node = new ResXDataNode(name, value, _typeNameConverter);
+                    ResXDataNode node = new(name, value, _typeNameConverter);
                     DataNodeInfo info = node.GetDataNodeInfo();
                     AddDataRow(elementName, info.Name, info.ValueData, info.TypeName, info.MimeType, info.Comment);
                     break;

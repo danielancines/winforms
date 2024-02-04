@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.Drawing;
@@ -15,7 +14,7 @@ public class PropertyTabTests
     [Fact]
     public void PropertyTab_Ctor_Default()
     {
-        var tab = new SubPropertyTab();
+        SubPropertyTab tab = new();
         Assert.Null(tab.Bitmap);
         Assert.Null(tab.Components);
         Assert.Equal("TabName", tab.HelpKeyword);
@@ -24,7 +23,7 @@ public class PropertyTabTests
     [Fact]
     public void PropertyTab_Bitmap_GetValidMultipleTimes_ReturnsExpected()
     {
-        var tab = new CustomPropertyTab();
+        CustomPropertyTab tab = new();
         Bitmap bitmap = tab.Bitmap;
         Assert.Equal(new Size(11, 22), tab.Bitmap.Size);
         Assert.Same(bitmap, tab.Bitmap);
@@ -33,7 +32,7 @@ public class PropertyTabTests
     [Fact]
     public void PropertyTab_Bitmap_GetInvalidMultipleTimes_ReturnsNull()
     {
-        var tab = new SubPropertyTab();
+        SubPropertyTab tab = new();
         Assert.Null(tab.Bitmap);
         Assert.Null(tab.Bitmap);
     }
@@ -42,14 +41,14 @@ public class PropertyTabTests
     [StringWithNullData]
     public void PropertyTab_CanExtend_Invoke_ReturnsTrue(object extendee)
     {
-        var tab = new SubPropertyTab();
+        SubPropertyTab tab = new();
         Assert.True(tab.CanExtend(extendee));
     }
 
     [Fact]
     public void PropertyTab_Dispose_WithBitmap_Success()
     {
-        var tab = new CustomPropertyTab();
+        CustomPropertyTab tab = new();
         Bitmap bitmap = tab.Bitmap;
 
         tab.Dispose();
@@ -65,7 +64,7 @@ public class PropertyTabTests
     [Fact]
     public void PropertyTab_Dispose_NoBitmap_Success()
     {
-        var tab = new SubPropertyTab();
+        SubPropertyTab tab = new();
         tab.Dispose();
         Assert.Null(tab.Bitmap);
 
@@ -78,7 +77,7 @@ public class PropertyTabTests
     [BoolData]
     public void PropertyTab_Dispose_NoBitmapDisposing_Success(bool disposing)
     {
-        var tab = new SubPropertyTab();
+        SubPropertyTab tab = new();
         tab.Dispose(disposing);
         Assert.Null(tab.Bitmap);
 
@@ -91,7 +90,7 @@ public class PropertyTabTests
     [BoolData]
     public void PropertyTab_Dispose_WithBitmapDisposing_Success(bool disposing)
     {
-        var tab = new CustomPropertyTab();
+        CustomPropertyTab tab = new();
         Bitmap bitmap = tab.Bitmap;
 
         tab.Dispose(disposing);
@@ -121,21 +120,21 @@ public class PropertyTabTests
     [Fact]
     public void PropertyTab_GetDefaultProperty_InvokeWithoutDefaultProperty_ReturnsExpected()
     {
-        var tab = new SubPropertyTab();
+        SubPropertyTab tab = new();
         Assert.Null(tab.GetDefaultProperty(new ClassWithoutDefaultProperty()));
     }
 
     [Fact]
     public void PropertyTab_GetDefaultProperty_InvokeWithDefaultProperty_ReturnsExpected()
     {
-        var tab = new SubPropertyTab();
+        SubPropertyTab tab = new();
         Assert.Equal("Value", tab.GetDefaultProperty(new ClassWithDefaultProperty()).Name);
     }
 
     [Fact]
     public void PropertyTab_GetDefaultProperty_InvokeNullComponent_ReturnsExpected()
     {
-        var tab = new SubPropertyTab();
+        SubPropertyTab tab = new();
         Assert.Null(tab.GetDefaultProperty(null));
     }
 
@@ -143,7 +142,7 @@ public class PropertyTabTests
     [StringWithNullData]
     public void PropertyTab_GetProperties_Invoke_ReturnsExpected(object component)
     {
-        var tab = new SubPropertyTab();
+        SubPropertyTab tab = new();
         PropertyDescriptorCollection result = TypeDescriptor.GetProperties(typeof(ClassWithDefaultProperty));
         int callCount = 0;
         tab.GetPropertiesAction = (componentResult, attributesResult) =>
@@ -161,15 +160,15 @@ public class PropertyTabTests
     public static IEnumerable<object[]> GetProperties_Attributes_TestData()
     {
         yield return new object[] { null, null, null };
-        var mockContext = new Mock<ITypeDescriptorContext>(MockBehavior.Strict);
-        yield return new object[] { mockContext.Object, new object(), Array.Empty<Attribute>() };
+        Mock<ITypeDescriptorContext> mockContext = new(MockBehavior.Strict);
+        yield return new object[] { mockContext.Object, new(), Array.Empty<Attribute>() };
     }
 
     [Theory]
     [MemberData(nameof(GetProperties_Attributes_TestData))]
     public void PropertyTab_GetProperties_InvokeWithAttributes_ReturnsExpected(ITypeDescriptorContext context, object component, Attribute[] attributes)
     {
-        var tab = new SubPropertyTab();
+        SubPropertyTab tab = new();
         PropertyDescriptorCollection result = TypeDescriptor.GetProperties(typeof(ClassWithDefaultProperty));
         int callCount = 0;
         tab.GetPropertiesAction = (componentResult, attributesResult) =>

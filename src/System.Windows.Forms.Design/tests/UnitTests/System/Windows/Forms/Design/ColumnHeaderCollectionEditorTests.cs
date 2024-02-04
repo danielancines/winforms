@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Design.Tests;
 
@@ -17,7 +16,7 @@ public class ColumnHeaderCollectionEditorTests
     public void ColumnHeaderCollectionEditor_EditValue_ReturnsValue()
     {
         ColumnHeaderCollectionEditor editor = new(typeof(string));
-        string[] value = new string[] { "asdf", "qwer", "zxcv" };
+        string[] value = ["asdf", "qwer", "zxcv"];
 
         Assert.Same(value, editor.EditValue(null, value));
     }

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Globalization;
 
@@ -19,7 +18,7 @@ public class InputLanguageChangingEventArgsTests
     [MemberData(nameof(Ctor_CultureInfo_Bool_TestData))]
     public void Ctor_CultureInfo_Bool(CultureInfo culture, bool sysCharSet)
     {
-        var e = new InputLanguageChangingEventArgs(culture, sysCharSet);
+        InputLanguageChangingEventArgs e = new(culture, sysCharSet);
         Assert.Equal(InputLanguage.FromCulture(culture), e.InputLanguage);
         Assert.Equal(culture, e.Culture);
         Assert.Equal(sysCharSet, e.SysCharSet);
@@ -61,7 +60,7 @@ public class InputLanguageChangingEventArgsTests
             return;
         }
 
-        var e = new InputLanguageChangingEventArgs(inputLanguage, sysCharSet);
+        InputLanguageChangingEventArgs e = new(inputLanguage, sysCharSet);
         Assert.Equal(inputLanguage, e.InputLanguage);
         Assert.Equal(inputLanguage.Culture, e.Culture);
         Assert.Equal(sysCharSet, e.SysCharSet);

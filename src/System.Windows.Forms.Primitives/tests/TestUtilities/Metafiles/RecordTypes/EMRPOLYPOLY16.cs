@@ -1,12 +1,10 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 #nullable enable
 
 using System.Runtime.InteropServices;
 using System.Text;
-using static Interop;
 
 namespace System.Windows.Forms.Metafiles;
 
@@ -37,7 +35,7 @@ internal struct EMRPOLYPOLY16
 
     public string ToString(DeviceContextState? state)
     {
-        StringBuilder sb = new StringBuilder(512);
+        StringBuilder sb = new(512);
         sb.Append($"[EMR{emr.iType}] Bounds: {rclBounds} Poly count: {nPolys} Total points: {cpts}");
 
         for (int i = 0; i < nPolys; i++)

@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 namespace System.Windows.Forms.Tests;
 
@@ -13,8 +12,8 @@ public class WebBrowserNavigatingEventArgsTests
     [InlineData("targetFrameName")]
     public void Ctor_Uri(string targetFrameName)
     {
-        var url = new Uri("http://google.com");
-        var e = new WebBrowserNavigatingEventArgs(url, targetFrameName);
+        Uri url = new("http://google.com");
+        WebBrowserNavigatingEventArgs e = new(url, targetFrameName);
         Assert.Equal(url, e.Url);
         Assert.Equal(targetFrameName, e.TargetFrameName);
     }

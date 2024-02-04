@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 
@@ -19,10 +18,10 @@ public class ToolStripItemTextRenderEventArgsTests
     [MemberData(nameof(Ctor_ToolStripItem_String_Rectangle_Color_Font_TextFormatFlags_TestData))]
     public void Ctor_ToolStripItem_String_Rectangle_Color_Font_TextFormatFlags(ToolStripItem item, string text, Rectangle textRectangle, Color textColor, Font textFont, TextFormatFlags format)
     {
-        using var image = new Bitmap(10, 10);
+        using Bitmap image = new(10, 10);
         using Graphics g = Graphics.FromImage(image);
 
-        var e = new ToolStripItemTextRenderEventArgs(g, item, text, textRectangle, textColor, textFont, format);
+        ToolStripItemTextRenderEventArgs e = new(g, item, text, textRectangle, textColor, textFont, format);
         Assert.Equal(g, e.Graphics);
         Assert.Equal(item, e.Item);
         Assert.Equal(text, e.Text);
@@ -45,10 +44,10 @@ public class ToolStripItemTextRenderEventArgsTests
     [MemberData(nameof(Ctor_ToolStripItem_String_Rectangle_Color_Font_ContentAlignment_TestData))]
     public void Ctor_ToolStripItem_String_Rectangle_Color_Font_ContentAlignment(ToolStripItem item, string text, Rectangle textRectangle, Color textColor, Font textFont, ContentAlignment textAlign, TextFormatFlags expectedTextFormat)
     {
-        using var image = new Bitmap(10, 10);
+        using Bitmap image = new(10, 10);
         using Graphics g = Graphics.FromImage(image);
 
-        var e = new ToolStripItemTextRenderEventArgs(g, item, text, textRectangle, textColor, textFont, textAlign);
+        ToolStripItemTextRenderEventArgs e = new(g, item, text, textRectangle, textColor, textFont, textAlign);
         Assert.Equal(g, e.Graphics);
         Assert.Equal(item, e.Item);
         Assert.Equal(text, e.Text);
@@ -62,7 +61,7 @@ public class ToolStripItemTextRenderEventArgsTests
     [Fact]
     public void Ctor_NullItem_ThrowsArgumentNullException()
     {
-        using (var image = new Bitmap(10, 10))
+        using (Bitmap image = new(10, 10))
         using (Graphics graphics = Graphics.FromImage(image))
         {
             Assert.Throws<ArgumentNullException>("item", () => new ToolStripItemTextRenderEventArgs(graphics, null, "", new Rectangle(1, 2, 3, 4), Color.Red, SystemFonts.DefaultFont, TextFormatFlags.Top));
@@ -80,10 +79,10 @@ public class ToolStripItemTextRenderEventArgsTests
     [MemberData(nameof(TextColor_TestData))]
     public void TextColor_Set_GetReturnsExpected(Color value)
     {
-        using (var image = new Bitmap(10, 10))
+        using (Bitmap image = new(10, 10))
         using (Graphics graphics = Graphics.FromImage(image))
         {
-            var e = new ToolStripItemTextRenderEventArgs(graphics, new ToolStripButton(), "", new Rectangle(1, 2, 3, 4), Color.Blue, SystemFonts.DefaultFont, TextFormatFlags.Top)
+            ToolStripItemTextRenderEventArgs e = new(graphics, new ToolStripButton(), "", new Rectangle(1, 2, 3, 4), Color.Blue, SystemFonts.DefaultFont, TextFormatFlags.Top)
             {
                 TextColor = value
             };

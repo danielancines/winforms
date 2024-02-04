@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.ComponentModel;
 using System.ComponentModel.Design.Serialization;
@@ -21,7 +20,7 @@ public class ListViewItemConverterTests
     [InlineData(typeof(string), false)]
     public void ListViewItemConverter_CanConvertFrom_Invoke_ReturnsExpected(Type sourceType, bool expected)
     {
-        var converter = new ListViewItemConverter();
+        ListViewItemConverter converter = new();
         Assert.Equal(expected, converter.CanConvertFrom(sourceType));
     }
 
@@ -31,7 +30,7 @@ public class ListViewItemConverterTests
     [InlineData(null)]
     public void ListViewItemConverter_ConvertFrom_InvalidValue_ThrowsNotSupportedException(object value)
     {
-        var converter = new ListViewItemConverter();
+        ListViewItemConverter converter = new();
         Assert.Throws<NotSupportedException>(() => converter.ConvertFrom(value));
     }
 
@@ -43,13 +42,13 @@ public class ListViewItemConverterTests
     [InlineData(null, false)]
     public void ListViewItemConverter_ConverterCanConvertTo_Invoke_ReturnsExpected(Type destinationType, bool expected)
     {
-        var converter = new ListViewItemConverter();
+        ListViewItemConverter converter = new();
         Assert.Equal(expected, converter.CanConvertTo(destinationType));
     }
 
     public static IEnumerable<object[]> ConvertTo_InstanceDescriptor_TestData()
     {
-        var group = new ListViewGroup();
+        ListViewGroup group = new();
         var subItem1 = new ListViewItem.ListViewSubItem(null, "text1");
         var subItem2 = new ListViewItem.ListViewSubItem(null, "text2");
         var subItem3 = new ListViewItem.ListViewSubItem(null, "text3")
@@ -256,7 +255,7 @@ public class ListViewItemConverterTests
     [MemberData(nameof(ConvertTo_InstanceDescriptor_TestData))]
     public void ListViewItemConverter_ConvertTo_InstanceDescriptor_ReturnsExpected(ListViewItem value, Type[] parameterTypes, object[] arguments)
     {
-        var converter = new ListViewItemConverter();
+        ListViewItemConverter converter = new();
         InstanceDescriptor descriptor = Assert.IsType<InstanceDescriptor>(converter.ConvertTo(value, typeof(InstanceDescriptor)));
         Assert.Equal(typeof(ListViewItem).GetConstructor(parameterTypes), descriptor.MemberInfo);
         Assert.Equal(arguments, descriptor.Arguments);
@@ -267,21 +266,21 @@ public class ListViewItemConverterTests
     [InlineData(1, "1")]
     public void ListViewItemConverter_ConvertTo_String_ReturnsExpected(object value, string expected)
     {
-        var converter = new ListViewItemConverter();
+        ListViewItemConverter converter = new();
         Assert.Equal(expected, converter.ConvertTo(value, typeof(string)));
     }
 
     [Fact]
     public void ListViewItemConverter_ConvertTo_NullDestinationType_ThrowsArgumentNullException()
     {
-        var converter = new ListViewItemConverter();
+        ListViewItemConverter converter = new();
         Assert.Throws<ArgumentNullException>("destinationType", () => converter.ConvertTo(new object(), null));
     }
 
     [Fact]
     public void ListViewItemConverter_ConvertTo_ValueNotThrowsNotSupportedException()
     {
-        var converter = new ListViewItemConverter();
+        ListViewItemConverter converter = new();
         Assert.Throws<NotSupportedException>(() => converter.ConvertTo(1, typeof(InstanceDescriptor)));
     }
 
@@ -290,43 +289,43 @@ public class ListViewItemConverterTests
     [InlineData(typeof(int))]
     public void ListViewItemConverter_ConvertTo_InvalidDestinationType_ThrowsNotSupportedException(Type destinationType)
     {
-        var converter = new ListViewItemConverter();
+        ListViewItemConverter converter = new();
         Assert.Throws<NotSupportedException>(() => converter.ConvertTo(new ListViewItem(), destinationType));
     }
 
     [Fact]
     public void ListViewItemConverter_GetPropertiesSupported_Invoke_ReturnsTrue()
     {
-        var converter = new ListViewItemConverter();
+        ListViewItemConverter converter = new();
         Assert.True(converter.GetPropertiesSupported(null));
     }
 
     [Fact]
     public void ListViewItemConverter_GetProperties_Invoke_ReturnsExpected()
     {
-        var converter = new ListViewItemConverter();
-        var item = new ListViewItem();
+        ListViewItemConverter converter = new();
+        ListViewItem item = new();
         Assert.Equal(TypeDescriptor.GetProperties(item, null).Count, converter.GetProperties(null, item, null).Count);
     }
 
     [Fact]
     public void ListViewItemConverter_GetStandardValues_Invoke_ReturnsNull()
     {
-        var converter = new ListViewItemConverter();
+        ListViewItemConverter converter = new();
         Assert.Null(converter.GetStandardValues(null));
     }
 
     [Fact]
     public void ListViewItemConverter_GetStandardValuesExclusive_Invoke_ReturnsFalse()
     {
-        var converter = new ListViewItemConverter();
+        ListViewItemConverter converter = new();
         Assert.False(converter.GetStandardValuesExclusive(null));
     }
 
     [Fact]
     public void ListViewItemConverter_GetStandardValuesSupported_Invoke_ReturnsFalse()
     {
-        var converter = new ListViewItemConverter();
+        ListViewItemConverter converter = new();
         Assert.False(converter.GetStandardValuesSupported(null));
     }
 }

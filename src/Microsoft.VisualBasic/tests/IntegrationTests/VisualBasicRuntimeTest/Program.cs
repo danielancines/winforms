@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Drawing;
 using System.Reflection;
@@ -12,10 +11,10 @@ using Microsoft.VisualBasic.CompilerServices;
 
 namespace VisualBasicRuntimeTest;
 
-internal class Program
+internal static class Program
 {
     [STAThread]
-    static void Main(string[] args)
+    public static void Main(string[] args)
     {
         try
         {
@@ -99,9 +98,9 @@ internal class Program
         {
             loaded = true;
             var forms = application.OpenForms;
-            valid = forms.Count == 1 &&
-                forms[0] == mainForm &&
-                application.ApplicationContext.MainForm == mainForm;
+            valid = forms.Count == 1
+                && forms[0] == mainForm
+                && application.ApplicationContext.MainForm == mainForm;
             if (!valid)
             {
                 mainForm.Close();

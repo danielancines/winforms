@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System.Windows.Forms;
 
@@ -15,7 +14,7 @@ public class MouseTests
     [ConditionalFact(typeof(SystemInformation), nameof(SystemInformation.MousePresent))]
     public void Mouse_ButtonsSwapped_Get_ReturnsExpected()
     {
-        var mouse = new Mouse();
+        Mouse mouse = new();
         Assert.Equal(SystemInformation.MouseButtonsSwapped, mouse.ButtonsSwapped);
         Assert.Equal(mouse.ButtonsSwapped, mouse.ButtonsSwapped);
     }
@@ -25,7 +24,7 @@ public class MouseTests
     {
         if (NoMousePresent)
         {
-            var mouse = new Mouse();
+            Mouse mouse = new();
             Assert.Throws<InvalidOperationException>(() => mouse.ButtonsSwapped);
         }
     }
@@ -33,7 +32,7 @@ public class MouseTests
     [ConditionalFact(typeof(SystemInformation), nameof(SystemInformation.MousePresent))]
     public void Mouse_WheelExists_Get_ReturnsExpected()
     {
-        var mouse = new Mouse();
+        Mouse mouse = new();
         Assert.Equal(SystemInformation.MouseWheelPresent, mouse.WheelExists);
         Assert.Equal(mouse.WheelExists, mouse.WheelExists);
     }
@@ -43,7 +42,7 @@ public class MouseTests
     {
         if (NoMousePresent)
         {
-            var mouse = new Mouse();
+            Mouse mouse = new();
             Assert.Throws<InvalidOperationException>(() => mouse.WheelExists);
         }
     }
@@ -53,7 +52,7 @@ public class MouseTests
     {
         if (SystemInformation.MouseWheelPresent)
         {
-            var mouse = new Mouse();
+            Mouse mouse = new();
             Assert.Equal(SystemInformation.MouseWheelScrollLines, mouse.WheelScrollLines);
             Assert.Equal(mouse.WheelScrollLines, mouse.WheelScrollLines);
         }
@@ -64,7 +63,7 @@ public class MouseTests
     {
         if (NoMouseWheelPresent)
         {
-            var mouse = new Mouse();
+            Mouse mouse = new();
             Assert.Throws<InvalidOperationException>(() => mouse.WheelScrollLines);
         }
     }
