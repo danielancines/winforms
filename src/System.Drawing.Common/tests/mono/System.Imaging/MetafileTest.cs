@@ -1,6 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-//
+
 // Metafile class unit tests
 //
 // Authors:
@@ -185,7 +185,7 @@ public class MetafileTest
 
 public class MetafileFulltrustTest
 {
-    private void CheckEmptyHeader(Metafile mf, EmfType type)
+    private static void CheckEmptyHeader(Metafile mf, EmfType type)
     {
         MetafileHeader mh = mf.GetMetafileHeader();
         Assert.Equal(0, mh.Bounds.X);
@@ -210,22 +210,6 @@ public class MetafileFulltrustTest
         }
     }
 
-    private void Metafile_IntPtrEmfType(EmfType type)
-    {
-        using Bitmap bmp = new(10, 10, PixelFormat.Format32bppArgb);
-        using Graphics g = Graphics.FromImage(bmp);
-        IntPtr hdc = g.GetHdc();
-        try
-        {
-            Metafile mf = new(hdc, type);
-            CheckEmptyHeader(mf, type);
-        }
-        finally
-        {
-            g.ReleaseHdc(hdc);
-        }
-    }
-
     [Fact]
     public void Metafile_IntPtrRectangle_Empty()
     {
@@ -234,7 +218,7 @@ public class MetafileFulltrustTest
         IntPtr hdc = g.GetHdc();
         try
         {
-            Metafile mf = new(hdc, new Rectangle());
+            Metafile mf = new(hdc, default(Rectangle));
             CheckEmptyHeader(mf, EmfType.EmfPlusDual);
         }
         finally
@@ -251,7 +235,7 @@ public class MetafileFulltrustTest
         IntPtr hdc = g.GetHdc();
         try
         {
-            Metafile mf = new(hdc, new RectangleF());
+            Metafile mf = new(hdc, default(RectangleF));
             CheckEmptyHeader(mf, EmfType.EmfPlusDual);
         }
         finally
@@ -296,44 +280,6 @@ public class MetafileFulltrustTest
         Assert.Throws<ArgumentException>(() => Metafile_StreamEmfType(ms, (EmfType)int.MinValue));
     }
 
-    private void CreateFilename(EmfType type, bool single)
-    {
-        string name = $"{type}-{(single ? "Single" : "Multiple")}.emf";
-        string filename = Path.Combine(Path.GetTempPath(), name);
-        Metafile mf;
-        using Bitmap bmp = new(100, 100, PixelFormat.Format32bppArgb);
-        using (Graphics g = Graphics.FromImage(bmp))
-        {
-            IntPtr hdc = g.GetHdc();
-            try
-            {
-                mf = new Metafile(filename, hdc, type);
-                Assert.Equal(0, new FileInfo(filename).Length);
-            }
-            finally
-            {
-                g.ReleaseHdc(hdc);
-            }
-        }
-
-        long size = 0;
-        using (Graphics g = Graphics.FromImage(mf))
-        {
-            g.FillRectangle(Brushes.BlueViolet, 10, 10, 80, 80);
-            size = new FileInfo(filename).Length;
-            Assert.Equal(0, size);
-        }
-
-        if (!single)
-        {
-            using Graphics g = Graphics.FromImage(mf);
-            g.DrawRectangle(Pens.Azure, 10, 10, 80, 80);
-        }
-
-        mf.Dispose();
-        Assert.Equal(size, new FileInfo(filename).Length);
-    }
-
     [Fact]
     public void Measure()
     {
@@ -362,8 +308,10 @@ public class MetafileFulltrustTest
             SizeF size = g.MeasureString(text, test_font);
             Assert.False(size.IsEmpty);
 
-            StringFormat sf = new();
-            sf.FormatFlags = StringFormatFlags.NoClip;
+            StringFormat sf = new()
+            {
+                FormatFlags = StringFormatFlags.NoClip
+            };
             sf.SetMeasurableCharacterRanges(ranges);
 
             RectangleF rect = new(0, 0, size.Width, size.Height);

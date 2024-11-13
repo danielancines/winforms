@@ -18,15 +18,15 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
         list.Items.Add(listItem);
 
         Type type = listItem.AccessibilityObject.GetType();
-        ConstructorInfo ctor = type.GetConstructor(new Type[] { typeof(ListViewItem) });
+        ConstructorInfo ctor = type.GetConstructor([typeof(ListViewItem)]);
 
         Assert.NotNull(ctor);
-        Assert.Throws<TargetInvocationException>(() => ctor.Invoke(new object[] { null }));
+        Assert.Throws<TargetInvocationException>(() => ctor.Invoke([null]));
 
         // item without parent ListView
         ListViewItem itemWithoutList = new();
 
-        Assert.Throws<TargetInvocationException>(() => ctor.Invoke(new object[] { itemWithoutList }));
+        Assert.Throws<TargetInvocationException>(() => ctor.Invoke([itemWithoutList]));
     }
 
     [WinFormsFact]
@@ -486,8 +486,8 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
 
         Assert.NotNull(lastChild1);
         Assert.NotNull(lastChild2);
-        Assert.Equal(1, listView.Items[0].SubItems.Count);
-        Assert.Equal(1, listView.Items[1].SubItems.Count);
+        Assert.Single(listView.Items[0].SubItems);
+        Assert.Single(listView.Items[1].SubItems);
 
         listView.Items[0].SubItems.Add(new ListViewSubItem() { Text = $"SubItem 0" });
         listView.Items[1].SubItems.Add(new ListViewSubItem() { Text = $"SubItem 0" });
@@ -526,8 +526,8 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
 
         Assert.NotNull(lastChild1);
         Assert.NotNull(lastChild2);
-        Assert.Equal(1, listView.Items[0].SubItems.Count);
-        Assert.Equal(1, listView.Items[1].SubItems.Count);
+        Assert.Single(listView.Items[0].SubItems);
+        Assert.Single(listView.Items[1].SubItems);
         Assert.Equal(createControl, listView.IsHandleCreated);
     }
 
@@ -562,23 +562,23 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
 
         listView.VirtualListSize = 1;
 
-        ListViewItem listItem1 = new(new string[]
-        {
+        ListViewItem listItem1 = new(
+        [
             "Test A",
             "Alpha"
-        }, -1);
+        ], -1);
 
-        ListViewItem listItem2 = new(new string[]
-        {
+        ListViewItem listItem2 = new(
+        [
             "Test B",
             "Beta"
-        }, -1);
+        ], -1);
 
-        ListViewItem listItem3 = new(new string[]
-        {
+        ListViewItem listItem3 = new(
+        [
             "Test C",
             "Gamma"
-        }, -1);
+        ], -1);
 
         listView.RetrieveVirtualItem += (s, e) =>
         {
@@ -652,7 +652,7 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
             Assert.NotEqual(IntPtr.Zero, listView.Handle);
         }
 
-        ListViewItem listItem1 = new(new string[] { "Test A", "Alpha" }, -1);
+        ListViewItem listItem1 = new(["Test A", "Alpha"], -1);
         listView.Items.Add(listItem1);
         listView.Items[0].Selected = selected;
         AccessibleObject accessibleObject = listView.Items[0].AccessibilityObject;
@@ -696,7 +696,7 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
             VirtualListSize = 1
         };
 
-        ListViewItem listItem1 = new(new string[] { "Test A", "Alpha" }, -1);
+        ListViewItem listItem1 = new(["Test A", "Alpha"], -1);
 
         listView.RetrieveVirtualItem += (s, e) =>
         {
@@ -1173,7 +1173,7 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
         }
         else
         {
-            listView.Items.AddRange(new ListViewItem[] { listItem1, listItem2 });
+            listView.Items.AddRange((ListViewItem[])[listItem1, listItem2]);
         }
 
         if (createControl)
@@ -1194,10 +1194,10 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
             VirtualListSize = 4
         };
 
-        ListViewItem listItem1 = new(new string[] { "Test Item 1", "Item A" }, -1);
+        ListViewItem listItem1 = new(["Test Item 1", "Item A"], -1);
         ListViewItem listItem2 = new("Group item 2");
         ListViewItem listItem3 = new("Item 3");
-        ListViewItem listItem4 = new(new string[] { "Test Item 4", "Item B", "Item C", "Item D" }, -1);
+        ListViewItem listItem4 = new(["Test Item 4", "Item B", "Item C", "Item D"], -1);
 
         if (!virtualMode && groupsEnabled)
         {
@@ -1260,12 +1260,12 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
         ListViewItem listViewVisibleItem2 = new("Visible item 1");
 
         listView.Groups.Add(listViewGroup);
-        listView.Items.AddRange(new ListViewItem[] { listViewVisibleItem1, listViewVisibleItem2 });
-        listViewGroup.Items.AddRange(new ListViewItem[]
-        {
+        listView.Items.AddRange((ListViewItem[])[listViewVisibleItem1, listViewVisibleItem2]);
+        listViewGroup.Items.AddRange((ListViewItem[])
+        [
             listViewInvisibleItem1, listViewVisibleItem1,
             listViewVisibleItem2, listViewInvisibleItem2
-        });
+        ]);
 
         return listView;
     }
@@ -1475,7 +1475,8 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
         Assert.Null(accessibleObject3.FragmentNavigate(NavigateDirection.NavigateDirection_NextSibling));
         Assert.Equal(accessibleObject2, accessibleObject3.FragmentNavigate(NavigateDirection.NavigateDirection_PreviousSibling));
 
-        // Since "List" mode does not support ListViewGroups, adding a ListViewGroup should not affect the operation of availability objects
+        // Since "List" mode does not support ListViewGroups, adding a ListViewGroup should not affect the operation
+        // of availability objects
         listView.Groups.Add(new ListViewGroup());
         listView.Items[1].Group = listView.Groups[0];
 
@@ -1491,7 +1492,8 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
         Assert.Null(accessibleObject3.FragmentNavigate(NavigateDirection.NavigateDirection_NextSibling));
         Assert.Equal(accessibleObject2, accessibleObject3.FragmentNavigate(NavigateDirection.NavigateDirection_PreviousSibling));
 
-        // Since "List" mode does not support ListViewGroups, updating a ListViewGroup should not affect the operation of availability objects
+        // Since "List" mode does not support ListViewGroups, updating a ListViewGroup should not affect the operation
+        // of availability objects
         listView.Groups[0].Items.Insert(0, listView.Items[0]);
 
         Assert.Equal(listView.AccessibilityObject, accessibleObject1.FragmentNavigate(NavigateDirection.NavigateDirection_Parent));
@@ -1506,7 +1508,8 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
         Assert.Null(accessibleObject3.FragmentNavigate(NavigateDirection.NavigateDirection_NextSibling));
         Assert.Equal(accessibleObject2, accessibleObject3.FragmentNavigate(NavigateDirection.NavigateDirection_PreviousSibling));
 
-        // Since "List" mode does not support ListViewGroups, removing a ListViewGroup should not affect the operation of availability objects
+        // Since "List" mode does not support ListViewGroups, removing a ListViewGroup should not affect the operation
+        // of availability objects
         listView.Groups.RemoveAt(0);
 
         Assert.Equal(listView.AccessibilityObject, accessibleObject1.FragmentNavigate(NavigateDirection.NavigateDirection_Parent));
@@ -1531,7 +1534,7 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
     public void ListViewItemAccessibleObject_GetChildIndex_ReturnsExpected(View view)
     {
         using ListView listView = new() { View = view };
-        listView.Items.Add(new ListViewItem(new string[] { "Item 1", "SubItem 1", "SubItem 2" }));
+        listView.Items.Add(new ListViewItem(["Item 1", "SubItem 1", "SubItem 2"]));
         listView.Columns.Add(new ColumnHeader());
         listView.Columns.Add(new ColumnHeader());
         AccessibleObject accessibleObject = listView.Items[0].AccessibilityObject;
@@ -1561,7 +1564,7 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
     public void ListViewItemAccessibleObject_GetChildIndex_ReturnsMinusOne_IfChildIsNull(View view)
     {
         using ListView listView = new() { View = view };
-        listView.Items.Add(new ListViewItem(new string[] { "Item 1", "SubItem 1", "SubItem 2" }));
+        listView.Items.Add(new ListViewItem(["Item 1", "SubItem 1", "SubItem 2"]));
 
         Assert.Equal(-1, listView.Items[0].AccessibilityObject.GetChildIndex(null));
         Assert.False(listView.IsHandleCreated);
@@ -1579,8 +1582,8 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
         listView.Columns.Add(new ColumnHeader());
         listView.Columns.Add(new ColumnHeader());
         listView.Columns.Add(new ColumnHeader());
-        listView.Items.Add(new ListViewItem(new string[] { "Item 1", "SubItem 11", "SubItem 12" }));
-        listView.Items.Add(new ListViewItem(new string[] { "Item 2", "SubItem 21", "SubItem 22" }));
+        listView.Items.Add(new ListViewItem(["Item 1", "SubItem 11", "SubItem 12"]));
+        listView.Items.Add(new ListViewItem(["Item 2", "SubItem 21", "SubItem 22"]));
 
         Assert.Equal(-1, listView.Items[0].AccessibilityObject.GetChildIndex(listView.Items[1].SubItems[1].AccessibilityObject));
         Assert.False(listView.IsHandleCreated);
@@ -1594,7 +1597,7 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
         listView.Columns.Add(new ColumnHeader());
         listView.Columns.Add(new ColumnHeader());
         listView.Columns.Add(new ColumnHeader());
-        listView.Items.Add(new ListViewItem(new string[] { "Item 1" }));
+        listView.Items.Add(new ListViewItem(["Item 1"]));
         ListViewItemDetailsAccessibleObject accessibleObject = (ListViewItemDetailsAccessibleObject)listView.Items[0].AccessibilityObject;
 
         Assert.Equal(0, accessibleObject.GetChildIndex(listView.Items[0].SubItems[0].AccessibilityObject));
@@ -1621,7 +1624,7 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
         ListViewItem listViewItem = new("Item 1", imageIndex: hasImage ? 0 : -1);
         listView.Items.Add(listViewItem);
         var accessibleObject = (ListViewItemDetailsAccessibleObject)listView.Items[0].AccessibilityObject;
-        
+
         Assert.Equal(expectedFirstSubItemIndex, accessibleObject.GetChildIndex(listView.Items[0].SubItems[0].AccessibilityObject));
         Assert.False(listView.IsHandleCreated);
     }
@@ -1638,7 +1641,7 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
         listView.Columns.Add(new ColumnHeader());
         listView.Columns.Add(new ColumnHeader());
         listView.Columns.Add(new ColumnHeader());
-        listView.Items.Add(new ListViewItem(new string[] { "Item 1", "SubItem 11", "SubItem 12" }));
+        listView.Items.Add(new ListViewItem(["Item 1", "SubItem 11", "SubItem 12"]));
 
         Assert.Equal(-1, listView.Items[0].AccessibilityObject.GetChildIndex(listView.AccessibilityObject));
         Assert.False(listView.IsHandleCreated);
@@ -1748,7 +1751,7 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
     public void ListViewItemAccessibleObject_GetChild_ReturnException_AfterChangingView(View oldView, View newView)
     {
         using ListView listView = new() { View = oldView };
-        listView.Items.Add(new ListViewItem(new string[] { "1", "2" }));
+        listView.Items.Add(new ListViewItem(["1", "2"]));
         AccessibleObject accessibleObject = listView.Items[0].AccessibilityObject;
         Assert.Null(accessibleObject.GetChild(0));
 
@@ -1781,7 +1784,7 @@ public class ListViewItem_ListViewItemAccessibleObjectTests
     public void ListViewItemAccessibleObject_GetChildCount_ReturnException_AfterChangingView(View oldView, View newView)
     {
         using ListView listView = new() { View = oldView };
-        listView.Items.Add(new ListViewItem(new string[] { "1" }));
+        listView.Items.Add(new ListViewItem(["1"]));
         AccessibleObject accessibleObject = listView.Items[0].AccessibilityObject;
         Assert.NotEqual(2, accessibleObject.GetChildCount());
 

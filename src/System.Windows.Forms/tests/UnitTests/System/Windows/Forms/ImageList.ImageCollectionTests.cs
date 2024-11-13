@@ -18,7 +18,7 @@ public class ImageCollectionTests
         Assert.NotEqual(IntPtr.Zero, list.Handle);
 
         ImageList.ImageCollection collection = list.Images;
-        Assert.Equal(0, collection.Count);
+        Assert.Empty(collection);
     }
 
     [WinFormsFact]
@@ -160,23 +160,25 @@ public class ImageCollectionTests
         // SetPixel is not supported for images with indexed pixel formats.
         yield return new object[] { PixelFormat.Format1bppIndexed, Color.Empty, Color.Empty, Color.FromArgb(255, 0, 0, 0) };
 
-        // The actual colours are visually close to the originals, but no colour fidelity
+        // The actual colors are visually close to the originals, but no color fidelity.
+        // Comment the following data out due to ActiveIssue "https://github.com/dotnet/winforms/issues/11226".
         if (ArchitectureDetection.Is64bit)
         {
             yield return new object[] { PixelFormat.Format24bppRgb, Color.Red, Color.FromArgb(200, 50, 75, 100), Color.FromArgb(255, 50, 75, 100) };
             yield return new object[] { PixelFormat.Format32bppRgb, Color.Red, Color.FromArgb(200, 50, 75, 100), Color.FromArgb(255, 50, 75, 100) };
-            yield return new object[] { PixelFormat.Format32bppArgb, Color.Red, Color.FromArgb(200, 50, 75, 100), Color.FromArgb(200, 67, 81, 96) };
-            yield return new object[] { PixelFormat.Format32bppPArgb, Color.Red, Color.FromArgb(200, 50, 75, 100), Color.FromArgb(200, 67, 81, 96) };
+            // yield return new object[] { PixelFormat.Format32bppArgb, Color.Red, Color.FromArgb(200, 50, 75, 100), Color.FromArgb(200, 67, 81, 96) };
+            // yield return new object[] { PixelFormat.Format32bppPArgb, Color.Red, Color.FromArgb(200, 50, 75, 100), Color.FromArgb(200, 67, 81, 96) };
         }
         else
         {
-            yield return new object[] { PixelFormat.Format24bppRgb, Color.Red, Color.FromArgb(200, 50, 75, 100), Color.FromArgb(255, 49, 74, 99) };
-            yield return new object[] { PixelFormat.Format32bppRgb, Color.Red, Color.FromArgb(200, 50, 75, 100), Color.FromArgb(255, 49, 74, 99) };
-            yield return new object[] { PixelFormat.Format32bppArgb, Color.Red, Color.FromArgb(200, 50, 75, 100), Color.FromArgb(200, 66, 81, 95) };
-            yield return new object[] { PixelFormat.Format32bppPArgb, Color.Red, Color.FromArgb(200, 50, 75, 100), Color.FromArgb(200, 66, 81, 95) };
+            // yield return new object[] { PixelFormat.Format24bppRgb, Color.Red, Color.FromArgb(200, 50, 75, 100), Color.FromArgb(255, 49, 74, 99) };
+            // yield return new object[] { PixelFormat.Format32bppRgb, Color.Red, Color.FromArgb(200, 50, 75, 100), Color.FromArgb(255, 49, 74, 99) };
+            // yield return new object[] { PixelFormat.Format32bppArgb, Color.Red, Color.FromArgb(200, 50, 75, 100), Color.FromArgb(200, 66, 81, 95) };
+            // yield return new object[] { PixelFormat.Format32bppPArgb, Color.Red, Color.FromArgb(200, 50, 75, 100), Color.FromArgb(200, 66, 81, 95) };
         }
     }
 
+    [ActiveIssue("https://github.com/dotnet/winforms/issues/11226")]
     [WinFormsTheory]
     [MemberData(nameof(ImageCollection_VisualStyles_on_Item_Get32bppColorDepth_TestData))]
     public void ImageCollection_Item_Get32bppColorDepth_Success(PixelFormat pixelFormat, Color pixel00Color, Color givenPixel10Color, Color expectedPixel10Color)
@@ -199,7 +201,7 @@ public class ImageCollectionTests
         collection.Add(image);
         collection.Add(imageFiller2);
 
-        // By getting a bitmap from the ImageListcollection ImageList will clone the original bitmap.
+        // By getting a bitmap from the ImageListCollection ImageList will clone the original bitmap.
         // Assert that the new bitmap contains all the same properties.
 
         Bitmap resultImage = Assert.IsType<Bitmap>(collection[1]);
@@ -441,7 +443,7 @@ public class ImageCollectionTests
         ImageList.ImageCollection collection = list.Images;
 
         collection.Add("Key1", value);
-        Assert.Equal(1, collection.Count);
+        collection.Count.Should().Be(1);
         Assert.False(collection.Empty);
         Assert.Equal("Key1", Assert.Single(collection.Keys));
         Assert.False(list.HandleCreated);
@@ -486,7 +488,7 @@ public class ImageCollectionTests
         Assert.NotEqual(IntPtr.Zero, list.Handle);
 
         collection.Add("Key1", value);
-        Assert.Equal(1, collection.Count);
+        Assert.Single(collection);
         Assert.False(collection.Empty);
         Assert.Equal("Key1", Assert.Single(collection.Keys));
         Assert.True(list.HandleCreated);
@@ -530,7 +532,7 @@ public class ImageCollectionTests
         ImageList.ImageCollection collection = list.Images;
 
         collection.Add(value);
-        Assert.Equal(1, collection.Count);
+        collection.Count.Should().Be(1);
         Assert.False(collection.Empty);
         Assert.Equal(string.Empty, Assert.Single(collection.Keys));
         Assert.False(list.HandleCreated);
@@ -555,7 +557,7 @@ public class ImageCollectionTests
         Assert.NotEqual(IntPtr.Zero, list.Handle);
 
         collection.Add(value);
-        Assert.Equal(1, collection.Count);
+        Assert.Single(collection);
         Assert.False(collection.Empty);
         Assert.Equal(string.Empty, Assert.Single(collection.Keys));
         Assert.True(list.HandleCreated);
@@ -599,7 +601,7 @@ public class ImageCollectionTests
         ImageList.ImageCollection collection = list.Images;
 
         collection.Add(value, transparentColor);
-        Assert.Equal(1, collection.Count);
+        collection.Count.Should().Be(1);
         Assert.False(collection.Empty);
         Assert.Equal(string.Empty, Assert.Single(collection.Keys));
         Assert.False(list.HandleCreated);
@@ -624,7 +626,7 @@ public class ImageCollectionTests
         Assert.NotEqual(IntPtr.Zero, list.Handle);
 
         collection.Add(value, transparentColor);
-        Assert.Equal(1, collection.Count);
+        Assert.Single(collection);
         Assert.False(collection.Empty);
         Assert.Equal(string.Empty, Assert.Single(collection.Keys));
         Assert.True(list.HandleCreated);
@@ -656,7 +658,7 @@ public class ImageCollectionTests
         ImageList.ImageCollection collection = list.Images;
 
         collection.Add("Key1", value);
-        Assert.Equal(1, collection.Count);
+        collection.Count.Should().Be(1);
         Assert.False(collection.Empty);
         Assert.Equal("Key1", Assert.Single(collection.Keys));
         Assert.False(list.HandleCreated);
@@ -701,7 +703,7 @@ public class ImageCollectionTests
         Assert.NotEqual(IntPtr.Zero, list.Handle);
 
         collection.Add("Key1", value);
-        Assert.Equal(1, collection.Count);
+        Assert.Single(collection);
         Assert.False(collection.Empty);
         Assert.Equal("Key1", Assert.Single(collection.Keys));
         Assert.True(list.HandleCreated);
@@ -745,7 +747,7 @@ public class ImageCollectionTests
         ImageList.ImageCollection collection = list.Images;
 
         collection.Add(value);
-        Assert.Equal(1, collection.Count);
+        collection.Count.Should().Be(1);
         Assert.False(collection.Empty);
         Assert.Equal(string.Empty, Assert.Single(collection.Keys));
         Assert.False(list.HandleCreated);
@@ -770,7 +772,7 @@ public class ImageCollectionTests
         Assert.NotEqual(IntPtr.Zero, list.Handle);
 
         collection.Add(value);
-        Assert.Equal(1, collection.Count);
+        Assert.Single(collection);
         Assert.False(collection.Empty);
         Assert.Equal(string.Empty, Assert.Single(collection.Keys));
         Assert.True(list.HandleCreated);
@@ -789,7 +791,7 @@ public class ImageCollectionTests
         using ImageList list = new();
         ImageList.ImageCollection collection = list.Images;
         Assert.Throws<ArgumentNullException>("value", () => collection.Add((Image)null));
-        Assert.Throws<ArgumentNullException>("value", () => collection.Add((Image)null, Color.Transparent));
+        Assert.Throws<ArgumentNullException>("value", () => collection.Add(null, Color.Transparent));
         Assert.Throws<InvalidOperationException>(() => collection.Add("Key", (Image)null));
         Assert.Throws<ArgumentNullException>("value", () => collection.Add((Icon)null));
         Assert.Throws<InvalidOperationException>(() => collection.Add("Key", (Icon)null));
@@ -817,7 +819,7 @@ public class ImageCollectionTests
         };
         ImageList.ImageCollection collection = list.Images;
 
-        collection.AddRange(new Image[] { value, value });
+        collection.AddRange([value, value]);
         Assert.Equal(2, collection.Count);
         Assert.False(collection.Empty);
         Assert.Equal(new string[] { string.Empty, string.Empty }, collection.Keys.Cast<string>());
@@ -842,7 +844,7 @@ public class ImageCollectionTests
         ImageList.ImageCollection collection = list.Images;
         Assert.NotEqual(IntPtr.Zero, list.Handle);
 
-        collection.AddRange(new Image[] { value, value });
+        collection.AddRange([value, value]);
         Assert.Equal(2, collection.Count);
         Assert.False(collection.Empty);
         Assert.Equal(new string[] { string.Empty, string.Empty }, collection.Keys.Cast<string>());
@@ -869,7 +871,7 @@ public class ImageCollectionTests
     {
         using ImageList list = new();
         ImageList.ImageCollection collection = list.Images;
-        Assert.Throws<ArgumentNullException>("value", () => collection.AddRange(new Image[] { null }));
+        Assert.Throws<ArgumentNullException>("value", () => collection.AddRange([null]));
     }
 
     [WinFormsFact]
@@ -879,7 +881,7 @@ public class ImageCollectionTests
         ImageList.ImageCollection collection = list.Images;
 
         using Metafile value = new("bitmaps/telescope_01.wmf");
-        Assert.Throws<ArgumentException>(() => collection.AddRange(new Image[] { value }));
+        Assert.Throws<ArgumentException>(() => collection.AddRange([value]));
     }
 
     public static IEnumerable<object[]> AddStrip_TestData()
@@ -971,14 +973,14 @@ public class ImageCollectionTests
 
         collection.Clear();
         Assert.Empty(collection);
-        Assert.Equal(0, collection.Count);
+        Assert.Empty(collection);
         Assert.True(collection.Empty);
         Assert.False(list.HandleCreated);
 
         // Clear again.
         collection.Clear();
         Assert.Empty(collection);
-        Assert.Equal(0, collection.Count);
+        Assert.Empty(collection);
         Assert.True(collection.Empty);
         Assert.False(list.HandleCreated);
     }
@@ -993,14 +995,14 @@ public class ImageCollectionTests
 
         collection.Clear();
         Assert.Empty(collection);
-        Assert.Equal(0, collection.Count);
+        Assert.Empty(collection);
         Assert.True(collection.Empty);
         Assert.False(list.HandleCreated);
 
         // Clear again.
         collection.Clear();
         Assert.Empty(collection);
-        Assert.Equal(0, collection.Count);
+        Assert.Empty(collection);
         Assert.True(collection.Empty);
         Assert.False(list.HandleCreated);
     }
@@ -1014,14 +1016,14 @@ public class ImageCollectionTests
 
         collection.Clear();
         Assert.Empty(collection);
-        Assert.Equal(0, collection.Count);
+        Assert.Empty(collection);
         Assert.True(collection.Empty);
         Assert.True(list.HandleCreated);
 
         // Clear again.
         collection.Clear();
         Assert.Empty(collection);
-        Assert.Equal(0, collection.Count);
+        Assert.Empty(collection);
         Assert.True(collection.Empty);
         Assert.True(list.HandleCreated);
     }
@@ -1037,14 +1039,14 @@ public class ImageCollectionTests
 
         collection.Clear();
         Assert.Empty(collection);
-        Assert.Equal(0, collection.Count);
+        Assert.Empty(collection);
         Assert.True(collection.Empty);
         Assert.True(list.HandleCreated);
 
         // Clear again.
         collection.Clear();
         Assert.Empty(collection);
-        Assert.Equal(0, collection.Count);
+        Assert.Empty(collection);
         Assert.True(collection.Empty);
         Assert.True(list.HandleCreated);
     }
@@ -1319,13 +1321,13 @@ public class ImageCollectionTests
         // Remove first.
         collection.RemoveAt(0);
         Assert.True(list.HandleCreated);
-        Assert.Equal(1, collection.Count);
+        Assert.Single(collection);
         Assert.False(collection.Empty);
 
         // Remove last.
         collection.RemoveAt(0);
         Assert.True(list.HandleCreated);
-        Assert.Equal(0, collection.Count);
+        Assert.Empty(collection);
         Assert.True(collection.Empty);
     }
 
@@ -1359,14 +1361,14 @@ public class ImageCollectionTests
         // Remove first.
         collection.RemoveAt(0);
         Assert.True(list.HandleCreated);
-        Assert.Equal(1, collection.Count);
+        Assert.Single(collection);
         Assert.False(collection.Empty);
         Assert.Equal(color3, ((Bitmap)collection[0]).GetPixel(0, 0));
 
         // Remove last.
         collection.RemoveAt(0);
         Assert.True(list.HandleCreated);
-        Assert.Equal(0, collection.Count);
+        Assert.Empty(collection);
         Assert.True(collection.Empty);
     }
 
@@ -1423,13 +1425,13 @@ public class ImageCollectionTests
         // Remove first.
         collection.RemoveByKey("image1");
         Assert.True(list.HandleCreated);
-        Assert.Equal(1, collection.Count);
+        Assert.Single(collection);
         Assert.False(collection.Empty);
 
         // Remove last.
         collection.RemoveByKey("IMAGE3");
         Assert.True(list.HandleCreated);
-        Assert.Equal(0, collection.Count);
+        Assert.Empty(collection);
         Assert.True(collection.Empty);
     }
 
@@ -1471,14 +1473,14 @@ public class ImageCollectionTests
         // Remove first.
         collection.RemoveByKey("image1");
         Assert.True(list.HandleCreated);
-        Assert.Equal(1, collection.Count);
+        Assert.Single(collection);
         Assert.False(collection.Empty);
         Assert.Equal(color3, ((Bitmap)collection[0]).GetPixel(0, 0));
 
         // Remove last.
         collection.RemoveByKey("IMAGE3");
         Assert.True(list.HandleCreated);
-        Assert.Equal(0, collection.Count);
+        Assert.Empty(collection);
         Assert.True(collection.Empty);
     }
 

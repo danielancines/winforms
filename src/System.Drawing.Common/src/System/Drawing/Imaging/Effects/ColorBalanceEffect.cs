@@ -3,15 +3,12 @@
 
 #if NET9_0_OR_GREATER
 
-using System.Runtime.Versioning;
-
 namespace System.Drawing.Imaging.Effects;
 
 /// <summary>
 ///  Adjusts the color balance of an image.
 /// </summary>
-[RequiresPreviewFeatures]
-public sealed class ColorBalanceEffect : Effect
+public class ColorBalanceEffect : Effect
 {
     private readonly ColorBalanceParams _colorBalanceParams;
 

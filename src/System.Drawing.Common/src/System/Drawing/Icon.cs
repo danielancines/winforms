@@ -3,11 +3,11 @@
 
 using System.Buffers;
 using System.ComponentModel;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
+using Windows.Win32.System.Ole;
 
 namespace System.Drawing;
 
@@ -16,15 +16,11 @@ namespace System.Drawing;
 [TypeConverter(typeof(IconConverter))]
 [Serializable]
 [TypeForwardedFrom(AssemblyRef.SystemDrawing)]
-public sealed unsafe partial class Icon : MarshalByRefObject, ICloneable, IDisposable, ISerializable, IHandle<HICON>
+public sealed unsafe partial class Icon : MarshalByRefObject, ICloneable, IDisposable, ISerializable, IIcon
 {
-#if FINALIZATION_WATCH
-    private string allocationSite = Graphics.GetAllocationStack();
-#endif
-
     private static int s_bitDepth;
 
-    // The PNG signature is specified at http://www.w3.org/TR/PNG/#5PNG-file-signature
+    // The PNG signature is specified at https://www.w3.org/TR/PNG/#5PNG-file-signature
     private const int PNGSignature1 = 137 + ('P' << 8) + ('N' << 16) + ('G' << 24);
     private const int PNGSignature2 = 13 + (10 << 8) + (26 << 16) + (10 << 24);
 
@@ -35,6 +31,8 @@ public sealed unsafe partial class Icon : MarshalByRefObject, ICloneable, IDispo
     private uint _bestBytesInRes;
     private bool? _isBestImagePng;
     private Size _iconSize = Size.Empty;
+
+    [NonSerialized]
     private HICON _handle;
     private readonly bool _ownHandle = true;
 
@@ -67,7 +65,6 @@ public sealed unsafe partial class Icon : MarshalByRefObject, ICloneable, IDispo
     {
         using (FileStream f = new(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
         {
-            Debug.Assert(f is not null, "File.OpenRead returned null instead of throwing an exception");
             _iconData = new byte[(int)f.Length];
             f.Read(_iconData, 0, _iconData.Length);
         }
@@ -239,15 +236,15 @@ public sealed unsafe partial class Icon : MarshalByRefObject, ICloneable, IDispo
 
     public object Clone() => new Icon(this, Size.Width, Size.Height);
 
-    // Called when this object is going to destroy it's Win32 handle.  You
+    // Called when this object is going to destroy it's Win32 handle. You
     // may override this if there is something special you need to do to
-    // destroy the handle.  This will be called even if the handle is not
+    // destroy the handle. This will be called even if the handle is not
     // owned by this object, which is handy if you want to create a
     // derived class that has it's own create/destroy semantics.
     //
     // The default implementation will call the appropriate Win32
     // call to destroy the handle if this object currently owns the
-    // handle.  It will do nothing if the object does not currently
+    // handle. It will do nothing if the object does not currently
     // own the handle.
     internal void DestroyHandle()
     {
@@ -261,28 +258,17 @@ public sealed unsafe partial class Icon : MarshalByRefObject, ICloneable, IDispo
 
     public void Dispose()
     {
-        Dispose(disposing: true);
+        if (!_handle.IsNull)
+        {
+            DestroyHandle();
+        }
+
         GC.SuppressFinalize(this);
     }
 
-    private void Dispose(bool disposing)
-    {
-        if (!_handle.IsNull)
-        {
-#if FINALIZATION_WATCH
-            Debug.WriteLineIf(!disposing, $"""
-                **********************
-                Disposed through finalization:
-                {allocationSite}
-                """);
-#endif
-            DestroyHandle();
-        }
-    }
-
-    // Draws this image to a graphics object.  The drawing command originates on the graphics
-    // object, but a graphics object generally has no idea how to render a given image.  So,
-    // it passes the call to the actual image.  This version crops the image to the given
+    // Draws this image to a graphics object. The drawing command originates on the graphics
+    // object, but a graphics object generally has no idea how to render a given image. So,
+    // it passes the call to the actual image. This version crops the image to the given
     // dimensions and allows the user to specify a rectangle within the image to draw.
     private void DrawIcon(HDC hdc, Rectangle imageRect, Rectangle targetRect, bool stretch)
     {
@@ -343,7 +329,7 @@ public sealed unsafe partial class Icon : MarshalByRefObject, ICloneable, IDispo
         }
 
         // The ROP is SRCCOPY, so we can be simple here and take
-        // advantage of clipping regions.  Drawing the cursor
+        // advantage of clipping regions. Drawing the cursor
         // is merely a matter of offsetting and clipping.
         using RegionScope clippingRegion = new(hdc);
         try
@@ -370,9 +356,9 @@ public sealed unsafe partial class Icon : MarshalByRefObject, ICloneable, IDispo
         Draw(graphics, new Rectangle(x, y, size.Width, size.Height));
     }
 
-    // Draws this image to a graphics object.  The drawing command originates on the graphics
-    // object, but a graphics object generally has no idea how to render a given image.  So,
-    // it passes the call to the actual image.  This version stretches the image to the given
+    // Draws this image to a graphics object. The drawing command originates on the graphics
+    // object, but a graphics object generally has no idea how to render a given image. So,
+    // it passes the call to the actual image. This version stretches the image to the given
     // dimensions and allows the user to specify a rectangle within the image to draw.
     internal void Draw(Graphics graphics, Rectangle targetRect)
     {
@@ -387,9 +373,9 @@ public sealed unsafe partial class Icon : MarshalByRefObject, ICloneable, IDispo
         DrawIcon(hdc, Rectangle.Empty, copy, true);
     }
 
-    // Draws this image to a graphics object.  The drawing command originates on the graphics
-    // object, but a graphics object generally has no idea how to render a given image.  So,
-    // it passes the call to the actual image.  This version crops the image to the given
+    // Draws this image to a graphics object. The drawing command originates on the graphics
+    // object, but a graphics object generally has no idea how to render a given image. So,
+    // it passes the call to the actual image. This version crops the image to the given
     // dimensions and allows the user to specify a rectangle within the image to draw.
     internal void DrawUnstretched(Graphics graphics, Rectangle targetRect)
     {
@@ -403,7 +389,7 @@ public sealed unsafe partial class Icon : MarshalByRefObject, ICloneable, IDispo
         DrawIcon(hdc, Rectangle.Empty, copy, false);
     }
 
-    ~Icon() => Dispose(disposing: false);
+    ~Icon() => Dispose();
 
     public static Icon FromHandle(IntPtr handle)
     {
@@ -413,7 +399,7 @@ public sealed unsafe partial class Icon : MarshalByRefObject, ICloneable, IDispo
         return new Icon((HICON)handle);
     }
 
-    // Initializes this Image object.  This is identical to calling the image's
+    // Initializes this Image object. This is identical to calling the image's
     // constructor with picture, but this allows non-constructor initialization,
     // which may be necessary in some instances.
     private void Initialize(int width, int height)
@@ -491,12 +477,12 @@ public sealed unsafe partial class Icon : MarshalByRefObject, ICloneable, IDispo
 
             // Windows rules for specifying an icon:
             //
-            //  1.  The icon with the closest size match.
-            //  2.  For matching sizes, the image with the closest bit depth.
-            //  3.  If there is no color depth match, the icon with the closest color depth that does not exceed the display.
-            //  4.  If all icon color depth > display, lowest color depth is chosen.
-            //  5.  color depth of > 8bpp are all equal.
-            //  6.  Never choose an 8bpp icon on an 8bpp system.
+            //  1. The icon with the closest size match.
+            //  2. For matching sizes, the image with the closest bit depth.
+            //  3. If there is no color depth match, the icon with the closest color depth that does not exceed the display.
+            //  4. If all icon color depth > display, lowest color depth is chosen.
+            //  5. color depth of > 8bpp are all equal.
+            //  6. Never choose an 8bpp icon on an 8bpp system.
 
             if (_bestBytesInRes == 0)
             {
@@ -771,7 +757,6 @@ public sealed unsafe partial class Icon : MarshalByRefObject, ICloneable, IDispo
             bitmap.MakeTransparent(fakeTransparencyColor);
         }
 
-        Debug.Assert(bitmap is not null, "Bitmap cannot be null");
         return bitmap;
     }
 
@@ -804,9 +789,29 @@ public sealed unsafe partial class Icon : MarshalByRefObject, ICloneable, IDispo
 
     public override string ToString() => SR.toStringIcon;
 
-    internal static class Ole
+    /// <summary>
+    ///  Saves this <see cref="Icon"/> to the specified output <see cref="Stream"/>.
+    /// </summary>
+    /// <param name="outputStream">The <see cref="Stream"/> to save to.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="outputStream"/> was <see langword="null"/>.</exception>
+    public unsafe void Save(Stream outputStream)
     {
-        public const int PICTYPE_ICON = 3;
+        ArgumentNullException.ThrowIfNull(outputStream);
+
+        if (_iconData is not null)
+        {
+            outputStream.Write(_iconData, 0, _iconData.Length);
+        }
+        else
+        {
+            // Ideally, we would pick apart the icon using GetIconInfo, and then pull the individual bitmaps out,
+            // converting them to DIBS and saving them into the file. But, in the interest of simplicity, we just
+            // call to OLE to do it for us.
+
+            using var iPicture = IPicture.CreateFromIcon(this, copy: false);
+            using var iStream = outputStream.ToIStream(makeSeekable: true);
+            iPicture.Value->SaveAsFile(iStream, (BOOL)(-1), pCbSize: null).ThrowOnFailure();
+        }
     }
 
 #if NET8_0_OR_GREATER

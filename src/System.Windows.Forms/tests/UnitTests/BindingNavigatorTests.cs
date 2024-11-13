@@ -20,8 +20,8 @@ public class BindingNavigatorTests
     [WinFormsFact]
     public void BindingNavigator_ConstructorBindingSource()
     {
-        using BindingSource bindingSource = new();
-        List<string> data = new() { "Foo", "Bar" };
+        using BindingSource bindingSource = [];
+        List<string> data = ["Foo", "Bar"];
         bindingSource.DataSource = data;
 
         using BindingNavigator bn = new(bindingSource);
@@ -65,35 +65,35 @@ public class BindingNavigatorTests
         Assert.False(bn.PositionItem.AutoToolTip);
         Assert.Equal(SR.BindingNavigatorPositionAccessibleName, bn.PositionItem.AccessibleName);
 
-        List<ToolStripItem> items = new()
-        {
+        List<ToolStripItem> items =
+        [
             bn.MoveFirstItem,
             bn.MovePreviousItem,
             bn.MoveNextItem,
             bn.MoveLastItem,
             bn.AddNewItem,
             bn.DeleteItem
-        };
+        ];
 
-        List<string> itemNames = new()
-        {
+        List<string> itemNames =
+        [
             "bindingNavigatorMoveFirstItem",
             "bindingNavigatorMovePreviousItem",
             "bindingNavigatorMoveNextItem",
             "bindingNavigatorMoveLastItem",
             "bindingNavigatorAddNewItem",
             "bindingNavigatorDeleteItem"
-        };
+        ];
 
-        List<string> itemTexts = new()
-        {
+        List<string> itemTexts =
+        [
             SR.BindingNavigatorMoveFirstItemText,
             SR.BindingNavigatorMovePreviousItemText,
             SR.BindingNavigatorMoveNextItemText,
             SR.BindingNavigatorMoveLastItemText,
             SR.BindingNavigatorAddNewItemText,
             SR.BindingNavigatorDeleteItemText
-        };
+        ];
 
         for (int i = 0; i < items.Count; i++)
         {
@@ -189,6 +189,24 @@ public class BindingNavigatorTests
         Assert.Equal(bindingSource2, control.BindingSource);
         Assert.Equal("1", control.PositionItem.Text);
         Assert.Equal($"of {rowsCount2}", control.CountItem.Text);
+    }
+
+    [WinFormsFact]
+    public void BindingNavigator_AddStandardItems_AddsCorrectItems()
+    {
+        using BindingNavigator navigator = new();
+        navigator.AddStandardItems();
+        navigator.Items[0].Name.Should().Be("bindingNavigatorMoveFirstItem");
+        navigator.Items[1].Name.Should().Be("bindingNavigatorMovePreviousItem");
+        navigator.Items[2].Name.Should().Be("bindingNavigatorSeparator1");
+        navigator.Items[3].Name.Should().Be("bindingNavigatorPositionItem");
+        navigator.Items[4].Name.Should().Be("bindingNavigatorCountItem");
+        navigator.Items[5].Name.Should().Be("bindingNavigatorSeparator2");
+        navigator.Items[6].Name.Should().Be("bindingNavigatorMoveNextItem");
+        navigator.Items[7].Name.Should().Be("bindingNavigatorMoveLastItem");
+        navigator.Items[8].Name.Should().Be("bindingNavigatorSeparator3");
+        navigator.Items[9].Name.Should().Be("bindingNavigatorAddNewItem");
+        navigator.Items[10].Name.Should().Be("bindingNavigatorDeleteItem");
     }
 
     private BindingSource GetTestBindingSource(int rowsCount)

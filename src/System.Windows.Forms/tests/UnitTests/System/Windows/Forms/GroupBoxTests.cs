@@ -596,6 +596,24 @@ public class GroupBoxTests
         Assert.Equal(result, control.DisplayRectangle);
     }
 
+    [WinFormsFact]
+    public void GroupBox_FontPropertyChange_UpdatesFontHeightAndCachedFont()
+    {
+        using GroupBox groupBox = new();
+        var originalFont = groupBox.Font;
+        using Font newFont = new(originalFont.FontFamily, originalFont.Size + 5, originalFont.Style);
+
+        groupBox.Font = newFont;
+        Rectangle result = groupBox.DisplayRectangle;
+        var accessor = groupBox.TestAccessor();
+
+        int updatedFontHeight = accessor.Dynamic._fontHeight;
+        Font updatedCachedFont = accessor.Dynamic._cachedFont;
+
+        updatedFontHeight.Should().Be(newFont.Height);
+        updatedCachedFont.Should().BeEquivalentTo(newFont);
+    }
+
     [WinFormsTheory]
     [InlineData(FlatStyle.Flat, true, true, true)]
     [InlineData(FlatStyle.Popup, true, true, true)]
@@ -2053,13 +2071,13 @@ public class GroupBoxTests
 
     public static IEnumerable<object[]> WndProc_EraseBkgnd_TestData()
     {
-        yield return new object[] { PInvoke.WM_ERASEBKGND };
-        yield return new object[] { PInvoke.WM_PRINTCLIENT };
+        yield return new object[] { PInvokeCore.WM_ERASEBKGND };
+        yield return new object[] { PInvokeCore.WM_PRINTCLIENT };
     }
 
     [WinFormsTheory]
-    [InlineData((int)PInvoke.WM_ERASEBKGND)]
-    [InlineData((int)PInvoke.WM_PRINTCLIENT)]
+    [InlineData((int)PInvokeCore.WM_ERASEBKGND)]
+    [InlineData((int)PInvokeCore.WM_PRINTCLIENT)]
     public void GroupBox_WndProc_InvokeEraseBkgndNotOwnerDrawWithoutHandle_Success(int msg)
     {
         using SubGroupBox control = new()
@@ -2075,10 +2093,10 @@ public class GroupBoxTests
             {
                 Msg = msg,
                 WParam = hdc,
-                Result = (IntPtr)250
+                Result = 250
             };
             control.WndProc(ref m);
-            Assert.Equal((IntPtr)1, m.Result);
+            Assert.Equal(1, m.Result);
             Assert.True(control.IsHandleCreated);
         }
         finally
@@ -2088,8 +2106,8 @@ public class GroupBoxTests
     }
 
     [WinFormsTheory]
-    [InlineData((int)PInvoke.WM_ERASEBKGND)]
-    [InlineData((int)PInvoke.WM_PRINTCLIENT)]
+    [InlineData((int)PInvokeCore.WM_ERASEBKGND)]
+    [InlineData((int)PInvokeCore.WM_PRINTCLIENT)]
     public void GroupBox_WndProc_InvokeEraseBkgndNotOwnerDrawWithHandle_Success(int msg)
     {
         using SubGroupBox control = new()
@@ -2113,10 +2131,10 @@ public class GroupBoxTests
             {
                 Msg = msg,
                 WParam = hdc,
-                Result = (IntPtr)250
+                Result = 250
             };
             control.WndProc(ref m);
-            Assert.Equal((IntPtr)1, m.Result);
+            Assert.Equal(1, m.Result);
             Assert.True(control.IsHandleCreated);
             Assert.Equal(0, invalidatedCallCount);
             Assert.Equal(0, styleChangedCallCount);
@@ -2129,8 +2147,8 @@ public class GroupBoxTests
     }
 
     [WinFormsTheory]
-    [InlineData((int)PInvoke.WM_ERASEBKGND)]
-    [InlineData((int)PInvoke.WM_PRINTCLIENT)]
+    [InlineData((int)PInvokeCore.WM_ERASEBKGND)]
+    [InlineData((int)PInvokeCore.WM_PRINTCLIENT)]
     public void GroupBox_WndProc_InvokeEraseBkgndNotOwnerDrawZeroWParam_DoesNotThrow(int msg)
     {
         using SubGroupBox control = new()
@@ -2140,10 +2158,10 @@ public class GroupBoxTests
         Message m = new()
         {
             Msg = msg,
-            Result = (IntPtr)250
+            Result = 250
         };
         control.WndProc(ref m);
-        Assert.Equal((IntPtr)250, m.Result);
+        Assert.Equal(250, m.Result);
         Assert.False(control.IsHandleCreated);
     }
 
@@ -2174,12 +2192,12 @@ public class GroupBoxTests
         {
             Message m = new()
             {
-                Msg = (int)PInvoke.WM_ERASEBKGND,
+                Msg = (int)PInvokeCore.WM_ERASEBKGND,
                 WParam = hdc,
-                Result = (IntPtr)250
+                Result = 250
             };
             control.WndProc(ref m);
-            Assert.Equal((IntPtr)1, m.Result);
+            Assert.Equal(1, m.Result);
             Assert.Equal(0, paintCallCount);
             Assert.True(control.IsHandleCreated);
             Assert.Equal(0, invalidatedCallCount);
@@ -2219,12 +2237,12 @@ public class GroupBoxTests
         {
             Message m = new()
             {
-                Msg = (int)PInvoke.WM_PRINTCLIENT,
+                Msg = (int)PInvokeCore.WM_PRINTCLIENT,
                 WParam = hdc,
-                Result = (IntPtr)250
+                Result = 250
             };
             control.WndProc(ref m);
-            Assert.Equal((IntPtr)250, m.Result);
+            Assert.Equal(250, m.Result);
             Assert.Equal(1, paintCallCount);
             Assert.True(control.IsHandleCreated);
             Assert.Equal(0, invalidatedCallCount);
@@ -2262,8 +2280,8 @@ public class GroupBoxTests
         };
         Message m = new()
         {
-            Msg = (int)PInvoke.WM_MOUSEHOVER,
-            Result = (IntPtr)250
+            Msg = (int)PInvokeCore.WM_MOUSEHOVER,
+            Result = 250
         };
         control.WndProc(ref m);
         Assert.Equal(IntPtr.Zero, m.Result);

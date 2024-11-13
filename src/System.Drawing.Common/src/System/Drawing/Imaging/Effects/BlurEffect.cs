@@ -3,15 +3,12 @@
 
 #if NET9_0_OR_GREATER
 
-using System.Runtime.Versioning;
-
 namespace System.Drawing.Imaging.Effects;
 
 /// <summary>
 ///  Applies a Gaussian blur.
 /// </summary>
-[RequiresPreviewFeatures]
-public sealed unsafe class BlurEffect : Effect
+public unsafe class BlurEffect : Effect
 {
     private readonly BlurParams _blurParams;
 

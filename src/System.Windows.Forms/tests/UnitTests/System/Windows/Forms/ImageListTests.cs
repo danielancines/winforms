@@ -4,7 +4,6 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Windows.Forms.TestUtilities;
 
 namespace System.Windows.Forms.Tests;
 
@@ -441,11 +440,13 @@ public class ImageListTests
         using BinaryFormatterScope formatterScope = new(enable: true);
         using MemoryStream stream = new();
 #pragma warning disable SYSLIB0011 // Type or member is obsolete
-        BinaryFormatter formatter = new();
+        // cs/binary-formatter-without-binder
+        BinaryFormatter formatter = new(); // CodeQL [SM04191] : This is a test. Safe use because the deserialization process is performed on trusted data and the types are controlled and validated.
         formatter.Serialize(stream, source);
         stream.Position = 0;
-        return (T)formatter.Deserialize(stream);
-#pragma warning restore SYSLIB0011 // Type or member is obsolete
+        // cs/dangerous-binary-deserialization, cs/deserialization-unexpected-subtypes
+        return (T)formatter.Deserialize(stream); // CodeQL [SM03722, SM02229] : Testing legacy feature. This is a safe use of BinaryFormatter because the data is trusted and the types are controlled and validated.
+#pragma warning restore SYSLIB0011
     }
 
     [WinFormsTheory]
@@ -663,9 +664,9 @@ public class ImageListTests
 
     public static IEnumerable<object[]> TransparentColor_Set_TestData()
     {
-        foreach (object[] testData in CommonTestHelper.GetColorWithEmptyTheoryData())
+        foreach (Color testData in CommonTestHelper.GetColorWithEmptyTheoryData())
         {
-            yield return testData;
+            yield return [testData];
         }
 
         yield return new object[] { Color.LightGray };
@@ -834,8 +835,8 @@ public class ImageListTests
 
         list.Dispose();
         Assert.False(list.HandleCreated);
-        Assert.Throws<ObjectDisposedException>(() => list.Images.GetEnumerator());
-        Assert.Equal(0, list.Images.Count);
+        Assert.Throws<ObjectDisposedException>(list.Images.GetEnumerator);
+        list.Images.Count.Should().Be(0);
         Assert.True(list.HandleCreated);
 
         // Call again.

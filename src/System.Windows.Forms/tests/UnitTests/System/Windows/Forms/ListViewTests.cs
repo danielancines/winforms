@@ -7,6 +7,7 @@ using System.Windows.Forms.Automation;
 using Microsoft.DotNet.RemoteExecutor;
 using Windows.Win32.UI.Accessibility;
 using static System.Windows.Forms.ListViewItem;
+
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
@@ -511,7 +512,7 @@ public class ListViewTests
 
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         control.BackColor = Color.FromArgb(0xFF, 0x12, 0x34, 0x56);
-        Assert.Equal(0x563412, (int)PInvoke.SendMessage(control, PInvoke.LVM_GETBKCOLOR));
+        Assert.Equal(0x563412, (int)PInvokeCore.SendMessage(control, PInvoke.LVM_GETBKCOLOR));
     }
 
     [WinFormsFact]
@@ -1373,7 +1374,7 @@ public class ListViewTests
 
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         control.ForeColor = Color.FromArgb(0x12, 0x34, 0x56, 0x78);
-        Assert.Equal(0x785634, (int)PInvoke.SendMessage(control, PInvoke.LVM_GETTEXTCOLOR));
+        Assert.Equal(0x785634, (int)PInvokeCore.SendMessage(control, PInvoke.LVM_GETTEXTCOLOR));
     }
 
     [WinFormsFact]
@@ -1843,7 +1844,7 @@ public class ListViewTests
             BackColor = Color.FromArgb(0xFF, 0x12, 0x34, 0x56)
         };
         Assert.NotEqual(IntPtr.Zero, control.Handle);
-        Assert.Equal(0x563412, (int)PInvoke.SendMessage(control, PInvoke.LVM_GETBKCOLOR));
+        Assert.Equal(0x563412, (int)PInvokeCore.SendMessage(control, PInvoke.LVM_GETBKCOLOR));
     }
 
     [WinFormsFact]
@@ -1854,7 +1855,7 @@ public class ListViewTests
             ForeColor = Color.FromArgb(0x12, 0x34, 0x56, 0x78)
         };
         Assert.NotEqual(IntPtr.Zero, control.Handle);
-        Assert.Equal(0x785634, (int)PInvoke.SendMessage(control, PInvoke.LVM_GETTEXTCOLOR));
+        Assert.Equal(0x785634, (int)PInvokeCore.SendMessage(control, PInvoke.LVM_GETTEXTCOLOR));
     }
 
     [WinFormsTheory]
@@ -1865,7 +1866,7 @@ public class ListViewTests
         {
             ShowGroups = showGroups
         };
-        Assert.Equal(0, (int)PInvoke.SendMessage(listView, PInvoke.LVM_GETGROUPCOUNT));
+        Assert.Equal(0, (int)PInvokeCore.SendMessage(listView, PInvoke.LVM_GETGROUPCOUNT));
     }
 
     public static IEnumerable<object[]> Handle_GetWithGroups_TestData()
@@ -1927,7 +1928,7 @@ public class ListViewTests
                 listView.Groups.Add(group1);
                 listView.Groups.Add(group2);
 
-                Assert.Equal(2, (int)PInvoke.SendMessage(listView, PInvoke.LVM_GETGROUPCOUNT));
+                Assert.Equal(2, (int)PInvokeCore.SendMessage(listView, PInvoke.LVM_GETGROUPCOUNT));
 
                 LVGROUP lvgroup1 = new()
                 {
@@ -1938,7 +1939,7 @@ public class ListViewTests
                     pszFooter = footerBuffer,
                     cchFooter = 256,
                 };
-                Assert.Equal(1, (int)PInvoke.SendMessage(listView, PInvoke.LVM_GETGROUPINFOBYINDEX, 0, ref lvgroup1));
+                Assert.Equal(1, (int)PInvokeCore.SendMessage(listView, PInvoke.LVM_GETGROUPINFOBYINDEX, 0, ref lvgroup1));
                 Assert.Equal("ListViewGroup", new string(lvgroup1.pszHeader));
                 Assert.Empty(new string(lvgroup1.pszFooter));
                 Assert.True(lvgroup1.iGroupId >= 0);
@@ -1953,7 +1954,7 @@ public class ListViewTests
                     pszFooter = footerBuffer,
                     cchFooter = 256,
                 };
-                Assert.Equal(1, (int)PInvoke.SendMessage(listView, PInvoke.LVM_GETGROUPINFOBYINDEX, 1, ref lvgroup2));
+                Assert.Equal(1, (int)PInvokeCore.SendMessage(listView, PInvoke.LVM_GETGROUPINFOBYINDEX, 1, ref lvgroup2));
                 Assert.Equal(expectedHeaderText, new string(lvgroup2.pszHeader));
                 Assert.Equal(expectedFooterText, new string(lvgroup2.pszFooter));
                 Assert.True(lvgroup2.iGroupId > 0);
@@ -1973,7 +1974,7 @@ public class ListViewTests
         Assert.NotEqual(IntPtr.Zero, control.Handle);
 
         nint expected = unchecked((nint)0xFFFFFFFF);
-        Assert.Equal(expected, (nint)PInvoke.SendMessage(control, PInvoke.LVM_GETTEXTBKCOLOR));
+        Assert.Equal(expected, (nint)PInvokeCore.SendMessage(control, PInvoke.LVM_GETTEXTBKCOLOR));
     }
 
     [WinFormsFact]
@@ -1982,7 +1983,7 @@ public class ListViewTests
         using ListView control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int version = Application.UseVisualStyles ? 6 : 5;
-        Assert.Equal(version, (int)PInvoke.SendMessage(control, PInvoke.CCM_GETVERSION));
+        Assert.Equal(version, (int)PInvokeCore.SendMessage(control, PInvoke.CCM_GETVERSION));
     }
 
     public static IEnumerable<object[]> Handle_CustomGetVersion_TestData()
@@ -2021,7 +2022,7 @@ public class ListViewTests
             }
             else if (m.Msg == (int)PInvoke.CCM_SETVERSION)
             {
-                Assert.Equal((IntPtr)5, m.WParam);
+                Assert.Equal(5, m.WParam);
                 Assert.Equal(IntPtr.Zero, m.LParam);
                 SetVersionCallCount++;
                 return;
@@ -4139,7 +4140,7 @@ public class ListViewTests
 
     public static IEnumerable<object[]> GetItemRect_InvokeCustomGetItemRect_TestData()
     {
-        yield return new object[] { new RECT(), Rectangle.Empty };
+        yield return new object[] { default(RECT), Rectangle.Empty };
         yield return new object[] { new RECT(1, 2, 3, 4), new Rectangle(1, 2, 2, 2) };
     }
 
@@ -4168,7 +4169,7 @@ public class ListViewTests
             {
                 RECT* pRect = (RECT*)m.LParam;
                 *pRect = GetItemRectResult;
-                m.Result = (IntPtr)1;
+                m.Result = 1;
                 return;
             }
 
@@ -4339,7 +4340,7 @@ public class ListViewTests
         listView.Items[0].Focused = focused;
         listView.Items[0].Selected = selected;
 
-        Assert.Equal(expectedCallCount, customAccessibleObject?.RaiseAutomationEventCalls);
+        Assert.Equal(expectedCallCount, customAccessibleObject.RaiseAutomationEventCalls);
     }
 
     public static IEnumerable<object[]> ListView_InvokeOnSelectedIndexChanged_VirtualMode_TestData()
@@ -4402,7 +4403,39 @@ public class ListViewTests
         listView.Items[0].Focused = focused;
         listView.Items[0].Selected = selected;
 
-        Assert.Equal(expectedCallCount, customAccessibleObject?.RaiseAutomationEventCalls);
+        Assert.Equal(expectedCallCount, customAccessibleObject.RaiseAutomationEventCalls);
+    }
+
+    [WinFormsFact]
+    // Regression test for https://github.com/dotnet/winforms/issues/11658
+    public void ListView_OnItemChecked_VirtualMode()
+    {
+        ListViewItem listItem1 = new("Test 1");
+
+        using SubListView listView = new SubListView
+        {
+            VirtualMode = true,
+            VirtualListSize = 1,
+            CheckBoxes = true
+        };
+
+        listView.RetrieveVirtualItem += (s, e) =>
+        {
+            e.Item = e.ItemIndex switch
+            {
+                0 => listItem1,
+                _ => throw new NotImplementedException()
+            };
+        };
+        listView.CreateControl();
+
+        AccessibleObject accessibleObject = listView.AccessibilityObject;
+        listView.Items[0].Focused = true;
+        listView.OnGotFocus(new EventArgs());
+        var clone = (ListViewItem)listView.Items[0].Clone();
+        clone.Checked = true;
+        Action action = () => listView.OnItemChecked(new ItemCheckedEventArgs(clone));
+        action.Should().NotThrow();
     }
 
     public static IEnumerable<object[]> ListView_Checkboxes_VirtualMode_Disabling_TestData()
@@ -4448,8 +4481,8 @@ public class ListViewTests
         control.Items.Add(new ListViewItem());
         control.Items.Add(new ListViewItem());
         control.CreateControl();
-        PInvoke.SendMessage(control, PInvoke.WM_KEYDOWN);
-        Assert.Equal(0, control.SelectedItems.Count);
+        PInvokeCore.SendMessage(control, PInvokeCore.WM_KEYDOWN);
+        Assert.Empty(control.SelectedItems);
     }
 
     [WinFormsTheory]
@@ -4465,10 +4498,14 @@ public class ListViewTests
     {
         using ListView control = new();
         control.CheckBoxes = true;
-        ListViewItem item1 = new();
-        item1.Text = "First";
-        ListViewItem item2 = new();
-        item2.Text = "Second";
+        ListViewItem item1 = new()
+        {
+            Text = "First"
+        };
+        ListViewItem item2 = new()
+        {
+            Text = "Second"
+        };
 
         control.Items.Add(item1);
         control.Items.Add(item2);
@@ -4492,10 +4529,14 @@ public class ListViewTests
     public unsafe void ListView_WmReflectNotify_LVN_KEYDOWN_WithGroups_WithoutSelection_DoesntFocusGroup(Keys key)
     {
         using ListView control = new();
-        ListViewItem item1 = new();
-        item1.Text = "First";
-        ListViewItem item2 = new();
-        item2.Text = "Second";
+        ListViewItem item1 = new()
+        {
+            Text = "First"
+        };
+        ListViewItem item2 = new()
+        {
+            Text = "Second"
+        };
 
         ListViewGroup group = new("Test group");
         group.Items.Add(item1);
@@ -4526,12 +4567,18 @@ public class ListViewTests
             ListViewGroup group1 = new("Test group1");
             ListViewGroup group2 = new("Test group2");
             ListViewGroup group3 = new("Test group3");
-            ListViewItem item1 = new(group1);
-            item1.Text = "First";
-            ListViewItem item2 = new(group2);
-            item2.Text = "Second";
-            ListViewItem item3 = new(group3);
-            item3.Text = "Third";
+            ListViewItem item1 = new(group1)
+            {
+                Text = "First"
+            };
+            ListViewItem item2 = new(group2)
+            {
+                Text = "Second"
+            };
+            ListViewItem item3 = new(group3)
+            {
+                Text = "Third"
+            };
             control.Items.Add(item1);
             control.Items.Add(item2);
             control.Items.Add(item3);
@@ -4835,7 +4882,7 @@ public class ListViewTests
         ListViewItem listViewItem3 = new();
         var accessor = KeyboardToolTipStateMachine.Instance.TestAccessor();
 
-        listView.Items.AddRange(new ListViewItem[] { listViewItem1, listViewItem2, listViewItem3 });
+        listView.Items.AddRange((ListViewItem[])[listViewItem1, listViewItem2, listViewItem3]);
 
         Assert.True(accessor.IsToolTracked(listViewItem1));
         Assert.True(accessor.IsToolTracked(listViewItem2));
@@ -4966,11 +5013,11 @@ public class ListViewTests
         using ColumnHeader columnHeader1 = new();
         using ColumnHeader columnHeader2 = new();
 
-        listView.Columns.AddRange(new ColumnHeader[]
-        {
+        listView.Columns.AddRange(
+        [
         columnHeader1,
         columnHeader2
-        });
+        ]);
         listView.HideSelection = false;
         var listItems = new ListViewItem[]
         {
@@ -5022,11 +5069,11 @@ public class ListViewTests
         using ColumnHeader columnHeader1 = new();
         using ColumnHeader columnHeader2 = new();
 
-        listView.Columns.AddRange(new ColumnHeader[]
-        {
+        listView.Columns.AddRange(
+        [
         columnHeader1,
         columnHeader2
-        });
+        ]);
         listView.HideSelection = false;
         var listItems = new ListViewItem[]
         {
@@ -5104,7 +5151,7 @@ public class ListViewTests
         SubListViewAccessibleObject accessibleObject = new(listView);
 
         int accessibilityProperty = listView.TestAccessor().Dynamic.s_accessibilityProperty;
-        listView.Properties.SetObject(accessibilityProperty, accessibleObject);
+        listView.Properties.AddValue(accessibilityProperty, accessibleObject);
         listView.AnnounceColumnHeader(new Point(15, 40));
         Assert.Equal(0, accessibleObject.RaiseAutomationNotificationCallCount);
         Assert.False(listView.IsHandleCreated);
@@ -5129,7 +5176,7 @@ public class ListViewTests
         SubListViewAccessibleObject accessibleObject = new(listView);
 
         int accessibilityProperty = listView.TestAccessor().Dynamic.s_accessibilityProperty;
-        listView.Properties.SetObject(accessibilityProperty, accessibleObject);
+        listView.Properties.AddValue(accessibilityProperty, accessibleObject);
         listView.AnnounceColumnHeader(new Point(15, 40));
         Assert.Equal(0, accessibleObject.RaiseAutomationNotificationCallCount);
         Assert.True(listView.IsHandleCreated);
@@ -5154,7 +5201,7 @@ public class ListViewTests
         SubListViewAccessibleObject accessibleObject = new(listView);
 
         int accessibilityProperty = listView.TestAccessor().Dynamic.s_accessibilityProperty;
-        listView.Properties.SetObject(accessibilityProperty, accessibleObject);
+        listView.Properties.AddValue(accessibilityProperty, accessibleObject);
         listView.AnnounceColumnHeader(new Point(10, 20));
         Assert.Equal(0, accessibleObject.RaiseAutomationNotificationCallCount);
         Assert.True(listView.IsHandleCreated);
@@ -5181,12 +5228,72 @@ public class ListViewTests
         SubListViewAccessibleObject accessibleObject = new(listView);
 
         int accessibilityProperty = listView.TestAccessor().Dynamic.s_accessibilityProperty;
-        listView.Properties.SetObject(accessibilityProperty, accessibleObject);
+        listView.Properties.AddValue(accessibilityProperty, accessibleObject);
         listView.AnnounceColumnHeader(new Point(x, y));
 
         Assert.Equal(1, accessibleObject.RaiseAutomationNotificationCallCount);
         Assert.Equal(expectedColumnName, accessibleObject.AnnouncedColumn);
         Assert.True(listView.IsHandleCreated);
+    }
+
+    public static TheoryData<ListViewItem> GetListViewItemTheoryData() => new()
+    {
+        { new("Item 1") },
+        { null }
+    };
+
+    [WinFormsTheory]
+    [MemberData(nameof(GetListViewItemTheoryData))]
+    // Regression test for https://github.com/dotnet/winforms/issues/11663.
+    public void ListView_VirtualMode_ReleaseUiaProvider_Success(ListViewItem listItem)
+    {
+        using ListView listView = new()
+        {
+            VirtualMode = true,
+            VirtualListSize = 1
+        };
+
+        listView.RetrieveVirtualItem += (s, e) =>
+        {
+            e.Item = e.ItemIndex switch
+            {
+                0 => listItem,
+                _ => throw new NotImplementedException()
+            };
+        };
+
+        listView.AccessibilityObject.Should().NotBeNull();
+
+        Action action = () => listView.ReleaseUiaProvider(listView.InternalHandle);
+        action.Should().NotThrow();
+        listView.IsAccessibilityObjectCreated.Should().BeFalse();
+        listView.IsHandleCreated.Should().BeFalse();
+    }
+
+    [WinFormsFact]
+    public void ListView_VirtualMode_GetListViewItemAsExpected()
+    {
+        using ListView listView = new()
+        {
+            VirtualMode = true,
+            VirtualListSize = 2
+        };
+
+        ListViewItem listItem1 = new("Item 1");
+        ListViewItem listItem2 = null;
+        listView.RetrieveVirtualItem += (s, e) =>
+        {
+            e.Item = e.ItemIndex switch
+            {
+                0 => listItem1,
+                1 => listItem2,
+                _ => throw new NotImplementedException()
+            };
+        };
+        listView.Items.GetItemByIndex(0).Should().Be(listView.Items[0]);
+        listView.Items.GetItemByIndex(1).Should().BeNull();
+        Action action = () => listView.Items[1].ToString();
+        action.Should().Throw<InvalidOperationException>(SR.ListViewVirtualItemRequired);
     }
 
     private class SubListViewAccessibleObject : ListView.ListViewAccessibleObject
@@ -5295,7 +5402,7 @@ public class ListViewTests
         using SubListView listView = GetSubListViewWithData(view, virtualMode, showGroups, withinGroup, createControl);
         SubListViewAccessibleObject accessibleObject = new(listView);
         int accessibilityProperty = listView.TestAccessor().Dynamic.s_accessibilityProperty;
-        listView.Properties.SetObject(accessibilityProperty, accessibleObject);
+        listView.Properties.AddValue(accessibilityProperty, accessibleObject);
 
         listView.OnGroupCollapsedStateChanged(new ListViewGroupEventArgs(groupId));
 
@@ -5320,12 +5427,11 @@ public class ListViewTests
         };
 
         listView.Columns.AddRange(
-            new ColumnHeader[]
-            {
+            [
                 new() { Text = "Column 1", Width = 100 },
                 new() { Text = "Column 2", Width = 100 },
                 new() { Text = "Column 3", Width = 100 }
-            });
+            ]);
 
         ListViewItem item = new("Test");
         item.SubItems.Add("Sub1");
@@ -5341,17 +5447,17 @@ public class ListViewTests
         Point subItemLocation = listView.Items[0].SubItems[subItemIndex].Bounds.Location + new Size(1, 1);
         // The mouse down handler will wait for mouse up event, so we need to put it on the message queue
         // before invoking mouse down.
-        PInvoke.PostMessage(listView, PInvoke.WM_LBUTTONUP, 0, PARAM.FromPoint(subItemLocation));
-        PInvoke.SendMessage(listView, PInvoke.WM_LBUTTONDOWN, 1, PARAM.FromPoint(subItemLocation));
+        PInvokeCore.PostMessage(listView, PInvokeCore.WM_LBUTTONUP, 0, PARAM.FromPoint(subItemLocation));
+        PInvokeCore.SendMessage(listView, PInvokeCore.WM_LBUTTONDOWN, 1, PARAM.FromPoint(subItemLocation));
 
         // Start editing immediately (if it was queued).
-        PInvoke.SendMessage(listView, PInvoke.WM_TIMER, (WPARAM)(nint)listView.TestAccessor().Dynamic.LVLABELEDITTIMER);
+        PInvokeCore.SendMessage(listView, PInvokeCore.WM_TIMER, (WPARAM)(nint)listView.TestAccessor().Dynamic.LVLABELEDITTIMER);
 
-        nint editControlHandle = PInvoke.SendMessage(listView, PInvoke.LVM_GETEDITCONTROL);
+        nint editControlHandle = PInvokeCore.SendMessage(listView, PInvoke.LVM_GETEDITCONTROL);
 
         // End the edit because this more closely resembles real live usage. Additionally
         // when edit box is open, the native ListView will move focus to items being removed.
-        PInvoke.SendMessage(listView, PInvoke.LVM_CANCELEDITLABEL);
+        PInvokeCore.SendMessage(listView, PInvoke.LVM_CANCELEDITLABEL);
 
         if (isEditControlCreated)
         {
@@ -5380,7 +5486,7 @@ public class ListViewTests
         // lParam = repeatCount | (scanCode << 16)
         nint keyCode = (nint)key;
         nint lParam = 0x00000001 | keyCode << 16;
-        PInvoke.SendMessage(listView, PInvoke.WM_KEYUP, (WPARAM)keyCode, (LPARAM)lParam);
+        PInvokeCore.SendMessage(listView, PInvokeCore.WM_KEYUP, (WPARAM)keyCode, (LPARAM)lParam);
 
         Assert.True(listView.IsHandleCreated);
     }
@@ -5419,29 +5525,29 @@ public class ListViewTests
     {
         using ListView listView = new() { View = view, ShowGroups = showGroups };
         listView.CreateControl();
-        listView.Items.AddRange(new ListViewItem[] { new("test 1"), new("test 2"), new("test 3") });
+        listView.Items.AddRange((ListViewItem[])[new("test 1"), new("test 2"), new("test 3")]);
 
         listView.Items[0].Selected = true;
 
         Assert.True(listView.Items[0].Selected);
         Assert.Equal(3, listView.Items.Count);
-        Assert.Equal(1, listView.SelectedItems.Count);
-        Assert.Equal(1, listView.SelectedIndices.Count);
+        Assert.Single(listView.SelectedItems);
+        Assert.Single(listView.SelectedIndices);
 
         listView.Items.Remove(listView.Items[1]);
 
         Assert.True(listView.Items[0].Selected);
         Assert.Equal(2, listView.Items.Count);
-        Assert.Equal(1, listView.SelectedItems.Count);
-        Assert.Equal(1, listView.SelectedIndices.Count);
+        Assert.Single(listView.SelectedItems);
+        Assert.Single(listView.SelectedIndices);
         Assert.True(listView.Items[0].Selected);
 
         listView.Items.Remove(listView.Items[1]);
 
         Assert.True(listView.Items[0].Selected);
-        Assert.Equal(1, listView.Items.Count);
-        Assert.Equal(1, listView.SelectedItems.Count);
-        Assert.Equal(1, listView.SelectedIndices.Count);
+        Assert.Single(listView.Items);
+        Assert.Single(listView.SelectedItems);
+        Assert.Single(listView.SelectedIndices);
         Assert.True(listView.Items[0].Selected);
     }
 
@@ -5451,7 +5557,7 @@ public class ListViewTests
     {
         using ListView listView = new() { View = view, ShowGroups = showGroups };
         listView.CreateControl();
-        listView.Items.AddRange(new ListViewItem[] { new("test 1"), new("test 2"), new("test 3") });
+        listView.Items.AddRange((ListViewItem[])[new("test 1"), new("test 2"), new("test 3")]);
 
         for (int count = listView.Items.Count; count > 1; count -= 1)
         {
@@ -5461,8 +5567,8 @@ public class ListViewTests
             Assert.True(item.Selected);
             Assert.Equal(count, listView.Items.Count);
             Assert.Equal(listView, item.ListView);
-            Assert.Equal(1, listView.SelectedItems.Count);
-            Assert.Equal(1, listView.SelectedIndices.Count);
+            Assert.Single(listView.SelectedItems);
+            Assert.Single(listView.SelectedIndices);
 
             listView.Items.Remove(item);
             count -= 1;
@@ -5470,8 +5576,8 @@ public class ListViewTests
             Assert.True(item.Selected);
             Assert.Equal(count, listView.Items.Count);
             Assert.Null(item.ListView);
-            Assert.Equal(0, listView.SelectedItems.Count);
-            Assert.Equal(0, listView.SelectedIndices.Count);
+            Assert.Empty(listView.SelectedItems);
+            Assert.Empty(listView.SelectedIndices);
         }
     }
 
@@ -5481,28 +5587,28 @@ public class ListViewTests
     {
         using ListView listView = new() { View = view, ShowGroups = showGroups, CheckBoxes = true };
         listView.CreateControl();
-        listView.Items.AddRange(new ListViewItem[] { new("test 1"), new("test 2"), new("test 3") });
+        listView.Items.AddRange((ListViewItem[])[new("test 1"), new("test 2"), new("test 3")]);
 
         listView.Items[0].Checked = true;
 
         Assert.True(listView.Items[0].Checked);
         Assert.Equal(3, listView.Items.Count);
-        Assert.Equal(1, listView.CheckedItems.Count);
-        Assert.Equal(1, listView.CheckedIndices.Count);
+        Assert.Single(listView.CheckedItems);
+        Assert.Single(listView.CheckedIndices);
 
         listView.Items.Remove(listView.Items[1]);
 
         Assert.True(listView.Items[0].Checked);
         Assert.Equal(2, listView.Items.Count);
-        Assert.Equal(1, listView.CheckedItems.Count);
-        Assert.Equal(1, listView.CheckedIndices.Count);
+        Assert.Single(listView.CheckedItems);
+        Assert.Single(listView.CheckedIndices);
 
         listView.Items.Remove(listView.Items[1]);
 
         Assert.True(listView.Items[0].Checked);
-        Assert.Equal(1, listView.Items.Count);
-        Assert.Equal(1, listView.CheckedItems.Count);
-        Assert.Equal(1, listView.CheckedIndices.Count);
+        Assert.Single(listView.Items);
+        Assert.Single(listView.CheckedItems);
+        Assert.Single(listView.CheckedIndices);
     }
 
     [WinFormsTheory]
@@ -5511,7 +5617,7 @@ public class ListViewTests
     {
         using ListView listView = new() { View = view, ShowGroups = showGroups, CheckBoxes = true };
         listView.CreateControl();
-        listView.Items.AddRange(new ListViewItem[] { new("test 1"), new("test 2"), new("test 3") });
+        listView.Items.AddRange((ListViewItem[])[new("test 1"), new("test 2"), new("test 3")]);
 
         for (int count = listView.Items.Count; count > 1; count -= 1)
         {
@@ -5521,8 +5627,8 @@ public class ListViewTests
             Assert.True(item.Checked);
             Assert.Equal(count, listView.Items.Count);
             Assert.Equal(listView, item.ListView);
-            Assert.Equal(1, listView.CheckedItems.Count);
-            Assert.Equal(1, listView.CheckedIndices.Count);
+            Assert.Single(listView.CheckedItems);
+            Assert.Single(listView.CheckedIndices);
 
             listView.Items.Remove(item);
             count -= 1;
@@ -5530,8 +5636,8 @@ public class ListViewTests
             Assert.True(item.Checked);
             Assert.Equal(count, listView.Items.Count);
             Assert.Null(item.ListView);
-            Assert.Equal(0, listView.CheckedItems.Count);
-            Assert.Equal(0, listView.CheckedIndices.Count);
+            Assert.Empty(listView.CheckedItems);
+            Assert.Empty(listView.CheckedIndices);
         }
     }
 
@@ -5544,32 +5650,32 @@ public class ListViewTests
 
         var groups = new ListViewGroup[] { new("Group 1"), new("Group 2"), new("Group 3") };
         listView.Groups.AddRange(groups);
-        listView.Items.AddRange(new ListViewItem[] { new("test 1", groups[0]), new("test 2", groups[1]), new("test 3", groups[2]) });
+        listView.Items.AddRange((ListViewItem[])[new("test 1", groups[0]), new("test 2", groups[1]), new("test 3", groups[2])]);
 
         listView.Items[0].Selected = true;
 
         Assert.True(listView.Items[0].Selected);
         Assert.Equal(3, listView.Items.Count);
         Assert.Equal(3, listView.Groups.Count);
-        Assert.Equal(1, listView.SelectedItems.Count);
-        Assert.Equal(1, listView.SelectedIndices.Count);
+        Assert.Single(listView.SelectedItems);
+        Assert.Single(listView.SelectedIndices);
 
         listView.Groups.Remove(listView.Groups[2]);
 
         Assert.True(listView.Items[0].Selected);
         Assert.Equal(3, listView.Items.Count);
         Assert.Equal(2, listView.Groups.Count);
-        Assert.Equal(1, listView.SelectedItems.Count);
-        Assert.Equal(1, listView.SelectedIndices.Count);
+        Assert.Single(listView.SelectedItems);
+        Assert.Single(listView.SelectedIndices);
         Assert.True(listView.Items[0].Selected);
 
         listView.Groups.Remove(listView.Groups[1]);
 
         Assert.True(listView.Items[0].Selected);
         Assert.Equal(3, listView.Items.Count);
-        Assert.Equal(1, listView.Groups.Count);
-        Assert.Equal(1, listView.SelectedItems.Count);
-        Assert.Equal(1, listView.SelectedIndices.Count);
+        Assert.Single(listView.Groups);
+        Assert.Single(listView.SelectedItems);
+        Assert.Single(listView.SelectedIndices);
         Assert.True(listView.Items[0].Selected);
     }
 
@@ -5582,7 +5688,7 @@ public class ListViewTests
 
         var groups = new ListViewGroup[] { new("Group 1"), new("Group 2"), new("Group 3") };
         listView.Groups.AddRange(groups);
-        listView.Items.AddRange(new ListViewItem[] { new("test 1", groups[0]), new("test 2", groups[1]), new("test 3", groups[2]) });
+        listView.Items.AddRange((ListViewItem[])[new("test 1", groups[0]), new("test 2", groups[1]), new("test 3", groups[2])]);
 
         int count = 3;
         for (int i = 0; i < 2; i++)
@@ -5619,31 +5725,31 @@ public class ListViewTests
 
         var groups = new ListViewGroup[] { new("Group 1"), new("Group 2"), new("Group 3") };
         listView.Groups.AddRange(groups);
-        listView.Items.AddRange(new ListViewItem[] { new("test 1", groups[0]), new("test 2", groups[1]), new("test 3", groups[2]) });
+        listView.Items.AddRange((ListViewItem[])[new("test 1", groups[0]), new("test 2", groups[1]), new("test 3", groups[2])]);
 
         listView.Items[0].Checked = true;
 
         Assert.True(listView.Items[0].Checked);
         Assert.Equal(3, listView.Items.Count);
         Assert.Equal(3, listView.Items.Count);
-        Assert.Equal(1, listView.CheckedItems.Count);
-        Assert.Equal(1, listView.CheckedIndices.Count);
+        Assert.Single(listView.CheckedItems);
+        Assert.Single(listView.CheckedIndices);
 
         listView.Groups.Remove(listView.Groups[2]);
 
         Assert.True(listView.Items[0].Checked);
         Assert.Equal(3, listView.Items.Count);
         Assert.Equal(2, listView.Groups.Count);
-        Assert.Equal(1, listView.CheckedItems.Count);
-        Assert.Equal(1, listView.CheckedIndices.Count);
+        Assert.Single(listView.CheckedItems);
+        Assert.Single(listView.CheckedIndices);
 
         listView.Groups.Remove(listView.Groups[1]);
 
         Assert.True(listView.Items[0].Checked);
         Assert.Equal(3, listView.Items.Count);
-        Assert.Equal(1, listView.Groups.Count);
-        Assert.Equal(1, listView.CheckedItems.Count);
-        Assert.Equal(1, listView.CheckedIndices.Count);
+        Assert.Single(listView.Groups);
+        Assert.Single(listView.CheckedItems);
+        Assert.Single(listView.CheckedIndices);
     }
 
     [WinFormsTheory]
@@ -5655,7 +5761,7 @@ public class ListViewTests
 
         var groups = new ListViewGroup[] { new("Group 1"), new("Group 2"), new("Group 3") };
         listView.Groups.AddRange(groups);
-        listView.Items.AddRange(new ListViewItem[] { new("test 1", groups[0]), new("test 2", groups[1]), new("test 3", groups[2]) });
+        listView.Items.AddRange((ListViewItem[])[new("test 1", groups[0]), new("test 2", groups[1]), new("test 3", groups[2])]);
 
         int count = 3;
         for (int i = 0; i < 2; i++)
@@ -5759,6 +5865,205 @@ public class ListViewTests
         Assert.True(listView.IsHandleCreated);
     }
 
+    [WinFormsFact]
+    public void ListView_RightToLeftLayoutChanged_AddRemove_Invoke_Success()
+    {
+        using SubListView listView = new();
+        int callCount = 0;
+        EventHandler handler = (sender, e) =>
+        {
+            sender.Should().Be(listView);
+            e.Should().Be(EventArgs.Empty);
+            callCount++;
+        };
+
+        listView.RightToLeftLayoutChanged += handler;
+        listView.RightToLeftLayoutChanged -= handler;
+        callCount.Should().Be(0);
+
+        listView.RightToLeftLayoutChanged += handler;
+        listView.OnRightToLeftLayoutChanged(EventArgs.Empty);
+        callCount.Should().Be(1);
+
+        listView.RightToLeftLayoutChanged -= handler;
+        listView.OnRightToLeftLayoutChanged(EventArgs.Empty);
+        callCount.Should().Be(1);
+    }
+
+    [WinFormsFact]
+    public void ListView_TextChanged_AddRemove_Success()
+    {
+        using SubListView listView = new();
+        int callCount = 0;
+        EventHandler handler = (_, _) => callCount++;
+
+        listView.TextChanged += handler;
+        listView.Text = "New Text";
+        callCount.Should().Be(1);
+        listView.Text.Should().Be("New Text");
+
+        listView.TextChanged -= handler;
+        listView.Text = "Another Text";
+        callCount.Should().Be(1);
+        listView.Text.Should().Be("Another Text");
+    }
+
+    [WinFormsFact]
+    public void ListView_LabelEditEvents_AddRemove_Invoke()
+    {
+        using SubListView listView = new();
+        int beforeLabelEditCallCount = 0;
+        int afterLabelEditCallCount = 0;
+
+        LabelEditEventHandler beforeLabelEditHandler = (sender, e) =>
+        {
+            sender.Should().BeSameAs(listView);
+            e.Should().NotBeNull();
+            beforeLabelEditCallCount++;
+        };
+
+        LabelEditEventHandler afterLabelEditHandler = (sender, e) =>
+        {
+            sender.Should().BeSameAs(listView);
+            e.Should().NotBeNull();
+            afterLabelEditCallCount++;
+        };
+
+        listView.BeforeLabelEdit += beforeLabelEditHandler;
+
+        listView.OnBeforeLabelEdit(new LabelEditEventArgs(1));
+        beforeLabelEditCallCount.Should().Be(1);
+
+        listView.BeforeLabelEdit -= beforeLabelEditHandler;
+
+        listView.OnBeforeLabelEdit(new LabelEditEventArgs(1));
+        beforeLabelEditCallCount.Should().Be(1);
+
+        listView.AfterLabelEdit += afterLabelEditHandler;
+
+        listView.OnAfterLabelEdit(new LabelEditEventArgs(1));
+        afterLabelEditCallCount.Should().Be(1);
+
+        listView.AfterLabelEdit -= afterLabelEditHandler;
+
+        listView.OnAfterLabelEdit(new LabelEditEventArgs(1));
+        afterLabelEditCallCount.Should().Be(1);
+    }
+
+    [WinFormsFact]
+    public void ListView_CacheVirtualItemsEvent_Test()
+    {
+        using SubListView listView = new();
+        int callCount = 0;
+
+        CacheVirtualItemsEventHandler handler = (sender, e) =>
+        {
+            sender.Should().BeSameAs(listView);
+            e.Should().NotBeNull();
+            callCount++;
+        };
+
+        listView.CacheVirtualItems += handler;
+
+        listView.OnCacheVirtualItems(new CacheVirtualItemsEventArgs(1, 2));
+        callCount.Should().Be(1);
+
+        listView.CacheVirtualItems -= handler;
+
+        listView.OnCacheVirtualItems(new CacheVirtualItemsEventArgs(1, 2));
+        callCount.Should().Be(1);
+    }
+
+    [WinFormsFact]
+    public void ListView_ColumnClick_AddRemoveHandlers_ShouldCorrectlyInvokeOrNotInvokeEvent()
+    {
+        using SubListView listView = new();
+        int firstHandlerInvokeCount = 0;
+        int secondHandlerInvokeCount = 0;
+        ColumnClickEventArgs eventArgs = null;
+
+        ColumnClickEventHandler firstHandler = (sender, e) =>
+        {
+            firstHandlerInvokeCount++;
+            eventArgs = e;
+        };
+
+        ColumnClickEventHandler secondHandler = (sender, e) => { secondHandlerInvokeCount++; };
+
+        // Add first handler and simulate the column click event
+        listView.ColumnClick += firstHandler;
+        ColumnClickEventArgs args = new(1);
+        listView.TestAccessor().Dynamic.OnColumnClick(args);
+
+        firstHandlerInvokeCount.Should().Be(1);
+        secondHandlerInvokeCount.Should().Be(0);
+        eventArgs.Should().NotBeNull();
+        eventArgs.Column.Should().Be(1);
+
+        // Add second handler and simulate the event again
+        listView.ColumnClick += secondHandler;
+        listView.TestAccessor().Dynamic.OnColumnClick(args);
+
+        firstHandlerInvokeCount.Should().Be(2); // First handler called again
+        secondHandlerInvokeCount.Should().Be(1); // Second handler called for the first time
+
+        // Remove first handler and simulate the event again
+        listView.ColumnClick -= firstHandler;
+        listView.TestAccessor().Dynamic.OnColumnClick(args);
+
+        // First handler should not be called again, second handler should be called again
+        firstHandlerInvokeCount.Should().Be(2);
+        secondHandlerInvokeCount.Should().Be(2);
+    }
+
+    [WinFormsFact]
+    public void ListView_GroupTaskLinkClick_EventHandling_ShouldBehaveAsExpected()
+    {
+        using SubListView listView = new();
+        int callCount = 0;
+        object eventSender = null;
+        ListViewGroupEventArgs eventArgs = null;
+
+        EventHandler<ListViewGroupEventArgs> handler1 = (sender, e) =>
+        {
+            callCount++;
+            eventSender = sender;
+            eventArgs = e;
+        };
+
+        EventHandler<ListViewGroupEventArgs> handler2 = (sender, e) => { callCount++; };
+
+        // Test adding and invoking first handler.
+        listView.GroupTaskLinkClick += handler1;
+        ListViewGroupEventArgs expectedEventArgs = new(1);
+        listView.TestAccessor().Dynamic.OnGroupTaskLinkClick(expectedEventArgs);
+
+        callCount.Should().Be(1);
+        eventSender.Should().Be(listView);
+        eventArgs.Should().Be(expectedEventArgs);
+
+        // Test adding and invoking both handlers.
+        listView.GroupTaskLinkClick += handler2;
+        listView.TestAccessor().Dynamic.OnGroupTaskLinkClick(new ListViewGroupEventArgs(2));
+
+        // Expect callCount to be 3 because both handlers should be called.
+        callCount.Should().Be(3);
+
+        // Test removing first handler and invoking.
+        listView.GroupTaskLinkClick -= handler1;
+        listView.TestAccessor().Dynamic.OnGroupTaskLinkClick(new ListViewGroupEventArgs(3));
+
+        // Expect callCount to be 4 because only second handler should be called.
+        callCount.Should().Be(4);
+
+        // Test removing second handler and ensuring no invocation.
+        listView.GroupTaskLinkClick -= handler2;
+        listView.TestAccessor().Dynamic.OnGroupTaskLinkClick(new ListViewGroupEventArgs(4));
+
+        // Expect callCount to remain 4 because no handlers should be called.
+        callCount.Should().Be(4);
+    }
+
     private class SubListViewItem : ListViewItem
     {
         public AccessibleObject CustomAccessibleObject { get; set; }
@@ -5854,6 +6159,16 @@ public class ListViewTests
         public new void OnGroupCollapsedStateChanged(ListViewGroupEventArgs e) => base.OnGroupCollapsedStateChanged(e);
 
         public new void SetStyle(ControlStyles flag, bool value) => base.SetStyle(flag, value);
+
+        public new void OnRightToLeftLayoutChanged(EventArgs e) => base.OnRightToLeftLayoutChanged(e);
+
+        public new void OnBeforeLabelEdit(LabelEditEventArgs e) => base.OnBeforeLabelEdit(e);
+
+        public new void OnAfterLabelEdit(LabelEditEventArgs e) => base.OnAfterLabelEdit(e);
+
+        public new void OnCacheVirtualItems(CacheVirtualItemsEventArgs e) => base.OnCacheVirtualItems(e);
+
+        public new void OnItemChecked(ItemCheckedEventArgs e) => base.OnItemChecked(e);
     }
 
     private SubListView GetSubListViewWithData(View view, bool virtualMode, bool showGroups, bool withinGroup, bool createControl)

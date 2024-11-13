@@ -10,12 +10,12 @@ public static class AppContextSwitchNames
     /// <summary>
     ///  The switch that controls whether or not the <see cref="BinaryFormatter"/> is enabled.
     /// </summary>
-    public static string EnableUnsafeBinaryFormatterSerialization { get; }
+    public const string EnableUnsafeBinaryFormatterSerialization
         = "System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization";
 
     /// <summary>
     ///  Switch that controls <see cref="AppContext"/> switch caching.
     /// </summary>
-    public static string LocalAppContext_DisableCaching { get; }
+    public const string LocalAppContext_DisableCaching
         = "TestSwitch.LocalAppContext.DisableCaching";
 }

@@ -33,7 +33,7 @@ public class ColorDialogTests
     }
 
     [WinFormsFact]
-    public void ColorDialog_Ctor_Default_OverridenReset()
+    public void ColorDialog_Ctor_Default_OverriddenReset()
     {
         using EmptyResetColorDialog dialog = new();
         Assert.True(dialog.AllowFullOpen);
@@ -325,7 +325,7 @@ public class ColorDialogTests
             AllowFullOpen = false,
             AnyColor = true,
             Color = Color.Red,
-            CustomColors = new int[] { 1, 2, 3 },
+            CustomColors = [1, 2, 3],
             FullOpen = true,
             ShowHelp = true,
             SolidColorOnly = true,

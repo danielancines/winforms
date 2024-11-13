@@ -38,7 +38,7 @@ public partial class ComboBox
                 var listHandle = _owningComboBox.GetListHandle();
                 RECT itemRect = default;
 
-                int result = (int)PInvoke.SendMessage(
+                int result = (int)PInvokeCore.SendMessage(
                     listHandle,
                     PInvoke.LB_GETITEMRECT,
                     (WPARAM)currentIndex,
@@ -51,7 +51,7 @@ public partial class ComboBox
 
                 // Translate the item rect to screen coordinates
                 RECT translated = itemRect;
-                PInvoke.MapWindowPoints(listHandle, HWND.Null, ref translated);
+                PInvokeCore.MapWindowPoints(listHandle, HWND.Null, ref translated);
                 return translated;
             }
         }
@@ -128,16 +128,14 @@ public partial class ComboBox
 
         internal override bool IsPatternSupported(UIA_PATTERN_ID patternId)
         {
-            switch (patternId)
+            return patternId switch
             {
-                case UIA_PATTERN_ID.UIA_LegacyIAccessiblePatternId:
-                case UIA_PATTERN_ID.UIA_InvokePatternId:
-                case UIA_PATTERN_ID.UIA_ScrollItemPatternId:
-                case UIA_PATTERN_ID.UIA_SelectionItemPatternId:
-                    return true;
-                default:
-                    return base.IsPatternSupported(patternId);
-            }
+                UIA_PATTERN_ID.UIA_LegacyIAccessiblePatternId
+                    or UIA_PATTERN_ID.UIA_InvokePatternId
+                    or UIA_PATTERN_ID.UIA_ScrollItemPatternId
+                    or UIA_PATTERN_ID.UIA_SelectionItemPatternId => true,
+                _ => base.IsPatternSupported(patternId),
+            };
         }
 
         public override string? Name => _owningComboBox is null ? base.Name : _owningComboBox.GetItemText(_owningItem.Item);
@@ -184,7 +182,7 @@ public partial class ComboBox
                 return;
             }
 
-            PInvoke.SendMessage(_owningComboBox, PInvoke.CB_SETTOPINDEX, (WPARAM)GetCurrentIndex());
+            PInvokeCore.SendMessage(_owningComboBox, PInvoke.CB_SETTOPINDEX, (WPARAM)GetCurrentIndex());
         }
 
         internal override void SetFocus()

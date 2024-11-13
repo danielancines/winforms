@@ -3,6 +3,9 @@
 
 namespace System;
 
+/// <summary>
+///  Creates a test directory path and cleans it up when test class finishes execution.
+/// </summary>
 public abstract class FileCleanupTestBase : IDisposable
 {
     private string? _testDirectory;
@@ -29,7 +32,7 @@ public abstract class FileCleanupTestBase : IDisposable
         GC.SuppressFinalize(this);
     }
 
-    private void Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
         try
         {
@@ -42,7 +45,7 @@ public abstract class FileCleanupTestBase : IDisposable
 
     public string GetTestFilePath() => Path.Combine(TestDirectory, GetTestFileName());
 
-    public string GetTestFileName() => GetUniqueName();
+    public static string GetTestFileName() => GetUniqueName();
 
     private static string GetUniqueName() => Guid.NewGuid().ToString("D");
 }

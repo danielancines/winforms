@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using System.Windows.Forms.TestUtilities;
-
 namespace System.Windows.Forms.VisualStyles.Tests;
 
 // NB: doesn't require thread affinity
@@ -11,7 +9,7 @@ public class TextMetricsTests
     [Fact]
     public void TextMetrics_Ctor_Default()
     {
-        TextMetrics metric = new();
+        TextMetrics metric = default;
         Assert.Equal(0, metric.Ascent);
         Assert.Equal(0, metric.AverageCharWidth);
         Assert.Equal('\0', metric.BreakChar);

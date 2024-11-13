@@ -28,7 +28,7 @@ public class ListViewSubItemCollectionTests
     {
         ListViewItem item = new();
         IList collection = new ListViewItem.ListViewSubItemCollection(item);
-        Assert.Equal(0, collection.Count);
+        Assert.Empty(collection);
         Assert.False(collection.IsFixedSize);
         Assert.False(collection.IsReadOnly);
         Assert.True(collection.IsSynchronized);
@@ -574,7 +574,7 @@ public class ListViewSubItemCollectionTests
 
         Assert.Equal(expected, collection.IndexOfKey(key));
 
-        // Call again to validate caching behaviour.
+        // Call again to validate caching behavior.
         Assert.Equal(expected, collection.IndexOfKey(key));
         Assert.Equal(-1, collection.IndexOfKey("noSuchKey"));
     }
@@ -916,7 +916,7 @@ public class ListViewSubItemCollectionTests
         Assert.Null(subItem1._owner);
         Assert.Null(subItem2._owner);
 
-        listViewItem.SubItems.AddRange(new ListViewItem.ListViewSubItem[] { subItem1, subItem2 });
+        listViewItem.SubItems.AddRange([subItem1, subItem2]);
 
         Assert.Same(listViewItem, subItem1._owner);
         Assert.Same(listViewItem, subItem2._owner);
@@ -927,7 +927,7 @@ public class ListViewSubItemCollectionTests
     {
         ListViewItem listViewItem = new();
 
-        listViewItem.SubItems.AddRange(new string[] { "Test 1", "Test 2" });
+        listViewItem.SubItems.AddRange(["Test 1", "Test 2"]);
 
         Assert.Same(listViewItem, listViewItem.SubItems[1]._owner);
         Assert.Same(listViewItem, listViewItem.SubItems[2]._owner);
@@ -938,7 +938,7 @@ public class ListViewSubItemCollectionTests
     {
         ListViewItem listViewItem = new();
 
-        listViewItem.SubItems.AddRange(new string[] { "Test 1", "Test 2" }, Color.White, Color.Black, SystemFonts.MenuFont);
+        listViewItem.SubItems.AddRange(["Test 1", "Test 2"], Color.White, Color.Black, SystemFonts.MenuFont);
 
         Assert.Same(listViewItem, listViewItem.SubItems[1]._owner);
         Assert.Same(listViewItem, listViewItem.SubItems[2]._owner);
@@ -1112,7 +1112,7 @@ public class ListViewSubItemCollectionTests
         ListViewItem listViewItem = new("Test 1");
         ListViewItem.ListViewSubItem oldSubItem = listViewItem.SubItems[0];
         oldSubItem.Name = "Test 1";
-        ListViewItem.ListViewSubItem subItem = new(listViewItem, "Test 2") { Name = "Test 2"  };
+        ListViewItem.ListViewSubItem subItem = new(listViewItem, "Test 2") { Name = "Test 2" };
         listViewItem.SubItems.Add(subItem);
 
         Assert.Same(listViewItem, subItem._owner);

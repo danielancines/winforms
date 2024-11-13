@@ -55,10 +55,8 @@ GdipBeginContainer2
 GdipBitmapApplyEffect
 GdipBitmapConvertFormat
 GdipBitmapGetPixel
-GdipBitmapLockBits
 GdipBitmapSetPixel
 GdipBitmapSetResolution
-GdipBitmapUnlockBits
 GdipClearPathMarkers
 GdipCloneBitmapArea
 GdipCloneBitmapAreaI
@@ -98,9 +96,7 @@ GdipCreateFontFromDC
 GdipCreateFontFromLogfont
 GdipCreateFromHDC
 GdipCreateFromHDC2
-GdipCreateHalftonePalette
 GdipCreateHatchBrush
-GdipCreateHBITMAPFromBitmap
 GdipCreateHICONFromBitmap
 GdipCreateImageAttributes
 GdipCreateLineBrush
@@ -248,9 +244,7 @@ GdipGetGenericFontFamilySerif
 GdipGetHatchBackgroundColor
 GdipGetHatchForegroundColor
 GdipGetHatchStyle
-GdipGetHemfFromMetafile
 GdipGetImageAttributesAdjustedPalette
-GdipGetImageBounds
 GdipGetImageDecoders
 GdipGetImageDecodersSize
 GdipGetImageDimension
@@ -260,7 +254,6 @@ GdipGetImageHeight
 GdipGetImageHorizontalResolution
 GdipGetImagePalette
 GdipGetImagePaletteSize
-GdipGetImagePixelFormat
 GdipGetImageRawFormat
 GdipGetImageThumbnail
 GdipGetImageType
@@ -382,8 +375,6 @@ GdipLoadImageFromFile
 GdipLoadImageFromFileICM
 GdipLoadImageFromStream
 GdipLoadImageFromStreamICM
-GdiplusStartup
-GdiplusStartupInputEx
 GdipMeasureCharacterRanges
 GdipMeasureString
 GdipMultiplyLineTransform
@@ -558,7 +549,7 @@ LevelsParams
 PALETTEENTRY
 PaletteFlags
 PaletteType
-PixelFormat*
+PathPointType
 PRINTER_ENUM_CONNECTIONS
 PRINTER_ENUM_LOCAL
 PRINTER_INFO_4W

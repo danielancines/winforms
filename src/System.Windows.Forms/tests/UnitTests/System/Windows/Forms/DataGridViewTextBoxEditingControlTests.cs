@@ -11,7 +11,7 @@ namespace System.Windows.Forms.Tests;
 
 public class DataGridViewTextBoxEditingControlTests
 {
-    private static int s_preferredHeight = Control.DefaultFont.Height + SystemInformation.BorderSize.Height * 4 + 3;
+    private static readonly int s_preferredHeight = Control.DefaultFont.Height + SystemInformation.BorderSize.Height * 4 + 3;
 
     [WinFormsFact]
     public void DataGridViewTextBoxEditingDataGridViewTextBoxEditingControl_Ctor_Default()
@@ -1513,27 +1513,27 @@ public class DataGridViewTextBoxEditingControlTests
     {
         foreach (bool handled in new bool[] { true, false })
         {
-            foreach (IntPtr wParam in new IntPtr[] { (IntPtr)Keys.Enter, (IntPtr)Keys.LineFeed, (IntPtr)Keys.A, (IntPtr)2 })
+            foreach (IntPtr wParam in new IntPtr[] { (IntPtr)Keys.Enter, (IntPtr)Keys.LineFeed, (IntPtr)Keys.A, 2 })
             {
                 if (wParam != (IntPtr)Keys.Enter)
                 {
-                    yield return new object[] { (int)PInvoke.WM_CHAR, wParam, '2', handled, handled, 1, 0, 0, (IntPtr)50 };
-                    yield return new object[] { (int)PInvoke.WM_CHAR, wParam, '1', handled, handled, 1, 0, 0, (IntPtr)49 };
+                    yield return new object[] { (int)PInvokeCore.WM_CHAR, wParam, '2', handled, handled, 1, 0, 0, (IntPtr)50 };
+                    yield return new object[] { (int)PInvokeCore.WM_CHAR, wParam, '1', handled, handled, 1, 0, 0, (IntPtr)49 };
                 }
 
-                yield return new object[] { (int)PInvoke.WM_SYSCHAR, wParam, '2', handled, handled, 1, 0, 0, (IntPtr)50 };
-                yield return new object[] { (int)PInvoke.WM_SYSCHAR, wParam, '1', handled, handled, 1, 0, 0, (IntPtr)49 };
-                yield return new object[] { (int)PInvoke.WM_IME_CHAR, wParam, '2', handled, handled, 1, 0, 0, (IntPtr)50 };
-                yield return new object[] { (int)PInvoke.WM_IME_CHAR, wParam, '1', handled, handled, 1, 0, 0, (IntPtr)49 };
-                yield return new object[] { (int)PInvoke.WM_KEYDOWN, wParam, '2', handled, handled, 0, 1, 0, wParam };
-                yield return new object[] { (int)PInvoke.WM_SYSKEYDOWN, wParam, '2', handled, handled, 0, 1, 0, wParam };
-                yield return new object[] { (int)PInvoke.WM_KEYUP, wParam, '2', handled, handled, 0, 0, 1, wParam };
-                yield return new object[] { (int)PInvoke.WM_SYSKEYUP, wParam, '2', handled, handled, 0, 0, 1, wParam };
+                yield return new object[] { (int)PInvokeCore.WM_SYSCHAR, wParam, '2', handled, handled, 1, 0, 0, (IntPtr)50 };
+                yield return new object[] { (int)PInvokeCore.WM_SYSCHAR, wParam, '1', handled, handled, 1, 0, 0, (IntPtr)49 };
+                yield return new object[] { (int)PInvokeCore.WM_IME_CHAR, wParam, '2', handled, handled, 1, 0, 0, (IntPtr)50 };
+                yield return new object[] { (int)PInvokeCore.WM_IME_CHAR, wParam, '1', handled, handled, 1, 0, 0, (IntPtr)49 };
+                yield return new object[] { (int)PInvokeCore.WM_KEYDOWN, wParam, '2', handled, handled, 0, 1, 0, wParam };
+                yield return new object[] { (int)PInvokeCore.WM_SYSKEYDOWN, wParam, '2', handled, handled, 0, 1, 0, wParam };
+                yield return new object[] { (int)PInvokeCore.WM_KEYUP, wParam, '2', handled, handled, 0, 0, 1, wParam };
+                yield return new object[] { (int)PInvokeCore.WM_SYSKEYUP, wParam, '2', handled, handled, 0, 0, 1, wParam };
                 yield return new object[] { 0, wParam, '2', handled, handled, 0, 0, 1, wParam };
             }
 
-            yield return new object[] { (int)PInvoke.WM_CHAR, (IntPtr)Keys.Enter, '2', handled, true, 0, 0, 0, (IntPtr)Keys.Enter };
-            yield return new object[] { (int)PInvoke.WM_CHAR, (IntPtr)Keys.Enter, '1', handled, true, 0, 0, 0, (IntPtr)Keys.Enter };
+            yield return new object[] { (int)PInvokeCore.WM_CHAR, (IntPtr)Keys.Enter, '2', handled, true, 0, 0, 0, (IntPtr)Keys.Enter };
+            yield return new object[] { (int)PInvokeCore.WM_CHAR, (IntPtr)Keys.Enter, '1', handled, true, 0, 0, 0, (IntPtr)Keys.Enter };
         }
     }
 
@@ -1686,8 +1686,8 @@ public class DataGridViewTextBoxEditingControlTests
     }
 
     [WinFormsTheory]
-    [InlineData((int)PInvoke.WM_CHAR)]
-    [InlineData((int)PInvoke.WM_SYSCHAR)]
+    [InlineData((int)PInvokeCore.WM_CHAR)]
+    [InlineData((int)PInvokeCore.WM_SYSCHAR)]
     public void DataGridViewTextBoxEditingControl_ProcessKeyEventArgs_InvokeCharAfterImeChar_Success(int msg)
     {
         using SubDataGridViewTextBoxEditingControl control = new();
@@ -1705,7 +1705,7 @@ public class DataGridViewTextBoxEditingControlTests
         };
         Message imeM = new()
         {
-            Msg = (int)PInvoke.WM_IME_CHAR
+            Msg = (int)PInvokeCore.WM_IME_CHAR
         };
 
         // Char.
@@ -1743,10 +1743,10 @@ public class DataGridViewTextBoxEditingControlTests
     }
 
     [WinFormsTheory]
-    [InlineData((int)PInvoke.WM_KEYDOWN)]
-    [InlineData((int)PInvoke.WM_SYSKEYDOWN)]
-    [InlineData((int)PInvoke.WM_KEYUP)]
-    [InlineData((int)PInvoke.WM_SYSKEYUP)]
+    [InlineData((int)PInvokeCore.WM_KEYDOWN)]
+    [InlineData((int)PInvokeCore.WM_SYSKEYDOWN)]
+    [InlineData((int)PInvokeCore.WM_KEYUP)]
+    [InlineData((int)PInvokeCore.WM_SYSKEYUP)]
     public void DataGridViewTextBoxEditingControl_ProcessKeyEventArgs_InvokeNonCharAfterImeChar_Success(int msg)
     {
         using SubDataGridViewTextBoxEditingControl control = new();
@@ -1773,7 +1773,7 @@ public class DataGridViewTextBoxEditingControlTests
         };
         Message imeM = new()
         {
-            Msg = (int)PInvoke.WM_IME_CHAR
+            Msg = (int)PInvokeCore.WM_IME_CHAR
         };
 
         // Non-Char.

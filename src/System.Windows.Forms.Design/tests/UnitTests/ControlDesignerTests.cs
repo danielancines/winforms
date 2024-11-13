@@ -19,7 +19,7 @@ public class ControlDesignerTests
         Assert.True(controlDesigner.ControlSupportsSnaplines);
         Assert.Throws<InvalidOperationException>(() => controlDesigner.Component);
         Assert.True(controlDesigner.ForceVisible);
-        Assert.Throws<InvalidOperationException>(() => controlDesigner.GetParentComponentProperty());
+        Assert.Throws<InvalidOperationException>(controlDesigner.GetParentComponentProperty);
         Assert.False(controlDesigner.SerializePerformLayout);
     }
 
@@ -98,7 +98,14 @@ public class ControlDesignerTests
         using TestControlDesigner controlDesigner = new();
         using Button button = new();
         controlDesigner.Initialize(button);
-        Assert.Equal(SelectionRules.Visible | SelectionRules.AllSizeable | SelectionRules.Moveable, controlDesigner.SelectionRules);
+
+        SelectionRules selectionRules;
+        using (new NoAssertContext())
+        {
+            selectionRules = controlDesigner.SelectionRules;
+        }
+
+        Assert.Equal(SelectionRules.Visible | SelectionRules.AllSizeable | SelectionRules.Moveable, selectionRules);
     }
 
     [Fact]
@@ -157,7 +164,7 @@ public class ControlDesignerTests
         using TestControlDesigner controlDesigner = new();
         using Button button = new();
         controlDesigner.Initialize(button);
-        Assert.False(controlDesigner.GetHitTestMethod(new Drawing.Point()));
+        Assert.False(controlDesigner.GetHitTestMethod(default));
     }
 
     [Fact]
@@ -221,7 +228,7 @@ public class ControlDesignerTests
         designer.Initialize(button);
         Message m = new Message
         {
-            Msg = (int)PInvoke.WM_PAINT
+            Msg = (int)PInvokeCore.WM_PAINT
         };
         designer.TestAccessor().Dynamic.WndProc(ref m);
     }
@@ -266,6 +273,6 @@ public class ControlDesignerTests
         childControl.Site = mockSite.Object;
         control.Controls.Add(childControl);
 
-        Assert.Equal(1, controlDesigner.AssociatedComponents.Count);
+        Assert.Single(controlDesigner.AssociatedComponents);
     }
 }

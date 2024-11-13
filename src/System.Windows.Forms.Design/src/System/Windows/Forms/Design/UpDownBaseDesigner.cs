@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#nullable disable
-
 using System.ComponentModel;
 using System.Collections;
 using System.Windows.Forms.Design.Behavior;
@@ -23,7 +21,7 @@ internal class UpDownBaseDesigner : ControlDesigner
 
     /// <summary>
     ///  Retrieves a set of rules concerning the movement capabilities of a component.
-    ///  This should be one or more flags from the SelectionRules class.  If no designer
+    ///  This should be one or more flags from the SelectionRules class. If no designer
     ///  provides rules for a component, the component will not get any UI services.
     /// </summary>
     public override SelectionRules SelectionRules
@@ -45,11 +43,12 @@ internal class UpDownBaseDesigner : ControlDesigner
         {
             IList<SnapLine> snapLines = SnapLinesInternal;
             int baseline = DesignerUtils.GetTextBaseline(Control, Drawing.ContentAlignment.TopLeft);
-
-            PropertyDescriptor prop = TypeDescriptor.GetProperties(Component)["BorderStyle"];
-            BorderStyle borderStyle = prop is not null
-                ? (BorderStyle)prop.GetValue(Component)
-                : BorderStyle.Fixed3D;
+            BorderStyle borderStyle = BorderStyle.Fixed3D;
+            PropertyDescriptorCollection props = TypeDescriptor.GetProperties(Component);
+            props.TryGetPropertyDescriptorValue(
+                "BorderStyle",
+                Component,
+                ref borderStyle);
 
             baseline += borderStyle == BorderStyle.None ? -1 : 2;
             snapLines.Add(new SnapLine(SnapLineType.Baseline, baseline, SnapLinePriority.Medium));

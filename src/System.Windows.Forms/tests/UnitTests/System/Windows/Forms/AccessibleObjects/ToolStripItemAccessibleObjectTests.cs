@@ -165,7 +165,7 @@ public class ToolStripItemAccessibleObjectTests
 
         Assert.Equal(expected, actual);
         // Check if the method returns an exist UIA_ControlTypeId
-        Assert.True(actual >= UIA_CONTROLTYPE_ID.UIA_ButtonControlTypeId && actual <= UIA_CONTROLTYPE_ID.UIA_AppBarControlTypeId);
+        Assert.True(actual is >= UIA_CONTROLTYPE_ID.UIA_ButtonControlTypeId and <= UIA_CONTROLTYPE_ID.UIA_AppBarControlTypeId);
     }
 
     [WinFormsFact]
@@ -309,7 +309,7 @@ public class ToolStripItemAccessibleObjectTests
     {
         using ToolStrip toolStrip = new() { AutoSize = false, Size = new(300, 30) };
 
-        ToolStripItem CreateSkippedItem()
+        static ToolStripItem CreateSkippedItem()
         {
             return new ToolStripControlHost(new Label());
         }

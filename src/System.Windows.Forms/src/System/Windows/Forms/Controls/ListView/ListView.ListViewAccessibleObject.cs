@@ -25,7 +25,7 @@ public partial class ListView
             {
                 if (this.IsOwnerHandleCreated(out ListView? owningListView))
                 {
-                    PInvoke.GetWindowRect(owningListView, out var rect);
+                    PInvokeCore.GetWindowRect(owningListView, out var rect);
                     return rect;
                 }
 
@@ -77,20 +77,15 @@ public partial class ListView
             return element ?? base.ElementProviderFromPoint(x, y);
         }
 
-        internal override IRawElementProviderFragment.Interface? FragmentNavigate(NavigateDirection direction)
-        {
-            if (!this.IsOwnerHandleCreated(out ListView? _))
-            {
-                return null;
-            }
-
-            return direction switch
-            {
-                NavigateDirection.NavigateDirection_FirstChild => GetChild(0),
-                NavigateDirection.NavigateDirection_LastChild => GetLastChild(),
-                _ => base.FragmentNavigate(direction)
-            };
-        }
+        internal override IRawElementProviderFragment.Interface? FragmentNavigate(NavigateDirection direction) =>
+            !this.IsOwnerHandleCreated(out ListView? _)
+                ? null
+                : direction switch
+                {
+                    NavigateDirection.NavigateDirection_FirstChild => GetChild(0),
+                    NavigateDirection.NavigateDirection_LastChild => GetLastChild(),
+                    _ => base.FragmentNavigate(direction)
+                };
 
         public override AccessibleObject? GetChild(int index)
         {
@@ -155,30 +150,18 @@ public partial class ListView
             return InvalidIndex;
         }
 
-        internal override int GetChildIndex(AccessibleObject? child)
-        {
-            if (!this.TryGetOwnerAs(out ListView? owningListView))
-            {
-                return base.GetChildIndex(child);
-            }
+        internal override int GetChildIndex(AccessibleObject? child) => this.TryGetOwnerAs(out ListView? owningListView)
+            ? owningListView.GroupsDisplayed ? GetGroupIndex(child) : GetItemIndex(child)
+            : base.GetChildIndex(child);
 
-            return owningListView.GroupsDisplayed ? GetGroupIndex(child) : GetItemIndex(child);
-        }
-
-        private string GetItemStatus()
-        {
-            if (!this.TryGetOwnerAs(out ListView? owningListView))
-            {
-                return string.Empty;
-            }
-
-            return owningListView.Sorting switch
+        private string GetItemStatus() => this.TryGetOwnerAs(out ListView? owningListView)
+            ? owningListView.Sorting switch
             {
                 SortOrder.Ascending => SR.SortedAscendingAccessibleStatus,
                 SortOrder.Descending => SR.SortedDescendingAccessibleStatus,
                 _ => SR.NotSortedAccessibleStatus
-            };
-        }
+            }
+            : string.Empty;
 
         internal override IRawElementProviderSimple.Interface[]? GetColumnHeaders()
         {
@@ -205,7 +188,7 @@ public partial class ListView
             => this.TryGetOwnerAs(out ListView? owningListView) ? (int)owningListView.View : base.GetMultiViewProviderCurrentView();
 
         internal override int[] GetMultiViewProviderSupportedViews()
-            => new int[] { (int)View.Details };
+            => [(int)View.Details];
 
         internal override string GetMultiViewProviderViewName(int viewId)
         {
@@ -233,7 +216,7 @@ public partial class ListView
                 return visibleGroups.Count == 0 ? null : visibleGroups[visibleGroups.Count - 1].AccessibilityObject;
             }
 
-            return owningListView.Items.Count == 0 ? null : owningListView.Items[owningListView.Items.Count - 1].AccessibilityObject;
+            return owningListView.Items.Count == 0 ? null : owningListView.Items[^1].AccessibilityObject;
         }
 
         internal override VARIANT GetPropertyValue(UIA_PROPERTY_ID propertyID)
@@ -274,7 +257,7 @@ public partial class ListView
 
         internal IReadOnlyList<ListViewGroup> GetVisibleGroups()
         {
-            List<ListViewGroup> list = new();
+            List<ListViewGroup> list = [];
 
             if (!this.TryGetOwnerAs(out ListView? owningListView))
             {
@@ -361,23 +344,13 @@ public partial class ListView
             return null;
         }
 
-        internal override bool IsPatternSupported(UIA_PATTERN_ID patternId)
-        {
-            if (!this.TryGetOwnerAs(out ListView? owningListView))
-            {
-                return false;
-            }
-
-            if (patternId == UIA_PATTERN_ID.UIA_SelectionPatternId ||
-                patternId == UIA_PATTERN_ID.UIA_MultipleViewPatternId ||
-                (patternId == UIA_PATTERN_ID.UIA_GridPatternId && owningListView.View == View.Details) ||
-                (patternId == UIA_PATTERN_ID.UIA_TablePatternId && owningListView.View == View.Details))
-            {
-                return true;
-            }
-
-            return base.IsPatternSupported(patternId);
-        }
+        internal override bool IsPatternSupported(UIA_PATTERN_ID patternId) =>
+            this.TryGetOwnerAs(out ListView? owningListView)
+                && (patternId == UIA_PATTERN_ID.UIA_SelectionPatternId
+                    || patternId == UIA_PATTERN_ID.UIA_MultipleViewPatternId
+                    || (patternId == UIA_PATTERN_ID.UIA_GridPatternId && owningListView.View == View.Details)
+                    || (patternId == UIA_PATTERN_ID.UIA_TablePatternId && owningListView.View == View.Details)
+                    || base.IsPatternSupported(patternId));
 
         internal override void SetMultiViewProviderCurrentView(int viewId)
         {

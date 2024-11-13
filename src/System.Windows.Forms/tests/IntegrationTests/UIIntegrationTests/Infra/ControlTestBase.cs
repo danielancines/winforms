@@ -200,7 +200,7 @@ public abstract class ControlTestBase : IAsyncLifetime, IDisposable
         {
 #pragma warning disable CS8597 // Thrown value may be null.
             throw Marshal.GetExceptionForHR(Marshal.GetHRForLastWin32Error());
-#pragma warning restore CS8597 // Thrown value may be null.
+#pragma warning restore CS8597
         }
 
         if (actualPoint.X != point.X || actualPoint.Y != point.Y)
@@ -211,7 +211,7 @@ public abstract class ControlTestBase : IAsyncLifetime, IDisposable
             {
 #pragma warning disable CS8597 // Thrown value may be null.
                 throw Marshal.GetExceptionForHR(Marshal.GetHRForLastWin32Error());
-#pragma warning restore CS8597 // Thrown value may be null.
+#pragma warning restore CS8597
             }
         }
 
@@ -227,8 +227,10 @@ public abstract class ControlTestBase : IAsyncLifetime, IDisposable
         await RunFormAsync(
             () =>
             {
-                Form form = new();
-                form.TopMost = true;
+                Form form = new()
+                {
+                    TopMost = true
+                };
 
                 T control = new();
                 form.Controls.Add(control);
@@ -273,15 +275,19 @@ public abstract class ControlTestBase : IAsyncLifetime, IDisposable
         await RunFormAsync(
             () =>
             {
-                Form form = new();
-                form.TopMost = true;
+                Form form = new()
+                {
+                    TopMost = true
+                };
 
                 var control1 = new T1();
                 var control2 = new T2();
 
-                TableLayoutPanel tableLayout = new();
-                tableLayout.ColumnCount = 2;
-                tableLayout.RowCount = 1;
+                TableLayoutPanel tableLayout = new()
+                {
+                    ColumnCount = 2,
+                    RowCount = 1
+                };
                 tableLayout.Controls.Add(control1, 0, 0);
                 tableLayout.Controls.Add(control2, 1, 0);
                 form.Controls.Add(tableLayout);
@@ -328,7 +334,9 @@ public abstract class ControlTestBase : IAsyncLifetime, IDisposable
         Assert.NotNull(control);
 
         dialog.Activated += (sender, e) => gate.TrySetResult(default);
+#pragma warning disable VSTHRD103 // Call async methods when in an async method
         dialog.ShowDialog();
+#pragma warning restore VSTHRD103
 
         await test.JoinAsync();
     }
@@ -369,7 +377,9 @@ public abstract class ControlTestBase : IAsyncLifetime, IDisposable
         Assert.NotNull(dialog);
 
         dialog.Activated += (sender, e) => gate.TrySetResult(default);
+#pragma warning disable VSTHRD103 // Call async methods when in an async method
         dialog.ShowDialog();
+#pragma warning restore VSTHRD103
 
         await test.JoinAsync();
     }

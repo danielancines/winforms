@@ -31,6 +31,7 @@ public sealed partial class BehaviorService
 
             private bool _isHooked;
             private int _lastLButtonDownTimeStamp;
+            private readonly Lock _lock = new();
 
             public MouseHook()
             {
@@ -42,7 +43,9 @@ public sealed partial class BehaviorService
 
 #if DEBUG
             private readonly string _callingStack;
+#pragma warning disable CA1821 // Remove empty Finalizers
             ~MouseHook()
+#pragma warning restore CA1821
             {
                 Debug.Assert(
                     _mouseHookHandle == 0,
@@ -58,7 +61,7 @@ public sealed partial class BehaviorService
             private unsafe void HookMouse()
             {
                 Debug.Assert(s_adornerWindowList.Count > 0, "No AdornerWindow available to create the mouse hook");
-                lock (this)
+                lock (_lock)
                 {
                     if (_mouseHookHandle != 0 || s_adornerWindowList.Count == 0)
                     {
@@ -77,7 +80,7 @@ public sealed partial class BehaviorService
                         WINDOWS_HOOK_ID.WH_MOUSE,
                         (delegate* unmanaged[Stdcall]<int, WPARAM, LPARAM, LRESULT>)hook,
                         (HINSTANCE)0,
-                        PInvoke.GetCurrentThreadId());
+                        PInvokeCore.GetCurrentThreadId());
 
                     _isHooked = _mouseHookHandle != 0;
 
@@ -124,7 +127,7 @@ public sealed partial class BehaviorService
 
             private void UnhookMouse()
             {
-                lock (this)
+                lock (_lock)
                 {
                     if (_mouseHookHandle != 0)
                     {
@@ -177,11 +180,11 @@ public sealed partial class BehaviorService
                             Message m = Message.Create(hwnd, msg, 0u, PARAM.FromLowHigh(pt.Y, pt.X));
 
                             // No one knows why we get an extra click here from VS. As a workaround, we check the TimeStamp and discard it.
-                            if (m.Msg == (int)PInvoke.WM_LBUTTONDOWN)
+                            if (m.Msg == (int)PInvokeCore.WM_LBUTTONDOWN)
                             {
                                 _lastLButtonDownTimeStamp = PInvoke.GetMessageTime();
                             }
-                            else if (m.Msg == (int)PInvoke.WM_LBUTTONDBLCLK)
+                            else if (m.Msg == (int)PInvokeCore.WM_LBUTTONDBLCLK)
                             {
                                 int lButtonDoubleClickTimeStamp = PInvoke.GetMessageTime();
                                 if (lButtonDoubleClickTimeStamp == _lastLButtonDownTimeStamp)

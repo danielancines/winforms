@@ -7,10 +7,8 @@ using System.Drawing.Design;
 namespace System.Windows.Forms.Design;
 
 /// <summary>
-///  Implements the design time editor for specifying the <see cref="Control.Dock"/>
-///  property.
+///  Implements the design time editor for specifying the <see cref="Control.Dock"/> property.
 /// </summary>
-[CLSCompliant(false)]
 public sealed partial class DockEditor : UITypeEditor
 {
     private DockUI? _dockUI;
@@ -22,7 +20,7 @@ public sealed partial class DockEditor : UITypeEditor
             return value;
         }
 
-        _dockUI ??= new DockUI(this);
+        _dockUI ??= new DockUI();
 
         _dockUI.Start(editorService, value);
         editorService.DropDownControl(_dockUI);
@@ -32,6 +30,5 @@ public sealed partial class DockEditor : UITypeEditor
         return value;
     }
 
-    /// <inheritdoc />
     public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext? context) => UITypeEditorEditStyle.DropDown;
 }

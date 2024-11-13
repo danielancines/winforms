@@ -1,7 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-//
-// (C) 2004 Ximian, Inc.  http://www.ximian.com
+
+// (C) 2004 Ximian, Inc. http://www.ximian.com
 // Copyright (C) 2004,2006-2007 Novell, Inc (http://www.novell.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -481,7 +481,7 @@ public class BitmapTests : FileCleanupTestBase
         Bitmap bitmap = new(1, 1);
         bitmap.Dispose();
 
-        AssertExtensions.Throws<ArgumentException>(null, () => bitmap.Clone());
+        AssertExtensions.Throws<ArgumentException>(null, bitmap.Clone);
         AssertExtensions.Throws<ArgumentException>(null, () => bitmap.Clone(new Rectangle(0, 0, 1, 1), PixelFormat.Format32bppArgb));
         AssertExtensions.Throws<ArgumentException>(null, () => bitmap.Clone(new RectangleF(0, 0, 1, 1), PixelFormat.Format32bppArgb));
     }
@@ -723,7 +723,7 @@ public class BitmapTests : FileCleanupTestBase
     }
 
     [Fact]
-    public void SaveWmfAsPngDoesntChangeImageBoundaries()
+    public void SaveWmfAsPngDoesNotChangeImageBoundaries()
     {
         if (PlatformDetection.IsWindows7)
         {
@@ -855,7 +855,7 @@ public class BitmapTests : FileCleanupTestBase
     }
 
     [Fact]
-    public void MakeTransparent_CustomColorDoesntExist_DoesNothing()
+    public void MakeTransparent_CustomColorDoesNotExist_DoesNothing()
     {
         using Bitmap bitmap = new(10, 10);
         for (int x = 0; x < bitmap.Width; x++)
@@ -882,7 +882,7 @@ public class BitmapTests : FileCleanupTestBase
         Bitmap bitmap = new(1, 1);
         bitmap.Dispose();
 
-        AssertExtensions.Throws<ArgumentException>(null, () => bitmap.MakeTransparent());
+        AssertExtensions.Throws<ArgumentException>(null, bitmap.MakeTransparent);
         AssertExtensions.Throws<ArgumentException>(null, () => bitmap.MakeTransparent(Color.Red));
     }
 
@@ -890,7 +890,7 @@ public class BitmapTests : FileCleanupTestBase
     public void MakeTransparent_GrayscalePixelFormat_ThrowsArgumentException()
     {
         using Bitmap bitmap = new(1, 1, PixelFormat.Format16bppGrayScale);
-        AssertExtensions.Throws<ArgumentException>(null, () => bitmap.MakeTransparent());
+        AssertExtensions.Throws<ArgumentException>(null, bitmap.MakeTransparent);
 
         try
         {
@@ -1010,7 +1010,7 @@ public class BitmapTests : FileCleanupTestBase
 
     public static IEnumerable<object[]> LockBits_TestData()
     {
-        Bitmap bitmap() => new(2, 2, PixelFormat.Format32bppArgb);
+        static Bitmap bitmap() => new(2, 2, PixelFormat.Format32bppArgb);
         yield return new object[] { bitmap(), new Rectangle(0, 0, 2, 2), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb, 8, 1 };
         yield return new object[] { bitmap(), new Rectangle(0, 0, 2, 2), ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb, 8, 3 };
         yield return new object[] { bitmap(), new Rectangle(0, 0, 2, 2), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb, 8, 2 };
@@ -1602,7 +1602,7 @@ public class BitmapTests : FileCleanupTestBase
     }
 
 #if NET9_0_OR_GREATER
-    public static TheoryData<PixelFormat, DitherType, PaletteType> Convert_Valid = new()
+    public static TheoryData<PixelFormat, DitherType, PaletteType> Convert_Valid { get; } = new()
     {
         // PaletteType is ignored for non-indexed formats
         { PixelFormat.Format16bppArgb1555, DitherType.None, PaletteType.FixedHalftone8 },
@@ -1622,7 +1622,7 @@ public class BitmapTests : FileCleanupTestBase
         { PixelFormat.Format16bppRgb565, DitherType.None, (PaletteType)(-1) },
     };
 
-    public static TheoryData<PixelFormat, DitherType, PaletteType> Convert_InvalidArgument = new()
+    public static TheoryData<PixelFormat, DitherType, PaletteType> Convert_InvalidArgument { get; } = new()
     {
         // Indexed formats MUST always have a specified ColorPalette
         { PixelFormat.Format1bppIndexed, (DitherType)(-1), PaletteType.FixedHalftone256 },
@@ -1638,8 +1638,8 @@ public class BitmapTests : FileCleanupTestBase
         // Format16bppGrayScale is not supported for conversion
         { PixelFormat.Format16bppGrayScale, DitherType.None, PaletteType.FixedHalftone256 },
         { PixelFormat.Format16bppGrayScale, DitherType.ErrorDiffusion, PaletteType.FixedHalftone8 },
-        { PixelFormat.Format16bppGrayScale, DitherType.None, PaletteType.FixedBW },
-        { PixelFormat.Format16bppGrayScale, DitherType.Solid, PaletteType.FixedBW },
+        { PixelFormat.Format16bppGrayScale, DitherType.None, PaletteType.FixedBlackAndWhite },
+        { PixelFormat.Format16bppGrayScale, DitherType.Solid, PaletteType.FixedBlackAndWhite },
         { PixelFormat.Format16bppRgb565, (DitherType)(-1), PaletteType.FixedHalftone256 },
         { PixelFormat.Format16bppRgb565, (DitherType)(-1), (PaletteType)(-1) },
     };
@@ -1661,7 +1661,7 @@ public class BitmapTests : FileCleanupTestBase
         bitmap.Invoking(b => b.ConvertFormat(format, dither, palette)).Should().Throw<ArgumentException>();
     }
 
-    public static TheoryData<PixelFormat> AllValidPixelFormats = new()
+    public static TheoryData<PixelFormat> AllValidPixelFormats { get; } = new()
     {
         PixelFormat.Format16bppArgb1555,
         PixelFormat.Format16bppRgb555,
@@ -1690,9 +1690,9 @@ public class BitmapTests : FileCleanupTestBase
 
     private class TestStream : Stream
     {
-        private Stream _stream;
-        private bool _canRead;
-        private bool _canSeek;
+        private readonly Stream _stream;
+        private readonly bool _canRead;
+        private readonly bool _canSeek;
 
         public TestStream(Stream stream, bool canRead = true, bool canSeek = true)
         {
@@ -1712,7 +1712,7 @@ public class BitmapTests : FileCleanupTestBase
         }
 
         public override void Flush() => _stream.Flush();
-        public override int Read(byte[] buffer, int offset, int count) => _canRead ?  _stream.Read(buffer, offset, count) : throw new NotSupportedException();
+        public override int Read(byte[] buffer, int offset, int count) => _canRead ? _stream.Read(buffer, offset, count) : throw new NotSupportedException();
         public override long Seek(long offset, SeekOrigin origin) => _stream.Seek(offset, origin);
         public override void SetLength(long value) => _stream.SetLength(value);
         public override void Write(byte[] buffer, int offset, int count) => _stream.Write(buffer, offset, count);

@@ -12,10 +12,9 @@ namespace System.Drawing.Design;
 /// <summary>
 ///  Provides an editor for visually picking an image.
 /// </summary>
-[CLSCompliant(false)]
 public class ImageEditor : UITypeEditor
 {
-    private static readonly Type[] s_imageExtenders = new Type[] { typeof(BitmapEditor), typeof(MetafileEditor) };
+    private static readonly Type[] s_imageExtenders = [typeof(BitmapEditor), typeof(MetafileEditor)];
     private FileDialog? _fileDialog;
 
     // Accessor needed into the static field so that derived classes
@@ -125,7 +124,7 @@ public class ImageEditor : UITypeEditor
 
     protected virtual string[] GetExtensions()
     {
-        List<string> list = new();
+        List<string> list = [];
         foreach (Type extender in GetImageExtenders())
         {
             // Skip invalid extenders.
@@ -151,7 +150,7 @@ public class ImageEditor : UITypeEditor
             }
         }
 
-        return list.ToArray();
+        return [.. list];
     }
 
     /// <inheritdoc />

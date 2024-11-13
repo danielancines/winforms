@@ -67,6 +67,10 @@ public abstract partial class UpDownBase : ContainerControl
         SetStyle(ControlStyles.Opaque | ControlStyles.FixedHeight | ControlStyles.ResizeRedraw, true);
         SetStyle(ControlStyles.StandardClick, false);
         SetStyle(ControlStyles.UseTextForAccessibility, false);
+
+#pragma warning disable WFO5001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        SetStyle(ControlStyles.ApplyThemingImplicitly, true);
+#pragma warning restore WFO5001
     }
 
     [Browsable(false)]
@@ -492,7 +496,7 @@ public abstract partial class UpDownBase : ContainerControl
     {
         base.OnHandleCreated(e);
         PositionControls();
-        SystemEvents.UserPreferenceChanged += new UserPreferenceChangedEventHandler(UserPreferenceChanged);
+        SystemEvents.UserPreferenceChanged += UserPreferenceChanged;
     }
 
     /// <summary>
@@ -500,7 +504,7 @@ public abstract partial class UpDownBase : ContainerControl
     /// </summary>
     protected override void OnHandleDestroyed(EventArgs e)
     {
-        SystemEvents.UserPreferenceChanged -= new UserPreferenceChangedEventHandler(UserPreferenceChanged);
+        SystemEvents.UserPreferenceChanged -= UserPreferenceChanged;
         base.OnHandleDestroyed(e);
     }
 
@@ -576,7 +580,7 @@ public abstract partial class UpDownBase : ContainerControl
             // Draws a grayed rectangle around the upDownEdit, since otherwise we will have a white
             // border around the upDownEdit, which is inconsistent with Windows' behavior
             // we only want to do this when BackColor is not serialized, since otherwise
-            // we should display the backcolor instead of the usual grayed textbox.
+            // we should display the BackColor instead of the usual grayed textbox.
             editBounds.Inflate(1, 1);
             ControlPaint.DrawBorderSimple(e, editBounds, SystemColors.Control);
         }
@@ -646,7 +650,7 @@ public abstract partial class UpDownBase : ContainerControl
     {
         if (ChangingText)
         {
-            Debug.Assert(UserEdit == false, "OnTextBoxTextChanged() - UserEdit == true");
+            Debug.Assert(!UserEdit, "OnTextBoxTextChanged() - UserEdit == true");
             ChangingText = false;
         }
         else
@@ -940,7 +944,7 @@ public abstract partial class UpDownBase : ContainerControl
     {
         switch (m.MsgInternal)
         {
-            case PInvoke.WM_SETFOCUS:
+            case PInvokeCore.WM_SETFOCUS:
                 if (!HostedInWin32DialogManager)
                 {
                     if (ActiveControl is null)
@@ -963,7 +967,7 @@ public abstract partial class UpDownBase : ContainerControl
                 }
 
                 break;
-            case PInvoke.WM_KILLFOCUS:
+            case PInvokeCore.WM_KILLFOCUS:
                 DefWndProc(ref m);
                 break;
             default:
@@ -973,6 +977,18 @@ public abstract partial class UpDownBase : ContainerControl
     }
 
     internal override void SetToolTip(ToolTip toolTip)
+    {
+        if (toolTip is null)
+        {
+            return;
+        }
+
+        string? caption = toolTip.GetToolTip(this);
+        toolTip.SetToolTip(_upDownEdit, caption);
+        toolTip.SetToolTip(_upDownButtons, caption);
+    }
+
+    internal override void RemoveToolTip(ToolTip toolTip)
     {
         if (toolTip is null)
         {

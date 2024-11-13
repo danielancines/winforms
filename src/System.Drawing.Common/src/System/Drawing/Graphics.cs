@@ -18,19 +18,6 @@ namespace System.Drawing;
 /// </summary>
 public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, IDeviceContext, IGraphics
 {
-#if FINALIZATION_WATCH
-    static readonly TraceSwitch GraphicsFinalization = new("GraphicsFinalization", "Tracks the creation and destruction of finalization");
-    internal static string GetAllocationStack() {
-        if (GraphicsFinalization.TraceVerbose) {
-            return Environment.StackTrace;
-        }
-        else {
-            return "Enabled 'GraphicsFinalization' switch to see stack of allocation";
-        }
-    }
-    private string allocationSite = Graphics.GetAllocationStack();
-#endif
-
     /// <summary>
     ///  The context state previous to the current Graphics context (the head of the stack).
     ///  We don't keep a GraphicsContext for the current context since it is available at any time from GDI+ and
@@ -38,7 +25,7 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
     /// </summary>
     private GraphicsContext? _previousContext;
 
-    private static readonly object s_syncObject = new();
+    private static readonly Lock s_syncObject = new();
 
     // Object reference used for printing; it could point to a PrintPreviewGraphics to obtain the VisibleClipBounds, or
     // a DeviceContext holding a printer DC.
@@ -92,10 +79,7 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static Graphics FromHdc(IntPtr hdc)
     {
-        if (hdc == IntPtr.Zero)
-            throw new ArgumentNullException(nameof(hdc));
-
-        return FromHdcInternal(hdc);
+        return hdc == 0 ? throw new ArgumentNullException(nameof(hdc)) : FromHdcInternal(hdc);
     }
 
     [EditorBrowsable(EditorBrowsableState.Advanced)]
@@ -127,6 +111,11 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
     public static Graphics FromHwndInternal(IntPtr hwnd)
     {
         GpGraphics* nativeGraphics;
+
+        // This is one of the few places we need to manually ensure GDI+ is initialized. Other calls to PInvoke will do
+        // this automatically, PInvokeCore cannot and as such needs to be manually initialized if we've never called
+        // another PInvoke method.
+        GdiPlusInitialization.EnsureInitialized();
         Gdip.CheckStatus(PInvokeCore.GdipCreateFromHWND((HWND)hwnd, &nativeGraphics));
         return new Graphics(nativeGraphics);
     }
@@ -166,52 +155,33 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
 
     private void Dispose(bool disposing)
     {
-#if FINALIZATION_WATCH
-        Debug.WriteLineIf(!disposing && NativeGraphics is not null, $"""
-            System.Drawing.Graphics: ***************************************************
-            System.Drawing.Graphics: Object Disposed through finalization:
-            {allocationSite}
-            """);
-#endif
-        while (_previousContext is not null)
+        if (disposing)
         {
-            // Dispose entire stack.
-            GraphicsContext? context = _previousContext.Previous;
-            _previousContext.Dispose();
-            _previousContext = context;
+            while (_previousContext is not null)
+            {
+                // Dispose entire stack.
+                GraphicsContext? context = _previousContext.Previous;
+                _previousContext.Dispose();
+                _previousContext = context;
+            }
+
+            if (PrintingHelper is HdcHandle printerDC)
+            {
+                printerDC.Dispose();
+                _printingHelper = null;
+            }
+        }
+
+        if (!_nativeHdc.IsNull)
+        {
+            ReleaseHdc();
         }
 
         if (NativeGraphics is not null)
         {
-            try
-            {
-                if (_nativeHdc != IntPtr.Zero) // avoid a handle leak.
-                {
-                    ReleaseHdc();
-                }
-
-                if (PrintingHelper is HdcHandle printerDC)
-                {
-                    printerDC.Dispose();
-                    _printingHelper = null;
-                }
-
-#if DEBUG
-                Status status = !Gdip.Initialized ? Status.Ok :
-#endif
-                PInvokeCore.GdipDeleteGraphics(NativeGraphics);
-
-#if DEBUG
-                Debug.Assert(status == Status.Ok, $"GDI+ returned an error status: {status}");
-#endif
-            }
-            catch (Exception ex) when (!ClientUtils.IsSecurityOrCriticalException(ex))
-            {
-            }
-            finally
-            {
-                NativeGraphics = null;
-            }
+            Status status = !Gdip.Initialized ? Status.Ok : PInvokeCore.GdipDeleteGraphics(NativeGraphics);
+            NativeGraphics = null;
+            Debug.Assert(status == Status.Ok, $"GDI+ returned an error status: {status}");
         }
     }
 
@@ -222,7 +192,7 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
     /// </summary>
     internal GpGraphics* NativeGraphics { get; private set; }
 
-    GpGraphics* IPointer<GpGraphics>.Pointer => NativeGraphics;
+    nint IPointer<GpGraphics>.Pointer => (nint)NativeGraphics;
 
     public Region Clip
     {
@@ -747,18 +717,19 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
 
 #if NET9_0_OR_GREATER
     /// <inheritdoc cref="DrawRoundedRectangle(Pen, RectangleF, SizeF)"/>
-    public void DrawRoundedRectangle(Pen pen, Rectangle rect, Size corner) =>
-        DrawRoundedRectangle(pen, (RectangleF)rect, corner);
+    public void DrawRoundedRectangle(Pen pen, Rectangle rect, Size radius) =>
+        DrawRoundedRectangle(pen, (RectangleF)rect, radius);
 
     /// <summary>
     ///  Draws the outline of the specified rounded rectangle.
     /// </summary>
     /// <param name="pen">The <see cref="Pen"/> to draw the outline with.</param>
-    /// <inheritdoc cref="FillRoundedRectangle(Brush, RectangleF, SizeF)"/>
-    public void DrawRoundedRectangle(Pen pen, RectangleF rect, SizeF corner)
+    /// <param name="rect">The bounds of the rounded rectangle.</param>
+    /// <param name="radius">The radius width and height used to round the corners of the rectangle.</param>
+    public void DrawRoundedRectangle(Pen pen, RectangleF rect, SizeF radius)
     {
         using GraphicsPath path = new();
-        path.AddRoundedRectangle(rect, corner);
+        path.AddRoundedRectangle(rect, radius);
         DrawPath(pen, path);
     }
 #endif
@@ -779,13 +750,18 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
     public void DrawRectangle(Pen pen, int x, int y, int width, int height)
         => DrawRectangle(pen, (float)x, y, width, height);
 
-    /// <summary>
-    ///  Draws the outlines of a series of rectangles.
-    /// </summary>
-    public void DrawRectangles(Pen pen, RectangleF[] rects)
+    /// <inheritdoc cref="DrawRectangles(Pen, Rectangle[])"/>
+    public void DrawRectangles(Pen pen, params RectangleF[] rects) => DrawRectangles(pen, rects.OrThrowIfNull().AsSpan());
+
+    /// <inheritdoc cref="DrawRectangles(Pen, Rectangle[])"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void DrawRectangles(Pen pen, params ReadOnlySpan<RectangleF> rects)
     {
         ArgumentNullException.ThrowIfNull(pen);
-        ArgumentNullException.ThrowIfNull(rects);
 
         fixed (RectangleF* r = rects)
         {
@@ -798,10 +774,19 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
     /// <summary>
     ///  Draws the outlines of a series of rectangles.
     /// </summary>
-    public void DrawRectangles(Pen pen, Rectangle[] rects)
+    /// <param name="pen"><see cref="Pen"/> that determines the color, width, and style of the outlines of the rectangles.</param>
+    /// <param name="rects">An array of <see cref="Rectangle"/> structures that represents the rectangles to draw.</param>
+    public void DrawRectangles(Pen pen, params Rectangle[] rects) => DrawRectangles(pen, rects.OrThrowIfNull().AsSpan());
+
+    /// <inheritdoc cref="DrawRectangles(Pen, Rectangle[])"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void DrawRectangles(Pen pen, params ReadOnlySpan<Rectangle> rects)
     {
         ArgumentNullException.ThrowIfNull(pen);
-        ArgumentNullException.ThrowIfNull(rects);
 
         fixed (Rectangle* r = rects)
         {
@@ -864,13 +849,18 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
     public void DrawPie(Pen pen, int x, int y, int width, int height, int startAngle, int sweepAngle) =>
         DrawPie(pen, (float)x, y, width, height, startAngle, sweepAngle);
 
-    /// <summary>
-    ///  Draws the outline of a polygon defined by an array of points.
-    /// </summary>
-    public void DrawPolygon(Pen pen, PointF[] points)
+    /// <inheritdoc cref="DrawPolygon(Pen, Point[])"/>
+    public void DrawPolygon(Pen pen, params PointF[] points) => DrawPolygon(pen, points.OrThrowIfNull().AsSpan());
+
+    /// <inheritdoc cref="DrawPolygon(Pen, Point[])"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void DrawPolygon(Pen pen, params ReadOnlySpan<PointF> points)
     {
         ArgumentNullException.ThrowIfNull(pen);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (PointF* p = points)
         {
@@ -883,10 +873,19 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
     /// <summary>
     ///  Draws the outline of a polygon defined by an array of points.
     /// </summary>
-    public void DrawPolygon(Pen pen, Point[] points)
+    /// <param name="pen">The <see cref="Pen"/> to draw the outline with.</param>
+    /// <param name="points">An array of <see cref="Point"/> structures that represent the vertices of the polygon.</param>
+    public void DrawPolygon(Pen pen, params Point[] points) => DrawPolygon(pen, points.OrThrowIfNull().AsSpan());
+
+    /// <inheritdoc cref="DrawPolygon(Pen, Point[])"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void DrawPolygon(Pen pen, params ReadOnlySpan<Point> points)
     {
         ArgumentNullException.ThrowIfNull(pen);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (Point* p = points)
         {
@@ -910,13 +909,18 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
         GC.KeepAlive(path);
     }
 
-    /// <summary>
-    ///  Draws a curve defined by an array of points.
-    /// </summary>
-    public void DrawCurve(Pen pen, PointF[] points)
+    /// <inheritdoc cref="DrawCurve(Pen, Point[], int, int, float)"/>
+    public void DrawCurve(Pen pen, params PointF[] points) => DrawCurve(pen, points.OrThrowIfNull().AsSpan());
+
+    /// <inheritdoc cref="DrawCurve(Pen, Point[], int, int, float)"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void DrawCurve(Pen pen, params ReadOnlySpan<PointF> points)
     {
         ArgumentNullException.ThrowIfNull(pen);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (PointF* p = points)
         {
@@ -926,13 +930,19 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
         GC.KeepAlive(pen);
     }
 
-    /// <summary>
-    ///  Draws a curve defined by an array of points.
-    /// </summary>
-    public void DrawCurve(Pen pen, PointF[] points, float tension)
+    /// <inheritdoc cref="DrawCurve(Pen, Point[], int, int, float)"/>
+    public void DrawCurve(Pen pen, PointF[] points, float tension) =>
+        DrawCurve(pen, points.OrThrowIfNull().AsSpan(), tension);
+
+    /// <inheritdoc cref="DrawCurve(Pen, Point[], int, int, float)"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void DrawCurve(Pen pen, ReadOnlySpan<PointF> points, float tension)
     {
         ArgumentNullException.ThrowIfNull(pen);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (PointF* p = points)
         {
@@ -946,16 +956,29 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
         GC.KeepAlive(pen);
     }
 
+    /// <inheritdoc cref="DrawCurve(Pen, Point[], int, int, float)"/>
     public void DrawCurve(Pen pen, PointF[] points, int offset, int numberOfSegments) =>
         DrawCurve(pen, points, offset, numberOfSegments, 0.5f);
 
-    /// <summary>
-    ///  Draws a curve defined by an array of points.
-    /// </summary>
-    public void DrawCurve(Pen pen, PointF[] points, int offset, int numberOfSegments, float tension)
+#if NET9_0_OR_GREATER
+    /// <inheritdoc cref="DrawCurve(Pen, Point[], int, int, float)"/>
+    public void DrawCurve(Pen pen, ReadOnlySpan<PointF> points, int offset, int numberOfSegments) =>
+        DrawCurve(pen, points, offset, numberOfSegments, 0.5f);
+#endif
+
+    /// <inheritdoc cref="DrawCurve(Pen, Point[], int, int, float)"/>
+    public void DrawCurve(Pen pen, PointF[] points, int offset, int numberOfSegments, float tension) =>
+        DrawCurve(pen, points.OrThrowIfNull().AsSpan(), offset, numberOfSegments, tension);
+
+    /// <inheritdoc cref="DrawCurve(Pen, Point[], int, int, float)"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void DrawCurve(Pen pen, ReadOnlySpan<PointF> points, int offset, int numberOfSegments, float tension)
     {
         ArgumentNullException.ThrowIfNull(pen);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (PointF* p = points)
         {
@@ -971,13 +994,18 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
         GC.KeepAlive(pen);
     }
 
-    /// <summary>
-    ///  Draws a curve defined by an array of points.
-    /// </summary>
-    public void DrawCurve(Pen pen, Point[] points)
+    /// <inheritdoc cref="DrawCurve(Pen, Point[], int, int, float)"/>
+    public void DrawCurve(Pen pen, params Point[] points) => DrawCurve(pen, points.OrThrowIfNull().AsSpan());
+
+    /// <inheritdoc cref="DrawCurve(Pen, Point[], int, int, float)"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void DrawCurve(Pen pen, params ReadOnlySpan<Point> points)
     {
         ArgumentNullException.ThrowIfNull(pen);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (Point* p = points)
         {
@@ -987,13 +1015,19 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
         GC.KeepAlive(pen);
     }
 
-    /// <summary>
-    ///  Draws a curve defined by an array of points.
-    /// </summary>
-    public void DrawCurve(Pen pen, Point[] points, float tension)
+    /// <inheritdoc cref="DrawCurve(Pen, Point[], int, int, float)"/>
+    public void DrawCurve(Pen pen, Point[] points, float tension) =>
+        DrawCurve(pen, points.OrThrowIfNull().AsSpan(), tension);
+
+    /// <inheritdoc cref="DrawCurve(Pen, Point[], int, int, float)"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void DrawCurve(Pen pen, ReadOnlySpan<Point> points, float tension)
     {
         ArgumentNullException.ThrowIfNull(pen);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (Point* p = points)
         {
@@ -1010,10 +1044,23 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
     /// <summary>
     ///  Draws a curve defined by an array of points.
     /// </summary>
-    public void DrawCurve(Pen pen, Point[] points, int offset, int numberOfSegments, float tension)
+    /// <param name="pen">The <see cref="Pen"/> to draw the curve with.</param>
+    /// <param name="points">An array of points that define the curve.</param>
+    /// <param name="offset">The index of the first point in the array to draw.</param>
+    /// <param name="numberOfSegments">The number of segments to draw.</param>
+    /// <param name="tension">A value greater than, or equal to zero that specifies the tension of the curve.</param>
+    public void DrawCurve(Pen pen, Point[] points, int offset, int numberOfSegments, float tension) =>
+        DrawCurve(pen, points.OrThrowIfNull().AsSpan(), offset, numberOfSegments, tension);
+
+    /// <inheritdoc cref="DrawCurve(Pen, Point[], int, int, float)"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void DrawCurve(Pen pen, ReadOnlySpan<Point> points, int offset, int numberOfSegments, float tension)
     {
         ArgumentNullException.ThrowIfNull(pen);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (Point* p = points)
         {
@@ -1029,13 +1076,19 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
         GC.KeepAlive(pen);
     }
 
-    /// <summary>
-    ///  Draws a closed curve defined by an array of points.
-    /// </summary>
-    public void DrawClosedCurve(Pen pen, PointF[] points)
+    /// <inheritdoc cref="DrawClosedCurve(Pen, PointF[], float, FillMode)"/>
+    public void DrawClosedCurve(Pen pen, params PointF[] points) =>
+        DrawClosedCurve(pen, points.OrThrowIfNull().AsSpan());
+
+    /// <inheritdoc cref="DrawClosedCurve(Pen, PointF[], float, FillMode)"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void DrawClosedCurve(Pen pen, params ReadOnlySpan<PointF> points)
     {
         ArgumentNullException.ThrowIfNull(pen);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (PointF* p = points)
         {
@@ -1051,10 +1104,22 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
     /// <summary>
     ///  Draws a closed curve defined by an array of points.
     /// </summary>
-    public void DrawClosedCurve(Pen pen, PointF[] points, float tension, Drawing2D.FillMode fillmode)
+    /// <param name="pen">The <see cref="Pen"/> to draw the closed curve with.</param>
+    /// <param name="points">An array of points that define the closed curve.</param>
+    /// <param name="tension">A value greater than, or equal to zero that specifies the tension of the curve.</param>
+    /// <param name="fillmode">A <see cref="FillMode"/> enumeration that specifies the fill mode of the curve.</param>
+    public void DrawClosedCurve(Pen pen, PointF[] points, float tension, FillMode fillmode) =>
+        DrawClosedCurve(pen, points.OrThrowIfNull().AsSpan(), tension, fillmode);
+
+    /// <inheritdoc cref="DrawClosedCurve(Pen, PointF[], float, FillMode)"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void DrawClosedCurve(Pen pen, ReadOnlySpan<PointF> points, float tension, FillMode fillmode)
     {
         ArgumentNullException.ThrowIfNull(pen);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (PointF* p = points)
         {
@@ -1068,13 +1133,18 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
         GC.KeepAlive(pen);
     }
 
-    /// <summary>
-    ///  Draws a closed curve defined by an array of points.
-    /// </summary>
-    public void DrawClosedCurve(Pen pen, Point[] points)
+    /// <inheritdoc cref="DrawClosedCurve(Pen, PointF[], float, FillMode)"/>
+    public void DrawClosedCurve(Pen pen, params Point[] points) => DrawClosedCurve(pen, points.OrThrowIfNull().AsSpan());
+
+    /// <inheritdoc cref="DrawClosedCurve(Pen, PointF[], float, FillMode)"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void DrawClosedCurve(Pen pen, params ReadOnlySpan<Point> points)
     {
         ArgumentNullException.ThrowIfNull(pen);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (Point* p = points)
         {
@@ -1087,13 +1157,20 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
         GC.KeepAlive(pen);
     }
 
-    /// <summary>
-    ///  Draws a closed curve defined by an array of points.
-    /// </summary>
-    public void DrawClosedCurve(Pen pen, Point[] points, float tension, Drawing2D.FillMode fillmode)
+    /// <inheritdoc cref="DrawClosedCurve(Pen, PointF[], float, FillMode)"/>
+
+    public void DrawClosedCurve(Pen pen, Point[] points, float tension, FillMode fillmode) =>
+        DrawClosedCurve(pen, points.OrThrowIfNull().AsSpan(), tension, fillmode);
+
+    /// <inheritdoc cref="DrawClosedCurve(Pen, PointF[], float, FillMode)"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void DrawClosedCurve(Pen pen, ReadOnlySpan<Point> points, float tension, FillMode fillmode)
     {
         ArgumentNullException.ThrowIfNull(pen);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (Point* p = points)
         {
@@ -1114,19 +1191,19 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
 
 #if NET9_0_OR_GREATER
     /// <inheritdoc cref="FillRoundedRectangle(Brush, RectangleF, SizeF)"/>/>
-    public void FillRoundedRectangle(Brush brush, Rectangle rect, Size corner) =>
-        FillRoundedRectangle(brush, (RectangleF)rect, corner);
+    public void FillRoundedRectangle(Brush brush, Rectangle rect, Size radius) =>
+        FillRoundedRectangle(brush, (RectangleF)rect, radius);
 
     /// <summary>
     ///  Fills the interior of a rounded rectangle with a <see cref='Brush'/>.
     /// </summary>
     /// <param name="brush">The <see cref="Brush"/> to fill the rounded rectangle with.</param>
     /// <param name="rect">The bounds of the rounded rectangle.</param>
-    /// <param name="corner">The size of the ellipse used to round the corners of the rectangle.</param>
-    public void FillRoundedRectangle(Brush brush, RectangleF rect, SizeF corner)
+    /// <param name="radius">The radius width and height used to round the corners of the rectangle.</param>
+    public void FillRoundedRectangle(Brush brush, RectangleF rect, SizeF radius)
     {
         using GraphicsPath path = new();
-        path.AddRoundedRectangle(rect, corner);
+        path.AddRoundedRectangle(rect, radius);
         FillPath(brush, path);
     }
 #endif
@@ -1164,10 +1241,23 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
     /// <summary>
     ///  Fills the interiors of a series of rectangles with a <see cref='Brush'/>.
     /// </summary>
-    public void FillRectangles(Brush brush, RectangleF[] rects)
+    /// <param name="brush">The <see cref="Brush"/> to fill the rectangles with.</param>
+    /// <param name="rects">An array of rectangles to fill.</param>
+    public void FillRectangles(Brush brush, params RectangleF[] rects)
+    {
+        ArgumentNullException.ThrowIfNull(rects);
+        FillRectangles(brush, rects.AsSpan());
+    }
+
+    /// <inheritdoc cref="FillRectangles(Brush, RectangleF[])"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void FillRectangles(Brush brush, params ReadOnlySpan<RectangleF> rects)
     {
         ArgumentNullException.ThrowIfNull(brush);
-        ArgumentNullException.ThrowIfNull(rects);
 
         fixed (RectangleF* r = rects)
         {
@@ -1177,13 +1267,19 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
         GC.KeepAlive(brush);
     }
 
-    /// <summary>
-    ///  Fills the interiors of a series of rectangles with a <see cref='Brush'/>.
-    /// </summary>
-    public void FillRectangles(Brush brush, Rectangle[] rects)
+    /// <inheritdoc cref="FillRectangles(Brush, RectangleF[])"/>
+    public void FillRectangles(Brush brush, params Rectangle[] rects) =>
+        FillRectangles(brush, rects.OrThrowIfNull().AsSpan());
+
+    /// <inheritdoc cref="FillRectangles(Brush, RectangleF[])"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void FillRectangles(Brush brush, params ReadOnlySpan<Rectangle> rects)
     {
         ArgumentNullException.ThrowIfNull(brush);
-        ArgumentNullException.ThrowIfNull(rects);
 
         fixed (Rectangle* r = rects)
         {
@@ -1193,18 +1289,27 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
         GC.KeepAlive(brush);
     }
 
-    /// <summary>
-    ///  Fills the interior of a polygon defined by an array of points.
-    /// </summary>
-    public void FillPolygon(Brush brush, PointF[] points) => FillPolygon(brush, points, Drawing2D.FillMode.Alternate);
+    /// <inheritdoc cref="FillPolygon(Brush, Point[], FillMode)"/>
+    public void FillPolygon(Brush brush, params PointF[] points) => FillPolygon(brush, points, FillMode.Alternate);
 
-    /// <summary>
-    ///  Fills the interior of a polygon defined by an array of points.
-    /// </summary>
-    public void FillPolygon(Brush brush, PointF[] points, Drawing2D.FillMode fillMode)
+#if NET9_0_OR_GREATER
+    /// <inheritdoc cref="FillPolygon(Brush, Point[], FillMode)"/>
+    public void FillPolygon(Brush brush, params ReadOnlySpan<PointF> points) => FillPolygon(brush, points, FillMode.Alternate);
+#endif
+
+    /// <inheritdoc cref="FillPolygon(Brush, Point[], FillMode)"/>
+    public void FillPolygon(Brush brush, PointF[] points, FillMode fillMode) =>
+        FillPolygon(brush, points.OrThrowIfNull().AsSpan(), fillMode);
+
+    /// <inheritdoc cref="FillPolygon(Brush, Point[], FillMode)"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void FillPolygon(Brush brush, ReadOnlySpan<PointF> points, FillMode fillMode)
     {
         ArgumentNullException.ThrowIfNull(brush);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (PointF* p = points)
         {
@@ -1218,18 +1323,32 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
         GC.KeepAlive(brush);
     }
 
-    /// <summary>
-    ///  Fills the interior of a polygon defined by an array of points.
-    /// </summary>
-    public void FillPolygon(Brush brush, Point[] points) => FillPolygon(brush, points, Drawing2D.FillMode.Alternate);
+    /// <inheritdoc cref="FillPolygon(Brush, Point[], FillMode)"/>
+    public void FillPolygon(Brush brush, Point[] points) => FillPolygon(brush, points, FillMode.Alternate);
+
+#if NET9_0_OR_GREATER
+    /// <inheritdoc cref="FillPolygon(Brush, Point[], FillMode)"/>
+    public void FillPolygon(Brush brush, params ReadOnlySpan<Point> points) => FillPolygon(brush, points, FillMode.Alternate);
+#endif
 
     /// <summary>
     ///  Fills the interior of a polygon defined by an array of points.
     /// </summary>
-    public void FillPolygon(Brush brush, Point[] points, Drawing2D.FillMode fillMode)
+    /// <param name="brush">The <see cref="Brush"/> to fill the polygon with.</param>
+    /// <param name="points">An array points that represent the vertices of the polygon.</param>
+    /// <param name="fillMode">A <see cref="FillMode"/> enumeration that specifies the fill mode of the polygon.</param>
+    public void FillPolygon(Brush brush, Point[] points, FillMode fillMode) =>
+        FillPolygon(brush, points.OrThrowIfNull().AsSpan(), fillMode);
+
+    /// <inheritdoc cref="FillPolygon(Brush, Point[], FillMode)"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void FillPolygon(Brush brush, ReadOnlySpan<Point> points, FillMode fillMode)
     {
         ArgumentNullException.ThrowIfNull(brush);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (Point* p = points)
         {
@@ -1283,9 +1402,17 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
     ///  Fills the interior of a pie section defined by an ellipse and two radial lines.
     /// </summary>
     /// <param name="brush">A Brush that determines the characteristics of the fill.</param>
-    /// <param name="rect">A Rectangle structure that represents the bounding rectangle that defines the ellipse from which the pie section comes.</param>
-    /// <param name="startAngle">Angle in degrees measured clockwise from the x-axis to the first side of the pie section.</param>
-    /// <param name="sweepAngle">Angle in degrees measured clockwise from the <paramref name="startAngle"/> parameter to the second side of the pie section.</param>
+    /// <param name="rect">
+    ///  A Rectangle structure that represents the bounding rectangle that defines the ellipse from which
+    ///  the pie section comes.
+    /// </param>
+    /// <param name="startAngle">
+    ///  Angle in degrees measured clockwise from the x-axis to the first side of the pie section.
+    /// </param>
+    /// <param name="sweepAngle">
+    ///  Angle in degrees measured clockwise from the <paramref name="startAngle"/> parameter
+    ///  to the second side of the pie section.
+    /// </param>
     public void FillPie(Brush brush, RectangleF rect, float startAngle, float sweepAngle) =>
         FillPie(brush, rect.X, rect.Y, rect.Width, rect.Height, startAngle, sweepAngle);
 
@@ -1312,13 +1439,19 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
     public void FillPie(Brush brush, int x, int y, int width, int height, int startAngle, int sweepAngle)
         => FillPie(brush, (float)x, y, width, height, startAngle, sweepAngle);
 
-    /// <summary>
-    ///  Fills the interior a closed curve defined by an array of points.
-    /// </summary>
-    public void FillClosedCurve(Brush brush, PointF[] points)
+    /// <inheritdoc cref="FillClosedCurve(Brush, PointF[], FillMode, float)"/>
+    public void FillClosedCurve(Brush brush, params PointF[] points) =>
+        FillClosedCurve(brush, points.OrThrowIfNull().AsSpan());
+
+    /// <inheritdoc cref="FillClosedCurve(Brush, PointF[], FillMode, float)"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void FillClosedCurve(Brush brush, params ReadOnlySpan<PointF> points)
     {
         ArgumentNullException.ThrowIfNull(brush);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (PointF* p = points)
         {
@@ -1331,16 +1464,35 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
         GC.KeepAlive(brush);
     }
 
+    /// <inheritdoc cref="FillClosedCurve(Brush, PointF[], FillMode, float)"/>
+    public void FillClosedCurve(Brush brush, PointF[] points, FillMode fillmode) =>
+        FillClosedCurve(brush, points, fillmode, 0.5f);
+
+#if NET9_0_OR_GREATER
+    /// <inheritdoc cref="FillClosedCurve(Brush, PointF[], FillMode, float)"/>
+    public void FillClosedCurve(Brush brush, ReadOnlySpan<PointF> points, FillMode fillmode) =>
+        FillClosedCurve(brush, points, fillmode, 0.5f);
+#endif
+
     /// <summary>
     ///  Fills the interior of a closed curve defined by an array of points.
     /// </summary>
-    public void FillClosedCurve(Brush brush, PointF[] points, Drawing2D.FillMode fillmode) =>
-        FillClosedCurve(brush, points, fillmode, 0.5f);
+    /// <param name="brush">The <see cref="Brush"/> to fill the closed curve with.</param>
+    /// <param name="points">An array of points that make up the closed curve.</param>
+    /// <param name="fillmode">A <see cref="FillMode"/> enumeration that specifies the fill mode of the closed curve.</param>
+    /// <param name="tension">A value greater than, or equal to zero that specifies the tension of the curve.</param>
+    public void FillClosedCurve(Brush brush, PointF[] points, FillMode fillmode, float tension) =>
+        FillClosedCurve(brush, points.OrThrowIfNull().AsSpan(), fillmode, tension);
 
-    public void FillClosedCurve(Brush brush, PointF[] points, Drawing2D.FillMode fillmode, float tension)
+    /// <inheritdoc cref="FillClosedCurve(Brush, PointF[], FillMode, float)"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void FillClosedCurve(Brush brush, ReadOnlySpan<PointF> points, FillMode fillmode, float tension)
     {
         ArgumentNullException.ThrowIfNull(brush);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (PointF* p = points)
         {
@@ -1355,13 +1507,19 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
         GC.KeepAlive(brush);
     }
 
-    /// <summary>
-    ///  Fills the interior a closed curve defined by an array of points.
-    /// </summary>
-    public void FillClosedCurve(Brush brush, Point[] points)
+    /// <inheritdoc cref="FillClosedCurve(Brush, PointF[], FillMode, float)"/>
+    public void FillClosedCurve(Brush brush, params Point[] points) =>
+        FillClosedCurve(brush, points.OrThrowIfNull().AsSpan());
+
+    /// <inheritdoc cref="FillClosedCurve(Brush, PointF[], FillMode, float)"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void FillClosedCurve(Brush brush, params ReadOnlySpan<Point> points)
     {
         ArgumentNullException.ThrowIfNull(brush);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (Point* p = points)
         {
@@ -1374,13 +1532,30 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
         GC.KeepAlive(brush);
     }
 
-    public void FillClosedCurve(Brush brush, Point[] points, Drawing2D.FillMode fillmode) =>
+    /// <inheritdoc cref="FillClosedCurve(Brush, PointF[], FillMode, float)"/>
+    public void FillClosedCurve(Brush brush, Point[] points, FillMode fillmode) =>
         FillClosedCurve(brush, points, fillmode, 0.5f);
 
-    public void FillClosedCurve(Brush brush, Point[] points, Drawing2D.FillMode fillmode, float tension)
+#if NET9_0_OR_GREATER
+    /// <inheritdoc cref="FillClosedCurve(Brush, PointF[], FillMode, float)"/>
+    public void FillClosedCurve(Brush brush, ReadOnlySpan<Point> points, FillMode fillmode) =>
+        FillClosedCurve(brush, points, fillmode, 0.5f);
+
+#endif
+
+    /// <inheritdoc cref="FillClosedCurve(Brush, PointF[], FillMode, float)"/>
+    public void FillClosedCurve(Brush brush, Point[] points, FillMode fillmode, float tension) =>
+        FillClosedCurve(brush, points.OrThrowIfNull().AsSpan(), fillmode, tension);
+
+    /// <inheritdoc cref="FillClosedCurve(Brush, PointF[], FillMode, float)"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void FillClosedCurve(Brush brush, ReadOnlySpan<Point> points, FillMode fillmode, float tension)
     {
         ArgumentNullException.ThrowIfNull(brush);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (Point* p = points)
         {
@@ -1570,7 +1745,7 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
             CheckErrorStatus(PInvoke.GdipDrawString(
                 NativeGraphics,
                 c, s.Length,
-                (GpFont*)font.NativeFont,
+                font.NativeFont,
                 (RectF*)&layoutRectangle,
                 format.Pointer(),
                 brush.NativeBrush));
@@ -1632,7 +1807,7 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
                 NativeGraphics,
                 c,
                 text.Length,
-                (GpFont*)font.NativeFont,
+                font.NativeFont,
                 (RectF*)&layoutArea,
                 stringFormat.Pointer(),
                 &boundingBox,
@@ -1665,8 +1840,12 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
     public SizeF MeasureString(ReadOnlySpan<char> text, Font font, SizeF layoutArea) => MeasureString(text, font, layoutArea, null);
 #endif
 
-    /// <param name="stringFormat"><see cref="StringFormat"/> that represents formatting information, such as line spacing, for the text.</param>
-    /// <param name="layoutArea"><see cref="SizeF"/> structure that specifies the maximum layout area for the text.</param>
+    /// <param name="stringFormat">
+    ///  <see cref="StringFormat"/> that represents formatting information, such as line spacing, for the text.
+    /// </param>
+    /// <param name="layoutArea">
+    ///  <see cref="SizeF"/> structure that specifies the maximum layout area for the text.
+    /// </param>
     /// <inheritdoc cref="MeasureString(string?, Font, int, StringFormat?)"/>
     public SizeF MeasureString(string? text, Font font, SizeF layoutArea, StringFormat? stringFormat) =>
         MeasureStringInternal(text, font, new(default, layoutArea), stringFormat, out _, out _);
@@ -1718,7 +1897,9 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
         MeasureString(text, font, new SizeF(width, 999999));
 #endif
 
-    /// <param name="format"><see cref="StringFormat"/> that represents formatting information, such as line spacing, for the text.</param>
+    /// <param name="format">
+    ///  <see cref="StringFormat"/> that represents formatting information, such as line spacing, for the text.
+    /// </param>
     /// <inheritdoc cref="MeasureString(string?, Font, int)"/>
     public SizeF MeasureString(string? text, Font font, int width, StringFormat? format) =>
         MeasureString(text, font, new SizeF(width, 999999), format);
@@ -1736,7 +1917,9 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
     /// <param name="text">Text to measure.</param>
     /// <param name="font"><see cref="Font"/> that defines the text format.</param>
     /// <param name="layoutRect"><see cref="RectangleF"/> structure that specifies the layout rectangle for the text.</param>
-    /// <param name="stringFormat"><see cref="StringFormat"/> that represents formatting information, such as line spacing, for the text.</param>
+    /// <param name="stringFormat">
+    ///  <see cref="StringFormat"/> that represents formatting information, such as line spacing, for the text.
+    /// </param>
     /// <returns>
     ///  This method returns an array of <see cref="Region"/> objects, each of which bounds a range of character
     ///  positions within the specified text.
@@ -1792,7 +1975,7 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
                 NativeGraphics,
                 c,
                 text.Length,
-                (GpFont*)font.NativeFont,
+                font.NativeFont,
                 &layoutRect,
                 stringFormat.Pointer(),
                 count,
@@ -2174,13 +2357,18 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
     /// </summary>
     public void DrawLine(Pen pen, PointF pt1, PointF pt2) => DrawLine(pen, pt1.X, pt1.Y, pt2.X, pt2.Y);
 
-    /// <summary>
-    ///  Draws a series of line segments that connect an array of points.
-    /// </summary>
-    public void DrawLines(Pen pen, PointF[] points)
+    /// <inheritdoc cref="DrawLines(Pen, Point[])"/>
+    public void DrawLines(Pen pen, params PointF[] points) => DrawLines(pen, points.OrThrowIfNull().AsSpan());
+
+    /// <inheritdoc cref="DrawLines(Pen, Point[])"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void DrawLines(Pen pen, params ReadOnlySpan<PointF> points)
     {
         ArgumentNullException.ThrowIfNull(pen);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (PointF* p = points)
         {
@@ -2204,10 +2392,30 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
     /// <summary>
     ///  Draws a series of line segments that connect an array of points.
     /// </summary>
-    public void DrawLines(Pen pen, Point[] points)
+    /// <param name="pen">The <see cref="Pen"/> that determines the color, width, and style of the line segments.</param>
+    /// <param name="points">An array of points to connect.</param>
+    public void DrawLines(Pen pen, params Point[] points)
     {
         ArgumentNullException.ThrowIfNull(pen);
         ArgumentNullException.ThrowIfNull(points);
+
+        fixed (Point* p = points)
+        {
+            CheckErrorStatus(PInvoke.GdipDrawLinesI(NativeGraphics, pen.NativePen, (GdiPlus.Point*)p, points.Length));
+        }
+
+        GC.KeepAlive(pen);
+    }
+
+    /// <inheritdoc cref="DrawLines(Pen, Point[])"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void DrawLines(Pen pen, params ReadOnlySpan<Point> points)
+    {
+        ArgumentNullException.ThrowIfNull(pen);
 
         fixed (Point* p = points)
         {
@@ -2365,10 +2573,27 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
         EnumerateMetafileProc callback,
         IntPtr callbackData) => EnumerateMetafile(metafile, destPoints, srcRect, srcUnit, callback, callbackData, null);
 
-    public void TransformPoints(Drawing2D.CoordinateSpace destSpace, Drawing2D.CoordinateSpace srcSpace, PointF[] pts)
+    /// <summary>
+    ///  Transforms an array of points from one coordinate space to another using the current world and page
+    ///  transformations of this <see cref="Graphics"/>.
+    /// </summary>
+    /// <param name="destSpace">The destination coordinate space.</param>
+    /// <param name="srcSpace">The source coordinate space.</param>
+    /// <param name="pts">The points to transform.</param>
+    public void TransformPoints(Drawing2D.CoordinateSpace destSpace, Drawing2D.CoordinateSpace srcSpace, params PointF[] pts)
     {
         ArgumentNullException.ThrowIfNull(pts);
+        TransformPoints(destSpace, srcSpace, pts.AsSpan());
+    }
 
+    /// <inheritdoc cref="TransformPoints(Drawing2D.CoordinateSpace, Drawing2D.CoordinateSpace, PointF[])"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void TransformPoints(Drawing2D.CoordinateSpace destSpace, Drawing2D.CoordinateSpace srcSpace, params ReadOnlySpan<PointF> pts)
+    {
         fixed (PointF* p = pts)
         {
             CheckStatus(PInvoke.GdipTransformPoints(
@@ -2380,10 +2605,21 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
         }
     }
 
-    public void TransformPoints(Drawing2D.CoordinateSpace destSpace, Drawing2D.CoordinateSpace srcSpace, Point[] pts)
+    /// <inheritdoc cref="TransformPoints(Drawing2D.CoordinateSpace, Drawing2D.CoordinateSpace, PointF[])"/>
+    public void TransformPoints(Drawing2D.CoordinateSpace destSpace, Drawing2D.CoordinateSpace srcSpace, params Point[] pts)
     {
         ArgumentNullException.ThrowIfNull(pts);
+        TransformPoints(destSpace, srcSpace, pts.AsSpan());
+    }
 
+    /// <inheritdoc cref="TransformPoints(Drawing2D.CoordinateSpace, Drawing2D.CoordinateSpace, PointF[])"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void TransformPoints(Drawing2D.CoordinateSpace destSpace, Drawing2D.CoordinateSpace srcSpace, params ReadOnlySpan<Point> pts)
+    {
         fixed (Point* p = pts)
         {
             CheckStatus(PInvoke.GdipTransformPointsI(
@@ -2547,13 +2783,19 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
         GC.KeepAlive(pen);
     }
 
-    /// <summary>
-    /// Draws a series of cubic Bezier curves from an array of points.
-    /// </summary>
-    public void DrawBeziers(Pen pen, PointF[] points)
+    /// <inheritdoc cref="DrawBeziers(Pen, Point[])"/>
+    public void DrawBeziers(Pen pen, params PointF[] points) =>
+        DrawBeziers(pen, points.OrThrowIfNull().AsSpan());
+
+    /// <inheritdoc cref="DrawBeziers(Pen, Point[])"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void DrawBeziers(Pen pen, params ReadOnlySpan<PointF> points)
     {
         ArgumentNullException.ThrowIfNull(pen);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (PointF* p = points)
         {
@@ -2567,12 +2809,24 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
     }
 
     /// <summary>
-    ///  Draws a series of cubic Bezier curves from an array of points.
+    ///  Draws a series of cubic Bézier curves from an array of points.
     /// </summary>
-    public void DrawBeziers(Pen pen, Point[] points)
+    /// <param name="pen">The <paramref name="pen"/> to draw the Bézier with.</param>
+    /// <param name="points">
+    ///  Points that represent the points that determine the curve. The number of points in the array
+    ///  should be a multiple of 3 plus 1, such as 4, 7, or 10.
+    /// </param>
+    public void DrawBeziers(Pen pen, params Point[] points) => DrawBeziers(pen, points.OrThrowIfNull().AsSpan());
+
+    /// <inheritdoc cref="DrawBeziers(Pen, Point[])"/>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void DrawBeziers(Pen pen, params ReadOnlySpan<Point> points)
     {
         ArgumentNullException.ThrowIfNull(pen);
-        ArgumentNullException.ThrowIfNull(points);
 
         fixed (Point* p = points)
         {
@@ -3201,8 +3455,8 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
 
     public void Restore(GraphicsState gstate)
     {
-        CheckStatus(PInvoke.GdipRestoreGraphics(NativeGraphics, (uint)gstate.nativeState));
-        PopContext(gstate.nativeState);
+        CheckStatus(PInvoke.GdipRestoreGraphics(NativeGraphics, (uint)gstate._nativeState));
+        PopContext(gstate._nativeState);
     }
 
     public GraphicsContainer BeginContainer(RectangleF dstrect, RectangleF srcrect, GraphicsUnit unit)
@@ -3247,8 +3501,8 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
     public void EndContainer(GraphicsContainer container)
     {
         ArgumentNullException.ThrowIfNull(container);
-        CheckStatus(PInvoke.GdipEndContainer(NativeGraphics, (uint)container.nativeGraphicsContainer));
-        PopContext(container.nativeGraphicsContainer);
+        CheckStatus(PInvoke.GdipEndContainer(NativeGraphics, (uint)container._nativeGraphicsContainer));
+        PopContext(container._nativeGraphicsContainer);
     }
 
     public GraphicsContainer BeginContainer(Rectangle dstrect, Rectangle srcrect, GraphicsUnit unit)
@@ -3265,31 +3519,18 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
 
     public static IntPtr GetHalftonePalette()
     {
-        if (s_halftonePalette == IntPtr.Zero)
+        if (s_halftonePalette.IsNull)
         {
             lock (s_syncObject)
             {
-                if (s_halftonePalette == IntPtr.Zero)
+                if (s_halftonePalette.IsNull)
                 {
-                    AppDomain.CurrentDomain.DomainUnload += OnDomainUnload;
-                    AppDomain.CurrentDomain.ProcessExit += OnDomainUnload;
-
-                    s_halftonePalette = PInvoke.GdipCreateHalftonePalette();
+                    s_halftonePalette = PInvokeCore.GdipCreateHalftonePalette();
                 }
             }
         }
 
         return s_halftonePalette;
-    }
-
-    // This is called from AppDomain.ProcessExit and AppDomain.DomainUnload.
-    private static void OnDomainUnload(object? sender, EventArgs e)
-    {
-        if (!s_halftonePalette.IsNull)
-        {
-            PInvokeCore.DeleteObject(s_halftonePalette);
-            s_halftonePalette = HPALETTE.Null;
-        }
     }
 
     /// <summary>
@@ -3366,7 +3607,20 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
 #endif
 
 #if NET9_0_OR_GREATER
-    [RequiresPreviewFeatures]
+    /// <inheritdoc cref="DrawImage(Image, Effect, RectangleF, Matrix?, GraphicsUnit, ImageAttributes?)"/>
+    public void DrawImage(
+        Image image,
+        Effect effect) => DrawImage(image, effect, srcRect: default, transform: default, GraphicsUnit.Pixel, imageAttr: null);
+
+    /// <summary>
+    ///  Draws a portion of an image after applying a specified effect.
+    /// </summary>
+    /// <param name="image"><see cref="Image"/> to be drawn.</param>
+    /// <param name="effect">The effect to be applied when drawing.</param>
+    /// <param name="srcRect">The portion of the image to be drawn. <see cref="RectangleF.Empty"/> draws the full image.</param>
+    /// <param name="transform">The transform to apply to the <paramref name="srcRect"/> to determine the destination.</param>
+    /// <param name="srcUnit">Unit of measure of the <paramref name="srcRect"/>.</param>
+    /// <param name="imageAttr">Additional adjustments to be applied, if any.</param>
     public void DrawImage(
         Image image,
         Effect effect,
@@ -3384,6 +3638,9 @@ public sealed unsafe partial class Graphics : MarshalByRefObject, IDisposable, I
             imageAttr.Pointer(),
             (Unit)srcUnit).ThrowIfFailed();
 
+        GC.KeepAlive(effect);
+        GC.KeepAlive(imageAttr);
+        GC.KeepAlive(image);
         GC.KeepAlive(this);
     }
 #endif

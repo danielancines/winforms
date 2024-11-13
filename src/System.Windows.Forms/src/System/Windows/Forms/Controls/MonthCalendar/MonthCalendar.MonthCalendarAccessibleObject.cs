@@ -74,7 +74,8 @@ public partial class MonthCalendar
             }
         }
 
-        // This function should be called from a single place in the root of MonthCalendar object that already tests for availability of this API
+        // This function should be called from a single place in the root of MonthCalendar object that
+        // already tests for availability of this API
         internal void DisconnectChildren()
         {
             Debug.Assert(OsVersion.IsWindows8OrGreater());
@@ -199,7 +200,7 @@ public partial class MonthCalendar
 
         internal DayOfWeek FirstDayOfWeek => this.TryGetOwnerAs(out MonthCalendar? owner) ? CastDayToDayOfWeek(owner.FirstDayOfWeek) : CastDayToDayOfWeek(Day.Default);
 
-        internal bool Focused => this.TryGetOwnerAs(out MonthCalendar? owner) ? owner.Focused : false;
+        internal bool Focused => this.TryGetOwnerAs(out MonthCalendar? owner) && owner.Focused;
 
         internal CalendarCellAccessibleObject? FocusedCell
             => _focusedCellAccessibleObject ??= this.TryGetOwnerAs(out MonthCalendar? owner) ? GetCellByDate(owner._focusedDate) : null;
@@ -249,7 +250,7 @@ public partial class MonthCalendar
                 iRow = rowIndex
             };
 
-            bool success = PInvoke.SendMessage(owner, PInvoke.MCM_GETCALENDARGRIDINFO, 0, ref gridInfo) != 0;
+            bool success = PInvokeCore.SendMessage(owner, PInvoke.MCM_GETCALENDARGRIDINFO, 0, ref gridInfo) != 0;
 
             return success ? new((DateTime)gridInfo.stStart, (DateTime)gridInfo.stEnd) : null;
         }
@@ -271,7 +272,7 @@ public partial class MonthCalendar
                 iRow = rowIndex
             };
 
-            bool success = PInvoke.SendMessage(owner, PInvoke.MCM_GETCALENDARGRIDINFO, 0, ref gridInfo) != 0;
+            bool success = PInvokeCore.SendMessage(owner, PInvoke.MCM_GETCALENDARGRIDINFO, 0, ref gridInfo) != 0;
 
             return success ? owner.RectangleToScreen(gridInfo.rc) : default;
         }
@@ -299,7 +300,7 @@ public partial class MonthCalendar
                     cchName = (UIntPtr)name.Length - 1
                 };
 
-                PInvoke.SendMessage(owner, PInvoke.MCM_GETCALENDARGRIDINFO, 0, ref gridInfo);
+                PInvokeCore.SendMessage(owner, PInvoke.MCM_GETCALENDARGRIDINFO, 0, ref gridInfo);
             }
 
             string text = string.Empty;
@@ -398,7 +399,7 @@ public partial class MonthCalendar
                 pt = point
             };
 
-            PInvoke.SendMessage(owner, PInvoke.MCM_HITTEST, 0, ref hitTestInfo);
+            PInvokeCore.SendMessage(owner, PInvoke.MCM_HITTEST, 0, ref hitTestInfo);
 
             return hitTestInfo;
         }
@@ -555,9 +556,9 @@ public partial class MonthCalendar
             }
         }
 
-        internal bool ShowToday => this.TryGetOwnerAs(out MonthCalendar? owner) ? owner.ShowToday : false;
+        internal bool ShowToday => this.TryGetOwnerAs(out MonthCalendar? owner) && owner.ShowToday;
 
-        internal bool ShowWeekNumbers => this.TryGetOwnerAs(out MonthCalendar? owner) ? owner.ShowWeekNumbers : false;
+        internal bool ShowWeekNumbers => this.TryGetOwnerAs(out MonthCalendar? owner) && owner.ShowWeekNumbers;
 
         internal DateTime TodayDate => this.TryGetOwnerAs(out MonthCalendar? owner) ? owner.TodayDate : DateTime.Today;
 
@@ -619,7 +620,7 @@ public partial class MonthCalendar
 
         internal void UpdateDisplayRange()
         {
-            if(!this.TryGetOwnerAs(out MonthCalendar? owner))
+            if (!this.TryGetOwnerAs(out MonthCalendar? owner))
             {
                 return;
             }

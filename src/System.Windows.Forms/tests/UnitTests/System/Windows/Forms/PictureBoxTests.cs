@@ -3,7 +3,6 @@
 
 using System.ComponentModel;
 using System.Drawing;
-using System.Windows.Forms.Primitives;
 using System.Windows.Forms.TestUtilities;
 using Moq;
 using Point = System.Drawing.Point;
@@ -736,13 +735,10 @@ public class PictureBoxTests
     [BoolData]
     public void PictureBox_ImageLocation_SetValidWithWaitOnLoadTrueUri_ConfigSwitch_CheckCRL_GetReturnsExpected(bool switchValue)
     {
-        dynamic testAccessor = typeof(LocalAppContextSwitches).TestAccessor().Dynamic;
+        using ServicePointManagerCheckCrlScope scope = new(switchValue);
 
         try
         {
-            AppContext.SetSwitch(LocalAppContextSwitches.ServicePointManagerCheckCrlSwitchName, switchValue);
-            Assert.Equal(switchValue, LocalAppContextSwitches.ServicePointManagerCheckCrl);
-
             using PictureBox pictureBox = new()
             {
                 WaitOnLoad = true
@@ -762,10 +758,6 @@ public class PictureBoxTests
         catch
         {
             // Swallow network errors.
-        }
-        finally
-        {
-            testAccessor.s_servicePointManagerCheckCrl = 0;
         }
     }
 
@@ -848,7 +840,8 @@ public class PictureBoxTests
         Assert.Equal(value, pictureBox.ImageLocation);
 
         // NB: disposing the component with strictly mocked object causes tests to fail
-        // Moq.MockException : ISite.Container invocation failed with mock behavior Strict. All invocations on the mock must have a corresponding setup.
+        // Moq.MockException : ISite.Container invocation failed with mock behavior Strict.
+        // All invocations on the mock must have a corresponding setup.
         pictureBox.Site = null;
     }
 
@@ -877,7 +870,8 @@ public class PictureBoxTests
         Assert.Null(pictureBox.Image);
 
         // NB: disposing the component with strictly mocked object causes tests to fail
-        // Moq.MockException : ISite.Container invocation failed with mock behavior Strict. All invocations on the mock must have a corresponding setup.
+        // Moq.MockException : ISite.Container invocation failed with mock behavior Strict.
+        // All invocations on the mock must have a corresponding setup.
         pictureBox.Site = null;
     }
 
@@ -2006,13 +2000,10 @@ public class PictureBoxTests
     [BoolData]
     public void PictureBox_Load_UrlValidWithWaitOnLoadTrueUri_ConfigSwitch_CheckCRL_GetReturnsExpected(bool switchValue)
     {
-        dynamic testAccessor = typeof(LocalAppContextSwitches).TestAccessor().Dynamic;
+        using ServicePointManagerCheckCrlScope scope = new(switchValue);
 
         try
         {
-            AppContext.SetSwitch(LocalAppContextSwitches.ServicePointManagerCheckCrlSwitchName, switchValue);
-            Assert.Equal(switchValue, LocalAppContextSwitches.ServicePointManagerCheckCrl);
-
             using PictureBox pictureBox = new()
             {
                 WaitOnLoad = true
@@ -2032,10 +2023,6 @@ public class PictureBoxTests
         catch
         {
             // Swallow network errors.
-        }
-        finally
-        {
-            testAccessor.s_servicePointManagerCheckCrl = 0;
         }
     }
 
@@ -2068,7 +2055,8 @@ public class PictureBoxTests
         Assert.Equal(value, pictureBox.ImageLocation);
 
         // NB: disposing the component with strictly mocked object causes tests to fail
-        // Moq.MockException : ISite.Container invocation failed with mock behavior Strict. All invocations on the mock must have a corresponding setup.
+        // Moq.MockException : ISite.Container invocation failed with mock behavior Strict.
+        // All invocations on the mock must have a corresponding setup.
         pictureBox.Site = null;
     }
 
@@ -2097,7 +2085,8 @@ public class PictureBoxTests
         Assert.Null(pictureBox.Image);
 
         // NB: disposing the component with strictly mocked object causes tests to fail
-        // Moq.MockException : ISite.Container invocation failed with mock behavior Strict. All invocations on the mock must have a corresponding setup.
+        // Moq.MockException : ISite.Container invocation failed with mock behavior Strict.
+        // All invocations on the mock must have a corresponding setup.
         pictureBox.Site = null;
     }
 
@@ -2128,7 +2117,7 @@ public class PictureBoxTests
         {
             ImageLocation = imageLocation
         };
-        Assert.Throws<InvalidOperationException>(() => pictureBox.Load());
+        Assert.Throws<InvalidOperationException>(pictureBox.Load);
         Assert.Throws<InvalidOperationException>(() => pictureBox.Load(imageLocation));
     }
 
@@ -2140,7 +2129,7 @@ public class PictureBoxTests
         {
             ImageLocation = imageLocation
         };
-        Assert.Throws<InvalidOperationException>(() => pictureBox.LoadAsync());
+        Assert.Throws<InvalidOperationException>(pictureBox.LoadAsync);
         Assert.Throws<InvalidOperationException>(() => pictureBox.LoadAsync(imageLocation));
     }
 
@@ -2491,11 +2480,11 @@ public class PictureBoxTests
 
     public static IEnumerable<object[]> OnPaint_Image_TestData()
     {
-        foreach (object[] testData in CommonTestHelperEx.GetPaintEventArgsTheoryData())
+        foreach (PaintEventArgs testData in CommonTestHelperEx.GetPaintEventArgsTheoryData())
         {
             foreach (PictureBoxSizeMode sizeMode in Enum.GetValues(typeof(PictureBoxSizeMode)))
             {
-                yield return new object[] { sizeMode, testData[0] };
+                yield return new object[] { sizeMode, testData };
             }
         }
     }
@@ -2536,10 +2525,10 @@ public class PictureBoxTests
 
     public static IEnumerable<object[]> OnPaint_NullOrEmptyImageLocation_TestData()
     {
-        foreach (object[] testData in CommonTestHelperEx.GetPaintEventArgsTheoryData())
+        foreach (PaintEventArgs testData in CommonTestHelperEx.GetPaintEventArgsTheoryData())
         {
-            yield return new object[] { string.Empty, testData[0] };
-            yield return new object[] { null, testData[0] };
+            yield return new object[] { string.Empty, testData };
+            yield return new object[] { null, testData };
         }
     }
 
@@ -2562,12 +2551,12 @@ public class PictureBoxTests
 
     public static IEnumerable<object[]> OnPaint_InvalidImageLocation_TestData()
     {
-        foreach (object[] testData in CommonTestHelperEx.GetPaintEventArgsTheoryData())
+        foreach (PaintEventArgs testData in CommonTestHelperEx.GetPaintEventArgsTheoryData())
         {
             foreach (PictureBoxSizeMode sizeMode in Enum.GetValues(typeof(PictureBoxSizeMode)))
             {
-                yield return new object[] { sizeMode, "NoSuchImage", testData[0] };
-                yield return new object[] { sizeMode, "  ", testData[0] };
+                yield return new object[] { sizeMode, "NoSuchImage", testData };
+                yield return new object[] { sizeMode, "  ", testData };
             }
         }
     }

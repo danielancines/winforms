@@ -393,7 +393,9 @@ public class DataGridViewHeaderCellTests
         Assert.Equal(0, createdCallCount);
     }
 
-    // Note if we fix this issue https://github.com/dotnet/winforms/issues/6930#issuecomment-1090213559 then we will have to edit this test.
+    // Note if we fix this issue
+    // https://github.com/dotnet/winforms/issues/6930#issuecomment-1090213559
+    // then we will have to edit this test.
     [WinFormsTheory]
     [MemberData(nameof(Displayed_GetShared_TestData))]
     public void DataGridViewHeaderCell_Displayed_GetSharedWithHandle_ReturnsExpected(bool gridVisible, bool rowHeadersVisible, bool columnHeadersVisible, bool columnVisible)
@@ -2681,7 +2683,7 @@ public class DataGridViewHeaderCellTests
         {
             foreach (DataGridViewColumnHeadersHeightSizeMode columnHeadersHeightSizeMode in Enum.GetValues(typeof(DataGridViewColumnHeadersHeightSizeMode)))
             {
-                DataGridViewElementStates expected = rowHeadersWidthSizeMode == DataGridViewRowHeadersWidthSizeMode.EnableResizing || columnHeadersHeightSizeMode == DataGridViewColumnHeadersHeightSizeMode.EnableResizing ? DataGridViewElementStates.Resizable : (DataGridViewElementStates)0;
+                DataGridViewElementStates expected = rowHeadersWidthSizeMode == DataGridViewRowHeadersWidthSizeMode.EnableResizing || columnHeadersHeightSizeMode == DataGridViewColumnHeadersHeightSizeMode.EnableResizing ? DataGridViewElementStates.Resizable : 0;
                 yield return new object[] { rowHeadersWidthSizeMode, true, columnHeadersHeightSizeMode, true, DataGridViewElementStates.Visible | expected };
                 yield return new object[] { rowHeadersWidthSizeMode, true, columnHeadersHeightSizeMode, false, expected };
                 yield return new object[] { rowHeadersWidthSizeMode, false, columnHeadersHeightSizeMode, false, expected };
@@ -4242,10 +4244,12 @@ public class DataGridViewHeaderCellTests
     }
 
     [WinFormsTheory]
-    // [InlineData(true, -2)] If a datagridview is rendered with visual styles, mouse entering a header cell will lead to a ArgumentOutOfRangeException
+    // [InlineData(true, -2)] If a DataGridView is rendered with visual styles,
+    // mouse entering a header cell will lead to a ArgumentOutOfRangeException
     [InlineData(true, -1)]
     [InlineData(true, 0)]
-    // [InlineData(true, 1)] If a datagridview is rendered with visual styles, mouse entering a header cell will lead to a ArgumentOutOfRangeException
+    // [InlineData(true, 1)] If a DataGridView is rendered with visual styles,
+    // mouse entering a header cell will lead to a ArgumentOutOfRangeException
     [InlineData(false, -2)]
     [InlineData(false, -1)]
     [InlineData(false, 0)]
@@ -4308,10 +4312,12 @@ public class DataGridViewHeaderCellTests
     }
 
     [WinFormsTheory]
-    // [InlineData(true, -2)] If a datagridview is rendered with visual styles, mouse leaving a header cell will lead to a ArgumentOutOfRangeException
+    // [InlineData(true, -2)] If a DataGridView is rendered with visual styles,
+    // mouse leaving a header cell will lead to a ArgumentOutOfRangeException
     [InlineData(true, -1)]
     [InlineData(true, 0)]
-    // [InlineData(true, 1)] If a datagridview is rendered with visual styles, mouse leaving a header cell will lead to a ArgumentOutOfRangeException
+    // [InlineData(true, 1)] If a DataGridView is rendered with visual styles,
+    // mouse leaving a header cell will lead to a ArgumentOutOfRangeException
     [InlineData(false, -2)]
     [InlineData(false, -1)]
     [InlineData(false, 0)]

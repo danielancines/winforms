@@ -155,7 +155,7 @@ public partial class DataGridViewTextBoxEditingControl : TextBox, IDataGridViewE
                 // If the end of the selection is on the last line of the text then
                 // send this character to the dataGridView, else process the key event
                 int end = SelectionStart + SelectionLength;
-                if (Text.IndexOf("\r\n", end) != -1)
+                if (Text.IndexOf("\r\n", end, StringComparison.Ordinal) != -1)
                 {
                     return true;
                 }
@@ -165,7 +165,8 @@ public partial class DataGridViewTextBoxEditingControl : TextBox, IDataGridViewE
             case Keys.Up:
                 // If the end of the selection is on the first line of the text then
                 // send this character to the dataGridView, else process the key event
-                if (!(Text.IndexOf("\r\n") < 0 || SelectionStart + SelectionLength < Text.IndexOf("\r\n")))
+                if (!(Text.IndexOf("\r\n", StringComparison.Ordinal) < 0
+                    || SelectionStart + SelectionLength < Text.IndexOf("\r\n", StringComparison.Ordinal)))
                 {
                     return true;
                 }
@@ -255,7 +256,7 @@ public partial class DataGridViewTextBoxEditingControl : TextBox, IDataGridViewE
         switch ((Keys)(nint)m.WParamInternal)
         {
             case Keys.Enter:
-                if (m.MsgInternal == PInvoke.WM_CHAR
+                if (m.MsgInternal == PInvokeCore.WM_CHAR
                     && !(ModifierKeys == Keys.Shift && Multiline && AcceptsReturn))
                 {
                     // Ignore the Enter key and don't add it to the textbox content. This happens when failing
@@ -267,7 +268,7 @@ public partial class DataGridViewTextBoxEditingControl : TextBox, IDataGridViewE
                 break;
 
             case Keys.LineFeed:
-                if (m.MsgInternal == PInvoke.WM_CHAR && ModifierKeys == Keys.Control && Multiline && AcceptsReturn)
+                if (m.MsgInternal == PInvokeCore.WM_CHAR && ModifierKeys == Keys.Control && Multiline && AcceptsReturn)
                 {
                     // Ignore linefeed character when user hits Ctrl-Enter to commit the cell.
                     return true;
@@ -276,7 +277,7 @@ public partial class DataGridViewTextBoxEditingControl : TextBox, IDataGridViewE
                 break;
 
             case Keys.A:
-                if (m.MsgInternal == PInvoke.WM_KEYDOWN && ModifierKeys == Keys.Control)
+                if (m.MsgInternal == PInvokeCore.WM_KEYDOWN && ModifierKeys == Keys.Control)
                 {
                     SelectAll();
                     return true;

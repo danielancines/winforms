@@ -2,9 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Drawing;
+namespace WinFormsControlsTest;
 
-namespace WinformsControlsTest;
-
+[DesignerCategory("Default")]
 public partial class ListViewTest : Form
 {
     public ListViewTest()
@@ -34,6 +34,19 @@ public partial class ListViewTest : Form
 
         AddCollapsibleGroupToListView();
         AddGroupTasks();
+
+        // Manual test for https://github.com/dotnet/winforms/issues/11658
+        string[] TestItems = ["Item 1", "Item 2", "Item 3"];
+        listView3.RetrieveVirtualItem += (s, e) =>
+        {
+            e.Item = e.ItemIndex switch
+            {
+                0 => new ListViewItem(TestItems[0]),
+                1 => new ListViewItem(TestItems[1]),
+                2 => new ListViewItem(TestItems[2]),
+                _ => throw new ArgumentOutOfRangeException(),
+            };
+        };
     }
 
     private void CreateMyListView()
@@ -97,7 +110,7 @@ public partial class ListViewTest : Form
                 0 => item1,
                 1 => item2,
                 2 => item3,
-                _ => throw new IndexOutOfRangeException(),
+                _ => throw new ArgumentOutOfRangeException(),
             };
         };
 
@@ -114,10 +127,10 @@ public partial class ListViewTest : Form
         ImageList imageListLarge = new(components);
 
         // Initialize the ImageList objects with bitmaps.
-        imageListSmall.Images.Add(Bitmap.FromFile("Images\\SmallA.bmp"));
-        imageListSmall.Images.Add(Bitmap.FromFile("Images\\SmallABlue.bmp"));
-        imageListLarge.Images.Add(Bitmap.FromFile("Images\\LargeA.bmp"));
-        imageListLarge.Images.Add(Bitmap.FromFile("Images\\LargeABlue.bmp"));
+        imageListSmall.Images.Add(Image.FromFile("Images\\SmallA.bmp"));
+        imageListSmall.Images.Add(Image.FromFile("Images\\SmallABlue.bmp"));
+        imageListLarge.Images.Add(Image.FromFile("Images\\LargeA.bmp"));
+        imageListLarge.Images.Add(Image.FromFile("Images\\LargeABlue.bmp"));
 
         // Assign the ImageList objects to the ListView.
         listView2.LargeImageList = imageListLarge;
@@ -189,18 +202,24 @@ public partial class ListViewTest : Form
         MessageBox.Show(this, $"Task at group index {e.GroupIndex} was clicked", "GroupClick Event");
     }
 
-    private void listView2_Click(object sender, System.EventArgs e)
+    private void listView2_Click(object sender, EventArgs e)
     {
         Debug.WriteLine(listView1.TileSize);
         MessageBox.Show(this, "listView2_Click", "event");
     }
 
-    private void listView2_SelectedIndexChanged(object sender, System.EventArgs e)
+    private void listView3_Click(object sender, EventArgs e)
     {
-        // MessageBox.Show(this, "listView2_SelectedIndexChanged", "event");
+        var item = ((ListView)sender).FocusedItem;
+        var clone = (ListViewItem)item.Clone();
+        clone.Checked = true;
+        listView3.InvokeOnItemChecked(new ItemCheckedEventArgs(clone));
+        MessageBox.Show(this, $"Click {clone.Text} in ListView3", "Click Event");
+    }
 
-        var listView2 = sender as ListView;
-        if (listView2 is null)
+    private void listView2_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        if (sender is not ListView listView2)
         {
             return;
         }
@@ -227,7 +246,7 @@ public partial class ListViewTest : Form
 
         foreach (string file in openFileDialog1.FileNames)
         {
-            Bitmap bitmap = (Bitmap)Bitmap.FromFile(file);
+            Bitmap bitmap = (Bitmap)Image.FromFile(file);
             LargeImageList.Images.Add(file, bitmap);
 
             ListViewItem item = new ListViewItem
@@ -258,7 +277,7 @@ public partial class ListViewTest : Form
         }
 
         string file = openFileDialog1.FileName;
-        Bitmap bitmap = (Bitmap)Bitmap.FromFile(file);
+        Bitmap bitmap = (Bitmap)Image.FromFile(file);
         LargeImageList.Images[listView1.SelectedIndices[0]] = bitmap;
 
         listView1.Refresh();

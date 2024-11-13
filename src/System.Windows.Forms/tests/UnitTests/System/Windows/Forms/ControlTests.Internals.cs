@@ -3,7 +3,6 @@
 
 using System.Drawing;
 using System.Runtime.CompilerServices;
-using System.Windows.Forms.TestUtilities;
 
 namespace System.Windows.Forms.Tests;
 
@@ -398,30 +397,6 @@ public partial class ControlTests
 
         // act and assert
         Assert.Equal(third, control.GetFirstChildControlInTabOrder(false));
-    }
-
-    [WinFormsFact]
-    public void Control_NotifyEnter()
-    {
-        bool wasChanged = false;
-        using Control control = new();
-        control.Enter += (sender, args) => wasChanged = true;
-
-        control.NotifyEnter();
-
-        Assert.True(wasChanged);
-    }
-
-    [WinFormsFact]
-    public void Control_NotifyLeave()
-    {
-        bool wasChanged = false;
-        using Control control = new();
-        control.Leave += (sender, args) => wasChanged = true;
-
-        control.NotifyLeave();
-
-        Assert.True(wasChanged);
     }
 
     [WinFormsFact]

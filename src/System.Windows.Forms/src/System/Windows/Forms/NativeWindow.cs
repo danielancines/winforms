@@ -14,11 +14,9 @@ namespace System.Windows.Forms;
 public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHandle<HWND>
 {
 #if DEBUG
-    private static readonly BooleanSwitch AlwaysUseNormalWndProc
+    private static BooleanSwitch AlwaysUseNormalWndProc { get; }
         = new("AlwaysUseNormalWndProc", "Skips checking for the debugger when choosing the debuggable WndProc handler");
 #endif
-
-    private static readonly TraceSwitch WndProcChoice = new("WndProcChoice", "Info about choice of WndProc");
 
     private const int InitializedFlags = 0x01;
     private const int UseDebuggableWndProc = 0x04;
@@ -37,10 +35,12 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
 
     // Need to Store Table of Ids and Handles
     private static short s_globalID = 1;
-    private static readonly Dictionary<HWND, GCHandle> s_windowHandles = new();
-    private static readonly Dictionary<short, HWND> s_windowIds = new();
-    private static readonly object s_internalSyncObject = new();
-    private static readonly object s_createWindowSyncObject = new();
+    private static readonly Dictionary<HWND, GCHandle> s_windowHandles = [];
+    private static readonly Dictionary<short, HWND> s_windowIds = [];
+    private static readonly Lock s_internalSyncObject = new();
+    private static readonly Lock s_createWindowSyncObject = new();
+
+    private readonly Lock _lock = new();
 
     // Our window procedure delegate
     private WNDPROC? _windowProc;
@@ -68,7 +68,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
     }
 
     /// <summary>
-    /// Cache window DpiContext awareness information that helps to create handle with right context at the later time.
+    ///  Cache window DpiContext awareness information that helps to create handle with right context at the later time.
     /// </summary>
     internal DPI_AWARENESS_CONTEXT DpiAwarenessContext { get; } = PInvoke.GetThreadDpiAwarenessContextInternal();
 
@@ -82,7 +82,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
 
     /// <summary>
     ///  This was factored into another function so the finalizer in control that releases the window
-    ///  can perform the exact same code without further changes.  If you make changes to the finalizer,
+    ///  can perform the exact same code without further changes. If you make changes to the finalizer,
     ///  change this method -- try not to change NativeWindow's finalizer.
     /// </summary>
     internal unsafe void ForceExitMessageLoop()
@@ -90,7 +90,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
         HWND handle;
         bool ownedHandle;
 
-        lock (this)
+        lock (_lock)
         {
             handle = HWND;
             ownedHandle = _ownHandle;
@@ -99,7 +99,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
         if (!handle.IsNull)
         {
             // Now, before we set handle to zero and finish the finalizer, let's send
-            // a WM_NULL to the window.  Why?  Because if the main ui thread is INSIDE
+            // a WM_NULL to the window. Why?  Because if the main ui thread is INSIDE
             // the wndproc for this control during our unsubclass, then we could AV
             // when control finally reaches us.
             if (PInvoke.IsWindow(handle))
@@ -136,7 +136,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
         if (!handle.IsNull && ownedHandle)
         {
             // If we owned the handle, post a WM_CLOSE to get rid of it.
-            PInvoke.PostMessage(handle, PInvoke.WM_CLOSE);
+            PInvokeCore.PostMessage(handle, PInvokeCore.WM_CLOSE);
         }
     }
 
@@ -197,9 +197,6 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
 
             if (intWndProcFlags == 0)
             {
-                WndProcChoice.TraceVerbose("Init wndProcFlags");
-                Debug.Indent();
-
                 if (t_userSetProcFlags != 0)
                 {
                     intWndProcFlags = t_userSetProcFlags;
@@ -212,31 +209,18 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
                 {
                     if (Debugger.IsAttached)
                     {
-                        WndProcChoice.TraceVerbose("Debugger is attached, using debuggable WndProc");
                         intWndProcFlags |= UseDebuggableWndProc;
-                    }
-                    else
-                    {
-                        // Reading Framework registry key in Netcore/5.0 doesn't make sense. This path seems to be used to override the
-                        // default behaviour after applications deployed (otherwise, Developer/user can set this flag
-                        // via Application.SetUnhandledExceptionModeInternal(..).
-                        // Disabling this feature from .NET core 3.0 release. Would need to redesign if there are customer requests on this.
-
-                        WndProcChoice.TraceVerbose("Debugger check from registry is not supported in this release of .Net version");
                     }
                 }
 
 #if DEBUG
                 if (AlwaysUseNormalWndProc.Enabled)
                 {
-                    WndProcChoice.TraceVerbose("Stripping debuggablewndproc due to AlwaysUseNormalWndProc switch");
                     intWndProcFlags &= ~UseDebuggableWndProc;
                 }
 #endif
                 intWndProcFlags |= InitializedFlags;
-                WndProcChoice.TraceVerbose($"Final 0x{intWndProcFlags:X}");
                 t_wndProcFlags = (byte)intWndProcFlags;
-                Debug.Unindent();
             }
 
             return intWndProcFlags;
@@ -297,7 +281,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
         s_windowIds[id] = handle.Handle;
 
         // Set the Window ID
-        PInvoke.SetWindowLong(handle, WINDOW_LONG_PTR_INDEX.GWL_ID, id);
+        PInvokeCore.SetWindowLong(handle, WINDOW_LONG_PTR_INDEX.GWL_ID, id);
 
         return id;
     }
@@ -305,40 +289,36 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
     /// <summary>
     ///  Assigns a handle to this <see cref="NativeWindow"/> instance.
     /// </summary>
-    public void AssignHandle(IntPtr handle)
-        => AssignHandle((HWND)handle, assignUniqueID: true);
+    public void AssignHandle(IntPtr handle) => AssignHandle((HWND)handle, assignUniqueID: true);
 
     internal unsafe void AssignHandle(HWND hwnd, bool assignUniqueID)
     {
-        lock (this)
+        lock (_lock)
         {
             CheckReleased();
             Debug.Assert(!hwnd.IsNull);
 
             HWND = hwnd;
 
-            _priorWindowProcHandle = (void*)PInvoke.GetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC);
+            _priorWindowProcHandle = (void*)PInvokeCore.GetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC);
             Debug.Assert(_priorWindowProcHandle is not null);
-
-            WndProcChoice.TraceVerbose(
-                WndProcShouldBeDebuggable ? "Using debuggable wndproc" : "Using normal wndproc");
 
             _windowProc = new WNDPROC(Callback);
 
             AddWindowToTable(hwnd, this);
 
             // Set the NativeWindow window procedure delegate and get back the native pointer for it.
-            PInvoke.SetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, _windowProc);
-            _windowProcHandle = (void*)PInvoke.GetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC);
+            PInvokeCore.SetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, _windowProc);
+            _windowProcHandle = (void*)PInvokeCore.GetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC);
 
             // This shouldn't be possible.
             Debug.Assert(_priorWindowProcHandle != _windowProcHandle, "Uh oh! Subclassed ourselves!!!");
 
             if (assignUniqueID
-                && ((WINDOW_STYLE)(uint)PInvoke.GetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_STYLE)).HasFlag(WINDOW_STYLE.WS_CHILD)
-                && PInvoke.GetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_ID) == 0)
+                && ((WINDOW_STYLE)(uint)PInvokeCore.GetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_STYLE)).HasFlag(WINDOW_STYLE.WS_CHILD)
+                && PInvokeCore.GetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_ID) == 0)
             {
-                PInvoke.SetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_ID, hwnd);
+                PInvokeCore.SetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_ID, hwnd);
             }
 
             if (_suppressedGC)
@@ -357,12 +337,12 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
     ///  in a Message object and invokes the wndProc() method. A WM_NCDESTROY
     ///  message automatically causes the releaseHandle() method to be called.
     /// </summary>
-    private LRESULT Callback(HWND hWnd, MessageId msg, WPARAM wparam, LPARAM lparam)
+    private LRESULT Callback(HWND hWnd, uint msg, WPARAM wparam, LPARAM lparam)
     {
         // Note: if you change this code be sure to change the
         // corresponding code in DebuggableCallback below!
 
-        Message m = Message.Create(hWnd, (uint)msg, wparam, lparam);
+        Message m = Message.Create(hWnd, msg, wparam, lparam);
 
         try
         {
@@ -386,7 +366,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
         }
         finally
         {
-            if (msg == PInvoke.WM_NCDESTROY)
+            if (msg == PInvokeCore.WM_NCDESTROY)
             {
                 ReleaseHandle(handleValid: false);
             }
@@ -405,7 +385,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
     /// </summary>
     private void CheckReleased()
     {
-        if (Handle != IntPtr.Zero)
+        if (Handle != 0)
         {
             throw new InvalidOperationException(SR.HandleAlreadyExists);
         }
@@ -416,17 +396,17 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
     /// </summary>
     public virtual unsafe void CreateHandle(CreateParams cp)
     {
-        lock (this)
+        lock (_lock)
         {
             CheckReleased();
-            WindowClass windowClass = WindowClass.Create(cp.ClassName, (WNDCLASS_STYLES)cp.ClassStyle);
+            WindowClass windowClass = WindowClass.FindOrCreate(cp.ClassName, (WNDCLASS_STYLES)cp.ClassStyle);
             lock (s_createWindowSyncObject)
             {
                 // The CLR will sometimes pump messages while we're waiting on the lock.
                 // If a message comes through (say a WM_ACTIVATE for the parent) which
                 // causes the handle to be created, we can try to create the handle twice
                 // for NativeWindow. Check the handle again to avoid this.
-                if (Handle != IntPtr.Zero)
+                if (!HWND.IsNull)
                 {
                     return;
                 }
@@ -453,7 +433,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
                             // If it exceeds the max, we should take the substring....
                             if (cp.Caption is not null && cp.Caption.Length > short.MaxValue)
                             {
-                                cp.Caption = cp.Caption.Substring(0, short.MaxValue);
+                                cp.Caption = cp.Caption[..short.MaxValue];
                             }
 
                             createResult = PInvoke.CreateWindowEx(
@@ -495,8 +475,10 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
 #if DEBUG
                 if (OsVersion.IsWindows10_18030rGreater())
                 {
-                    // In a mixed DPI hosting environment, the DPI settings for child windows can be determined by either the parent window or the thread hosting it,
-                    // based on the window properties and the behavior of the thread. For additional information, please refer to
+                    // In a mixed DPI hosting environment, the DPI settings for child windows can be determined by
+                    // either the parent window or the thread hosting it,
+                    // based on the window properties and the behavior of the thread. For additional information,
+                    // please refer to
                     // https://microsoft.visualstudio.com/OS/_git/os.2020?path=/clientcore/windows/Core/ntuser/kernel/windows/createw.cxx&version=GBofficial/main&line=881&lineEnd=882&lineStartColumn=1&lineEndColumn=1&lineStyle=plain&_a=contents
                     DPI_AWARENESS_CONTEXT controlHandleDpiContext = PInvoke.GetWindowDpiAwarenessContext(HWND);
                     Debug.Assert(DpiAwarenessContext.IsEquivalent(controlHandleDpiContext),
@@ -520,13 +502,13 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
             {
                 Debug.Fail($"Can't find a default window procedure for message {m} on class {GetType().Name}");
 
-                // At this point, there isn't much we can do.  There's a small chance the following
+                // At this point, there isn't much we can do. There's a small chance the following
                 // line will allow the rest of the program to run, but don't get your hopes up.
-                m.ResultInternal = PInvoke.DefWindowProc(m.HWND, (uint)m.Msg, m.WParamInternal, m.LParamInternal);
+                m.ResultInternal = PInvokeCore.DefWindowProc(m.HWND, (uint)m.Msg, m.WParamInternal, m.LParamInternal);
                 return;
             }
 
-            m.ResultInternal = PInvoke.CallWindowProc(
+            m.ResultInternal = PInvokeCore.CallWindowProc(
                 _priorWindowProcHandle,
                 m.HWND,
                 (uint)m.Msg,
@@ -544,7 +526,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
     /// </summary>
     public virtual void DestroyHandle()
     {
-        lock (this)
+        lock (_lock)
         {
             if (!HWND.IsNull)
             {
@@ -553,7 +535,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
                     UnSubclass();
 
                     // Now post a close and let it do whatever it needs to do on its own.
-                    PInvoke.PostMessage(this, PInvoke.WM_CLOSE);
+                    PInvokeCore.PostMessage(this, PInvokeCore.WM_CLOSE);
                 }
 
                 HWND = HWND.Null;
@@ -575,15 +557,10 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
     /// <summary>
     ///  Returns the native window for the given handle, or null if the handle is not in our hash table.
     /// </summary>
-    private static NativeWindow? GetWindowFromTable(HWND handle)
-    {
-        if (s_windowHandles.TryGetValue(handle, out GCHandle value) && value.IsAllocated)
-        {
-            return (NativeWindow?)value.Target;
-        }
-
-        return null;
-    }
+    private static NativeWindow? GetWindowFromTable(HWND handle) =>
+        s_windowHandles.TryGetValue(handle, out GCHandle value) && value.IsAllocated
+            ? (NativeWindow?)value.Target
+            : null;
 
     /// <summary>
     ///  Returns the handle from the given <paramref name="id"/> if found, otherwise returns
@@ -609,21 +586,21 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
 
     /// <summary>
     ///  On class load, we connect an event to Application to let us know when
-    ///  the process or domain terminates.  When this happens, we attempt to
-    ///  clear our window class cache.  We cannot destroy windows (because we don't
+    ///  the process or domain terminates. When this happens, we attempt to
+    ///  clear our window class cache. We cannot destroy windows (because we don't
     ///  have access to their thread), and we cannot unregister window classes
-    ///  (because the classes are in use by the windows we can't destroy).  Instead,
+    ///  (because the classes are in use by the windows we can't destroy). Instead,
     ///  we move the class and window procs to DefWndProc
     /// </summary>
 #pragma warning disable SYSLIB0004 // Type or member is obsolete
     [PrePrepareMethod]
-#pragma warning restore SYSLIB0004 // Type or member is obsolete
+#pragma warning restore SYSLIB0004
     private static void OnShutdown(object? sender, EventArgs e)
     {
         // If we still have windows allocated, we must sling them to userDefWindowProc
         // or else they will AV if they get a message after the managed code has been
-        // removed.  In debug builds, we assert and give the "ToString" of the native
-        // window. In retail we just detach the window proc and let it go.  Note that
+        // removed. In debug builds, we assert and give the "ToString" of the native
+        // window. In retail we just detach the window proc and let it go. Note that
         // we cannot call DestroyWindow because this API will fail if called from
         // an incorrect thread.
 
@@ -637,11 +614,11 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
                 {
                     if (!handle.IsNull && handle != (HWND)(-1))
                     {
-                        PInvoke.SetWindowLong(handle, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, DefaultWindowProc);
-                        PInvoke.SetClassLong(handle, GET_CLASS_LONG_INDEX.GCL_WNDPROC, DefaultWindowProc);
-                        PInvoke.PostMessage(handle, PInvoke.WM_CLOSE);
+                        PInvokeCore.SetWindowLong(handle, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, DefaultWindowProc);
+                        PInvokeCore.SetClassLong(handle, GET_CLASS_LONG_INDEX.GCL_WNDPROC, DefaultWindowProc);
+                        PInvokeCore.PostMessage(handle, PInvokeCore.WM_CLOSE);
 
-                        // Fish out the Window object, if it is valid, and NULL the handle pointer.  This
+                        // Fish out the Window object, if it is valid, and NULL the handle pointer. This
                         // way the rest of WinForms won't think the handle is still valid here.
                         if (gcHandle.IsAllocated)
                         {
@@ -692,7 +669,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
             return;
         }
 
-        lock (this)
+        lock (_lock)
         {
             if (HWND.IsNull)
             {
@@ -782,15 +759,15 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
 
     /// <summary>
     ///  This method can be used to modify the exception handling behavior of
-    ///  NativeWindow.  By default, NativeWindow will detect if an application
+    ///  NativeWindow. By default, NativeWindow will detect if an application
     ///  is running under a debugger, or is running on a machine with a debugger
-    ///  installed.  In this case, an unhandled exception in the NativeWindow's
-    ///  WndProc method will remain unhandled so the debugger can trap it.  If
+    ///  installed. In this case, an unhandled exception in the NativeWindow's
+    ///  WndProc method will remain unhandled so the debugger can trap it. If
     ///  there is no debugger installed NativeWindow will trap the exception
     ///  and route it to the Application class's unhandled exception filter.
     ///
     ///  You can control this behavior via a config file, or directly through
-    ///  code using this method.  Setting the unhandled exception mode does
+    ///  code using this method. Setting the unhandled exception mode does
     ///  not change the behavior of any NativeWindow objects that are currently
     ///  connected to window handles; it only affects new handle connections.
     ///
@@ -854,7 +831,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
     }
 
     /// <summary>
-    ///  Unsubclassing is a tricky business.  We need to account for some border cases:
+    ///  Unsubclassing is a tricky business. We need to account for some border cases:
     ///
     ///   1) User has done multiple subclasses but has un-subclassed out of order.
     ///   2) User has done multiple subclasses but now our defWindowProc points to
@@ -867,7 +844,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
         bool finalizing = !_weakThisPtr.TryGetTarget(out _);
 
         // Don't touch if the current window proc is not ours.
-        void* currentWindowProc = (void*)PInvoke.GetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC);
+        void* currentWindowProc = (void*)PInvokeCore.GetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC);
         if (_windowProcHandle == currentWindowProc)
         {
             // The current window proc is ours
@@ -875,25 +852,25 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
             if (PreviousWindow is null)
             {
                 // This is the first NativeWindow registered for this HWND, just put back the prior handle we stashed away.
-                PInvoke.SetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, (nint)_priorWindowProcHandle);
+                PInvokeCore.SetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, (nint)_priorWindowProcHandle);
             }
             else
             {
                 if (finalizing)
                 {
-                    // Here, we are finalizing and defWindowProc is pointing to a managed object.  We must assume
-                    // that the object defWindowProc is pointing to is also finalizing.  Why?  Because we're
-                    // holding a ref to it, and it is holding a ref to us.  The only way this cycle will
-                    // finalize is if no one else is hanging onto it.  So, we re-assign the window proc to
+                    // Here, we are finalizing and defWindowProc is pointing to a managed object. We must assume
+                    // that the object defWindowProc is pointing to is also finalizing. Why?  Because we're
+                    // holding a ref to it, and it is holding a ref to us. The only way this cycle will
+                    // finalize is if no one else is hanging onto it. So, we re-assign the window proc to
                     // userDefWindowProc.
-                    PInvoke.SetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, DefaultWindowProc);
+                    PInvokeCore.SetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, DefaultWindowProc);
                 }
                 else
                 {
-                    // Here we are not finalizing so we use the windowProc for our previous window.  This may
+                    // Here we are not finalizing so we use the windowProc for our previous window. This may
                     // DIFFER from the value we are currently storing in defWindowProc because someone may
                     // have re-subclassed.
-                    PInvoke.SetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, PreviousWindow._windowProc!);
+                    PInvokeCore.SetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, PreviousWindow._windowProc!);
                 }
             }
         }
@@ -902,7 +879,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
             // The current window proc isn't one we registered.
 
             // Cutting the subclass chain anyway, even if we're not the last one in the chain. If the whole chain
-            // is all managed NativeWindow classes it doesnt matter, if the chain is not, then someone didn't clean
+            // is all managed NativeWindow classes it doesn't matter, if the chain is not, then someone didn't clean
             // up properly, too bad for them...
 
             // We will cut off the chain if we cannot unsubclass.
@@ -912,7 +889,7 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
             if (_nextWindow is null || _nextWindow._priorWindowProcHandle != _windowProcHandle)
             {
                 // we didn't find it... let's unhook anyway and cut the chain... this prevents crashes
-                PInvoke.SetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, DefaultWindowProc);
+                PInvokeCore.SetWindowLong(this, WINDOW_LONG_PTR_INDEX.GWL_WNDPROC, DefaultWindowProc);
             }
         }
     }
@@ -924,12 +901,12 @@ public unsafe partial class NativeWindow : MarshalByRefObject, IWin32Window, IHa
     {
         switch (m.MsgInternal)
         {
-            case PInvoke.WM_DPICHANGED_BEFOREPARENT:
+            case PInvokeCore.WM_DPICHANGED_BEFOREPARENT:
                 WmDpiChangedBeforeParent(ref m);
                 m.ResultInternal = (LRESULT)0;
                 break;
 
-            case PInvoke.WM_DPICHANGED_AFTERPARENT:
+            case PInvokeCore.WM_DPICHANGED_AFTERPARENT:
                 WmDpiChangedAfterParent(ref m);
                 m.ResultInternal = (LRESULT)0;
                 break;

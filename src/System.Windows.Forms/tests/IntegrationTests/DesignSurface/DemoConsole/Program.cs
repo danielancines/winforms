@@ -1,12 +1,15 @@
-﻿using System.Windows.Forms;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System.Windows.Forms;
 
 namespace TestConsole;
 
-class Program
+internal class Program
 {
     // - NOTE: the code needs to run under a thread with an STA ApartmentState
     [STAThread]
-    static void Main(string[] args)
+    private static void Main()
     {
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);

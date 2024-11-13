@@ -69,10 +69,10 @@ public class CommonDialogTests
 
     public static IEnumerable<object[]> HookProc_TestData()
     {
-        yield return new object[] { PInvoke.WM_INITDIALOG };
-        yield return new object[] { PInvoke.WM_SETFOCUS };
+        yield return new object[] { PInvokeCore.WM_INITDIALOG };
+        yield return new object[] { PInvokeCore.WM_SETFOCUS };
 
-        const int CDM_SETDEFAULTFOCUS = (int)PInvoke.WM_USER + 0x51;
+        const int CDM_SETDEFAULTFOCUS = (int)PInvokeCore.WM_USER + 0x51;
         yield return new object[] { CDM_SETDEFAULTFOCUS };
 
         yield return new object[] { 0 };
@@ -220,7 +220,7 @@ public class CommonDialogTests
         var owner = new Mock<IWin32Window>(MockBehavior.Strict);
         owner
             .Setup(o => o.Handle)
-            .Returns((IntPtr)1);
+            .Returns(1);
         Assert.Throws<Win32Exception>(() => dialog.ShowDialog(owner.Object));
     }
 

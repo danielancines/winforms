@@ -35,6 +35,9 @@ public partial class TabPage : Panel
     public TabPage() : base()
     {
         SetStyle(ControlStyles.CacheText, true);
+#pragma warning disable WFO5001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        SetStyle(ControlStyles.ApplyThemingImplicitly, true);
+#pragma warning restore WFO5001
         Text = null;
     }
 
@@ -97,14 +100,19 @@ public partial class TabPage : Panel
         get
         {
             Color color = base.BackColor;
+#pragma warning disable WFO5001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             if (color != DefaultBackColor)
             {
                 return color;
             }
-            else if (Application.RenderWithVisualStyles && UseVisualStyleBackColor && (ParentInternal is TabControl parent && parent.Appearance == TabAppearance.Normal))
+            else if (!Application.IsDarkModeEnabled
+                && Application.RenderWithVisualStyles
+                && UseVisualStyleBackColor
+                && (ParentInternal is TabControl parent && parent.Appearance == TabAppearance.Normal))
             {
                 return Color.Transparent;
             }
+#pragma warning restore WFO5001
 
             return color;
         }
@@ -149,7 +157,7 @@ public partial class TabPage : Panel
 
     private protected override IList<Rectangle> GetNeighboringToolsRectangles()
     {
-        List<Rectangle> neighbors = new();
+        List<Rectangle> neighbors = [];
 
         if (ParentInternal is not TabControl tabControl)
         {
@@ -474,7 +482,7 @@ public partial class TabPage : Panel
     /// </summary>
     internal override void AssignParent(Control? value)
     {
-        if (value is not null && value is not TabControl)
+        if (value is not null and not TabControl)
         {
             throw new ArgumentException(string.Format(SR.TabControlTabPageNotOnTabControl, value.GetType().FullName));
         }
@@ -494,7 +502,7 @@ public partial class TabPage : Panel
             return null;
         }
 
-        while (c is not null && c is not TabPage)
+        while (c is not null and not TabPage)
         {
             c = c.ParentInternal;
         }
@@ -542,11 +550,11 @@ public partial class TabPage : Panel
     ///  when the event is fired [this is preferable to adding an event handler on yourself for
     ///  this event]. They should, however, remember to call base.OnEnter(e); to ensure the event
     ///  i still fired to external listeners
-    ///  This listener is overidden so that we can fire SAME ENTER and LEAVE events on the TabPage.
+    ///  This listener is overridden so that we can fire SAME ENTER and LEAVE events on the TabPage.
     ///  TabPage should fire enter when the focus is on the TabPage and not when the control
     ///  within the TabPage gets Focused.
     /// </summary>
-    protected override void OnEnter(EventArgs e)
+    protected internal override void OnEnter(EventArgs e)
     {
         if (ParentInternal is TabControl)
         {
@@ -564,12 +572,12 @@ public partial class TabPage : Panel
     ///  when the event is fired [this is preferable to adding an event handler on yourself for
     ///  this event]. They should, however, remember to call base.OnLeave(e); to ensure the event
     ///  is still fired to external listeners
-    ///  This listener is overidden so that we can fire same enter and leave events on the TabPage.
+    ///  This listener is overridden so that we can fire same enter and leave events on the TabPage.
     ///  TabPage should fire enter when the focus is on the TabPage and not when the control within
     ///  the TabPage gets Focused.
-    ///  Similary the Leave should fire when the TabControl (and hence the TabPage) loses focus.
+    ///  Similarly the Leave should fire when the TabControl (and hence the TabPage) loses focus.
     /// </summary>
-    protected override void OnLeave(EventArgs e)
+    protected internal override void OnLeave(EventArgs e)
     {
         if (ParentInternal is TabControl)
         {
@@ -590,15 +598,26 @@ public partial class TabPage : Panel
 
         // Utilize the UseVisualStyleBackColor property to determine whether or not the themed
         // background should be utilized.
-        if (Application.RenderWithVisualStyles && UseVisualStyleBackColor && (ParentInternal is TabControl parent && parent.Appearance == TabAppearance.Normal))
+        if (Application.RenderWithVisualStyles
+            && UseVisualStyleBackColor
+            && (ParentInternal is TabControl parent && parent.Appearance == TabAppearance.Normal))
         {
-            Color bkcolor = UseVisualStyleBackColor ? Color.Transparent : BackColor;
+#pragma warning disable WFO5001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            Color bkColor = (UseVisualStyleBackColor && !Application.IsDarkModeEnabled)
+                ? Color.Transparent
+                : BackColor;
+#pragma warning restore WFO5001
+
             Rectangle inflateRect = LayoutUtils.InflateRect(DisplayRectangle, Padding);
 
             // To ensure that the TabPage draws correctly (the border will get clipped and
-            // and gradient fill will match correctly with the tabcontrol). Unfortunately,
+            // and gradient fill will match correctly with the TabControl). Unfortunately,
             // there is no good way to determine the padding used on the TabPage.
-            Rectangle rectWithBorder = new(inflateRect.X - 4, inflateRect.Y - 2, inflateRect.Width + 8, inflateRect.Height + 6);
+            Rectangle rectWithBorder = new(
+                inflateRect.X - 4,
+                inflateRect.Y - 2,
+                inflateRect.Width + 8,
+                inflateRect.Height + 6);
 
             TabRenderer.DrawTabPage(e, rectWithBorder);
 
@@ -606,7 +625,14 @@ public partial class TabPage : Panel
             // draw it ourselves.
             if (BackgroundImage is not null)
             {
-                ControlPaint.DrawBackgroundImage(e.Graphics, BackgroundImage, bkcolor, BackgroundImageLayout, inflateRect, inflateRect, DisplayRectangle.Location);
+                ControlPaint.DrawBackgroundImage(
+                    e.Graphics,
+                    BackgroundImage,
+                    bkColor,
+                    BackgroundImageLayout,
+                    inflateRect,
+                    inflateRect,
+                    DisplayRectangle.Location);
             }
         }
         else
@@ -683,7 +709,7 @@ public partial class TabPage : Panel
         // In this case, the keyboard toolTip will show the text of the latest toolTip instance that was set.
         if (_associatedToolTips is null)
         {
-            _associatedToolTips = new List<ToolTip>() { _externalToolTip, toolTip };
+            _associatedToolTips = [_externalToolTip, toolTip];
             return;
         }
 

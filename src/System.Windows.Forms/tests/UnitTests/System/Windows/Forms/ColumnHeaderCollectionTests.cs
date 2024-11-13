@@ -27,7 +27,7 @@ public class ColumnHeaderCollectionTests
     {
         using ListView listView = new();
         IList collection = new ListView.ColumnHeaderCollection(listView);
-        Assert.Equal(0, collection.Count);
+        Assert.Empty(collection);
         Assert.False(collection.IsFixedSize);
         Assert.False(collection.IsReadOnly);
         Assert.True(collection.IsSynchronized);
@@ -423,7 +423,7 @@ public class ColumnHeaderCollectionTests
     {
         using ListView listView = new();
         var collection = new ListView.ColumnHeaderCollection(listView);
-        Assert.Throws<ArgumentNullException>("values", () => collection.AddRange(new ColumnHeader[] { null }));
+        Assert.Throws<ArgumentNullException>("values", () => collection.AddRange([null]));
     }
 
     [WinFormsFact]
@@ -658,7 +658,7 @@ public class ColumnHeaderCollectionTests
 
         Assert.Equal(expected, collection.IndexOfKey(key));
 
-        // Call again to validate caching behaviour.
+        // Call again to validate caching behavior.
         Assert.Equal(expected, collection.IndexOfKey(key));
         Assert.Equal(-1, collection.IndexOfKey("noSuchKey"));
     }

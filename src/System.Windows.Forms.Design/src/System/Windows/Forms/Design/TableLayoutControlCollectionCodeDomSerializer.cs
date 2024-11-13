@@ -14,14 +14,14 @@ namespace System.Windows.Forms.Design;
 internal class TableLayoutControlCollectionCodeDomSerializer : CollectionCodeDomSerializer
 {
     /// <summary>
-    ///  Serializes the given collection.  targetExpression will refer to the expression used to rever to the
+    ///  Serializes the given collection. targetExpression will refer to the expression used to refer to the
     ///  collection, but it can be null.
     /// </summary>
     protected override object SerializeCollection(IDesignerSerializationManager manager, CodeExpression? targetExpression, Type targetType, ICollection originalCollection, ICollection valuesToSerialize)
     {
         // Here we need to invoke Add once for each and every item in the collection. We can re-use the property
         // reference and method reference, but we will need to recreate the invoke statement each time.
-        CodeStatementCollection statements = new();
+        CodeStatementCollection statements = [];
         CodeMethodReferenceExpression methodRef = new(targetExpression, "Add");
         TableLayoutControlCollection tableCollection = (TableLayoutControlCollection)originalCollection;
 
@@ -57,8 +57,10 @@ internal class TableLayoutControlCollectionCodeDomSerializer : CollectionCodeDom
 
                 if (genCode)
                 {
-                    CodeMethodInvokeExpression statement = new();
-                    statement.Method = methodRef;
+                    CodeMethodInvokeExpression statement = new()
+                    {
+                        Method = methodRef
+                    };
                     CodeExpression? serializedObj = SerializeToExpression(manager, o);
 
                     if (serializedObj is not null && !typeof(Control).IsAssignableFrom(o.GetType()))

@@ -16,10 +16,12 @@ namespace System.Drawing.Imaging;
         $"System.Drawing.Design.UITypeEditor, {AssemblyRef.SystemDrawing}")]
 [Serializable]
 [TypeForwardedFrom(AssemblyRef.SystemDrawing)]
-public sealed unsafe class Metafile : Image
+public sealed unsafe class Metafile : Image, IPointer<GpMetafile>
 {
     // GDI+ doesn't handle filenames over MAX_PATH very well
     private const int MaxPath = 260;
+
+    nint IPointer<GpMetafile>.Pointer => (nint)this.Pointer();
 
     /// <summary>
     ///  Initializes a new instance of the <see cref='Metafile'/> class from the specified handle and
@@ -531,7 +533,7 @@ public sealed unsafe class Metafile : Image
     public void PlayRecord(EmfPlusRecordType recordType, int flags, int dataSize, byte[] data)
     {
         // Used in conjunction with Graphics.EnumerateMetafile to play an EMF+
-        // The data must be DWORD aligned if it's an EMF or EMF+.  It must be
+        // The data must be DWORD aligned if it's an EMF or EMF+. It must be
         // WORD aligned if it's a WMF.
 
         fixed (byte* d = data)
@@ -628,11 +630,5 @@ public sealed unsafe class Metafile : Image
     /// <summary>
     ///  Returns a Windows handle to an enhanced <see cref='Metafile'/>.
     /// </summary>
-    public IntPtr GetHenhmetafile()
-    {
-        HENHMETAFILE hemf;
-        PInvoke.GdipGetHemfFromMetafile(this.Pointer(), &hemf).ThrowIfFailed();
-        GC.KeepAlive(this);
-        return hemf;
-    }
+    public IntPtr GetHenhmetafile() => this.GetHENHMETAFILE();
 }

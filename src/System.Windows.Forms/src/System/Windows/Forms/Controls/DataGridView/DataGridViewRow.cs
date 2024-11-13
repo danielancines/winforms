@@ -17,7 +17,8 @@ public partial class DataGridViewRow : DataGridViewBand
     private static readonly int s_propRowErrorText = PropertyStore.CreateKey();
     private static readonly int s_propRowAccessibilityObject = PropertyStore.CreateKey();
 
-    private const DataGridViewAutoSizeRowCriteriaInternal InvalidDataGridViewAutoSizeRowCriteriaInternalMask = ~(DataGridViewAutoSizeRowCriteriaInternal.Header | DataGridViewAutoSizeRowCriteriaInternal.AllColumns);
+    private const DataGridViewAutoSizeRowCriteriaInternal InvalidDataGridViewAutoSizeRowCriteriaInternalMask =
+        ~(DataGridViewAutoSizeRowCriteriaInternal.Header | DataGridViewAutoSizeRowCriteriaInternal.AllColumns);
 
     private const int DefaultMinRowThickness = 3;
 
@@ -37,11 +38,10 @@ public partial class DataGridViewRow : DataGridViewBand
     {
         get
         {
-            AccessibleObject? result = (AccessibleObject?)Properties.GetObject(s_propRowAccessibilityObject);
-            if (result is null)
+            if (!Properties.TryGetValue(s_propRowAccessibilityObject, out AccessibleObject? result))
             {
                 result = CreateAccessibilityInstance();
-                Properties.SetObject(s_propRowAccessibilityObject, result);
+                Properties.AddValue(s_propRowAccessibilityObject, result);
             }
 
             return result;
@@ -163,22 +163,12 @@ public partial class DataGridViewRow : DataGridViewBand
 
     private string ErrorTextInternal
     {
-        get
-        {
-            object? errorText = Properties.GetObject(s_propRowErrorText);
-            return (string?)errorText ?? string.Empty;
-        }
+        get => Properties.GetStringOrEmptyString(s_propRowErrorText);
         set
         {
-            string errorText = ErrorTextInternal;
-            if (!string.IsNullOrEmpty(value) || Properties.ContainsObject(s_propRowErrorText))
+            if (Properties.AddOrRemoveString(s_propRowErrorText, value))
             {
-                Properties.SetObject(s_propRowErrorText, value);
-            }
-
-            if (DataGridView is not null && !errorText.Equals(ErrorTextInternal))
-            {
-                DataGridView.OnRowErrorTextChanged(this);
+                DataGridView?.OnRowErrorTextChanged(this);
             }
         }
     }
@@ -206,18 +196,15 @@ public partial class DataGridViewRow : DataGridViewBand
         }
     }
 
-    private bool HasErrorText
-    {
-        get => Properties.ContainsObjectThatIsNotNull(s_propRowErrorText);
-    }
+    private bool HasErrorText => Properties.ContainsKey(s_propRowErrorText);
 
     [Browsable(false)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     [AllowNull]
     public DataGridViewRowHeaderCell HeaderCell
     {
-        get => (DataGridViewRowHeaderCell)base.HeaderCellCore;
-        set => base.HeaderCellCore = value;
+        get => (DataGridViewRowHeaderCell)HeaderCellCore;
+        set => HeaderCellCore = value;
     }
 
     [NotifyParentProperty(true)]
@@ -252,7 +239,7 @@ public partial class DataGridViewRow : DataGridViewBand
         }
     }
 
-    internal bool IsAccessibilityObjectCreated => Properties.GetObject(s_propRowAccessibilityObject) is AccessibleObject;
+    internal bool IsAccessibilityObjectCreated => Properties.ContainsKey(s_propRowAccessibilityObject);
 
     [Browsable(false)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -1064,7 +1051,7 @@ public partial class DataGridViewRow : DataGridViewBand
 
         if (dataGridViewRow is not null)
         {
-            base.CloneInternal(dataGridViewRow);
+            CloneInternal(dataGridViewRow);
             if (HasErrorText)
             {
                 dataGridViewRow.ErrorText = ErrorTextInternal;
@@ -1508,7 +1495,7 @@ public partial class DataGridViewRow : DataGridViewBand
 
         ArgumentNullException.ThrowIfNull(graphics);
 
-        if (paintParts < DataGridViewPaintParts.None || paintParts > DataGridViewPaintParts.All)
+        if (paintParts is < DataGridViewPaintParts.None or > DataGridViewPaintParts.All)
         {
             throw new ArgumentException(string.Format(SR.DataGridView_InvalidDataGridViewPaintPartsCombination, "paintParts"));
         }
@@ -1612,7 +1599,7 @@ public partial class DataGridViewRow : DataGridViewBand
                     graphics.SetClip(rowRect);
                 }
 
-                dataGridViewColumn = (DataGridViewColumn)dataGridView.Columns[dataGridView.FirstDisplayedScrollingColumnIndex];
+                dataGridViewColumn = dataGridView.Columns[dataGridView.FirstDisplayedScrollingColumnIndex];
                 Debug.Assert(dataGridViewColumn.Visible && !dataGridViewColumn.Frozen);
 
                 while (dataGridViewColumn is not null)
@@ -1701,7 +1688,7 @@ public partial class DataGridViewRow : DataGridViewBand
 
         ArgumentNullException.ThrowIfNull(graphics);
 
-        if (paintParts < DataGridViewPaintParts.None || paintParts > DataGridViewPaintParts.All)
+        if (paintParts is < DataGridViewPaintParts.None or > DataGridViewPaintParts.All)
         {
             throw new InvalidEnumArgumentException(nameof(paintParts), (int)paintParts, typeof(DataGridViewPaintParts));
         }
@@ -1754,8 +1741,7 @@ public partial class DataGridViewRow : DataGridViewBand
         }
 
         PInvoke.UiaDisconnectProvider(AccessibilityObject);
-
-        Properties.SetObject(s_propRowAccessibilityObject, null);
+        Properties.RemoveValue(s_propRowAccessibilityObject);
     }
 
     internal void SetReadOnlyCellCore(DataGridViewCell dataGridViewCell, bool readOnly)

@@ -24,64 +24,64 @@ namespace System.Windows.Forms.Design;
 [ProvideProperty("TrayLocation", typeof(IComponent))]
 public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIHandler, IOleDragClient
 {
-    private static readonly Point InvalidPoint = new(int.MinValue, int.MinValue);
-    private IServiceProvider serviceProvider; // Where services come from.
-    private Point whiteSpace = Point.Empty; // space to leave between components.
-    private Size grabHandle = Size.Empty; // Size of the grab handles.
+    private static Point InvalidPoint { get; } = new(int.MinValue, int.MinValue);
+    private IServiceProvider _serviceProvider; // Where services come from.
+    private Point _whiteSpace = Point.Empty; // space to leave between components.
+    private Size _grabHandle = Size.Empty; // Size of the grab handles.
 
-    private List<Control> controls; // List of items in the tray in the order of their layout.
-    private SelectionUIHandler dragHandler; // the thing responsible for handling mouse drags
-    private ISelectionUIService selectionUISvc; // selection UI; we use this a lot
-    private IToolboxService toolboxService; // cached for drag/drop
+    private List<Control> _controls; // List of items in the tray in the order of their layout.
+    private SelectionUIHandler _dragHandler; // the thing responsible for handling mouse drags
+    private ISelectionUIService _selectionUISvc; // selection UI; we use this a lot
+    private IToolboxService _toolboxService; // cached for drag/drop
 
     /// <summary>
     ///  Provides drag and drop functionality through OLE.
     /// </summary>
-    internal OleDragDropHandler oleDragDropHandler; // handler class for ole drag drop operations.
+    internal OleDragDropHandler _oleDragDropHandler; // handler class for ole drag drop operations.
 
-    private readonly IDesigner mainDesigner; // the designer that is associated with this tray
-    private IEventHandlerService eventHandlerService; // Event Handler service to handle keyboard and focus.
-    private bool queriedTabOrder;
-    private MenuCommand tabOrderCommand;
-    private ICollection selectedObjects;
+    private readonly IDesigner _mainDesigner; // the designer that is associated with this tray
+    private IEventHandlerService _eventHandlerService; // Event Handler service to handle keyboard and focus.
+    private bool _queriedTabOrder;
+    private MenuCommand _tabOrderCommand;
+    private ICollection _selectedObjects;
 
     // Services that we use on a high enough frequency to merit caching.
-    private IMenuCommandService menuCommandService;
-    private InheritanceUI inheritanceUI;
+    private IMenuCommandService _menuCommandService;
+    private InheritanceUI _inheritanceUI;
 
-    private Point mouseDragStart = InvalidPoint; // the starting location of a drag
-    private Point mouseDragEnd = InvalidPoint; // the ending location of a drag
-    private Rectangle mouseDragWorkspace = Rectangle.Empty; // a temp work rectangle we cache for perf
-    private ToolboxItem mouseDragTool; // the tool that's being dragged; only for drag/drop
-    private Point mouseDropLocation = InvalidPoint; // where the tool was dropped
-    private bool showLargeIcons; // Show Large icons or not.
-    private bool autoArrange; // allows for auto arranging icons.
-    private Point autoScrollPosBeforeDragging = Point.Empty; // Used to return the correct scroll pos. after a drag
+    private Point _mouseDragStart = InvalidPoint; // the starting location of a drag
+    private Point _mouseDragEnd = InvalidPoint; // the ending location of a drag
+    private Rectangle _mouseDragWorkspace = Rectangle.Empty; // a temp work rectangle we cache for perf
+    private ToolboxItem _mouseDragTool; // the tool that's being dragged; only for drag/drop
+    private Point _mouseDropLocation = InvalidPoint; // where the tool was dropped
+    private bool _showLargeIcons; // Show Large icons or not.
+    private bool _autoArrange; // allows for auto arranging icons.
+    private Point _autoScrollPosBeforeDragging = Point.Empty; // Used to return the correct scroll pos. after a drag
 
     // Component Tray Context menu items...
-    private readonly MenuCommand menucmdArrangeIcons;
-    private readonly MenuCommand menucmdLineupIcons;
-    private readonly MenuCommand menucmdLargeIcons;
-    private bool fResetAmbient;
-    private bool fSelectionChanged;
-    private ComponentTrayGlyphManager glyphManager; // used to manage any glyphs added to the tray
+    private readonly MenuCommand _menucmdArrangeIcons;
+    private readonly MenuCommand _menucmdLineupIcons;
+    private readonly MenuCommand _menucmdLargeIcons;
+    private bool _fResetAmbient;
+    private bool _fSelectionChanged;
+    private ComponentTrayGlyphManager _glyphManager; // used to manage any glyphs added to the tray
 
     // Empty class for build time dependancy
 
     /// <summary>
-    ///  Creates a new component tray.  The component tray
+    ///  Creates a new component tray. The component tray
     ///  will monitor component additions and removals and create
     ///  appropriate UI objects in its space.
     /// </summary>
     public ComponentTray(IDesigner mainDesigner, IServiceProvider serviceProvider)
     {
         AutoScroll = true;
-        this.mainDesigner = mainDesigner;
-        this.serviceProvider = serviceProvider;
+        _mainDesigner = mainDesigner;
+        _serviceProvider = serviceProvider;
         AllowDrop = true;
         Text = "ComponentTray"; // makes debugging easier
         SetStyle(ControlStyles.ResizeRedraw | ControlStyles.OptimizedDoubleBuffer, true);
-        controls = new();
+        _controls = [];
         IDesignerHost host = (IDesignerHost)GetService(typeof(IDesignerHost));
         IExtenderProviderService es = (IExtenderProviderService)GetService(typeof(IExtenderProviderService));
         Debug.Assert(es is not null, "Component tray wants an extender provider service, but there isn't one.");
@@ -91,50 +91,52 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         {
             if (host is not null)
             {
-                eventHandlerService = new EventHandlerService(this);
-                host.AddService(eventHandlerService);
+                _eventHandlerService = new EventHandlerService(this);
+                host.AddService(_eventHandlerService);
             }
         }
 
         IMenuCommandService mcs = MenuService;
         if (mcs is not null)
         {
-            Debug.Assert(menucmdArrangeIcons is null, "Non-Null Menu Command for ArrangeIcons");
-            Debug.Assert(menucmdLineupIcons is null, "Non-Null Menu Command for LineupIcons");
-            Debug.Assert(menucmdLargeIcons is null, "Non-Null Menu Command for LargeIcons");
-            menucmdArrangeIcons = new MenuCommand(new EventHandler(OnMenuArrangeIcons), StandardCommands.ArrangeIcons);
-            menucmdLineupIcons = new MenuCommand(new EventHandler(OnMenuLineupIcons), StandardCommands.LineupIcons);
-            menucmdLargeIcons = new MenuCommand(new EventHandler(OnMenuShowLargeIcons), StandardCommands.ShowLargeIcons);
-            menucmdArrangeIcons.Checked = AutoArrange;
-            menucmdLargeIcons.Checked = ShowLargeIcons;
-            mcs.AddCommand(menucmdArrangeIcons);
-            mcs.AddCommand(menucmdLineupIcons);
-            mcs.AddCommand(menucmdLargeIcons);
+            Debug.Assert(_menucmdArrangeIcons is null, "Non-Null Menu Command for ArrangeIcons");
+            Debug.Assert(_menucmdLineupIcons is null, "Non-Null Menu Command for LineupIcons");
+            Debug.Assert(_menucmdLargeIcons is null, "Non-Null Menu Command for LargeIcons");
+            _menucmdArrangeIcons = new MenuCommand(OnMenuArrangeIcons, StandardCommands.ArrangeIcons);
+            _menucmdLineupIcons = new MenuCommand(OnMenuLineupIcons, StandardCommands.LineupIcons);
+            _menucmdLargeIcons = new MenuCommand(OnMenuShowLargeIcons, StandardCommands.ShowLargeIcons);
+            _menucmdArrangeIcons.Checked = AutoArrange;
+            _menucmdLargeIcons.Checked = ShowLargeIcons;
+            mcs.AddCommand(_menucmdArrangeIcons);
+            mcs.AddCommand(_menucmdLineupIcons);
+            mcs.AddCommand(_menucmdLargeIcons);
         }
 
         IComponentChangeService componentChangeService = (IComponentChangeService)GetService(typeof(IComponentChangeService));
         if (componentChangeService is not null)
         {
-            componentChangeService.ComponentRemoved += new ComponentEventHandler(OnComponentRemoved);
+            componentChangeService.ComponentRemoved += OnComponentRemoved;
         }
 
         if (GetService(typeof(IUIService)) is IUIService uiService)
         {
             Color styleColor;
-            if (uiService.Styles["ArtboardBackground"] is Color)
+            if (uiService.Styles["ArtboardBackground"] is Color backgroundColor)
             {
-                styleColor = (Color)uiService.Styles["ArtboardBackground"];
+                styleColor = backgroundColor;
             }
 
             // Can't use 'as' here since Color is a value type
-            else if (uiService.Styles["VsColorDesignerTray"] is Color)
+            else if (uiService.Styles["VsColorDesignerTray"] is Color designerTrayColor)
             {
-                styleColor = (Color)uiService.Styles["VsColorDesignerTray"];
+                styleColor = designerTrayColor;
             }
-            else if (uiService.Styles["HighlightColor"] is Color)
+            else if (uiService.Styles["HighlightColor"] is Color highlightColor)
             {
-                // Since v1, we have had code here that checks for HighlightColor, so some hosts (like WinRes) have been setting it. If VsColorDesignerTray isn't present, we look for HighlightColor for backward compat.
-                styleColor = (Color)uiService.Styles["HighlightColor"];
+                // Since v1, we have had code here that checks for HighlightColor,
+                // so some hosts (like WinRes) have been setting it.
+                // If VsColorDesignerTray isn't present, we look for HighlightColor for backward compatibility.
+                styleColor = highlightColor;
             }
             else
             {
@@ -142,13 +144,13 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
                 styleColor = SystemColors.Info;
             }
 
-            if (uiService.Styles["ArtboardBackgroundText"] is Color)
+            if (uiService.Styles["ArtboardBackgroundText"] is Color backgroundTextColor)
             {
-                ForeColor = (Color)uiService.Styles["ArtboardBackgroundText"];
+                ForeColor = backgroundTextColor;
             }
-            else if (uiService.Styles["VsColorPanelText"] is Color)
+            else if (uiService.Styles["VsColorPanelText"] is Color panelTextColor)
             {
-                ForeColor = (Color)uiService.Styles["VsColorPanelText"];
+                ForeColor = panelTextColor;
             }
 
             BackColor = styleColor;
@@ -158,18 +160,18 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         ISelectionService selSvc = (ISelectionService)GetService(typeof(ISelectionService));
         if (selSvc is not null)
         {
-            selSvc.SelectionChanged += new EventHandler(OnSelectionChanged);
+            selSvc.SelectionChanged += OnSelectionChanged;
         }
 
         // Listen to the SystemEvents so that we can resync selection based on display settings etc.
-        SystemEvents.DisplaySettingsChanged += new EventHandler(OnSystemSettingChanged);
-        SystemEvents.InstalledFontsChanged += new EventHandler(OnSystemSettingChanged);
-        SystemEvents.UserPreferenceChanged += new UserPreferenceChangedEventHandler(OnUserPreferenceChanged);
+        SystemEvents.DisplaySettingsChanged += OnSystemSettingChanged;
+        SystemEvents.InstalledFontsChanged += OnSystemSettingChanged;
+        SystemEvents.UserPreferenceChanged += OnUserPreferenceChanged;
 
         if (GetService(typeof(BehaviorService)) is BehaviorService behSvc)
         {
             // this object will manage any glyphs that get added to our tray
-            glyphManager = new ComponentTrayGlyphManager(selSvc, behSvc);
+            _glyphManager = new ComponentTrayGlyphManager(behSvc);
         }
     }
 
@@ -177,9 +179,9 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     {
         if (IsHandleCreated)
         {
-            fResetAmbient = true;
+            _fResetAmbient = true;
             ResetTrayControls();
-            BeginInvoke(new AsyncInvokeHandler(Invalidate), new object[] { true });
+            BeginInvoke(new AsyncInvokeHandler(Invalidate), [true]);
         }
     }
 
@@ -195,8 +197,8 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
                 {
                     control.Visible = shouldDisplay;
                     Rectangle bounds = control.Bounds;
-                    bounds.Inflate(grabHandle);
-                    bounds.Inflate(grabHandle);
+                    bounds.Inflate(_grabHandle);
+                    bounds.Inflate(_grabHandle);
                     Invalidate(bounds);
                     PerformLayout();
                 }
@@ -208,9 +210,9 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     {
         if (IsHandleCreated)
         {
-            fResetAmbient = true;
+            _fResetAmbient = true;
             ResetTrayControls();
-            BeginInvoke(new AsyncInvokeHandler(Invalidate), new object[] { true });
+            BeginInvoke(new AsyncInvokeHandler(Invalidate), [true]);
         }
     }
 
@@ -235,19 +237,19 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
 
     private void OnSelectionChanged(object sender, EventArgs e)
     {
-        selectedObjects = ((ISelectionService)sender).GetSelectedComponents();
+        _selectedObjects = ((ISelectionService)sender).GetSelectedComponents();
         object primary = ((ISelectionService)sender).PrimarySelection;
         Invalidate();
-        fSelectionChanged = true;
+        _fSelectionChanged = true;
+
         // Accessibility information
-        foreach (object selObj in selectedObjects)
+        foreach (object selObj in _selectedObjects)
         {
             if (selObj is IComponent component)
             {
                 Control c = TrayControl.FromComponent(component);
                 if (c is not null)
                 {
-                    Debug.WriteLineIf(CompModSwitches.MSAA.TraceInfo, $"MSAA: SelectionAdd, traycontrol = {c}");
                     PInvoke.NotifyWinEvent(
                         (uint)AccessibleEvents.SelectionAdd,
                         c,
@@ -270,15 +272,15 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
                     (int)PInvoke.CHILDID_SELF);
             }
 
-            if (glyphManager is not null)
+            if (_glyphManager is not null)
             {
-                glyphManager.SelectionGlyphs.Clear();
+                _glyphManager.SelectionGlyphs.Clear();
                 IDesignerHost host = (IDesignerHost)GetService(typeof(IDesignerHost));
-                foreach (object selObj in selectedObjects)
+                foreach (object selObj in _selectedObjects)
                 {
                     if (selObj is IComponent selectedComponent && !(host.GetDesigner(selectedComponent) is ControlDesigner))
                     { // don't want to do it for controls that are also in the tray
-                        GlyphCollection glyphs = glyphManager.GetGlyphsForComponent(selectedComponent);
+                        GlyphCollection glyphs = _glyphManager.GetGlyphsForComponent(selectedComponent);
                         if (glyphs is not null && glyphs.Count > 0)
                         {
                             SelectionGlyphs.AddRange(glyphs);
@@ -301,8 +303,8 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         try
         {
             t = host.CreateTransaction(SR.TrayShowLargeIcons);
-            PropertyDescriptor trayIconProp = TypeDescriptor.GetProperties(mainDesigner.Component)["TrayLargeIcon"];
-            trayIconProp?.SetValue(mainDesigner.Component, !ShowLargeIcons);
+            PropertyDescriptor trayIconProp = TypeDescriptor.GetProperties(_mainDesigner.Component)["TrayLargeIcon"];
+            trayIconProp?.SetValue(_mainDesigner.Component, !ShowLargeIcons);
         }
         finally
         {
@@ -327,37 +329,37 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
 
     private void DoLineupIcons()
     {
-        if (autoArrange)
+        if (_autoArrange)
         {
             return;
         }
 
-        bool oldValue = autoArrange;
-        autoArrange = true;
+        bool oldValue = _autoArrange;
+        _autoArrange = true;
         try
         {
             DoAutoArrange(true);
         }
         finally
         {
-            autoArrange = oldValue;
+            _autoArrange = oldValue;
         }
     }
 
     private void DoAutoArrange(bool dirtyDesigner)
     {
-        if (controls is null || controls.Count <= 0)
+        if (_controls is null || _controls.Count <= 0)
         {
             return;
         }
 
-        controls.Sort(new AutoArrangeComparer());
+        _controls.Sort(new AutoArrangeComparer());
 
         SuspendLayout();
 
         // Reset the autoscroll position before auto arranging.
         // This way, when OnLayout gets fired after this, we won't
-        // have to move every component again.  Note that syncing
+        // have to move every component again. Note that syncing
         // the selection will automatically select & scroll into view
         // the right components
         AutoScrollPosition = new Point(0, 0);
@@ -366,15 +368,18 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         {
             Control prevCtl = null;
             bool positionedGlobal = true;
-            foreach (Control ctl in controls)
+            foreach (Control ctl in _controls)
             {
                 if (!ctl.Visible)
                 {
                     continue;
                 }
 
-                // If we're auto arranging, always move the control.  If not, move the control only if it was never given a position.  This auto arranges it until the user messes with it, or until its position is saved into the resx. (if one control is no longer positioned, move all the other one as  we don't want them to go under one another)
-                if (autoArrange)
+                // If we're auto arranging, always move the control. If not, move the control only
+                // if it was never given a position. This auto arranges it until the user messes with it,
+                // or until its position is saved into the resx. (if one control is no longer positioned,
+                // move all the other one as we don't want them to go under one another)
+                if (_autoArrange)
                 {
                     PositionInNextAutoSlot(ctl as TrayControl, prevCtl, dirtyDesigner);
                 }
@@ -387,7 +392,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
                 prevCtl = ctl;
             }
 
-            selectionUISvc?.SyncSelection();
+            _selectionUISvc?.SyncSelection();
         }
         finally
         {
@@ -404,8 +409,8 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         {
             t = host.CreateTransaction(SR.TrayAutoArrange);
 
-            PropertyDescriptor trayAAProp = TypeDescriptor.GetProperties(mainDesigner.Component)["TrayAutoArrange"];
-            trayAAProp?.SetValue(mainDesigner.Component, !AutoArrange);
+            PropertyDescriptor trayAAProp = TypeDescriptor.GetProperties(_mainDesigner.Component)["TrayAutoArrange"];
+            trayAAProp?.SetValue(_mainDesigner.Component, !AutoArrange);
         }
         finally
         {
@@ -415,15 +420,15 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
 
     public bool AutoArrange
     {
-        get => autoArrange;
+        get => _autoArrange;
         set
         {
-            if (autoArrange != value)
+            if (_autoArrange != value)
             {
-                autoArrange = value;
-                menucmdArrangeIcons.Checked = value;
+                _autoArrange = value;
+                _menucmdArrangeIcons.Checked = value;
 
-                if (autoArrange)
+                if (_autoArrange)
                 {
                     DoAutoArrange(true);
                 }
@@ -443,9 +448,9 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     {
         get
         {
-            if (glyphManager is not null)
+            if (_glyphManager is not null)
             {
-                return glyphManager.SelectionGlyphs;
+                return _glyphManager.SelectionGlyphs;
             }
             else
             {
@@ -459,13 +464,13 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     /// </summary>
     public bool ShowLargeIcons
     {
-        get => showLargeIcons;
+        get => _showLargeIcons;
         set
         {
-            if (showLargeIcons != value)
+            if (_showLargeIcons != value)
             {
-                showLargeIcons = value;
-                menucmdLargeIcons.Checked = ShowLargeIcons;
+                _showLargeIcons = value;
+                _menucmdLargeIcons.Checked = ShowLargeIcons;
 
                 ResetTrayControls();
                 Invalidate(true);
@@ -480,7 +485,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
 
     IComponent IOleDragClient.Component
     {
-        get => mainDesigner.Component;
+        get => _mainDesigner.Component;
     }
 
     bool IOleDragClient.CanModifyComponents
@@ -491,13 +496,13 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     bool IOleDragClient.AddComponent(IComponent component, string name, bool firstAdd)
     {
         // the designer for controls decides what to do here
-        if (mainDesigner is IOleDragClient oleDragClient)
+        if (_mainDesigner is IOleDragClient oleDragClient)
         {
             try
             {
                 oleDragClient.AddComponent(component, name, firstAdd);
                 PositionControl(TrayControl.FromComponent(component));
-                mouseDropLocation = InvalidPoint;
+                _mouseDropLocation = InvalidPoint;
                 return true;
             }
             catch
@@ -566,18 +571,18 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
 
     internal virtual OleDragDropHandler GetOleDragHandler()
     {
-        oleDragDropHandler ??= new TrayOleDragDropHandler(DragHandler, serviceProvider, this);
+        _oleDragDropHandler ??= new TrayOleDragDropHandler(DragHandler, _serviceProvider, this);
 
-        return oleDragDropHandler;
+        return _oleDragDropHandler;
     }
 
     internal virtual SelectionUIHandler DragHandler
     {
         get
         {
-            dragHandler ??= new TraySelectionUIHandler(this);
+            _dragHandler ??= new TraySelectionUIHandler(this);
 
-            return dragHandler;
+            return _dragHandler;
         }
     }
 
@@ -586,20 +591,21 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     void ISelectionUIHandler.EndDrag(object[] components, bool cancel)
     {
         DragHandler.EndDrag(components, cancel);
-        GetOleDragHandler().DoEndDrag(components, cancel);
-        // Here, after the drag is finished and after we have resumed layout, adjust the location of the components we dragged by the scroll offset
-        if (!autoScrollPosBeforeDragging.IsEmpty)
+        GetOleDragHandler().DoEndDrag();
+        // Here, after the drag is finished and after we have resumed layout,
+        // adjust the location of the components we dragged by the scroll offset
+        if (!_autoScrollPosBeforeDragging.IsEmpty)
         {
             foreach (IComponent comp in components)
             {
                 TrayControl tc = TrayControl.FromComponent(comp);
                 if (tc is not null)
                 {
-                    SetTrayLocation(comp, new Point(tc.Location.X - autoScrollPosBeforeDragging.X, tc.Location.Y - autoScrollPosBeforeDragging.Y));
+                    SetTrayLocation(comp, new Point(tc.Location.X - _autoScrollPosBeforeDragging.X, tc.Location.Y - _autoScrollPosBeforeDragging.Y));
                 }
             }
 
-            AutoScrollPosition = new Point(-autoScrollPosBeforeDragging.X, -autoScrollPosBeforeDragging.Y);
+            AutoScrollPosition = new Point(-_autoScrollPosBeforeDragging.X, -_autoScrollPosBeforeDragging.Y);
         }
     }
 
@@ -630,7 +636,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     }
 
     bool ISelectionUIHandler.QueryBeginDrag(object[] components, SelectionRules rules, int initialX, int initialY)
-        => DragHandler.QueryBeginDrag(components, rules, initialX, initialY);
+        => DragHandler.QueryBeginDrag(components);
 
     void ISelectionUIHandler.ShowContextMenu(IComponent component) => OnContextMenu(MousePosition);
 
@@ -649,7 +655,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
             Cursor.Clip = Rectangle.Empty;
             ISelectionService selectionService = (ISelectionService)GetService(typeof(ISelectionService));
             if (selectionService is not null
-                && !(selectionService.SelectionCount == 1 && selectionService.PrimarySelection == mainDesigner.Component))
+                && !(selectionService.SelectionCount == 1 && selectionService.PrimarySelection == _mainDesigner.Component))
             {
                 mcs.ShowContextMenu(MenuCommands.TraySelectionMenu, location.X, location.Y);
             }
@@ -681,18 +687,18 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
 
         // And designate us as the selection UI handler for the control.
-        if (selectionUISvc is null)
+        if (_selectionUISvc is null)
         {
-            selectionUISvc = (ISelectionUIService)GetService(typeof(ISelectionUIService));
+            _selectionUISvc = (ISelectionUIService)GetService(typeof(ISelectionUIService));
 
             // If there is no selection service, then we will provide our own.
-            if (selectionUISvc is null)
+            if (_selectionUISvc is null)
             {
-                selectionUISvc = new SelectionUIService(host);
-                host.AddService(selectionUISvc);
+                _selectionUISvc = new SelectionUIService(host);
+                host.AddService(_selectionUISvc);
             }
 
-            grabHandle = selectionUISvc.GetAdornmentDimensions(AdornmentType.GrabHandle);
+            _grabHandle = _selectionUISvc.GetAdornmentDimensions(AdornmentType.GrabHandle);
         }
 
         // Create a new instance of a tray control.
@@ -702,11 +708,13 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         {
             // Add it to us.
             Controls.Add(trayctl);
-            controls.Add(trayctl);
-            // CanExtend can actually be called BEFORE the component is added to the ComponentTray. ToolStrip is such as scenario:
+            _controls.Add(trayctl);
+            // CanExtend can actually be called BEFORE the component is added to the ComponentTray.
+            // ToolStrip is such as scenario:
             // 1. Add a timer to the Tray.
             // 2. Add a ToolStrip.
-            // 3. ToolStripDesigner.Initialize will be called before ComponentTray.AddComponent, so the ToolStrip is not yet added to the tray.
+            // 3. ToolStripDesigner.Initialize will be called before ComponentTray.AddComponent,
+            //    so the ToolStrip is not yet added to the tray.
             // 4. TooStripDesigner.Initialize calls GetProperties, which causes our CanExtend to be called.
             // 5. CanExtend will return false, since the component has not yet been added.
             // 6. This causes all sorts of badness
@@ -717,7 +725,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
                 PositionControl(trayctl);
             }
 
-            selectionUISvc?.AssignSelectionUIHandler(component, this);
+            _selectionUISvc?.AssignSelectionUIHandler(component, this);
 
             InheritanceAttribute attr = trayctl.InheritanceAttribute;
             if (attr.InheritanceLevel != InheritanceLevel.NotInherited)
@@ -737,7 +745,6 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
     }
 
-    [CLSCompliant(false)]
     protected virtual bool CanCreateComponentFromTool(ToolboxItem tool)
     {
         IDesignerHost host = (IDesignerHost)GetService(typeof(IDesignerHost));
@@ -796,8 +803,8 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
 
     /// <summary>
     ///  This method determines if a UI representation for the given component should be provided.
-    ///  If it returns true, then the component will get a glyph in the tray area.  If it returns
-    ///  false, then the component will not actually be added to the tray.  The default
+    ///  If it returns true, then the component will get a glyph in the tray area. If it returns
+    ///  false, then the component will not actually be added to the tray. The default
     ///  implementation looks for DesignTimeVisibleAttribute.Yes on the component's class.
     /// </summary>
     protected virtual bool CanDisplayComponent(IComponent component)
@@ -805,7 +812,6 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         return TypeDescriptor.GetAttributes(component).Contains(DesignTimeVisibleAttribute.Yes);
     }
 
-    [CLSCompliant(false)]
     public void CreateComponentFromTool(ToolboxItem tool)
     {
         if (!CanCreateComponentFromTool(tool))
@@ -813,7 +819,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
             return;
         }
 
-        // We invoke the drag drop handler for this.  This implementation is shared between all designers that create components.
+        // We invoke the drag drop handler for this. This implementation is shared between all designers that create components.
         GetOleDragHandler().CreateTool(tool, null, 0, 0, 0, 0, false, false);
     }
 
@@ -844,58 +850,57 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     /// </summary>
     protected override void Dispose(bool disposing)
     {
-        if (disposing && controls is not null)
+        if (disposing && _controls is not null)
         {
             IExtenderProviderService es = (IExtenderProviderService)GetService(typeof(IExtenderProviderService));
-            Debug.Assert(!CompModSwitches.CommonDesignerServices.Enabled || (es is not null), "IExtenderProviderService not found");
             es?.RemoveExtenderProvider(this);
 
             IDesignerHost host = (IDesignerHost)GetService(typeof(IDesignerHost));
-            if (eventHandlerService is not null)
+            if (_eventHandlerService is not null)
             {
                 if (host is not null)
                 {
                     host.RemoveService<IEventHandlerService>();
-                    eventHandlerService = null;
+                    _eventHandlerService = null;
                 }
             }
 
             IComponentChangeService componentChangeService = (IComponentChangeService)GetService(typeof(IComponentChangeService));
             if (componentChangeService is not null)
             {
-                componentChangeService.ComponentRemoved -= new ComponentEventHandler(OnComponentRemoved);
+                componentChangeService.ComponentRemoved -= OnComponentRemoved;
             }
 
-            SystemEvents.DisplaySettingsChanged -= new EventHandler(OnSystemSettingChanged);
-            SystemEvents.InstalledFontsChanged -= new EventHandler(OnSystemSettingChanged);
-            SystemEvents.UserPreferenceChanged -= new UserPreferenceChangedEventHandler(OnUserPreferenceChanged);
+            SystemEvents.DisplaySettingsChanged -= OnSystemSettingChanged;
+            SystemEvents.InstalledFontsChanged -= OnSystemSettingChanged;
+            SystemEvents.UserPreferenceChanged -= OnUserPreferenceChanged;
             IMenuCommandService mcs = MenuService;
             if (mcs is not null)
             {
-                Debug.Assert(menucmdArrangeIcons is not null, "Null Menu Command for ArrangeIcons");
-                Debug.Assert(menucmdLineupIcons is not null, "Null Menu Command for LineupIcons");
-                Debug.Assert(menucmdLargeIcons is not null, "Null Menu Command for LargeIcons");
-                mcs.RemoveCommand(menucmdArrangeIcons);
-                mcs.RemoveCommand(menucmdLineupIcons);
-                mcs.RemoveCommand(menucmdLargeIcons);
+                Debug.Assert(_menucmdArrangeIcons is not null, "Null Menu Command for ArrangeIcons");
+                Debug.Assert(_menucmdLineupIcons is not null, "Null Menu Command for LineupIcons");
+                Debug.Assert(_menucmdLargeIcons is not null, "Null Menu Command for LargeIcons");
+                mcs.RemoveCommand(_menucmdArrangeIcons);
+                mcs.RemoveCommand(_menucmdLineupIcons);
+                mcs.RemoveCommand(_menucmdLargeIcons);
             }
 
-            selectionUISvc = null;
+            _selectionUISvc = null;
 
-            if (inheritanceUI is not null)
+            if (_inheritanceUI is not null)
             {
-                inheritanceUI.Dispose();
-                inheritanceUI = null;
+                _inheritanceUI.Dispose();
+                _inheritanceUI = null;
             }
 
-            serviceProvider = null;
-            controls.Clear();
-            controls = null;
+            _serviceProvider = null;
+            _controls.Clear();
+            _controls = null;
 
-            if (glyphManager is not null)
+            if (_glyphManager is not null)
             {
-                glyphManager.Dispose();
-                glyphManager = null;
+                _glyphManager.Dispose();
+                _glyphManager = null;
             }
         }
 
@@ -904,21 +909,21 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
 
     /// <summary>
     ///  Similar to GetNextControl on Control, this method returns the next
-    ///  component in the tray, given a starting component.  It will return
+    ///  component in the tray, given a starting component. It will return
     ///  null if the end (or beginning, if forward is false) of the list
     ///  is encountered.
     /// </summary>
     public IComponent GetNextComponent(IComponent component, bool forward)
     {
-        for (int i = 0; i < controls.Count; i++)
+        for (int i = 0; i < _controls.Count; i++)
         {
-            TrayControl control = (TrayControl)controls[i];
+            TrayControl control = (TrayControl)_controls[i];
             if (control.Component == component)
             {
                 int targetIndex = (forward ? i + 1 : i - 1);
-                if (targetIndex >= 0 && targetIndex < controls.Count)
+                if (targetIndex >= 0 && targetIndex < _controls.Count)
                 {
-                    return ((TrayControl)controls[targetIndex]).Component;
+                    return ((TrayControl)_controls[targetIndex]).Component;
                 }
 
                 // Reached the end of the road.
@@ -926,18 +931,18 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
             }
         }
 
-        // If we got here then the component isn't in our list.  Prime the caller with either the first or the last.
-        if (controls.Count > 0)
+        // If we got here then the component isn't in our list. Prime the caller with either the first or the last.
+        if (_controls.Count > 0)
         {
-            int targetIndex = (forward ? 0 : controls.Count - 1);
-            return ((TrayControl)controls[targetIndex]).Component;
+            int targetIndex = (forward ? 0 : _controls.Count - 1);
+            return ((TrayControl)_controls[targetIndex]).Component;
         }
 
         return null;
     }
 
     /// <summary>
-    ///  Accessor method for the location extender property.  We offer this extender
+    ///  Accessor method for the location extender property. We offer this extender
     ///  to all non-visual components.
     /// </summary>
     [Category("Layout")]
@@ -951,18 +956,21 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         PropertyDescriptor loc = TypeDescriptor.GetProperties(receiver.GetType())["Location"];
         if (loc is not null)
         {
-            // In this case the component already had a Location property, and what the caller wants is the underlying components Location, not the tray location. Why? Because we now use TrayLocation.
+            // In this case the component already had a Location property,
+            // and what the caller wants is the underlying components Location,
+            // not the tray location. Why? Because we now use TrayLocation.
             return (Point)(loc.GetValue(receiver));
         }
         else
         {
-            // If the component didn't already have a Location property, then the caller really wants the tray location. Could be a 3rd party vendor.
+            // If the component didn't already have a Location property,
+            // then the caller really wants the tray location. Could be a 3rd party vendor.
             return GetTrayLocation(receiver);
         }
     }
 
     /// <summary>
-    ///  Accessor method for the location extender property.  We offer this extender
+    ///  Accessor method for the location extender property. We offer this extender
     ///  to all non-visual components.
     /// </summary>
     [Category("Layout")]
@@ -990,10 +998,10 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     protected override object GetService(Type serviceType)
     {
         object service = null;
-        Debug.Assert(serviceProvider is not null, "Trying to access services too late or too early.");
-        if (serviceProvider is not null)
+        Debug.Assert(_serviceProvider is not null, "Trying to access services too late or too early.");
+        if (_serviceProvider is not null)
         {
-            service = serviceProvider.GetService(serviceType);
+            service = _serviceProvider.GetService(serviceType);
         }
 
         return service;
@@ -1023,7 +1031,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     protected override void OnMouseDoubleClick(MouseEventArgs e)
     {
         // give our glyphs first chance at this
-        if (glyphManager is not null && glyphManager.OnMouseDoubleClick(e))
+        if (_glyphManager is not null && _glyphManager.OnMouseDoubleClick(e))
         {
             // handled by a glyph - so don't send to the comp tray
             return;
@@ -1034,7 +1042,6 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         {
             OnLostCapture();
             IEventBindingService eps = (IEventBindingService)GetService(typeof(IEventBindingService));
-            Debug.Assert(!CompModSwitches.CommonDesignerServices.Enabled || (eps is not null), "IEventBindingService not found");
             eps?.ShowCode();
         }
     }
@@ -1050,19 +1057,20 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     }
 
     /// <summary>
-    ///  Called in response to a drag drop for OLE drag and drop.  Here we
+    ///  Called in response to a drag drop for OLE drag and drop. Here we
     ///  drop a toolbox component on our parent control.
     /// </summary>
     protected override void OnDragDrop(DragEventArgs de)
     {
-        // This will be used once during PositionComponent to place the component at the drop point. It is automatically set to null afterwards, so further components appear after the first one dropped.
-        mouseDropLocation = PointToClient(new Point(de.X, de.Y));
-        autoScrollPosBeforeDragging = AutoScrollPosition; // save the scroll position
-        if (mouseDragTool is not null)
+        // This will be used once during PositionComponent to place the component at the drop point. It is automatically
+        // set to null afterwards, so further components appear after the first one dropped.
+        _mouseDropLocation = PointToClient(new Point(de.X, de.Y));
+        _autoScrollPosBeforeDragging = AutoScrollPosition;
+
+        if (_mouseDragTool is not null)
         {
-            ToolboxItem tool = mouseDragTool;
-            mouseDragTool = null;
-            Debug.Assert(!CompModSwitches.CommonDesignerServices.Enabled || (GetService(typeof(IDesignerHost)) is not null), "IDesignerHost not found");
+            ToolboxItem tool = _mouseDragTool;
+            _mouseDragTool = null;
             try
             {
                 IDesignerHost host = (IDesignerHost)GetService(typeof(IDesignerHost));
@@ -1092,7 +1100,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
             GetOleDragHandler().DoOleDragDrop(de);
         }
 
-        mouseDropLocation = InvalidPoint;
+        _mouseDropLocation = InvalidPoint;
         ResumeLayout();
     }
 
@@ -1104,17 +1112,17 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         if (!TabOrderActive)
         {
             SuspendLayout();
-            toolboxService ??= (IToolboxService)GetService(typeof(IToolboxService));
+            _toolboxService ??= (IToolboxService)GetService(typeof(IToolboxService));
 
             OleDragDropHandler dragDropHandler = GetOleDragHandler();
             object[] dragComps = OleDragDropHandler.GetDraggingObjects(de);
             // Only assume the items came from the ToolBox if dragComps is null
-            if (toolboxService is not null && dragComps is null)
+            if (_toolboxService is not null && dragComps is null)
             {
-                mouseDragTool = toolboxService.DeserializeToolboxItem(de.Data, (IDesignerHost)GetService(typeof(IDesignerHost)));
+                _mouseDragTool = _toolboxService.DeserializeToolboxItem(de.Data, (IDesignerHost)GetService(typeof(IDesignerHost)));
             }
 
-            if (mouseDragTool is not null)
+            if (_mouseDragTool is not null)
             {
                 Debug.Assert((de.AllowedEffect & (DragDropEffects.Move | DragDropEffects.Copy)) != 0, "DragDropEffect.Move | .Copy isn't allowed?");
                 if ((de.AllowedEffect & DragDropEffects.Move) != 0)
@@ -1138,7 +1146,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     /// </summary>
     protected override void OnDragLeave(EventArgs e)
     {
-        mouseDragTool = null;
+        _mouseDragTool = null;
         GetOleDragHandler().DoOleDragLeave();
         ResumeLayout();
     }
@@ -1148,7 +1156,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     /// </summary>
     protected override void OnDragOver(DragEventArgs de)
     {
-        if (mouseDragTool is not null)
+        if (_mouseDragTool is not null)
         {
             Debug.Assert((de.AllowedEffect & DragDropEffects.Copy) != 0, "DragDropEffect.Move isn't allowed?");
             de.Effect = DragDropEffects.Copy;
@@ -1171,33 +1179,33 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     }
 
     /// <summary>
-    ///  This is called when we lose capture.  Here we get rid of any
-    ///  rubber band we were drawing.  You should put any cleanup
+    ///  This is called when we lose capture. Here we get rid of any
+    ///  rubber band we were drawing. You should put any cleanup
     ///  code in here.
     /// </summary>
     protected virtual void OnLostCapture()
     {
-        if (mouseDragStart != InvalidPoint)
+        if (_mouseDragStart != InvalidPoint)
         {
             Cursor.Clip = Rectangle.Empty;
-            if (mouseDragEnd != InvalidPoint)
+            if (_mouseDragEnd != InvalidPoint)
             {
-                DrawRubber(mouseDragStart, mouseDragEnd);
-                mouseDragEnd = InvalidPoint;
+                DrawRubber(_mouseDragStart, _mouseDragEnd);
+                _mouseDragEnd = InvalidPoint;
             }
 
-            mouseDragStart = InvalidPoint;
+            _mouseDragStart = InvalidPoint;
         }
     }
 
     private void DrawRubber(Point start, Point end)
     {
-        mouseDragWorkspace.X = Math.Min(start.X, end.X);
-        mouseDragWorkspace.Y = Math.Min(start.Y, end.Y);
-        mouseDragWorkspace.Width = Math.Abs(end.X - start.X);
-        mouseDragWorkspace.Height = Math.Abs(end.Y - start.Y);
-        mouseDragWorkspace = RectangleToScreen(mouseDragWorkspace);
-        ControlPaint.DrawReversibleFrame(mouseDragWorkspace, BackColor, FrameStyle.Dashed);
+        _mouseDragWorkspace.X = Math.Min(start.X, end.X);
+        _mouseDragWorkspace.Y = Math.Min(start.Y, end.Y);
+        _mouseDragWorkspace.Width = Math.Abs(end.X - start.X);
+        _mouseDragWorkspace.Height = Math.Abs(end.Y - start.Y);
+        _mouseDragWorkspace = RectangleToScreen(_mouseDragWorkspace);
+        ControlPaint.DrawReversibleFrame(_mouseDragWorkspace, BackColor, FrameStyle.Dashed);
     }
 
     /// <summary>
@@ -1207,7 +1215,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     protected override void OnMouseDown(MouseEventArgs e)
     {
         // give our glyphs first chance at this
-        if (glyphManager is not null && glyphManager.OnMouseDown(e))
+        if (_glyphManager is not null && _glyphManager.OnMouseDown(e))
         {
             // handled by a glyph - so don't send to the comp tray
             return;
@@ -1216,20 +1224,24 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         base.OnMouseDown(e);
         if (!TabOrderActive)
         {
-            toolboxService ??= (IToolboxService)GetService(typeof(IToolboxService));
+            _toolboxService ??= (IToolboxService)GetService(typeof(IToolboxService));
 
             FocusDesigner();
-            if (e.Button == MouseButtons.Left && toolboxService is not null)
+            if (e.Button == MouseButtons.Left && _toolboxService is not null)
             {
-                ToolboxItem tool = toolboxService.GetSelectedToolboxItem((IDesignerHost)GetService(typeof(IDesignerHost)));
+                ToolboxItem tool = _toolboxService.GetSelectedToolboxItem((IDesignerHost)GetService(typeof(IDesignerHost)));
                 if (tool is not null)
                 {
-                    // mouseDropLocation is checked in PositionControl, which should get called as a result of adding a new component.  This allows us to set the position without flickering, while still providing support for auto layout if the control was double clicked or added through extensibility.
-                    mouseDropLocation = new Point(e.X, e.Y);
+                    // mouseDropLocation is checked in PositionControl,
+                    // which should get called as a result of adding a new component.
+                    // This allows us to set the position without flickering,
+                    // while still providing support for auto layout if the control was double clicked or
+                    // added through extensibility.
+                    _mouseDropLocation = new Point(e.X, e.Y);
                     try
                     {
                         CreateComponentFromTool(tool);
-                        toolboxService.SelectedToolboxItemUsed();
+                        _toolboxService.SelectedToolboxItemUsed();
                     }
                     catch (Exception ex)
                     {
@@ -1240,7 +1252,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
                         }
                     }
 
-                    mouseDropLocation = InvalidPoint;
+                    _mouseDropLocation = InvalidPoint;
                     return;
                 }
             }
@@ -1248,7 +1260,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
             // If it is the left button, start a rubber band drag to lasso controls.
             if (e.Button == MouseButtons.Left)
             {
-                mouseDragStart = new Point(e.X, e.Y);
+                _mouseDragStart = new Point(e.X, e.Y);
                 Capture = true;
                 Cursor.Clip = RectangleToScreen(ClientRectangle);
             }
@@ -1257,8 +1269,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
                 try
                 {
                     ISelectionService ss = (ISelectionService)GetService(typeof(ISelectionService));
-                    Debug.Assert(!CompModSwitches.CommonDesignerServices.Enabled || (ss is not null), "ISelectionService not found");
-                    ss?.SetSelectedComponents(new object[] { mainDesigner.Component });
+                    ss?.SetSelectedComponents(new object[] { _mainDesigner.Component });
                 }
                 catch (Exception ex) when (!ex.IsCriticalException())
                 {
@@ -1275,7 +1286,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     protected override void OnMouseMove(MouseEventArgs e)
     {
         // give our glyphs first chance at this
-        if (glyphManager is not null && glyphManager.OnMouseMove(e))
+        if (_glyphManager is not null && _glyphManager.OnMouseMove(e))
         {
             // handled by a glyph - so don't send to the comp tray
             return;
@@ -1284,20 +1295,20 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         base.OnMouseMove(e);
 
         // If we are dragging, then draw our little rubber band.
-        if (mouseDragStart != InvalidPoint)
+        if (_mouseDragStart != InvalidPoint)
         {
-            if (mouseDragEnd != InvalidPoint)
+            if (_mouseDragEnd != InvalidPoint)
             {
-                DrawRubber(mouseDragStart, mouseDragEnd);
+                DrawRubber(_mouseDragStart, _mouseDragEnd);
             }
             else
             {
-                mouseDragEnd = new Point(0, 0);
+                _mouseDragEnd = new Point(0, 0);
             }
 
-            mouseDragEnd.X = e.X;
-            mouseDragEnd.Y = e.Y;
-            DrawRubber(mouseDragStart, mouseDragEnd);
+            _mouseDragEnd.X = e.X;
+            _mouseDragEnd.Y = e.Y;
+            DrawRubber(_mouseDragStart, _mouseDragEnd);
         }
     }
 
@@ -1308,44 +1319,43 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     protected override void OnMouseUp(MouseEventArgs e)
     {
         // give our glyphs first chance at this
-        if (glyphManager is not null && glyphManager.OnMouseUp(e))
+        if (_glyphManager is not null && _glyphManager.OnMouseUp(e))
         {
             // handled by a glyph - so don't send to the comp tray
             return;
         }
 
-        if (mouseDragStart != InvalidPoint && e.Button == MouseButtons.Left)
+        if (_mouseDragStart != InvalidPoint && e.Button == MouseButtons.Left)
         {
             IComponent[] comps;
             Capture = false;
             Cursor.Clip = Rectangle.Empty;
-            if (mouseDragEnd != InvalidPoint)
+            if (_mouseDragEnd != InvalidPoint)
             {
-                DrawRubber(mouseDragStart, mouseDragEnd);
+                DrawRubber(_mouseDragStart, _mouseDragEnd);
                 Rectangle rect = new Rectangle
                 {
-                    X = Math.Min(mouseDragStart.X, e.X),
-                    Y = Math.Min(mouseDragStart.Y, e.Y),
-                    Width = Math.Abs(e.X - mouseDragStart.X),
-                    Height = Math.Abs(e.Y - mouseDragStart.Y)
+                    X = Math.Min(_mouseDragStart.X, e.X),
+                    Y = Math.Min(_mouseDragStart.Y, e.Y),
+                    Width = Math.Abs(e.X - _mouseDragStart.X),
+                    Height = Math.Abs(e.Y - _mouseDragStart.Y)
                 };
                 comps = GetComponentsInRect(rect);
-                mouseDragEnd = InvalidPoint;
+                _mouseDragEnd = InvalidPoint;
             }
             else
             {
-                comps = Array.Empty<IComponent>();
+                comps = [];
             }
 
             if (comps.Length == 0)
             {
-                comps = new IComponent[] { mainDesigner.Component };
+                comps = [_mainDesigner.Component];
             }
 
             try
             {
                 ISelectionService ss = (ISelectionService)GetService(typeof(ISelectionService));
-                Debug.Assert(!CompModSwitches.CommonDesignerServices.Enabled || (ss is not null), "ISelectionService not found");
                 ss?.SetSelectedComponents(comps);
             }
             catch (Exception ex) when (!ex.IsCriticalException())
@@ -1353,7 +1363,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
                 // Nothing we can really do here; just eat it.
             }
 
-            mouseDragStart = InvalidPoint;
+            _mouseDragStart = InvalidPoint;
         }
 
         base.OnMouseUp(e);
@@ -1361,7 +1371,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
 
     private IComponent[] GetComponentsInRect(Rectangle rect)
     {
-        List<IComponent> list = new();
+        List<IComponent> list = [];
         int controlCount = Controls.Count;
         for (int i = 0; i < controlCount; i++)
         {
@@ -1373,33 +1383,35 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
             }
         }
 
-        return list.ToArray();
+        return [.. list];
     }
 
     protected override void OnPaint(PaintEventArgs pe)
     {
-        if (fResetAmbient || fSelectionChanged)
+        if (_fResetAmbient || _fSelectionChanged)
         {
-            fResetAmbient = false;
-            fSelectionChanged = false;
+            _fResetAmbient = false;
+            _fSelectionChanged = false;
             IUIService uiService = (IUIService)GetService(typeof(IUIService));
             if (uiService is not null)
             {
                 Color styleColor;
-                if (uiService.Styles["ArtboardBackground"] is Color)
+                if (uiService.Styles["ArtboardBackground"] is Color backgroundColor)
                 {
-                    styleColor = (Color)uiService.Styles["ArtboardBackground"];
+                    styleColor = backgroundColor;
                 }
 
                 // Can't use 'as' here since Color is a value type
-                else if (uiService.Styles["VsColorDesignerTray"] is Color)
+                else if (uiService.Styles["VsColorDesignerTray"] is Color trayColor)
                 {
-                    styleColor = (Color)uiService.Styles["VsColorDesignerTray"];
+                    styleColor = trayColor;
                 }
-                else if (uiService.Styles["HighlightColor"] is Color)
+                else if (uiService.Styles["HighlightColor"] is Color highlightColor)
                 {
-                    // Since v1, we have had code here that checks for HighlightColor, so some hosts (like WinRes) have been setting it. If VsColorDesignerTray isn't present, we look for HighlightColor for backward compat.
-                    styleColor = (Color)uiService.Styles["HighlightColor"];
+                    // Since v1, we have had code here that checks for HighlightColor,
+                    // so some hosts (like WinRes) have been setting it.
+                    // If VsColorDesignerTray isn't present, we look for HighlightColor for backward compatibility.
+                    styleColor = highlightColor;
                 }
                 else
                 {
@@ -1409,7 +1421,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
 
                 BackColor = styleColor;
                 Font = (Font)uiService.Styles["DialogFont"];
-                foreach (Control ctl in controls)
+                foreach (Control ctl in _controls)
                 {
                     ctl.BackColor = styleColor;
                     ctl.ForeColor = ForeColor;
@@ -1420,7 +1432,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         base.OnPaint(pe);
         Graphics gr = pe.Graphics;
         // Now, if we have a selection, paint it
-        if (selectedObjects is not null)
+        if (_selectedObjects is not null)
         {
             bool first = true; // indicates the first iteration of our foreach loop
             HatchBrush selectionBorderBrush;
@@ -1435,7 +1447,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
 
             try
             {
-                foreach (object o in selectedObjects)
+                foreach (object o in _selectedObjects)
                 {
                     Control c = ((IOleDragClient)this).GetControlForComponent(o);
                     if (c is not null && c.Visible)
@@ -1453,7 +1465,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
                         gr.FillRectangle(selectionBorderBrush, DesignerUtils.GetBoundsForNoResizeSelectionType(innerRect, SelectionBorderGlyphType.Left));
                         gr.FillRectangle(selectionBorderBrush, DesignerUtils.GetBoundsForNoResizeSelectionType(innerRect, SelectionBorderGlyphType.Right));
                         // Need to draw this one last
-                        DesignerUtils.DrawNoResizeHandle(gr, glyph.Bounds, first, glyph);
+                        DesignerUtils.DrawNoResizeHandle(gr, glyph.Bounds, first);
                     }
 
                     first = false;
@@ -1466,18 +1478,18 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
 
         // paint any glyphs
-        glyphManager?.OnPaintGlyphs(pe);
+        _glyphManager?.OnPaintGlyphs(pe);
     }
 
     /// <summary>
-    ///  Sets the cursor.  You may override this to set your own
+    ///  Sets the cursor. You may override this to set your own
     ///  cursor.
     /// </summary>
     protected virtual void OnSetCursor()
     {
-        toolboxService ??= (IToolboxService)GetService(typeof(IToolboxService));
+        _toolboxService ??= (IToolboxService)GetService(typeof(IToolboxService));
 
-        if (toolboxService is null || !toolboxService.SetCursor())
+        if (_toolboxService is null || !_toolboxService.SetCursor())
         {
             Cursor.Current = Cursors.Default;
         }
@@ -1494,12 +1506,12 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
             try
             {
                 InheritanceAttribute attr = c.InheritanceAttribute;
-                if (attr.InheritanceLevel != InheritanceLevel.NotInherited && inheritanceUI is not null)
+                if (attr.InheritanceLevel != InheritanceLevel.NotInherited && _inheritanceUI is not null)
                 {
-                    inheritanceUI.RemoveInheritedControl(c);
+                    _inheritanceUI.RemoveInheritedControl(c);
                 }
 
-                controls?.Remove(c);
+                _controls?.Remove(c);
             }
             finally
             {
@@ -1509,7 +1521,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     }
 
     /// <summary>
-    ///  Accessor method for the location extender property.  We offer this extender
+    ///  Accessor method for the location extender property. We offer this extender
     ///  to all non-visual components.
     /// </summary>
     public void SetLocation(IComponent receiver, Point location)
@@ -1518,7 +1530,10 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         IDesignerHost host = (IDesignerHost)GetService(typeof(IDesignerHost));
         if (host is not null && host.Loading)
         {
-            // If we are loading, and we get called here, that's because we have provided the extended Location property. In this case we are loading an old project, and what we are really setting is the tray location.
+            // If we are loading, and we get called here,
+            // that's because we have provided the extended Location property.
+            // In this case we are loading an old project,
+            // and what we are really setting is the tray location.
             SetTrayLocation(receiver, location);
         }
         else
@@ -1527,7 +1542,8 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
             PropertyDescriptor loc = TypeDescriptor.GetProperties(receiver.GetType())["Location"];
             if (loc is not null)
             {
-                // so if the component already had the Location property, what the caller wants is really the underlying component's Location property.
+                // so if the component already had the Location property,
+                // what the caller wants is really the underlying component's Location property.
                 loc.SetValue(receiver, location);
             }
             else
@@ -1539,7 +1555,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     }
 
     /// <summary>
-    ///  Accessor method for the location extender property.  We offer this extender
+    ///  Accessor method for the location extender property. We offer this extender
     ///  to all non-visual components.
     /// </summary>
     public void SetTrayLocation(IComponent receiver, Point location)
@@ -1574,27 +1590,27 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     {
         switch (m.MsgInternal)
         {
-            case PInvoke.WM_CANCELMODE:
+            case PInvokeCore.WM_CANCELMODE:
                 // When we get cancelmode (i.e. you tabbed away to another window) then we want to cancel
                 // any pending drag operation.
                 OnLostCapture();
                 break;
-            case PInvoke.WM_SETCURSOR:
+            case PInvokeCore.WM_SETCURSOR:
                 OnSetCursor();
                 return;
-            case PInvoke.WM_HSCROLL:
-            case PInvoke.WM_VSCROLL:
+            case PInvokeCore.WM_HSCROLL:
+            case PInvokeCore.WM_VSCROLL:
                 // When we scroll, we reposition a control without causing a property change event.
                 // Therefore, we must tell the selection UI service to sync itself.
                 base.WndProc(ref m);
-                selectionUISvc?.SyncSelection();
+                _selectionUISvc?.SyncSelection();
 
                 return;
-            case PInvoke.WM_STYLECHANGED:
+            case PInvokeCore.WM_STYLECHANGED:
                 // When the scroll bars first appear, we need to invalidate so we properly paint our grid.
                 Invalidate();
                 break;
-            case PInvoke.WM_CONTEXTMENU:
+            case PInvokeCore.WM_CONTEXTMENU:
                 {
                     // Pop a context menu for the composition designer.
                     Point location = PARAM.ToPoint(m.LParamInternal);
@@ -1608,15 +1624,15 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
                     break;
                 }
 
-            case PInvoke.WM_NCHITTEST:
+            case PInvokeCore.WM_NCHITTEST:
                 {
-                    if (glyphManager is not null)
+                    if (_glyphManager is not null)
                     {
                         // Get a hit test on any glyphs that we are managing this way.
                         // We know where to route appropriate messages.
                         Point location = PARAM.ToPoint(m.LParamInternal);
                         location.Offset(PointToClient(default));
-                        glyphManager.GetHitTest(location);
+                        _glyphManager.GetHitTest(location);
                     }
 
                     base.WndProc(ref m);
@@ -1638,22 +1654,17 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     {
         get
         {
-            if (!queriedTabOrder)
+            if (!_queriedTabOrder)
             {
-                queriedTabOrder = true;
+                _queriedTabOrder = true;
                 IMenuCommandService mcs = MenuService;
                 if (mcs is not null)
                 {
-                    tabOrderCommand = mcs.FindCommand(StandardCommands.TabOrder);
+                    _tabOrderCommand = mcs.FindCommand(StandardCommands.TabOrder);
                 }
             }
 
-            if (tabOrderCommand is not null)
-            {
-                return tabOrderCommand.Checked;
-            }
-
-            return false;
+            return _tabOrderCommand is not null && _tabOrderCommand.Checked;
         }
     }
 
@@ -1661,9 +1672,9 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     {
         get
         {
-            inheritanceUI ??= new InheritanceUI();
+            _inheritanceUI ??= new InheritanceUI();
 
-            return inheritanceUI;
+            return _inheritanceUI;
         }
     }
 
@@ -1671,9 +1682,9 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     {
         get
         {
-            menuCommandService ??= (IMenuCommandService)GetService(typeof(IMenuCommandService));
+            _menuCommandService ??= (IMenuCommandService)GetService(typeof(IMenuCommandService));
 
-            return menuCommandService;
+            return _menuCommandService;
         }
     }
 
@@ -1700,7 +1711,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     {
         get
         {
-            if (mainDesigner is ParentControlDesigner designer)
+            if (_mainDesigner is ParentControlDesigner designer)
             {
                 return designer.ParentGridSize;
             }
@@ -1718,12 +1729,12 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
                 return;
             }
 
-            if (mouseDropLocation == InvalidPoint)
+            if (_mouseDropLocation == InvalidPoint)
             {
                 Control prevCtl = null;
-                if (controls.Count > 1)
+                if (_controls.Count > 1)
                 {
-                    prevCtl = controls[controls.Count - 1];
+                    prevCtl = _controls[^1];
                 }
 
                 PositionInNextAutoSlot(c, prevCtl, true);
@@ -1740,26 +1751,28 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     private void PositionControl(TrayControl c)
     {
         Debug.Assert(c.Visible, $"TrayControl for {c.Component} should not be positioned");
-        if (!autoArrange)
+        if (!_autoArrange)
         {
-            if (mouseDropLocation != InvalidPoint)
+            if (_mouseDropLocation != InvalidPoint)
             {
-                if (!c.Location.Equals(mouseDropLocation))
+                if (!c.Location.Equals(_mouseDropLocation))
                 {
-                    c.Location = mouseDropLocation;
+                    c.Location = _mouseDropLocation;
                 }
             }
             else
             {
                 Control prevCtl = null;
-                if (controls.Count > 1)
+                if (_controls.Count > 1)
                 {
-                    // PositionControl can be called when all the controls have been added (from IOleDragClient.AddComponent), so we can't use the old way of looking up the previous control (prevCtl = controls[controls.Count - 2]
-                    int index = controls.IndexOf(c);
+                    // PositionControl can be called when all the controls have been added
+                    // (from IOleDragClient.AddComponent), so we can't use the old way of
+                    // looking up the previous control (prevCtl = controls[controls.Count - 2]
+                    int index = _controls.IndexOf(c);
                     Debug.Assert(index >= 1, "Got the wrong index, how could that be?");
                     if (index >= 1)
                     {
-                        prevCtl = controls[index - 1];
+                        prevCtl = _controls[index - 1];
                     }
                 }
 
@@ -1768,20 +1781,20 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
         else
         {
-            if (mouseDropLocation != InvalidPoint)
+            if (_mouseDropLocation != InvalidPoint)
             {
-                RearrangeInAutoSlots(c, mouseDropLocation);
+                RearrangeInAutoSlots(c, _mouseDropLocation);
             }
             else
             {
                 Control prevCtl = null;
-                if (controls.Count > 1)
+                if (_controls.Count > 1)
                 {
-                    int index = controls.IndexOf(c);
+                    int index = _controls.IndexOf(c);
                     Debug.Assert(index >= 1, "Got the wrong index, how could that be?");
                     if (index >= 1)
                     {
-                        prevCtl = controls[index - 1];
+                        prevCtl = _controls[index - 1];
                     }
                 }
 
@@ -1792,7 +1805,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
 
     internal void RearrangeInAutoSlots(Control c, Point pos)
     {
-        Debug.Assert(controls.IndexOf(c) != -1, "Add control to the list of controls before autoarranging.!!!");
+        Debug.Assert(_controls.IndexOf(c) != -1, "Add control to the list of controls before autoarranging.!!!");
         Debug.Assert(Visible == c.Visible, $"TrayControl for {((TrayControl)c).Component} should not be positioned");
 
         TrayControl tc = (TrayControl)c;
@@ -1803,18 +1816,18 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     private bool PositionInNextAutoSlot(TrayControl c, Control prevCtl, bool dirtyDesigner)
     {
         Debug.Assert(c.Visible, $"TrayControl for {c.Component} should not be positioned");
-        if (whiteSpace.IsEmpty)
+        if (_whiteSpace.IsEmpty)
         {
-            Debug.Assert(selectionUISvc is not null, "No SelectionUIService available for tray.");
-            whiteSpace = new Point(selectionUISvc.GetAdornmentDimensions(AdornmentType.GrabHandle));
-            whiteSpace.X = whiteSpace.X * 2 + 3;
-            whiteSpace.Y = whiteSpace.Y * 2 + 3;
+            Debug.Assert(_selectionUISvc is not null, "No SelectionUIService available for tray.");
+            _whiteSpace = new Point(_selectionUISvc.GetAdornmentDimensions(AdornmentType.GrabHandle));
+            _whiteSpace.X = _whiteSpace.X * 2 + 3;
+            _whiteSpace.Y = _whiteSpace.Y * 2 + 3;
         }
 
         if (prevCtl is null)
         {
             Rectangle display = DisplayRectangle;
-            Point newLoc = new(display.X + whiteSpace.X, display.Y + whiteSpace.Y);
+            Point newLoc = new(display.X + _whiteSpace.X, display.Y + _whiteSpace.Y);
             if (!c.Location.Equals(newLoc))
             {
                 c.Location = newLoc;
@@ -1842,13 +1855,13 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         {
             // Calculate the next location for this control.
             Rectangle bounds = prevCtl.Bounds;
-            Point newLoc = new(bounds.X + bounds.Width + whiteSpace.X, bounds.Y);
+            Point newLoc = new(bounds.X + bounds.Width + _whiteSpace.X, bounds.Y);
 
-            // Check to see if it goes over the edge of our window.  If it does, then wrap it.
+            // Check to see if it goes over the edge of our window. If it does, then wrap it.
             if (newLoc.X + c.Size.Width > Size.Width)
             {
-                newLoc.X = whiteSpace.X;
-                newLoc.Y += bounds.Height + whiteSpace.Y;
+                newLoc.X = _whiteSpace.X;
+                newLoc.Y += bounds.Height + _whiteSpace.Y;
             }
 
             if (!c.Location.Equals(newLoc))
@@ -1910,10 +1923,9 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
             UpdateIconInfo();
 
             IComponentChangeService cs = (IComponentChangeService)tray.GetService(typeof(IComponentChangeService));
-            Debug.Assert(!CompModSwitches.CommonDesignerServices.Enabled || (cs is not null), "IComponentChangeService not found");
             if (cs is not null)
             {
-                cs.ComponentRename += new ComponentRenameEventHandler(OnComponentRename);
+                cs.ComponentRename += OnComponentRename;
             }
 
             ISite site = component.Site;
@@ -1927,7 +1939,8 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
                 ds?.SetValue(GetType(), this);
             }
 
-            // We always want name to have something in it, so we default to the class name.  This way the design instance contains something semi-intuitive if we don't have a site.
+            // We always want name to have something in it, so we default to the class name.
+            // This way the design instance contains something semi-intuitive if we don't have a site.
             name ??= component.GetType().Name;
 
             Text = name;
@@ -1962,10 +1975,13 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         /// <summary>
         ///  Adjusts the size of the control based on the contents.
         /// </summary>
-        // CONSIDER: this method gets called three or four times per component, and is even reentrant (CreateGraphics can force handle creation, and OnCreateHandle calls this method).  There's probably a better way to do this, but since this doesn't seem to be on the critical path, I'm not going to lose sleep over it.
+        // CONSIDER: this method gets called three or four times per component,
+        // and is even reentrant (CreateGraphics can force handle creation, and OnCreateHandle calls this method).
+        // There's probably a better way to do this, but since this doesn't seem to be on the critical path,
+        // I'm not going to lose sleep over it.
         private void AdjustSize()
         {
-            // CONSIDER: this forces handle creation.  Can we delay this calculation?
+            // CONSIDER: this forces handle creation. Can we delay this calculation?
             Graphics gr = CreateGraphics();
             try
             {
@@ -1993,7 +2009,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
                 gr?.Dispose();
             }
 
-            _tray.glyphManager?.UpdateLocation(this);
+            _tray._glyphManager?.UpdateLocation(this);
         }
 
         protected override AccessibleObject CreateAccessibilityInstance() => new TrayControlAccessibleObject(this, _tray);
@@ -2008,16 +2024,15 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
                 ISite site = _component.Site;
                 if (site is not null)
                 {
-                    IComponentChangeService cs = (IComponentChangeService)site.GetService(typeof(IComponentChangeService));
-                    Debug.Assert(!CompModSwitches.CommonDesignerServices.Enabled || (cs is not null), "IComponentChangeService not found");
-                    if (cs is not null)
+                    if (site.TryGetService(out IComponentChangeService cs))
                     {
-                        cs.ComponentRename -= new ComponentRenameEventHandler(OnComponentRename);
+                        cs.ComponentRename -= OnComponentRename;
                     }
 
-                    IDictionaryService ds = (IDictionaryService)site.GetService(typeof(IDictionaryService));
-                    Debug.Assert(!CompModSwitches.CommonDesignerServices.Enabled || (ds is not null), "IDictionaryService not found");
-                    ds?.SetValue(typeof(TrayControl), null);
+                    if (site.TryGetService(out IDictionaryService ds))
+                    {
+                        ds.SetValue(typeof(TrayControl), null);
+                    }
                 }
             }
 
@@ -2029,28 +2044,22 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         /// </summary>
         public static TrayControl FromComponent(IComponent component)
         {
-            TrayControl c = null;
             if (component is null)
             {
                 return null;
             }
 
-            ISite site = component.Site;
-            if (site is not null)
+            if (component.Site.TryGetService(out IDictionaryService ds))
             {
-                IDictionaryService ds = (IDictionaryService)site.GetService(typeof(IDictionaryService));
-                Debug.Assert(!CompModSwitches.CommonDesignerServices.Enabled || (ds is not null), "IDictionaryService not found");
-                if (ds is not null)
-                {
-                    c = (TrayControl)ds.GetValue(typeof(TrayControl));
-                }
+                return (TrayControl)ds.GetValue(typeof(TrayControl));
             }
 
-            return c;
+            return null;
         }
 
         /// <summary>
-        ///  Delegate that is called in response to a name change.  Here we update our own stashed version of the name, recalculate our size and repaint.
+        ///  Delegate that is called in response to a name change.
+        ///  Here we update our own stashed version of the name, recalculate our size and repaint.
         /// </summary>
         private void OnComponentRename(object sender, ComponentRenameEventArgs e)
         {
@@ -2062,7 +2071,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
 
         /// <summary>
-        ///  Overrides handle creation notification for a control.  Here we just ensure that we're the proper size.
+        ///  Overrides handle creation notification for a control. Here we just ensure that we're the proper size.
         /// </summary>
         protected override void OnHandleCreated(EventArgs e)
         {
@@ -2071,7 +2080,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
 
         /// <summary>
-        ///  Called in response to a double-click of the left mouse button.  The default behavior here calls onDoubleClick on IMouseHandler
+        ///  Called in response to a double-click of the left mouse button. The default behavior here calls onDoubleClick on IMouseHandler
         /// </summary>
         protected override void OnDoubleClick(EventArgs e)
         {
@@ -2084,7 +2093,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
                 {
                     _mouseDragLast = InvalidPoint;
                     Capture = false;
-                    // We try to get a designer for the component and let it view the event.  If this fails, then we'll try to do it ourselves.
+                    // We try to get a designer for the component and let it view the event. If this fails, then we'll try to do it ourselves.
                     IDesigner designer = host.GetDesigner(_component);
                     if (designer is null)
                     {
@@ -2123,42 +2132,47 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
             OnSetCursor();
 
             // And now finish the drag.
-            Debug.Assert(_tray.selectionUISvc is not null, "We shouldn't be able to begin a drag without this");
-            if (_tray.selectionUISvc is not null && _tray.selectionUISvc.Dragging)
+            Debug.Assert(_tray._selectionUISvc is not null, "We shouldn't be able to begin a drag without this");
+            if (_tray._selectionUISvc is not null && _tray._selectionUISvc.Dragging)
             {
-                _tray.selectionUISvc.EndDrag(cancel);
+                _tray._selectionUISvc.EndDrag(cancel);
             }
         }
 
         /// <summary>
-        ///  Called when the mouse button is pressed down.  Here, we provide drag support for the component.
+        ///  Called when the mouse button is pressed down. Here, we provide drag support for the component.
         /// </summary>
         protected override void OnMouseDown(MouseEventArgs me)
         {
             base.OnMouseDown(me);
-            if (!_tray.TabOrderActive)
+            if (_tray.TabOrderActive)
             {
-                _tray.FocusDesigner();
-                // If this is the left mouse button, then begin a drag.
-                if (me.Button == MouseButtons.Left)
+                return;
+            }
+
+            _tray.FocusDesigner();
+
+            // If this is the left mouse button, then begin a drag.
+            if (me.Button == MouseButtons.Left)
+            {
+                Capture = true;
+                _mouseDragLast = PointToScreen(new Point(me.X, me.Y));
+
+                // If the CTRL key isn't down, select this component, otherwise, we wait until the mouse up.
+                // Make sure the component is selected.
+                _ctrlSelect = PInvoke.GetKeyState((int)Keys.ControlKey) != 0;
+                if (!_ctrlSelect)
                 {
-                    Capture = true;
-                    _mouseDragLast = PointToScreen(new Point(me.X, me.Y));
-                    // If the CTRL key isn't down, select this component, otherwise, we wait until the mouse up. Make sure the component is selected
-                    _ctrlSelect = PInvoke.GetKeyState((int)Keys.ControlKey) != 0;
-                    if (!_ctrlSelect)
-                    {
-                        ISelectionService sel = (ISelectionService)_tray.GetService(typeof(ISelectionService));
-                        // Make sure the component is selected
-                        Debug.Assert(!CompModSwitches.CommonDesignerServices.Enabled || (sel is not null), "ISelectionService not found");
-                        sel?.SetSelectedComponents(new object[] { Component }, SelectionTypes.Primary);
-                    }
+                    ISelectionService sel = (ISelectionService)_tray.GetService(typeof(ISelectionService));
+                    // Make sure the component is selected
+                    sel?.SetSelectedComponents(new object[] { Component }, SelectionTypes.Primary);
                 }
             }
         }
 
         /// <summary>
-        ///  Called when the mouse is moved over the component.  We update our drag information here if we're dragging the component around.
+        ///  Called when the mouse is moved over the component.
+        ///  We update our drag information here if we're dragging the component around.
         /// </summary>
         protected override void OnMouseMove(MouseEventArgs me)
         {
@@ -2197,7 +2211,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
                 sel?.SetSelectedComponents(new object[] { Component }, SelectionTypes.Primary);
 
                 // Notify the selection service that all the components are in the "mouse down" mode.
-                if (_tray.selectionUISvc is not null && _tray.selectionUISvc.BeginDrag(SelectionRules.Visible | SelectionRules.Moveable, _mouseDragLast.X, _mouseDragLast.Y))
+                if (_tray._selectionUISvc is not null && _tray._selectionUISvc.BeginDrag(SelectionRules.Visible | SelectionRules.Moveable, _mouseDragLast.X, _mouseDragLast.Y))
                 {
                     OnSetCursor();
                 }
@@ -2210,7 +2224,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
 
         /// <summary>
-        ///  Called when the mouse button is released.  Here, we finish our drag if one was started.
+        ///  Called when the mouse button is released. Here, we finish our drag if one was started.
         /// </summary>
         protected override void OnMouseUp(MouseEventArgs me)
         {
@@ -2312,7 +2326,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
 
         /// <summary>
-        ///  Overrides control's FontChanged.  Here we re-adjust our size if the font changes.
+        ///  Overrides control's FontChanged. Here we re-adjust our size if the font changes.
         /// </summary>
         protected override void OnFontChanged(EventArgs e)
         {
@@ -2321,15 +2335,15 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
 
         /// <summary>
-        ///  Overrides control's LocationChanged.  Here, we make sure that any glyphs associated with us are also relocated.
+        ///  Overrides control's LocationChanged. Here, we make sure that any glyphs associated with us are also relocated.
         /// </summary>
         protected override void OnLocationChanged(EventArgs e)
         {
-            _tray.glyphManager?.UpdateLocation(this);
+            _tray._glyphManager?.UpdateLocation(this);
         }
 
         /// <summary>
-        ///  Overrides control's TextChanged.  Here we re-adjust our size if the font changes.
+        ///  Overrides control's TextChanged. Here we re-adjust our size if the font changes.
         /// </summary>
         protected override void OnTextChanged(EventArgs e)
         {
@@ -2338,10 +2352,13 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
 
         /// <summary>
-        ///  Called each time the cursor needs to be set.  The ControlDesigner behavior here will set the cursor to one of three things:
-        ///  1.  If the selection UI service shows a locked selection, or if there is no location property on the control, then the default arrow will be set.
-        ///  2.  Otherwise, the four headed arrow will be set to indicate that the component can be clicked and moved.
-        ///  3.  If the user is currently dragging a component, the crosshair cursor will be used instead of the four headed arrow.
+        ///  Called each time the cursor needs to be set.
+        ///  The ControlDesigner behavior here will set the cursor to one of three things:
+        ///  1. If the selection UI service shows a locked selection, or if there is no location property
+        ///     on the control, then the default arrow will be set.
+        ///  2. Otherwise, the four headed arrow will be set to indicate that the component can be clicked and moved.
+        ///  3. If the user is currently dragging a component, the crosshair cursor will be used instead
+        ///     of the four headed arrow.
         /// </summary>
         private void OnSetCursor()
         {
@@ -2353,7 +2370,10 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
             }
             catch (FileNotFoundException e)
             {
-                // In case an unhandled exception was encountered, we don't want to leave the cursor with some strange shape Currently we have watson logs with FileNotFoundException only, so we are scoping the catch only to that type.
+                // In case an unhandled exception was encountered,
+                // we don't want to leave the cursor with some strange shape.
+                // Currently we have watson logs with FileNotFoundException only,
+                // so we are scoping the catch only to that type.
                 Cursor.Current = Cursors.Default;
                 Debug.Fail(e.Message);
                 return;
@@ -2440,7 +2460,8 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
 
         /// <summary>
-        ///  This creates a method signature in the source code file for the default event on the component and navigates the user's cursor to that location.
+        ///  This creates a method signature in the source code file for the default event
+        ///  on the component and navigates the user's cursor to that location.
         /// </summary>
         public virtual void ViewDefaultEvent(IComponent component)
         {
@@ -2448,7 +2469,6 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
             PropertyDescriptor defaultPropEvent = null;
             bool eventChanged = false;
             IEventBindingService eps = (IEventBindingService)GetService(typeof(IEventBindingService));
-            Debug.Assert(!CompModSwitches.CommonDesignerServices.Enabled || (eps is not null), "IEventBindingService not found");
             if (eps is not null)
             {
                 defaultPropEvent = eps.GetEventProperty(defaultEvent);
@@ -2458,7 +2478,6 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
             if (defaultPropEvent is null || defaultPropEvent.IsReadOnly)
             {
                 eps?.ShowCode();
-
                 return;
             }
 
@@ -2496,20 +2515,21 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
 
         /// <summary>
-        ///  This method should be called by the extending designer for each message the control would normally receive.  This allows the designer to pre-process messages before allowing them to be routed to the control.
+        ///  This method should be called by the extending designer for each message the control would normally receive.
+        ///  This allows the designer to pre-process messages before allowing them to be routed to the control.
         /// </summary>
         protected override void WndProc(ref Message m)
         {
             switch (m.MsgInternal)
             {
-                case PInvoke.WM_SETCURSOR:
+                case PInvokeCore.WM_SETCURSOR:
                     // We always handle setting the cursor ourselves.
                     OnSetCursor();
                     break;
-                case PInvoke.WM_CONTEXTMENU:
-                    // We must handle this ourselves.  Control only allows regular Windows Forms context menus, which
-                    // doesn't do us much good.  Also, control's button up processing calls DefwndProc first, which
-                    // causes a right mouse up to be routed as a WM_CONTEXTMENU.  If we don't respond to it here,
+                case PInvokeCore.WM_CONTEXTMENU:
+                    // We must handle this ourselves. Control only allows regular Windows Forms context menus, which
+                    // doesn't do us much good. Also, control's button up processing calls DefwndProc first, which
+                    // causes a right mouse up to be routed as a WM_CONTEXTMENU. If we don't respond to it here,
                     // this message will be bubbled up to our parent, which would pop up a container context menu
                     // instead of our own.
 
@@ -2522,8 +2542,8 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
 
                     OnContextMenu(location);
                     break;
-                case PInvoke.WM_NCHITTEST:
-                    if (_tray.glyphManager is not null)
+                case PInvokeCore.WM_NCHITTEST:
+                    if (_tray._glyphManager is not null)
                     {
                         // Make sure that we send our glyphs hit test messages over the TrayControls too.
                         Point pt = PARAM.ToPoint(m.LParamInternal);
@@ -2532,7 +2552,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
 
                         // Offset the location of the traycontrol so we're in component tray coordinates.
                         pt.Offset(Location.X, Location.Y);
-                        _tray.glyphManager.GetHitTest(pt);
+                        _tray._glyphManager.GetHitTest(pt);
                     }
 
                     base.WndProc(ref m);
@@ -2585,15 +2605,13 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
     {
         private Adorner _traySelectionAdorner; // we'll use a single adorner to manage the glyphs
         private Glyph _hitTestedGlyph; // the last glyph we hit tested (can be null)
-        private readonly ISelectionService _selSvc; // we need the selection service fo r the hover behavior
         private readonly BehaviorService _behaviorSvc;
 
         /// <summary>
         ///  Constructor that simply creates an empty adorner.
         /// </summary>
-        public ComponentTrayGlyphManager(ISelectionService selSvc, BehaviorService behaviorSvc)
+        public ComponentTrayGlyphManager(BehaviorService behaviorSvc)
         {
-            _selSvc = selSvc;
             _behaviorSvc = behaviorSvc;
             _traySelectionAdorner = new Adorner();
         }
@@ -2623,7 +2641,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         /// </summary>
         public GlyphCollection GetGlyphsForComponent(IComponent comp)
         {
-            GlyphCollection glyphs = new();
+            GlyphCollection glyphs = [];
             if (_behaviorSvc is not null && comp is not null)
             {
                 if (_behaviorSvc.DesignerActionUI is not null)
@@ -2640,7 +2658,9 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
 
         /// <summary>
-        ///  Called from the tray's NCHITTEST message in the WndProc. We use this to loop through our glyphs and identify which one is successfully hit tested.  From here, we know where to send our messages.
+        ///  Called from the tray's NCHITTEST message in the WndProc.
+        ///  We use this to loop through our glyphs and identify which one is successfully hit tested.
+        ///  From here, we know where to send our messages.
         /// </summary>
         public Cursor GetHitTest(Point p)
         {
@@ -2659,7 +2679,8 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
 
         /// <summary>
-        ///  Called when the tray receives this mouse message.  Here,  we'll give our glyphs the first chance to respond to the message before the tray even sees it.
+        ///  Called when the tray receives this mouse message.
+        ///  Here, we'll give our glyphs the first chance to respond to the message before the tray even sees it.
         /// </summary>
         public bool OnMouseDoubleClick(MouseEventArgs e)
         {
@@ -2672,7 +2693,8 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
 
         /// <summary>
-        ///  Called when the tray receives this mouse message.  Here,  we'll give our glyphs the first chance to respond to the message before the tray even sees it.
+        ///  Called when the tray receives this mouse message.
+        ///  Here, we'll give our glyphs the first chance to respond to the message before the tray even sees it.
         /// </summary>
         public bool OnMouseDown(MouseEventArgs e)
         {
@@ -2685,7 +2707,8 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
 
         /// <summary>
-        ///  Called when the tray receives this mouse message.  Here,  we'll give our glyphs the first chance to respond to the message before the tray even sees it.
+        ///  Called when the tray receives this mouse message.
+        ///  Here, we'll give our glyphs the first chance to respond to the message before the tray even sees it.
         /// </summary>
         public bool OnMouseMove(MouseEventArgs e)
         {
@@ -2698,7 +2721,8 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
 
         /// <summary>
-        ///  Called when the tray receives this mouse message.  Here,  we'll give our glyphs the first chance to respond to the message before the tray even sees it.
+        ///  Called when the tray receives this mouse message.
+        ///  Here, we'll give our glyphs the first chance to respond to the message before the tray even sees it.
         /// </summary>
         public bool OnMouseUp(MouseEventArgs e)
         {
@@ -2711,7 +2735,8 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
 
         /// <summary>
-        ///  Called when the comp tray or any tray control paints. This will simply enumerate through the glyphs in our  Adorner and ask them to paint
+        ///  Called when the comp tray or any tray control paints.
+        ///  This will simply enumerate through the glyphs in our Adorner and ask them to paint.
         /// </summary>
         public void OnPaintGlyphs(PaintEventArgs pe)
         {
@@ -2723,7 +2748,8 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
 
         /// <summary>
-        ///  Called when a tray control's location has changed. We'll loop through our glyphs and invalidate any that are associated with the component.
+        ///  Called when a tray control's location has changed.
+        ///  We'll loop through our glyphs and invalidate any that are associated with the component.
         /// </summary>
         public void UpdateLocation(TrayControl trayControl)
         {
@@ -2794,7 +2820,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
 
         /// <summary>
-        ///  Called when the user has completed the drag.  The designer should remove any UI feedback it may be providing.
+        ///  Called when the user has completed the drag. The designer should remove any UI feedback it may be providing.
         /// </summary>
         public override void EndDrag(object[] components, bool cancel)
         {
@@ -2851,7 +2877,8 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
         }
 
         /// <summary>
-        ///  Given a rectangle, this updates the dimensions of it with any grid snaps and returns a new rectangle.  If no changes to the rectangle's size were needed, this may return the same rectangle.
+        ///  Given a rectangle, this updates the dimensions of it with any grid snaps and returns a new rectangle.
+        ///  If no changes to the rectangle's size were needed, this may return the same rectangle.
         /// </summary>
         public override Rectangle GetUpdatedRect(Rectangle originalRect, Rectangle dragRect, bool updateSize)
         {
@@ -2917,7 +2944,7 @@ public class ComponentTray : ScrollableControl, IExtenderProvider, ISelectionUIH
                         continue;
                     }
 
-                    if (comp is Control || !(comp is IComponent))
+                    if (comp is Control or not IComponent)
                     {
                         return false;
                     }

@@ -11,7 +11,7 @@ using Size = System.Drawing.Size;
 
 namespace System.Windows.Forms.Tests;
 
-public class DataGridViewCellTests
+public partial class DataGridViewCellTests
 {
     [WinFormsFact]
     public void DataGridViewCell_Ctor_Default()
@@ -523,7 +523,9 @@ public class DataGridViewCellTests
     }
 
     // See https://github.com/dotnet/winforms/pull/6957
-    // Note if we fix this issue https://github.com/dotnet/winforms/issues/6930#issuecomment-1090213559 then we will have to edit this test.
+    // Note if we fix this issue
+    // https://github.com/dotnet/winforms/issues/6930#issuecomment-1090213559
+    // then we will have to edit this test.
     [WinFormsTheory]
     [MemberData(nameof(Displayed_GetWithSharedDataGridView_TestData))]
     public void DataGridViewCell_Displayed_GetWithSharedDataGridViewWithHandle_ReturnsExpected(bool gridVisible, bool rowHeadersVisible, bool columnHeadersVisible, bool columnVisible)
@@ -551,11 +553,12 @@ public class DataGridViewCellTests
         // While calling control.Handle we will create a new handle.
         // During this process DataGridView call MakeFirstDisplayedCellCurrentCell().
         // Where if we have cell to display (columnVisible) we will set it as CurrentCell.
-        // Which in turn will lead to unsharing of the raw in any case.
+        // Which in turn will lead to un-sharing of the raw in any case.
         // MakeFirstDisplayedCellCurrentCell() -> SetAndSelectCurrentCellAddress() -> SetCurrentCellAddressCore()
         //   -> OnCurrentCellChanged() -> CurrentCell.get() -> Rows[index]
         // See https://github.com/dotnet/winforms/issues/6930#issuecomment-1090213559.
-        // Note that the cell is Displayed (Displayed == true) only if the owning row IS NOT shared and Displayed and owning column is Displayed.
+        // Note that the cell is Displayed (Displayed == true) only if the owning row IS NOT shared and Displayed
+        //      and owning column is Displayed.
         // So we have these options:
         // 1. columnVisible == false - our row remain shared and therefore cell will not be Displayed;
         // 2. gridVisible == false - our row and column are not Displayed, so and the cell too.
@@ -573,15 +576,19 @@ public class DataGridViewCellTests
         // Test for shared row (if row.Index == -1 this is shared row).
         Assert.Equal(columnVisible, row.Index != -1);
         DataGridViewCell cell = row.Cells[0];
-        // 
-        // Here 3 our ways with previous implementation (prior #6957) in relation to the old test implementation (Assert.False(cell.Displayed)):
+        //
+        // Here 3 our ways with previous implementation (prior #6957) in relation to the old test implementation
+        // (Assert.False(cell.Displayed)):
         // 1. All correct - we have shared and therefore not Displayed row.
         // 2. All correct - we have not Displayed row.
-        // 3. control.Rows.SharedRow(0) unshared and Displayed BUT our stored row (LOST) still shared and therefore not Displayed.
+        // 3. control.Rows.SharedRow(0) unshared and Displayed BUT our stored row (LOST) still shared and
+        // therefore not Displayed.
         //    So test will pass of course.
         // Test must check: Assert.Equal(gridVisible && columnVisible, cell.Displayed);
         // And with new implementation it will work no mater where you put row = control.Rows.SharedRow(0);
-        Assert.Equal(gridVisible && columnVisible, cell.Displayed); // old test implementation: Assert.False(cell.Displayed);
+
+        // old test implementation: Assert.False(cell.Displayed);
+        Assert.Equal(gridVisible && columnVisible, cell.Displayed);
         Assert.True(control.IsHandleCreated);
         Assert.Equal(0, invalidatedCallCount);
         Assert.Equal(0, styleChangedCallCount);
@@ -1680,7 +1687,7 @@ public class DataGridViewCellTests
         cell.ReadOnly = !value;
         Assert.True(cell.ReadOnly);
         Assert.False(row.ReadOnly);
-        Assert.True((cell.State & DataGridViewElementStates.ReadOnly) != 0);
+        cell.State.Should().HaveFlag(DataGridViewElementStates.ReadOnly);
     }
 
     [WinFormsTheory]
@@ -3409,17 +3416,16 @@ public class DataGridViewCellTests
         public void DataGridViewCell_AccessibilityObject_Get_ReturnsExpected()
         {
             using SubDataGridViewCell cell = new();
-            DataGridViewCell.DataGridViewCellAccessibleObject accessibleObject = Assert.IsType<DataGridViewCell.DataGridViewCellAccessibleObject>(cell.AccessibilityObject);
+            DataGridViewCellAccessibleObject accessibleObject = Assert.IsType<DataGridViewCellAccessibleObject>(cell.AccessibilityObject);
             Assert.Same(accessibleObject, cell.AccessibilityObject);
             Assert.Same(cell, accessibleObject.Owner);
         }
 
         public static IEnumerable<object[]> AccessibilityObject_CustomCreateAccessibilityInstance_TestData()
         {
-            yield return new object[] { null };
             yield return new object[] { new AccessibleObject() };
-            yield return new object[] { new DataGridViewCell.DataGridViewCellAccessibleObject(null) };
-            yield return new object[] { new DataGridViewCell.DataGridViewCellAccessibleObject(new SubDataGridViewCell()) };
+            yield return new object[] { new DataGridViewCellAccessibleObject(null) };
+            yield return new object[] { new DataGridViewCellAccessibleObject(new SubDataGridViewCell()) };
         }
 
         [WinFormsTheory]
@@ -3438,7 +3444,7 @@ public class DataGridViewCellTests
         public void DataGridViewCell_CreateAccessibilityInstance_Invoke_ReturnsExpected()
         {
             using SubDataGridViewCell cell = new();
-            DataGridViewCell.DataGridViewCellAccessibleObject instance = Assert.IsAssignableFrom<DataGridViewCell.DataGridViewCellAccessibleObject>(cell.CreateAccessibilityInstance());
+            DataGridViewCellAccessibleObject instance = Assert.IsAssignableFrom<DataGridViewCellAccessibleObject>(cell.CreateAccessibilityInstance());
             Assert.NotNull(instance);
             Assert.Same(cell, instance.Owner);
             Assert.Equal(AccessibleRole.Cell, instance.Role);
@@ -3458,7 +3464,7 @@ public class DataGridViewCellTests
     public void DataGridViewCell_DetachEditingDataGridViewCell_InvokeNoDataGridView_ThrowsInvalidOperationException()
     {
         using SubDataGridViewCell cell = new();
-        Assert.Throws<InvalidOperationException>(() => cell.DetachEditingControl());
+        Assert.Throws<InvalidOperationException>(cell.DetachEditingControl);
     }
 
     [WinFormsFact]
@@ -3472,7 +3478,7 @@ public class DataGridViewCellTests
         using DataGridView control = new();
         control.Columns.Add(column);
         SubDataGridViewCell cell = (SubDataGridViewCell)control.Rows[0].Cells[0];
-        Assert.Throws<InvalidOperationException>(() => cell.DetachEditingControl());
+        Assert.Throws<InvalidOperationException>(cell.DetachEditingControl);
     }
 
     [WinFormsFact]
@@ -3559,125 +3565,6 @@ public class DataGridViewCellTests
     {
         using SubDataGridViewCell cell = new();
         Assert.False(cell.EnterUnsharesRow(-1, true));
-    }
-
-    public static IEnumerable<object[]> GetClipboardContent_TestData()
-    {
-        yield return new object[] { -2, true, true, true, true, "format", null };
-        yield return new object[] { -2, true, true, true, true, null, null };
-        yield return new object[] { -1, true, true, true, true, "format", null };
-        yield return new object[] { -1, true, true, true, true, null, null };
-        yield return new object[] { 0, true, true, true, true, "format", null };
-        yield return new object[] { 0, true, true, true, true, null, null };
-    }
-
-    [WinFormsTheory]
-    [MemberData(nameof(GetClipboardContent_TestData))]
-    public void DataGridViewCell_GetClipboardContent_Invoke_ReturnsExpected(int rowIndex, bool firstCell, bool lastCell, bool inFirstRow, bool inLastRow, string format, object expected)
-    {
-        using SubDataGridViewCell cell = new();
-        Assert.Equal(expected, cell.GetClipboardContent(rowIndex, firstCell, lastCell, inFirstRow, inLastRow, format));
-    }
-
-    [WinFormsTheory]
-    [MemberData(nameof(GetClipboardContent_TestData))]
-    public void DataGridViewCell_GetClipboardContent_InvokeWithRow_ReturnsExpected(int rowIndex, bool firstCell, bool lastCell, bool inFirstRow, bool inLastRow, string format, object expected)
-    {
-        using DataGridViewRow row = new();
-        using SubDataGridViewCell cell = new();
-        row.Cells.Add(cell);
-        Assert.Equal(expected, cell.GetClipboardContent(rowIndex, firstCell, lastCell, inFirstRow, inLastRow, format));
-    }
-
-    public static IEnumerable<object[]> GetClipboardContent_WithColumn_TestData()
-    {
-        yield return new object[] { true, true, true, true, "format", null };
-        yield return new object[] { true, true, true, true, null, null };
-    }
-
-    [WinFormsTheory]
-    [MemberData(nameof(GetClipboardContent_WithColumn_TestData))]
-    public void DataGridViewCell_GetClipboardContent_InvokeWithColumn_ReturnsExpected(bool firstCell, bool lastCell, bool inFirstRow, bool inLastRow, string format, object expected)
-    {
-        using DataGridViewColumn column = new();
-        using SubDataGridViewColumnHeaderCell cell = new();
-        column.HeaderCell = cell;
-        Assert.Equal(expected, cell.GetClipboardContent(-1, firstCell, lastCell, inFirstRow, inLastRow, format));
-    }
-
-    [WinFormsTheory]
-    [MemberData(nameof(GetClipboardContent_WithColumn_TestData))]
-    public void DataGridViewCell_GetClipboardContent_InvokeWithDataGridView_ReturnsExpected(bool firstCell, bool lastCell, bool inFirstRow, bool inLastRow, string format, object expected)
-    {
-        using SubDataGridViewCell cellTemplate = new();
-        using DataGridViewColumn column = new()
-        {
-            CellTemplate = cellTemplate
-        };
-        using DataGridView control = new();
-        control.Columns.Add(column);
-        SubDataGridViewCell cell = (SubDataGridViewCell)control.Rows[0].Cells[0];
-        Assert.Equal(expected, cell.GetClipboardContent(0, firstCell, lastCell, inFirstRow, inLastRow, format));
-    }
-
-    [WinFormsTheory]
-    [MemberData(nameof(GetClipboardContent_WithColumn_TestData))]
-    public void DataGridViewCell_GetClipboardContent_InvokeShared_ReturnsExpected(bool firstCell, bool lastCell, bool inFirstRow, bool inLastRow, string format, object expected)
-    {
-        using SubDataGridViewCell cellTemplate = new();
-        using DataGridViewColumn column = new()
-        {
-            CellTemplate = cellTemplate
-        };
-        using DataGridView control = new();
-        control.Columns.Add(column);
-        SubDataGridViewCell cell = (SubDataGridViewCell)control.Rows.SharedRow(0).Cells[0];
-        Assert.Equal(expected, cell.GetClipboardContent(0, firstCell, lastCell, inFirstRow, inLastRow, format));
-    }
-
-    [WinFormsTheory]
-    [InlineData(-2)]
-    [InlineData(0)]
-    public void DataGridViewCell_GetClipboardContent_InvalidRowIndexWithColumn_ThrowsArgumentOutOfRangeException(int rowIndex)
-    {
-        using DataGridViewColumn column = new();
-        using SubDataGridViewColumnHeaderCell cell = new();
-        column.HeaderCell = cell;
-        Assert.Throws<ArgumentOutOfRangeException>("rowIndex", () => cell.GetClipboardContent(rowIndex, true, true, true, true, "format"));
-    }
-
-    [WinFormsTheory]
-    [InlineData(-2)]
-    [InlineData(-1)]
-    [InlineData(1)]
-    public void DataGridViewCell_GetClipboardContent_InvalidRowIndexWithDataGridView_ThrowsArgumentOutOfRangeException(int rowIndex)
-    {
-        using SubDataGridViewCell cellTemplate = new();
-        using DataGridViewColumn column = new()
-        {
-            CellTemplate = cellTemplate
-        };
-        using DataGridView control = new();
-        control.Columns.Add(column);
-        SubDataGridViewCell cell = (SubDataGridViewCell)control.Rows[0].Cells[0];
-        Assert.Throws<ArgumentOutOfRangeException>("rowIndex", () => cell.GetClipboardContent(rowIndex, true, true, true, true, "format"));
-    }
-
-    [WinFormsTheory]
-    [InlineData(-2)]
-    [InlineData(-1)]
-    [InlineData(1)]
-    public void DataGridViewCell_GetClipboardContent_InvalidRowIndexShared_ThrowsArgumentOutOfRangeException(int rowIndex)
-    {
-        using SubDataGridViewCell cellTemplate = new();
-        using DataGridViewColumn column = new()
-        {
-            CellTemplate = cellTemplate
-        };
-        using DataGridView control = new();
-        control.Columns.Add(column);
-        SubDataGridViewCell cell = (SubDataGridViewCell)control.Rows.SharedRow(0).Cells[0];
-        Assert.Throws<ArgumentOutOfRangeException>("rowIndex", () => cell.GetClipboardContent(rowIndex, true, true, true, true, "format"));
     }
 
     [WinFormsTheory]
@@ -4249,9 +4136,9 @@ public class DataGridViewCellTests
         yield return new object[] { "value", -2, new DataGridViewCellStyle(), new Int32Converter(), new Int32Converter(), DataGridViewDataErrorContexts.Formatting, null };
         yield return new object[] { "value", -1, new DataGridViewCellStyle(), new Int32Converter(), new Int32Converter(), DataGridViewDataErrorContexts.Formatting, null };
         yield return new object[] { "value", 0, new DataGridViewCellStyle(), new Int32Converter(), new Int32Converter(), DataGridViewDataErrorContexts.Formatting, null };
-        yield return new object[] { null, -2, null, null, null, (DataGridViewDataErrorContexts)(DataGridViewDataErrorContexts.Formatting - 1), null };
-        yield return new object[] { null, -1, null, null, null, (DataGridViewDataErrorContexts)(DataGridViewDataErrorContexts.Formatting - 1), null };
-        yield return new object[] { null, 0, null, null, null, (DataGridViewDataErrorContexts)(DataGridViewDataErrorContexts.Formatting - 1), null };
+        yield return new object[] { null, -2, null, null, null, DataGridViewDataErrorContexts.Formatting - 1, null };
+        yield return new object[] { null, -1, null, null, null, DataGridViewDataErrorContexts.Formatting - 1, null };
+        yield return new object[] { null, 0, null, null, null, DataGridViewDataErrorContexts.Formatting - 1, null };
     }
 
     [WinFormsTheory]
@@ -4888,8 +4775,10 @@ public class DataGridViewCellTests
     [StaFact]
     public void DataGridViewCell_GetNeighboringToolsRectangles_ReturnsCorrectRectangles()
     {
-        DataGridView control = new();
-        control.Size = new Size(600, 200);
+        DataGridView control = new()
+        {
+            Size = new Size(600, 200)
+        };
         control.CreateControl();
 
         DataGridViewTextBoxColumn column1 = new();
@@ -5492,9 +5381,7 @@ public class DataGridViewCellTests
     {
         using Bitmap image = new(10, 10);
         using Graphics graphics = Graphics.FromImage(image);
-        {
-            Assert.Equal(Size.Empty, DataGridViewCell.MeasureTextSize(graphics, text, SystemFonts.DefaultFont, TextFormatFlags.Default));
-        }
+        Assert.Equal(Size.Empty, DataGridViewCell.MeasureTextSize(graphics, text, SystemFonts.DefaultFont, TextFormatFlags.Default));
     }
 
     [WinFormsTheory]
@@ -6245,8 +6132,8 @@ public class DataGridViewCellTests
         yield return new object[] { typeof(bool), typeof(CheckState), CheckState.Indeterminate, new DataGridViewCellStyle(), null, null, DBNull.Value };
         yield return new object[] { typeof(bool), typeof(CheckState), CheckState.Checked, new DataGridViewCellStyle(), null, null, true };
         yield return new object[] { typeof(bool), typeof(CheckState), CheckState.Unchecked, new DataGridViewCellStyle(), null, null, false };
-        yield return new object[] { typeof(bool), typeof(CheckState), (CheckState)(CheckState.Unchecked - 1), new DataGridViewCellStyle(), null, null, false };
-        yield return new object[] { typeof(bool), typeof(CheckState), (CheckState)(CheckState.Indeterminate + 1), new DataGridViewCellStyle(), null, null, false };
+        yield return new object[] { typeof(bool), typeof(CheckState), CheckState.Unchecked - 1, new DataGridViewCellStyle(), null, null, false };
+        yield return new object[] { typeof(bool), typeof(CheckState), CheckState.Indeterminate + 1, new DataGridViewCellStyle(), null, null, false };
         yield return new object[] { typeof(CheckState), typeof(CheckState), CheckState.Checked, new DataGridViewCellStyle(), null, null, CheckState.Checked };
         yield return new object[] { typeof(int), typeof(CheckState), CheckState.Checked, new DataGridViewCellStyle(), null, null, 1 };
         yield return new object[] { typeof(int), typeof(CheckState), CheckState.Checked, new DataGridViewCellStyle(), new EnumConverter(typeof(CheckState)), null, 1 };
@@ -6534,6 +6421,19 @@ public class DataGridViewCellTests
     }
 
     [WinFormsFact]
+    public void DataGridViewCell_ImageCell_ImageLayout_Set_NotSet_Success()
+    {
+        using DataGridView dataGridView = new();
+        using DataGridViewImageColumn imageColumn = new();
+        dataGridView.Columns.Add(imageColumn);
+
+        DataGridViewImageCell cell = dataGridView.Rows[0].Cells[0].Should().BeOfType<DataGridViewImageCell>().Which;
+        cell.ImageLayout.Should().Be(DataGridViewImageCellLayout.Normal);
+        cell.ImageLayout = DataGridViewImageCellLayout.NotSet;
+        cell.ImageLayout.Should().Be(DataGridViewImageCellLayout.NotSet);
+    }
+
+    [WinFormsFact]
     public void DataGridViewCell_OnContentClick_InvokeInternalRaiseAutomationNotification()
     {
         using SubDataGridViewCheckBoxCell cellTemplate = new();
@@ -6613,9 +6513,9 @@ public class DataGridViewCellTests
 
         protected override AccessibleObject CreateAccessibilityInstance() => MockAccessibleObject;
 
-        public void MouseClick(DataGridViewCellMouseEventArgs e) => base.OnMouseUpInternal(e);
+        public void MouseClick(DataGridViewCellMouseEventArgs e) => OnMouseUpInternal(e);
 
-        public void OnKeyClick(KeyEventArgs e, int rowIndex) => base.OnKeyUp(e, rowIndex);
+        public void OnKeyClick(KeyEventArgs e, int rowIndex) => OnKeyUp(e, rowIndex);
     }
 
     private class SubDataGridViewColumnHeaderCell : DataGridViewColumnHeaderCell

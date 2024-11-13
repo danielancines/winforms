@@ -23,7 +23,7 @@ public class LinearGradientBrushTests
     {
         using LinearGradientBrush brush = new((PointF)point1, point2, color1, color2);
         Assert.Equal([1], brush.Blend.Factors);
-        Assert.Equal(1, brush.Blend.Positions.Length);
+        Assert.Single(brush.Blend.Positions);
 
         Assert.False(brush.GammaCorrection);
         _ = brush.InterpolationColors;
@@ -50,7 +50,7 @@ public class LinearGradientBrushTests
     {
         using LinearGradientBrush brush = new(point1, point2, color1, color2);
         Assert.Equal([1], brush.Blend.Factors);
-        Assert.Equal(1, brush.Blend.Positions.Length);
+        Assert.Single(brush.Blend.Positions);
 
         Assert.False(brush.GammaCorrection);
         _ = brush.InterpolationColors;
@@ -84,7 +84,7 @@ public class LinearGradientBrushTests
     {
         using LinearGradientBrush brush = new(rectangle, color1, color2, linearGradientMode);
         Assert.Equal([1], brush.Blend.Factors);
-        Assert.Equal(1, brush.Blend.Positions.Length);
+        Assert.Single(brush.Blend.Positions);
 
         Assert.False(brush.GammaCorrection);
         _ = brush.InterpolationColors;
@@ -101,7 +101,7 @@ public class LinearGradientBrushTests
     {
         using LinearGradientBrush brush = new((RectangleF)rectangle, color1, color2, linearGradientMode);
         Assert.Equal([1], brush.Blend.Factors);
-        Assert.Equal(1, brush.Blend.Positions.Length);
+        Assert.Single(brush.Blend.Positions);
 
         Assert.False(brush.GammaCorrection);
         _ = brush.InterpolationColors;
@@ -127,7 +127,7 @@ public class LinearGradientBrushTests
     {
         using LinearGradientBrush brush = new(rectangle, color1, color2, angle);
         Assert.Equal([1], brush.Blend.Factors);
-        Assert.Equal(1, brush.Blend.Positions.Length);
+        Assert.Single(brush.Blend.Positions);
 
         Assert.False(brush.GammaCorrection);
         _ = brush.InterpolationColors;
@@ -144,7 +144,7 @@ public class LinearGradientBrushTests
     {
         using LinearGradientBrush brush = new((RectangleF)rectangle, color1, color2, angle);
         Assert.Equal([1], brush.Blend.Factors);
-        Assert.Equal(1, brush.Blend.Positions.Length);
+        Assert.Single(brush.Blend.Positions);
 
         Assert.False(brush.GammaCorrection);
         _ = brush.InterpolationColors;
@@ -170,7 +170,7 @@ public class LinearGradientBrushTests
     {
         using LinearGradientBrush brush = new(rectangle, color1, color2, angle, isAngleScalable);
         Assert.Equal([1], brush.Blend.Factors);
-        Assert.Equal(1, brush.Blend.Positions.Length);
+        Assert.Single(brush.Blend.Positions);
 
         Assert.False(brush.GammaCorrection);
         _ = brush.InterpolationColors;
@@ -187,7 +187,7 @@ public class LinearGradientBrushTests
     {
         using LinearGradientBrush brush = new((RectangleF)rectangle, color1, color2, angle, isAngleScalable);
         Assert.Equal([1], brush.Blend.Factors);
-        Assert.Equal(1, brush.Blend.Positions.Length);
+        Assert.Single(brush.Blend.Positions);
 
         Assert.False(brush.GammaCorrection);
         _ = brush.InterpolationColors;
@@ -249,7 +249,7 @@ public class LinearGradientBrushTests
         LinearGradientBrush brush = new(new Rectangle(1, 2, 3, 4), Color.Plum, Color.Red, 45, true);
         brush.Dispose();
 
-        AssertExtensions.Throws<ArgumentException>(null, () => brush.Clone());
+        AssertExtensions.Throws<ArgumentException>(null, brush.Clone);
     }
 
     [Fact]
@@ -425,7 +425,9 @@ public class LinearGradientBrushTests
     public void InterpolationColors_SetBlendWithTooFewColors_ThrowsArgumentException(int colorsLength)
     {
         using LinearGradientBrush brush = new(new Rectangle(1, 2, 3, 4), Color.Plum, Color.Red, 45, true);
-        AssertExtensions.Throws<ArgumentException>(null, () => brush.InterpolationColors = new ColorBlend { Colors = new Color[colorsLength] });
+        AssertExtensions.Throws<ArgumentException>(
+            colorsLength == 0 ? "value" : null,
+            () => brush.InterpolationColors = new ColorBlend { Colors = new Color[colorsLength] });
     }
 
     [Fact]
@@ -442,7 +444,7 @@ public class LinearGradientBrushTests
     public void InterpolationColors_SetInvalidBlendPositionsLength_ThrowsArgumentException(int positionsLength)
     {
         using LinearGradientBrush brush = new(new Rectangle(1, 2, 3, 4), Color.Plum, Color.Red, 45, true);
-        AssertExtensions.Throws<ArgumentException>(null, () => brush.InterpolationColors = new ColorBlend
+        AssertExtensions.Throws<ArgumentException>("value", () => brush.InterpolationColors = new ColorBlend
         {
             Colors = new Color[2],
             Positions = new float[positionsLength]
@@ -647,7 +649,7 @@ public class LinearGradientBrushTests
         LinearGradientBrush brush = new(new Rectangle(1, 2, 3, 4), Color.Plum, Color.Red, 45, true);
         brush.Dispose();
 
-        AssertExtensions.Throws<ArgumentException>(null, () => brush.ResetTransform());
+        AssertExtensions.Throws<ArgumentException>(null, brush.ResetTransform);
     }
 
     [Fact]
@@ -673,7 +675,7 @@ public class LinearGradientBrushTests
         using Matrix matrix = new(1, 2, 3, 4, 5, 6);
         Matrix expectedTransform = brush.Transform;
 
-        if (order == MatrixOrder.Append || order == MatrixOrder.Prepend)
+        if (order is MatrixOrder.Append or MatrixOrder.Prepend)
         {
             expectedTransform.Multiply(matrix, order);
         }

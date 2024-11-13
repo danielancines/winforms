@@ -167,7 +167,7 @@ public sealed class FolderBrowserDialog : CommonDialog
     public string SelectedPath
     {
         get => _selectedPaths.Length > 0 ? _selectedPaths[0] : string.Empty;
-        set => _selectedPaths = value is not null ? new string[] { value } : Array.Empty<string>();
+        set => _selectedPaths = value is not null ? [value] : [];
     }
 
     /// <summary>
@@ -176,7 +176,7 @@ public sealed class FolderBrowserDialog : CommonDialog
     [Browsable(false)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     [SRDescription(nameof(SR.FolderBrowserDialogSelectedPathsDescr))]
-    public string[] SelectedPaths => _selectedPaths.Length > 0 ? (string[])_selectedPaths.Clone() : Array.Empty<string>();
+    public string[] SelectedPaths => _selectedPaths.Length > 0 ? (string[])_selectedPaths.Clone() : [];
 
     /// <summary>
     ///  Gets or sets the initial directory displayed by the folder browser dialog.
@@ -231,8 +231,11 @@ public sealed class FolderBrowserDialog : CommonDialog
     ///  Gets or sets a value that indicates whether to use the value of the <see cref="Description" /> property
     ///  as the dialog title for Vista style dialogs. This property has no effect on old style dialogs.
     /// </summary>
-    /// <value><see langword="true" /> to indicate that the value of the <see cref="Description" /> property is used as dialog title; <see langword="false" />
-    ///  to indicate the value is added as additional text to the dialog. The default is <see langword="false" />.</value>
+    /// <value>
+    ///  <see langword="true" /> to indicate that the value of the <see cref="Description" /> property is used as dialog title;
+    ///  <see langword="false" /> to indicate the value is added as additional text to the dialog.
+    ///  The default is <see langword="false" />.
+    /// </value>
     [Browsable(true)]
     [DefaultValue(false)]
     [Localizable(true)]
@@ -256,7 +259,7 @@ public sealed class FolderBrowserDialog : CommonDialog
         _options = (FOS_PICKFOLDERS | FOS_FORCEFILESYSTEM | FOS_FILEMUSTEXIST);
         _rootFolder = Environment.SpecialFolder.Desktop;
         _descriptionText = string.Empty;
-        _selectedPaths = Array.Empty<string>();
+        _selectedPaths = [];
         _initialDirectory = string.Empty;
         ShowNewFolderButton = true;
         ClientGuid = null;
@@ -285,7 +288,7 @@ public sealed class FolderBrowserDialog : CommonDialog
             // Creating the Vista dialog can fail on Windows Server Core, even if the
             // Server Core App Compatibility FOD is installed.
             PInvokeCore.CoCreateInstance(
-                in CLSID.FileOpenDialog,
+                CLSID.FileOpenDialog,
                 pUnkOuter: null,
                 CLSCTX.CLSCTX_INPROC_SERVER | CLSCTX.CLSCTX_LOCAL_SERVER | CLSCTX.CLSCTX_REMOTE_SERVER,
                 out dialog).ThrowOnFailure();
@@ -403,7 +406,7 @@ public sealed class FolderBrowserDialog : CommonDialog
             using ComScope<IShellItemArray> itemArray = new(null);
             dialog->GetResults(itemArray);
             itemArray.Value->GetCount(out uint itemCount);
-            List<string> tempSelectedPaths = new();
+            List<string> tempSelectedPaths = [];
             for (uint itemIndex = 0; itemIndex < itemCount; itemIndex++)
             {
                 using ComScope<IShellItem> item = new(null);
@@ -416,7 +419,7 @@ public sealed class FolderBrowserDialog : CommonDialog
                 }
             }
 
-            _selectedPaths = tempSelectedPaths.ToArray();
+            _selectedPaths = [.. tempSelectedPaths];
         }
         else
         {
@@ -477,12 +480,11 @@ public sealed class FolderBrowserDialog : CommonDialog
     }
 
     /// <summary>
-    ///  Callback function used to enable/disable the OK button,
-    /// and select the initial folder.
+    ///  Callback function used to enable/disable the OK button, and select the initial folder.
     /// </summary>
 #pragma warning disable CS3016 // Arrays as attribute arguments is not CLS-compliant
-    [UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvStdcall) })]
-#pragma warning restore CS3016 // Arrays as attribute arguments is not CLS-compliant
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvStdcall)])]
+#pragma warning restore CS3016
     private static unsafe int FolderBrowserDialog_BrowseCallbackProc(HWND hwnd, uint msg, LPARAM lParam, LPARAM lpData)
     {
         switch (msg)
@@ -493,13 +495,13 @@ public sealed class FolderBrowserDialog : CommonDialog
                 if (instance._initialDirectory.Length != 0)
                 {
                     // Try to expand the folder specified by initialDir
-                    PInvoke.SendMessage(hwnd, PInvoke.BFFM_SETEXPANDED, (WPARAM)(BOOL)true, instance._initialDirectory);
+                    PInvokeCore.SendMessage(hwnd, PInvoke.BFFM_SETEXPANDED, (WPARAM)(BOOL)true, instance._initialDirectory);
                 }
 
                 if (instance.SelectedPath.Length != 0)
                 {
                     // Try to select the folder specified by selectedPath
-                    PInvoke.SendMessage(hwnd, PInvoke.BFFM_SETSELECTIONW, (WPARAM)(BOOL)true, instance.SelectedPath);
+                    PInvokeCore.SendMessage(hwnd, PInvoke.BFFM_SETSELECTIONW, (WPARAM)(BOOL)true, instance.SelectedPath);
                 }
 
                 break;
@@ -509,11 +511,11 @@ public sealed class FolderBrowserDialog : CommonDialog
                 if (selectedPidl is not null)
                 {
                     // Try to retrieve the path from the IDList
-                    using BufferScope<char> buffer = new(stackalloc char[PInvoke.MAX_PATH + 1]);
+                    using BufferScope<char> buffer = new(stackalloc char[(int)PInvokeCore.MAX_PATH + 1]);
                     fixed (char* b = buffer)
                     {
                         bool isFileSystemFolder = PInvoke.SHGetPathFromIDListEx(selectedPidl, b, (uint)buffer.Length, GPFIDL_FLAGS.GPFIDL_UNCPRINTER);
-                        PInvoke.SendMessage(hwnd, PInvoke.BFFM_ENABLEOK, 0, (nint)(BOOL)isFileSystemFolder);
+                        PInvokeCore.SendMessage(hwnd, PInvoke.BFFM_ENABLEOK, 0, (nint)(BOOL)isFileSystemFolder);
                     }
                 }
 

@@ -2,6 +2,8 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Drawing;
+using System.Private.Windows.Core.BinaryFormat;
+using System.Private.Windows.Core.BinaryFormat.Serializer;
 
 namespace System.Windows.Forms.BinaryFormat;
 
@@ -27,7 +29,7 @@ internal static class WinFormsBinaryFormatWriter
         new ClassWithMembersAndTypes(
             new ClassInfo(1, typeof(Bitmap).FullName!, s_dataMemberName),
             libraryId: 2,
-            new MemberTypeInfo((BinaryType.PrimitiveArray, PrimitiveType.Byte)),
+            new MemberTypeInfo[] { new(BinaryType.PrimitiveArray, PrimitiveType.Byte) },
             new MemberReference(3)).Write(writer);
 
         new ArraySinglePrimitive<byte>(3, data).Write(writer);
@@ -43,7 +45,7 @@ internal static class WinFormsBinaryFormatWriter
         new ClassWithMembersAndTypes(
             new ClassInfo(1, typeof(ImageListStreamer).FullName!, s_dataMemberName),
             libraryId: 2,
-            new MemberTypeInfo((BinaryType.PrimitiveArray, PrimitiveType.Byte)),
+            new MemberTypeInfo[] { new(BinaryType.PrimitiveArray, PrimitiveType.Byte) },
             new MemberReference(3)).Write(writer);
 
         new ArraySinglePrimitive<byte>(3, data).Write(writer);
@@ -73,5 +75,14 @@ internal static class WinFormsBinaryFormatWriter
 
             return false;
         }
+    }
+
+    /// <summary>
+    ///  Writes the given Framework, WinForms or System.Drawing.Primitives <paramref name="value"/> if supported.
+    /// </summary>
+    public static bool TryWriteCommonObject(Stream stream, object value)
+    {
+        return TryWriteObject(stream, value)
+            || BinaryFormatWriter.TryWriteDrawingPrimitivesObject(stream, value);
     }
 }

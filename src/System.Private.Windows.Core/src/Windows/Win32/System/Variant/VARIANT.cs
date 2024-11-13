@@ -245,7 +245,7 @@ internal unsafe partial struct VARIANT : IDisposable
         return t;
     }
 
-    private static object? ToArray(SAFEARRAY* psa, VARENUM vt)
+    private static Array? ToArray(SAFEARRAY* psa, VARENUM vt)
     {
         if (psa is null)
         {
@@ -645,7 +645,7 @@ internal unsafe partial struct VARIANT : IDisposable
             && !(vt == VT_UNKNOWN && arrayVarType == VT_DISPATCH)
             && !(arrayVarType == VT_RECORD))
         {
-            // To match CLR behaviour.
+            // To match CLR behavior.
             throw new SafeArrayTypeMismatchException();
         }
 

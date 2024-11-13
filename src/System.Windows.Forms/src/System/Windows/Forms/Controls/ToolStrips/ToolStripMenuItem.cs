@@ -108,7 +108,7 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
     internal ToolStripMenuItem(Form mdiForm)
     {
         Initialize();
-        Properties.SetObject(s_propMdiForm, mdiForm);
+        Properties.AddOrRemoveValue(s_propMdiForm, mdiForm);
     }
 
     /// <summary>
@@ -125,7 +125,7 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
 
         // Since fetching the image and the text is an awful lot of work
         // we're going to just cache it and assume the native stuff
-        // doesnt update.
+        // doesn't update.
         // we'll only live-update enabled.
         // if this becomes a problem we can override Image and Text properties
         // to live-return the results.
@@ -196,6 +196,12 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
 
     private void Initialize()
     {
+        if (Control.UseComponentModelRegisteredTypes)
+        {
+            // Register the type with the ComponentModel so as to be trim safe
+            TypeDescriptor.RegisterType<Keys>();
+        }
+
         Overflow = ToolStripItemOverflow.Never;
         MouseDownAndUpMustBeInSameItem = false;
         SupportsDisabledHotTracking = true;
@@ -293,11 +299,7 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
     [SRDescription(nameof(SR.CheckBoxCheckStateDescr))]
     public CheckState CheckState
     {
-        get
-        {
-            object checkState = Properties.GetInteger(s_propCheckState, out bool found);
-            return (found) ? (CheckState)checkState : CheckState.Unchecked;
-        }
+        get => Properties.GetValueOrDefault(s_propCheckState, CheckState.Unchecked);
         set
         {
             // Valid values are 0x0 to 0x2
@@ -305,7 +307,7 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
 
             if (value != CheckState)
             {
-                Properties.SetInteger(s_propCheckState, (int)value);
+                Properties.AddOrRemoveValue(s_propCheckState, value, defaultValue: CheckState.Unchecked);
                 OnCheckedChanged(EventArgs.Empty);
                 OnCheckStateChanged(EventArgs.Empty);
             }
@@ -313,9 +315,7 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
     }
 
     /// <summary>
-    ///  Occurs when the
-    ///  value of the <see cref="CheckBox.Checked"/>
-    ///  property changes.
+    ///  Occurs when the value of the <see cref="CheckBox.Checked"/> property changes.
     /// </summary>
     [SRDescription(nameof(SR.CheckBoxOnCheckedChangedDescr))]
     public event EventHandler? CheckedChanged
@@ -325,9 +325,7 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
     }
 
     /// <summary>
-    ///  Occurs when the
-    ///  value of the <see cref="CheckBox.CheckState"/>
-    ///  property changes.
+    ///  Occurs when the value of the <see cref="CheckBox.CheckState"/> property changes.
     /// </summary>
     [SRDescription(nameof(SR.CheckBoxOnCheckStateChangedDescr))]
     public event EventHandler? CheckStateChanged
@@ -358,52 +356,50 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
     [SRDescription(nameof(SR.MenuItemShortCutDescr))]
     public Keys ShortcutKeys
     {
-        get
-        {
-            object shortcutKeys = Properties.GetInteger(s_propShortcutKeys, out bool found);
-            return (found) ? (Keys)shortcutKeys : Keys.None;
-        }
+        get => Properties.GetValueOrDefault(s_propShortcutKeys, Keys.None);
         set
         {
             if ((value != Keys.None) && !ToolStripManager.IsValidShortcut(value))
             {
-                // prevent use of alt, ctrl, shift modifiers with no key code.
+                // Prevent use of alt, ctrl, shift modifiers with no key code.
                 throw new InvalidEnumArgumentException(nameof(value), (int)value, typeof(Keys));
             }
 
             Keys originalShortcut = ShortcutKeys;
-            if (originalShortcut != value)
+            if (originalShortcut == value)
             {
-                ClearShortcutCache();
-                ToolStrip? owner = Owner;
-                if (owner is not null)
-                {
-                    // add to the shortcut caching system.
-                    if (originalShortcut != Keys.None)
-                    {
-                        owner.Shortcuts.Remove(originalShortcut);
-                    }
+                return;
+            }
 
-                    if (owner.Shortcuts.ContainsKey(value))
-                    {
-                        // last one in wins.
-                        owner.Shortcuts[value] = this;
-                    }
-                    else
-                    {
-                        owner.Shortcuts.Add(value, this);
-                    }
+            ClearShortcutCache();
+            ToolStrip? owner = Owner;
+            if (owner is not null)
+            {
+                // Add to the shortcut caching system.
+                if (originalShortcut != Keys.None)
+                {
+                    owner.Shortcuts.Remove(originalShortcut);
                 }
 
-                Properties.SetInteger(s_propShortcutKeys, (int)value);
-
-                if (ShowShortcutKeys && IsOnDropDown)
+                if (owner.Shortcuts.ContainsKey(value))
                 {
-                    if (GetCurrentParentDropDown() is ToolStripDropDownMenu parent)
-                    {
-                        LayoutTransaction.DoLayout(ParentInternal, this, "ShortcutKeys");
-                        parent.AdjustSize();
-                    }
+                    // Last one in wins.
+                    owner.Shortcuts[value] = this;
+                }
+                else
+                {
+                    owner.Shortcuts.Add(value, this);
+                }
+            }
+
+            Properties.AddOrRemoveValue(s_propShortcutKeys, value, defaultValue: Keys.None);
+
+            if (ShowShortcutKeys && IsOnDropDown)
+            {
+                if (GetCurrentParentDropDown() is ToolStripDropDownMenu parent)
+                {
+                    LayoutTransaction.DoLayout(ParentInternal, this, "ShortcutKeys");
+                    parent.AdjustSize();
                 }
             }
         }
@@ -481,7 +477,7 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
     internal static MenuTimer MenuTimer => s_menuTimer;
 
     /// <summary> Tag property for internal use </summary>
-    internal Form? MdiForm => Properties.TryGetObject(s_propMdiForm, out Form? form) ? form : null;
+    internal Form? MdiForm => Properties.GetValueOrDefault<Form>(s_propMdiForm);
 
     internal ToolStripMenuItem Clone()
     {
@@ -577,10 +573,7 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
                 }
 
                 _lastOwner = null;
-                if (MdiForm is not null)
-                {
-                    Properties.SetObject(s_propMdiForm, null);
-                }
+                Properties.RemoveValue(s_propMdiForm);
             }
         }
 
@@ -659,7 +652,7 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
         return text;
     }
 
-    private unsafe Image? GetNativeMenuItemImage()
+    private unsafe Bitmap? GetNativeMenuItemImage()
     {
         if (_nativeMenuCommandID == -1 || _nativeMenuHandle.IsNull)
         {
@@ -787,22 +780,21 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
             // use PostMessage instead of SendMessage so that the DefWndProc can appropriately handle
             // the system message... if we use SendMessage the dismissal of our window
             // breaks things like the modal sizing loop.
-            PInvoke.PostMessage(_targetWindowHandle, PInvoke.WM_SYSCOMMAND, (WPARAM)(uint)_nativeMenuCommandID);
+            PInvokeCore.PostMessage(_targetWindowHandle, PInvokeCore.WM_SYSCOMMAND, (WPARAM)(uint)_nativeMenuCommandID);
         }
         else
         {
             // These are user added items like ".Net Window..."
 
             // be consistent with sending a WM_SYSCOMMAND, use POST not SEND.
-            PInvoke.PostMessage(_targetWindowHandle, PInvoke.WM_COMMAND, (WPARAM)(uint)_nativeMenuCommandID);
+            PInvokeCore.PostMessage(_targetWindowHandle, PInvokeCore.WM_COMMAND, (WPARAM)(uint)_nativeMenuCommandID);
         }
 
         Invalidate();
     }
 
     /// <summary>
-    ///  Raises the <see cref="CheckedChanged"/>
-    ///  event.
+    ///  Raises the <see cref="CheckedChanged"/> event.
     /// </summary>
     protected virtual void OnCheckedChanged(EventArgs e)
     {
@@ -820,16 +812,13 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
 
     protected override void OnDropDownHide(EventArgs e)
     {
-        ToolStrip.s_menuAutoExpandDebug.TraceVerbose("[ToolStripMenuItem.OnDropDownHide] MenuTimer.Cancel called");
         MenuTimer.Cancel(this);
         base.OnDropDownHide(e);
     }
 
     protected override void OnDropDownShow(EventArgs e)
     {
-        // if someone has beaten us to the punch by arrowing around
-        // cancel the current menu timer.
-        ToolStrip.s_menuAutoExpandDebug.TraceVerbose("[ToolStripMenuItem.OnDropDownShow] MenuTimer.Cancel called");
+        // If someone has beaten us to the punch by arrowing around, cancel the current menu timer.
         MenuTimer.Cancel(this);
         if (ParentInternal is not null)
         {
@@ -852,17 +841,13 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
 
     protected override void OnMouseDown(MouseEventArgs e)
     {
-        // Opening should happen on mouse down
-        // we use a mouse down ID to ensure that the reshow
-
-        ToolStrip.s_menuAutoExpandDebug.TraceVerbose("[ToolStripMenuItem.OnMouseDown] MenuTimer.Cancel called");
         MenuTimer.Cancel(this);
-        OnMouseButtonStateChange(e, /*isMouseDown=*/true);
+        OnMouseButtonStateChange(e, isMouseDown: true);
     }
 
     protected override void OnMouseUp(MouseEventArgs e)
     {
-        OnMouseButtonStateChange(e, /*isMouseDown=*/false);
+        OnMouseButtonStateChange(e, isMouseDown: false);
         base.OnMouseUp(e);
     }
 
@@ -895,7 +880,7 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
             }
             else if (!isMouseDown && !showDropDown)
             {
-                // closing should happen on mouse up.  ensure it's not the mouse
+                // closing should happen on mouse up. Ensure it's not the mouse
                 // up for the mouse down we opened with.
                 Debug.Assert(ParentInternal is not null, "Parent is null here, not going to get accurate ID");
                 byte closeMouseId = (ParentInternal is null) ? (byte)0 : ParentInternal.GetMouseId();
@@ -917,10 +902,6 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
         // If we are in a submenu pop down the submenu.
         if (ParentInternal is not null && ParentInternal.MenuAutoExpand && Selected)
         {
-            ToolStripItem.s_mouseDebugging.TraceVerbose("received mouse enter - calling drop down");
-
-            ToolStrip.s_menuAutoExpandDebug.TraceVerbose("[ToolStripMenuItem.OnMouseEnter] MenuTimer.Cancel / MenuTimer.Start called");
-
             MenuTimer.Cancel(this);
             MenuTimer.Start(this);
         }
@@ -930,7 +911,6 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
 
     protected override void OnMouseLeave(EventArgs e)
     {
-        ToolStrip.s_menuAutoExpandDebug.TraceVerbose("[ToolStripMenuItem.OnMouseLeave] MenuTimer.Cancel called");
         MenuTimer.Cancel(this);
         base.OnMouseLeave(e);
     }
@@ -1039,7 +1019,7 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
         }
         else
         {
-            // Toplevel item support, menu items hosted on a plain ToolStrip dropdown
+            // Top-level item support, menu items hosted on a plain ToolStrip dropdown
             if ((DisplayStyle & ToolStripItemDisplayStyle.Text) == ToolStripItemDisplayStyle.Text)
             {
                 renderer.DrawItemText(new ToolStripItemTextRenderEventArgs(g, this, Text, InternalLayout.TextRectangle, textColor, Font, InternalLayout.TextFormat));
@@ -1052,9 +1032,6 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
         }
     }
 
-    /// <summary>
-    ///  handle shortcut keys here.
-    /// </summary>
     protected internal override bool ProcessCmdKey(ref Message m, Keys keyData)
     {
         if (Enabled && ShortcutKeys == keyData && !HasDropDownItems)
@@ -1089,7 +1066,7 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
     {
         if (InternalLayout is ToolStripMenuItemInternalLayout internalLayout && internalLayout.UseMenuLayout)
         {
-            // Scooch over by the padding amount.  The padding is added to
+            // Scooch over by the padding amount. The padding is added to
             // the ToolStripDropDownMenu to keep the non-menu item riffraff
             // aligned to the text rectangle. When flow layout comes through to set our position
             // via IArrangedElement DEFY IT!
@@ -1124,7 +1101,15 @@ public partial class ToolStripMenuItem : ToolStripDropDownItem
             return string.Empty;
         }
 
-        return TypeDescriptor.GetConverter(typeof(Keys)).ConvertToString(context: null, CultureInfo.CurrentUICulture, shortcutKeys);
+        if (!Control.UseComponentModelRegisteredTypes)
+        {
+            return TypeDescriptor.GetConverter(typeof(Keys)).ConvertToString(context: null, CultureInfo.CurrentUICulture, shortcutKeys);
+        }
+        else
+        {
+            // Call the trim safe API, Keys type has been registered at Initialize()
+            return TypeDescriptor.GetConverterFromRegisteredType(typeof(Keys)).ConvertToString(context: null, CultureInfo.CurrentUICulture, shortcutKeys);
+        }
     }
 
     internal override bool IsBeingTabbedTo()

@@ -50,7 +50,7 @@ internal class WindowClass
 
         if (backgroundBrush.IsNull)
         {
-            backgroundBrush = PInvoke.GetSysColorBrush(SYS_COLOR_INDEX.COLOR_WINDOW);
+            backgroundBrush = PInvokeCore.GetSysColorBrush(SYS_COLOR_INDEX.COLOR_WINDOW);
         }
         else if (backgroundBrush == (HBRUSH)(-1))
         {
@@ -202,7 +202,7 @@ internal class WindowClass
 
             if (!Atom.IsValid)
             {
-                Atom = PInvoke.GetClassLong(window, GET_CLASS_LONG_INDEX.GCW_ATOM);
+                Atom = PInvokeCore.GetClassLong(window, GET_CLASS_LONG_INDEX.GCW_ATOM);
             }
 
             if (isMainWindow)
@@ -214,11 +214,11 @@ internal class WindowClass
         }
     }
 
-    protected virtual LRESULT WNDPROC(HWND hWnd, MessageId msg, WPARAM wParam, LPARAM lParam)
+    protected virtual LRESULT WNDPROC(HWND hWnd, uint msg, WPARAM wParam, LPARAM lParam)
     {
         switch (msg)
         {
-            case PInvoke.WM_DESTROY:
+            case PInvokeCore.WM_DESTROY:
                 if (hWnd == MainWindow)
                 {
                     PInvoke.PostQuitMessage(0);
@@ -227,6 +227,6 @@ internal class WindowClass
                 return (LRESULT)0;
         }
 
-        return PInvoke.DefWindowProc(hWnd, (uint)msg, wParam, lParam);
+        return PInvokeCore.DefWindowProc(hWnd, msg, wParam, lParam);
     }
 }

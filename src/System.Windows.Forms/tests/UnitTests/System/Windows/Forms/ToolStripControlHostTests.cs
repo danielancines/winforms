@@ -2702,7 +2702,7 @@ public class ToolStripControlHostTests
         using ToolStripControlHost item = new(c);
         item.Dispose();
 
-        Assert.Throws<ObjectDisposedException>(() => item.Focus());
+        Assert.Throws<ObjectDisposedException>(item.Focus);
     }
 
     public static IEnumerable<object[]> GetPreferredSize_TestData()
@@ -4193,12 +4193,12 @@ public class ToolStripControlHostTests
     [InlineData(Keys.A)]
     [InlineData(Keys.Enter)]
     [InlineData(Keys.Space)]
-    [InlineData((Keys)(Keys.None - 1))]
+    [InlineData((Keys.None - 1))]
     public void ToolStripControlHost_ProcessCmdKey_Invoke_ReturnsFalse(Keys keyData)
     {
         using Control c = new();
         using SubToolStripControlHost item = new(c);
-        Message m = new();
+        Message m = default;
         Assert.False(item.ProcessCmdKey(ref m, keyData));
         Assert.False(c.IsHandleCreated);
     }
@@ -4234,14 +4234,14 @@ public class ToolStripControlHostTests
     [InlineData(Keys.A)]
     [InlineData(Keys.Enter)]
     [InlineData(Keys.Space)]
-    [InlineData((Keys)(Keys.None - 1))]
+    [InlineData((Keys.None - 1))]
     public void ToolStripControlHost_ProcessCmdKey_InvokeDisposed_ReturnsFalse(Keys keyData)
     {
         using Control c = new();
         using SubToolStripControlHost item = new(c);
         item.Dispose();
 
-        Message m = new();
+        Message m = default;
         Assert.False(item.ProcessCmdKey(ref m, keyData));
     }
 
@@ -4250,7 +4250,7 @@ public class ToolStripControlHostTests
     [InlineData(Keys.A)]
     [InlineData(Keys.Enter)]
     [InlineData(Keys.Space)]
-    [InlineData((Keys)(Keys.None - 1))]
+    [InlineData((Keys.None - 1))]
     public void ToolStripControlHost_ProcessDialogKey_Invoke_ReturnsFalse(Keys keyData)
     {
         using Control c = new();
@@ -4294,7 +4294,7 @@ public class ToolStripControlHostTests
     [InlineData(Keys.A)]
     [InlineData(Keys.Enter)]
     [InlineData(Keys.Space)]
-    [InlineData((Keys)(Keys.None - 1))]
+    [InlineData((Keys.None - 1))]
     public void ToolStripControlHost_ProcessDialogKey_InvokeDisposed_ReturnsFalse(Keys keyData)
     {
         using Control c = new();
@@ -4412,7 +4412,7 @@ public class ToolStripControlHostTests
         using SubToolStripControlHost item = new(c);
         item.Dispose();
 
-        Assert.Throws<ObjectDisposedException>(() => item.ResetBackColor());
+        Assert.Throws<ObjectDisposedException>(item.ResetBackColor);
     }
 
     [WinFormsFact]
@@ -4445,7 +4445,7 @@ public class ToolStripControlHostTests
         using SubToolStripControlHost item = new(c);
         item.Dispose();
 
-        Assert.Throws<ObjectDisposedException>(() => item.ResetForeColor());
+        Assert.Throws<ObjectDisposedException>(item.ResetForeColor);
     }
 
     [WinFormsTheory]

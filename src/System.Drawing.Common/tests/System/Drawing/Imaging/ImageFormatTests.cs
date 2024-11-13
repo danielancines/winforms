@@ -5,19 +5,19 @@ namespace System.Drawing.Imaging.Tests;
 
 public class ImageFormatTests
 {
-    private static ImageFormat BmpImageFormat = new(new Guid("b96b3cab-0728-11d3-9d7b-0000f81ef32e"));
-    private static ImageFormat EmfImageFormat = new(new Guid("b96b3cac-0728-11d3-9d7b-0000f81ef32e"));
-    private static ImageFormat ExifImageFormat = new(new Guid("b96b3cb2-0728-11d3-9d7b-0000f81ef32e"));
-    private static ImageFormat GifImageFormat = new(new Guid("b96b3cb0-0728-11d3-9d7b-0000f81ef32e"));
-    private static ImageFormat TiffImageFormat = new(new Guid("b96b3cb1-0728-11d3-9d7b-0000f81ef32e"));
-    private static ImageFormat PngImageFormat = new(new Guid("b96b3caf-0728-11d3-9d7b-0000f81ef32e"));
-    private static ImageFormat MemoryBmpImageFormat = new(new Guid("b96b3caa-0728-11d3-9d7b-0000f81ef32e"));
-    private static ImageFormat IconImageFormat = new(new Guid("b96b3cb5-0728-11d3-9d7b-0000f81ef32e"));
-    private static ImageFormat JpegImageFormat = new(new Guid("b96b3cae-0728-11d3-9d7b-0000f81ef32e"));
-    private static ImageFormat WmfImageFormat = new(new Guid("b96b3cad-0728-11d3-9d7b-0000f81ef32e"));
-    private static ImageFormat HeifImageFormat = new(new Guid("{b96b3cb6-0728-11d3-9d7b-0000f81ef32e}"));
-    private static ImageFormat WebpImageFormat = new(new Guid("{b96b3cb7-0728-11d3-9d7b-0000f81ef32e}"));
-    private static ImageFormat CustomImageFormat = new(new Guid("48749428-316f-496a-ab30-c819a92b3137"));
+    private static ImageFormat BmpImageFormat { get; } = new(new Guid("b96b3cab-0728-11d3-9d7b-0000f81ef32e"));
+    private static ImageFormat EmfImageFormat { get; } = new(new Guid("b96b3cac-0728-11d3-9d7b-0000f81ef32e"));
+    private static ImageFormat ExifImageFormat { get; } = new(new Guid("b96b3cb2-0728-11d3-9d7b-0000f81ef32e"));
+    private static ImageFormat GifImageFormat { get; } = new(new Guid("b96b3cb0-0728-11d3-9d7b-0000f81ef32e"));
+    private static ImageFormat TiffImageFormat { get; } = new(new Guid("b96b3cb1-0728-11d3-9d7b-0000f81ef32e"));
+    private static ImageFormat PngImageFormat { get; } = new(new Guid("b96b3caf-0728-11d3-9d7b-0000f81ef32e"));
+    private static ImageFormat MemoryBmpImageFormat { get; } = new(new Guid("b96b3caa-0728-11d3-9d7b-0000f81ef32e"));
+    private static ImageFormat IconImageFormat { get; } = new(new Guid("b96b3cb5-0728-11d3-9d7b-0000f81ef32e"));
+    private static ImageFormat JpegImageFormat { get; } = new(new Guid("b96b3cae-0728-11d3-9d7b-0000f81ef32e"));
+    private static ImageFormat WmfImageFormat { get; } = new(new Guid("b96b3cad-0728-11d3-9d7b-0000f81ef32e"));
+    private static ImageFormat HeifImageFormat { get; } = new(new Guid("{b96b3cb6-0728-11d3-9d7b-0000f81ef32e}"));
+    private static ImageFormat WebpImageFormat { get; } = new(new Guid("{b96b3cb7-0728-11d3-9d7b-0000f81ef32e}"));
+    private static ImageFormat CustomImageFormat { get; } = new(new Guid("48749428-316f-496a-ab30-c819a92b3137"));
 
     public static IEnumerable<object[]> ImageFormatGuidTestData
     {
@@ -34,8 +34,10 @@ public class ImageFormatTests
             yield return new object[] { JpegImageFormat.Guid, ImageFormat.Jpeg };
             yield return new object[] { WmfImageFormat.Guid, ImageFormat.Wmf };
 #if NET
+#pragma warning disable CA1416 // Validate platform compatibility
             yield return new object[] { HeifImageFormat.Guid, ImageFormat.Heif };
             yield return new object[] { WebpImageFormat.Guid, ImageFormat.Webp };
+#pragma warning restore CA1416
 #endif
             yield return new object[] { new Guid("48749428-316f-496a-ab30-c819a92b3137"), CustomImageFormat };
         }
@@ -56,8 +58,10 @@ public class ImageFormatTests
             yield return new object[] { "Jpeg", ImageFormat.Jpeg };
             yield return new object[] { "Wmf", ImageFormat.Wmf };
 #if NET
+#pragma warning disable CA1416 // Validate platform compatibility
             yield return new object[] { "Heif", ImageFormat.Heif };
             yield return new object[] { "Webp", ImageFormat.Webp };
+#pragma warning restore CA1416
 #endif
             yield return new object[] { "[ImageFormat: 48749428-316f-496a-ab30-c819a92b3137]", CustomImageFormat };
         }
@@ -69,7 +73,7 @@ public class ImageFormatTests
         {
             yield return new object[] { Path.Combine("bitmaps", "nature24bits.gif"), "Gif" };
             yield return new object[] { Path.Combine("bitmaps", "nature24bits.jpg"), "Jpeg" };
-            yield return new object[] { Path.Combine("bitmaps", "VisualPng.ico"), "Icon"};
+            yield return new object[] { Path.Combine("bitmaps", "VisualPng.ico"), "Icon" };
             yield return new object[] { Path.Combine("bitmaps", "almogaver32bits.tif"), "Tiff" };
         }
     }

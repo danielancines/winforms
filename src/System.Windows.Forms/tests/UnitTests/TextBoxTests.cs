@@ -10,7 +10,7 @@ namespace System.Windows.Forms.Tests;
 
 public partial class TextBoxTests
 {
-    private static int s_preferredHeight = Control.DefaultFont.Height + SystemInformation.BorderSize.Height * 4 + 3;
+    private static readonly int s_preferredHeight = Control.DefaultFont.Height + SystemInformation.BorderSize.Height * 4 + 3;
 
     [WinFormsFact]
     public void TextBox_Ctor_Default()
@@ -257,6 +257,41 @@ public partial class TextBoxTests
         Assert.Equal(0, createdCallCount);
     }
 
+    [WinFormsTheory]
+    [InvalidEnumData<AutoCompleteMode>]
+    public void TextBox_AutoCompleteMode_SetInvalidValue_ThrowsInvalidEnumArgumentException(AutoCompleteMode value)
+    {
+        using SubTextBox control = new();
+
+        Action act = () => control.AutoCompleteMode = value;
+        act.Should().Throw<InvalidEnumArgumentException>().And.ParamName.Should().Be("value");
+    }
+
+    [WinFormsTheory]
+    [EnumData<AutoCompleteSource>]
+    public void TextBox_AutoCompleteSource_Set_GetReturnsExpected(AutoCompleteSource value)
+    {
+        using SubTextBox control = new()
+        {
+            AutoCompleteSource = value == AutoCompleteSource.ListItems ? AutoCompleteSource.None : value
+        };
+
+        if (value != AutoCompleteSource.ListItems)
+        {
+            control.AutoCompleteSource.Should().Be(value);
+        }
+    }
+
+    [WinFormsTheory]
+    [InvalidEnumData<AutoCompleteSource>]
+    public void TextBox_AutoCompleteSource_InvalidAutoCompleteSource_ThrowsInvalidEnumArgumentException(AutoCompleteSource source)
+    {
+        using SubTextBox control = new();
+
+        Action act = () => control.AutoCompleteSource = source;
+        act.Should().Throw<InvalidEnumArgumentException>().And.ParamName.Should().Be("value");
+    }
+
     [WinFormsFact]
     public void TextBox_PasswordChar_GetWithoutHandle_ReturnsExpected()
     {
@@ -366,7 +401,7 @@ public partial class TextBoxTests
     }
 
     [WinFormsFact]
-    public void TextBox_PlaceholderText_Overriden()
+    public void TextBox_PlaceholderText_Overridden()
     {
         using SubTextBox tb = new();
 
@@ -382,11 +417,11 @@ public partial class TextBoxTests
         };
 
         // Cover the Placeholder draw code path
-        PInvoke.SendMessage(tb, PInvoke.WM_PAINT, (WPARAM)(BOOL)false);
+        PInvokeCore.SendMessage(tb, PInvokeCore.WM_PAINT, (WPARAM)(BOOL)false);
         tb.TextAlign = HorizontalAlignment.Center;
-        PInvoke.SendMessage(tb, PInvoke.WM_PAINT, (WPARAM)(BOOL)false);
+        PInvokeCore.SendMessage(tb, PInvokeCore.WM_PAINT, (WPARAM)(BOOL)false);
         tb.TextAlign = HorizontalAlignment.Right;
-        PInvoke.SendMessage(tb, PInvoke.WM_PAINT, (WPARAM)(BOOL)false);
+        PInvokeCore.SendMessage(tb, PInvokeCore.WM_PAINT, (WPARAM)(BOOL)false);
 
         Assert.False(string.IsNullOrEmpty(tb.PlaceholderText));
     }
@@ -401,11 +436,11 @@ public partial class TextBoxTests
         };
 
         // Cover the Placeholder draw code path in RightToLeft scenario
-        PInvoke.SendMessage(tb, PInvoke.WM_PAINT, (WPARAM)(BOOL)false);
+        PInvokeCore.SendMessage(tb, PInvokeCore.WM_PAINT, (WPARAM)(BOOL)false);
         tb.TextAlign = HorizontalAlignment.Center;
-        PInvoke.SendMessage(tb, PInvoke.WM_PAINT, (WPARAM)(BOOL)false);
+        PInvokeCore.SendMessage(tb, PInvokeCore.WM_PAINT, (WPARAM)(BOOL)false);
         tb.TextAlign = HorizontalAlignment.Right;
-        PInvoke.SendMessage(tb, PInvoke.WM_PAINT, (WPARAM)(BOOL)false);
+        PInvokeCore.SendMessage(tb, PInvokeCore.WM_PAINT, (WPARAM)(BOOL)false);
 
         Assert.False(string.IsNullOrEmpty(tb.PlaceholderText));
     }

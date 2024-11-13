@@ -3,6 +3,10 @@
 
 using System.Runtime.InteropServices;
 using System.IO;
+using System.Runtime.CompilerServices;
+#if NET9_0_OR_GREATER
+using System.ComponentModel;
+#endif
 
 namespace System.Drawing.Imaging;
 
@@ -17,12 +21,12 @@ namespace System.Drawing.Imaging;
 
 // Bitmaps, Brushes, Pens, and Text will all use any color adjustments
 // that have been set into the default ImageAttributes until their own
-// color adjustments have been set.  So as soon as any "Set" method is
+// color adjustments have been set. So as soon as any "Set" method is
 // called for Bitmaps, Brushes, Pens, or Text, then they start from
 // scratch with only the color adjustments that have been set for them.
 // Calling Reset removes any individual color adjustments for a type
 // and makes it revert back to using all the default color adjustments
-// (if any).  The SetToIdentity method is a way to force a type to
+// (if any). The SetToIdentity method is a way to force a type to
 // have no color adjustments at all, regardless of what previous adjustments
 // have been set for the defaults or for that type.
 
@@ -32,9 +36,7 @@ namespace System.Drawing.Imaging;
 [StructLayout(LayoutKind.Sequential)]
 public sealed unsafe class ImageAttributes : ICloneable, IDisposable
 {
-#if FINALIZATION_WATCH
-    private string allocationSite = Graphics.GetAllocationStack();
-#endif
+    private const int ColorMapStackSpace = 32;
 
     internal GpImageAttributes* _nativeImageAttributes;
 
@@ -65,46 +67,21 @@ public sealed unsafe class ImageAttributes : ICloneable, IDisposable
     /// </summary>
     public void Dispose()
     {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
-
-    private void Dispose(bool disposing)
-    {
-#if FINALIZATION_WATCH
-        Debug.WriteLineIf(!disposing && nativeImageAttributes is not null, $"""
-            **********************
-            Disposed through finalization:
-            {allocationSite}
-            """);
-#endif
-        if (_nativeImageAttributes is not null)
+        if (_nativeImageAttributes is null)
         {
-            try
-            {
-#if DEBUG
-                Status status = !Gdip.Initialized ? Status.Ok :
-#endif
-                PInvoke.GdipDisposeImageAttributes(_nativeImageAttributes);
-#if DEBUG
-                Debug.Assert(status == Status.Ok, $"GDI+ returned an error status: {status}");
-#endif
-            }
-            catch (Exception ex) when (!ClientUtils.IsSecurityOrCriticalException(ex))
-            {
-                Debug.Fail($"Exception thrown during Dispose: {ex}");
-            }
-            finally
-            {
-                _nativeImageAttributes = null;
-            }
+            return;
         }
+
+        Status status = !Gdip.Initialized ? Status.Ok : PInvoke.GdipDisposeImageAttributes(_nativeImageAttributes);
+        _nativeImageAttributes = null;
+        Debug.Assert(status == Status.Ok, $"GDI+ returned an error status: {status}");
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
     ///  Cleans up Windows resources for this <see cref='ImageAttributes'/>.
     /// </summary>
-    ~ImageAttributes() => Dispose(disposing: false);
+    ~ImageAttributes() => Dispose();
 
     /// <summary>
     ///  Creates an exact copy of this <see cref='ImageAttributes'/>.
@@ -337,19 +314,55 @@ public sealed unsafe class ImageAttributes : ICloneable, IDisposable
         GC.KeepAlive(this);
     }
 
-    public void SetRemapTable(ColorMap[] map) => SetRemapTable(map, ColorAdjustType.Default);
+    /// <inheritdoc cref="SetRemapTable(ColorMap[], ColorAdjustType)"/>
+    public void SetRemapTable(params ColorMap[] map) => SetRemapTable(map, ColorAdjustType.Default);
 
-    public unsafe void SetRemapTable(ColorMap[] map, ColorAdjustType type)
+    /// <summary>
+    ///  Sets the default color-remap table.
+    /// </summary>
+    /// <inheritdoc cref="SetRemapTable(ColorAdjustType, ReadOnlySpan{ColorMap})"/>
+#if NET9_0_OR_GREATER
+    [EditorBrowsable(EditorBrowsableState.Never)]
+#endif
+    public void SetRemapTable(ColorMap[] map, ColorAdjustType type)
     {
         ArgumentNullException.ThrowIfNull(map);
+        SetRemapTable(type, map);
+    }
 
+#if NET9_0_OR_GREATER
+    /// <inheritdoc cref="SetRemapTable(ColorMap[], ColorAdjustType)"/>
+    public void SetRemapTable(params ReadOnlySpan<ColorMap> map) => SetRemapTable(ColorAdjustType.Default, map);
+
+    /// <inheritdoc cref="SetRemapTable(ColorMap[], ColorAdjustType)"/>
+    public void SetRemapTable(params ReadOnlySpan<(Color OldColor, Color NewColor)> map) => SetRemapTable(ColorAdjustType.Default, map);
+#endif
+
+    /// <summary>
+    ///  Sets the color-remap table for a specified category.
+    /// </summary>
+    /// <param name="type">
+    ///  An element of <see cref="ColorAdjustType"/> that specifies the category for which the color-remap table is set.
+    /// </param>
+    /// <param name="map">
+    ///  A series of color pairs mapping an existing color to a new color.
+    /// </param>
+#if NET9_0_OR_GREATER
+    public
+#else
+    private
+#endif
+    void SetRemapTable(ColorAdjustType type, params ReadOnlySpan<ColorMap> map)
+    {
         // Color is being generated incorrectly so we can't use GdiPlus.ColorMap directly.
         // https://github.com/microsoft/CsWin32/issues/1121
-        using BufferScope<(int, int)> buffer = new(map.Length * 2);
+
+        StackBuffer stackBuffer = default;
+        using BufferScope<(ARGB, ARGB)> buffer = new(stackBuffer, map.Length);
 
         for (int i = 0; i < map.Length; i++)
         {
-            buffer[i] = (map[i].OldColor.ToArgb(), map[i].NewColor.ToArgb());
+            buffer[i] = (map[i].OldColor, map[i].NewColor);
         }
 
         fixed (void* m = buffer)
@@ -363,6 +376,38 @@ public sealed unsafe class ImageAttributes : ICloneable, IDisposable
         }
 
         GC.KeepAlive(this);
+    }
+
+#if NET9_0_OR_GREATER
+    /// <inheritdoc cref="SetRemapTable(ColorAdjustType, ReadOnlySpan{ColorMap})"/>
+    public void SetRemapTable(ColorAdjustType type, params ReadOnlySpan<(Color OldColor, Color NewColor)> map)
+    {
+        StackBuffer stackBuffer = default;
+        using BufferScope<(ARGB, ARGB)> buffer = new(stackBuffer, map.Length);
+
+        for (int i = 0; i < map.Length; i++)
+        {
+            buffer[i] = (map[i].OldColor, map[i].NewColor);
+        }
+
+        fixed (void* m = buffer)
+        {
+            PInvoke.GdipSetImageAttributesRemapTable(
+                _nativeImageAttributes,
+                (GdiPlus.ColorAdjustType)type,
+                enableFlag: true,
+                (uint)map.Length,
+                (GdiPlus.ColorMap*)m).ThrowIfFailed();
+        }
+
+        GC.KeepAlive(this);
+    }
+#endif
+
+    [InlineArray(ColorMapStackSpace)]
+    private struct StackBuffer
+    {
+        internal (ARGB, ARGB) _element0;
     }
 
     public void ClearRemapTable() => ClearRemapTable(ColorAdjustType.Default);
@@ -379,7 +424,15 @@ public sealed unsafe class ImageAttributes : ICloneable, IDisposable
         GC.KeepAlive(this);
     }
 
-    public void SetBrushRemapTable(ColorMap[] map) => SetRemapTable(map, ColorAdjustType.Brush);
+    public void SetBrushRemapTable(params ColorMap[] map) => SetRemapTable(map, ColorAdjustType.Brush);
+
+#if NET9_0_OR_GREATER
+    /// <inheritdoc cref="SetRemapTable(ColorAdjustType, ReadOnlySpan{ColorMap})"/>
+    public void SetBrushRemapTable(params ReadOnlySpan<ColorMap> map) => SetRemapTable(ColorAdjustType.Brush, map);
+
+    /// <inheritdoc cref="SetRemapTable(ColorAdjustType, ReadOnlySpan{ColorMap})"/>
+    public void SetBrushRemapTable(params ReadOnlySpan<(Color OldColor, Color NewColor)> map) => SetRemapTable(ColorAdjustType.Brush, map);
+#endif
 
     public void ClearBrushRemapTable() => ClearRemapTable(ColorAdjustType.Brush);
 

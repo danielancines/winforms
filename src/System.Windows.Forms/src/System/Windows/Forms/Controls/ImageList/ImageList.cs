@@ -39,7 +39,8 @@ public sealed partial class ImageList : Component, IHandle<HIMAGELIST>
 
     // The usual handle virtualization problem, with a new twist: image
     // lists are lossy. At runtime, we delay handle creation as long as possible, and store
-    // away the original images until handle creation (and hope no one disposes of the images!). At design time, we keep the originals around indefinitely.
+    // away the original images until handle creation (and hope no one disposes of the images!).
+    // At design time, we keep the originals around indefinitely.
     // This variable will become null when the original images are lost.
     private List<Original>? _originals = [];
     private EventHandler? _recreateHandler;
@@ -88,7 +89,7 @@ public sealed partial class ImageList : Component, IHandle<HIMAGELIST>
             }
 
             _colorDepth = value;
-            PerformRecreateHandle(nameof(ColorDepth));
+            PerformRecreateHandle();
         }
     }
 
@@ -166,7 +167,7 @@ public sealed partial class ImageList : Component, IHandle<HIMAGELIST>
             if (_imageSize.Width != value.Width || _imageSize.Height != value.Height)
             {
                 _imageSize = new Size(value.Width, value.Height);
-                PerformRecreateHandle(nameof(ImageSize));
+                PerformRecreateHandle();
             }
         }
     }
@@ -285,9 +286,9 @@ public sealed partial class ImageList : Component, IHandle<HIMAGELIST>
         }
 
         Bitmap bitmap;
-        if (original._image is Bitmap)
+        if (original._image is Bitmap originalBitmap)
         {
-            bitmap = (Bitmap)original._image;
+            bitmap = originalBitmap;
         }
         else if (original._image is Icon originalIcon)
         {
@@ -350,12 +351,7 @@ public sealed partial class ImageList : Component, IHandle<HIMAGELIST>
         {
             Debug.Assert(HandleCreated, "Calling AddIconToHandle when there is no handle");
             int index = PInvoke.ImageList.ReplaceIcon(this, -1, new HandleRef<HICON>(icon, (HICON)icon.Handle));
-            if (index == -1)
-            {
-                throw new InvalidOperationException(SR.ImageListAddFailed);
-            }
-
-            return index;
+            return index == -1 ? throw new InvalidOperationException(SR.ImageListAddFailed) : index;
         }
         finally
         {
@@ -391,12 +387,7 @@ public sealed partial class ImageList : Component, IHandle<HIMAGELIST>
             PInvokeCore.DeleteObject(hMask);
         }
 
-        if (index == -1)
-        {
-            throw new InvalidOperationException(SR.ImageListAddFailed);
-        }
-
-        return index;
+        return index == -1 ? throw new InvalidOperationException(SR.ImageListAddFailed) : index;
     }
 
     /// <summary>
@@ -440,7 +431,7 @@ public sealed partial class ImageList : Component, IHandle<HIMAGELIST>
             _nativeImageList = new NativeImageList(_imageSize, flags);
         }
 
-        PInvoke.ImageList.SetBkColor(this, (COLORREF)PInvoke.CLR_NONE);
+        PInvoke.ImageList.SetBkColor(this, (COLORREF)PInvokeCore.CLR_NONE);
 
         Debug.Assert(_originals is not null, "Handle not yet created, yet original images are gone");
         for (int i = 0; i < _originals.Count; i++)
@@ -473,7 +464,7 @@ public sealed partial class ImageList : Component, IHandle<HIMAGELIST>
         {
             _nativeImageList.Dispose();
             _nativeImageList = null;
-            _originals = new List<Original>();
+            _originals = [];
         }
     }
 
@@ -545,8 +536,8 @@ public sealed partial class ImageList : Component, IHandle<HIMAGELIST>
                 y,
                 width,
                 height,
-                (COLORREF)PInvoke.CLR_NONE,
-                (COLORREF)PInvoke.CLR_NONE,
+                (COLORREF)PInvokeCore.CLR_NONE,
+                (COLORREF)PInvokeCore.CLR_NONE,
                 IMAGE_LIST_DRAW_STYLE.ILD_TRANSPARENT);
         }
         finally
@@ -629,7 +620,7 @@ public sealed partial class ImageList : Component, IHandle<HIMAGELIST>
                 BitmapData? targetData = null;
                 try
                 {
-                    tmpBitmap = Bitmap.FromHbitmap((IntPtr)imageInfo.hbmImage);
+                    tmpBitmap = Image.FromHbitmap((IntPtr)imageInfo.hbmImage);
 
                     bmpData = tmpBitmap.LockBits(imageInfo.rcImage, ImageLockMode.ReadOnly, tmpBitmap.PixelFormat);
 
@@ -681,8 +672,8 @@ public sealed partial class ImageList : Component, IHandle<HIMAGELIST>
                         0,
                         _imageSize.Width,
                         _imageSize.Height,
-                        (COLORREF)PInvoke.CLR_NONE,
-                        (COLORREF)PInvoke.CLR_NONE,
+                        (COLORREF)PInvokeCore.CLR_NONE,
+                        (COLORREF)PInvokeCore.CLR_NONE,
                         IMAGE_LIST_DRAW_STYLE.ILD_TRANSPARENT);
                 }
                 finally
@@ -733,7 +724,7 @@ public sealed partial class ImageList : Component, IHandle<HIMAGELIST>
 
     // Thus, if you add a new Property to ImageList which ends up calling
     // PerformRecreateHandle, you must shadow the property in ImageListDesigner.
-    private void PerformRecreateHandle(string reason)
+    private void PerformRecreateHandle()
     {
         if (!HandleCreated)
         {
@@ -743,7 +734,7 @@ public sealed partial class ImageList : Component, IHandle<HIMAGELIST>
         if (_originals is null || Images.Empty)
         {
             // spoof it into thinking this is the first CreateHandle
-            _originals = new List<Original>();
+            _originals = [];
         }
 
         DestroyHandle();

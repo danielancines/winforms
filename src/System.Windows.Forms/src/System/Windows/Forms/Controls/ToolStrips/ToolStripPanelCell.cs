@@ -13,7 +13,7 @@ namespace System.Windows.Forms;
 ///  affect the underlying toolstrip's properties.... so if its
 ///  removed from a rafting container its still got its defaults
 ///  set up for it.
-internal class ToolStripPanelCell : ArrangedElement
+internal sealed class ToolStripPanelCell : ArrangedElement
 {
     private ToolStrip _wrappedToolStrip;
     private ToolStripPanelRow? _parent;
@@ -53,8 +53,8 @@ internal class ToolStripPanelCell : ArrangedElement
         _wrappedToolStrip = toolStrip;
 
         CommonProperties.SetAutoSize(this, true);
-        _wrappedToolStrip.LocationChanging += new ToolStripLocationCancelEventHandler(OnToolStripLocationChanging);
-        _wrappedToolStrip.VisibleChanged += new EventHandler(OnToolStripVisibleChanged);
+        _wrappedToolStrip.LocationChanging += OnToolStripLocationChanging;
+        _wrappedToolStrip.VisibleChanged += OnToolStripVisibleChanged;
     }
 
     public Rectangle CachedBounds
@@ -82,12 +82,12 @@ internal class ToolStripPanelCell : ArrangedElement
 
     public IArrangedElement InnerElement
     {
-        get { return _wrappedToolStrip as IArrangedElement; }
+        get { return _wrappedToolStrip; }
     }
 
     public ISupportToolStripPanel DraggedControl
     {
-        get { return _wrappedToolStrip as ISupportToolStripPanel; }
+        get { return _wrappedToolStrip; }
     }
 
     public ToolStripPanelRow? ToolStripPanelRow
@@ -229,8 +229,8 @@ internal class ToolStripPanelCell : ArrangedElement
 #if DEBUG
                     t_cellCount--;
 #endif
-                    _wrappedToolStrip.LocationChanging -= new ToolStripLocationCancelEventHandler(OnToolStripLocationChanging);
-                    _wrappedToolStrip.VisibleChanged -= new EventHandler(OnToolStripVisibleChanged);
+                    _wrappedToolStrip.LocationChanging -= OnToolStripLocationChanging;
+                    _wrappedToolStrip.VisibleChanged -= OnToolStripVisibleChanged;
                 }
 
                 _wrappedToolStrip = null!;
@@ -325,7 +325,6 @@ internal class ToolStripPanelCell : ArrangedElement
                     }
                 }
 
-                ToolStripPanelRow.ToolStripPanelMouseDebug.TraceVerbose($"[CELL] DRAGGING calling SetBounds {bounds}");
                 base.SetBoundsCore(bounds, specified);
                 InnerElement.SetBounds(bounds, specified);
             }
@@ -333,7 +332,6 @@ internal class ToolStripPanelCell : ArrangedElement
             {
                 if (!ToolStripPanelRow.CachedBoundsMode)
                 {
-                    ToolStripPanelRow.ToolStripPanelMouseDebug.TraceVerbose($"[CELL] NOT DRAGGING calling SetBounds {bounds}");
                     base.SetBoundsCore(bounds, specified);
                     InnerElement.SetBounds(bounds, specified);
                 }
@@ -345,32 +343,10 @@ internal class ToolStripPanelCell : ArrangedElement
         }
     }
 
-    public int Shrink(int shrinkBy)
-    {
-        if (ToolStripPanelRow is not null && ToolStripPanelRow.Orientation == Orientation.Vertical)
-        {
-            return ShrinkVertical(shrinkBy);
-        }
-        else
-        {
-            return ShrinkHorizontal(shrinkBy);
-        }
-    }
-
-    private static int ShrinkHorizontal(int shrinkBy)
-    {
-        return 0;
-    }
-
-    private static int ShrinkVertical(int shrinkBy)
-    {
-        return 0;
-    }
-
     /// <summary>
-    ///  New EventHandler for The LocationChanging so that ToolStripPanelCell Listens to the Location Property on the ToolStrips's being changed.
-    ///  The ToolStrip needs to Raft (Join) to the appropriate Location Depending on the new Location w.r.t to the oldLocation ...
-    ///  Hence the need for this event listener.
+    ///  New EventHandler for The LocationChanging so that ToolStripPanelCell Listens to the Location Property on the
+    ///  ToolStrips being changed. The ToolStrip needs to Raft (Join) to the appropriate Location Depending on the
+    ///  new Location w.r.t to the oldLocation ... Hence the need for this event listener.
     /// </summary>
     private void OnToolStripLocationChanging(object? sender, ToolStripLocationCancelEventArgs e)
     {

@@ -19,6 +19,52 @@ public class ToolStripMenuItem_ToolStripMenuItemAccessibleObjectTests
     }
 
     [WinFormsFact]
+    public void ToolStripMenuItemAccessibleObject_InvokePattern_Invoke_NoPopUpDialog()
+    {
+        int callCount = 0;
+        EventHandler handler = (sender, e) =>
+        {
+            callCount++;
+        };
+
+        using ToolStripMenuItem item1 = new();
+        item1.Click += handler;
+        Assert.True(item1.AccessibilityObject.IsPatternSupported(UIA_PATTERN_ID.UIA_InvokePatternId));
+
+        item1.AccessibilityObject.Invoke();
+        callCount.Should().Be(1);
+    }
+
+    [ActiveIssue("https://github.com/dotnet/winforms/issues/10244")]
+    [WinFormsFact(Skip = "https://github.com/dotnet/winforms/issues/10244")]
+    [SkipOnArchitecture(TestArchitectures.X86 | TestArchitectures.X64,
+        "InvokePattern.Invoke blocks on a menu item")]
+    public void ToolStripMenuItemAccessibleObject_InvokePattern_Invoke_WithPopUpDialog()
+    {
+        int callCount = 0;
+        EventHandler handler = (sender, e) =>
+        {
+            MessageBox.Show("TestDialog");
+            callCount++;
+        };
+
+        using ToolStripMenuItem item1 = new();
+        item1.Click += handler;
+        item1.AccessibilityObject.Invoke();
+
+        foreach (Form form in Application.OpenForms)
+        {
+            if (form.Text == "TestDialog")
+            {
+                form.Close();
+                break;
+            }
+        }
+
+        callCount.Should().Be(1);
+    }
+
+    [WinFormsFact]
     public void ToolStripMenuItemAccessibleObject_ControlType_IsMenuItem_IfAccessibleRoleIsDefault()
     {
         using ToolStripMenuItem toolStripMenuItem = new();
@@ -87,7 +133,7 @@ public class ToolStripMenuItem_ToolStripMenuItemAccessibleObjectTests
         menuStrip.Items.Add(item1);
         menuStrip.PerformLayout();
 
-        Assert.Equal(1, menuStrip.Items.Count);
+        Assert.Single(menuStrip.Items);
         Assert.Equal(1, (int)item1.AccessibilityObject.GetPropertyValue(UIA_PROPERTY_ID.UIA_PositionInSetPropertyId));
 
         using ToolStripSeparator separator = new();
@@ -127,7 +173,7 @@ public class ToolStripMenuItem_ToolStripMenuItemAccessibleObjectTests
         menuStrip.Items.Add(item1);
         menuStrip.PerformLayout();
 
-        Assert.Equal(1, menuStrip.Items.Count);
+        Assert.Single(menuStrip.Items);
         Assert.Equal(1, (int)item1.AccessibilityObject.GetPropertyValue(UIA_PROPERTY_ID.UIA_SizeOfSetPropertyId));
 
         using ToolStripSeparator separator = new();

@@ -39,7 +39,7 @@ public partial class CheckedListBox : ListBox
     private bool _flat = true;
 
     /// <summary>
-    ///  Indicates which item was last selected.  We want to keep track of this so we can be a little less
+    ///  Indicates which item was last selected. We want to keep track of this so we can be a little less
     ///  aggressive about checking/unchecking the items as the user moves around.
     /// </summary>
     private int _lastSelected = -1;
@@ -50,8 +50,8 @@ public partial class CheckedListBox : ListBox
     private CheckedItemCollection? _checkedItemCollection;
     private CheckedIndexCollection? _checkedIndexCollection;
 
-    private static readonly MessageId LBC_GETCHECKSTATE = PInvoke.RegisterWindowMessage("LBC_GETCHECKSTATE");
-    private static readonly MessageId LBC_SETCHECKSTATE = PInvoke.RegisterWindowMessage("LBC_SETCHECKSTATE");
+    private static uint LBC_GETCHECKSTATE { get; } = PInvoke.RegisterWindowMessage("LBC_GETCHECKSTATE");
+    private static uint LBC_SETCHECKSTATE { get; } = PInvoke.RegisterWindowMessage("LBC_SETCHECKSTATE");
 
     /// <summary>
     ///  Creates a new CheckedListBox for the user.
@@ -69,8 +69,8 @@ public partial class CheckedListBox : ListBox
 
     /// <summary>
     ///  Indicates whether or not the checkbox should be toggled whenever an
-    ///  item is selected.  The default behaviour is to just change the
-    ///  selection, and then make the user click again to check it.  However,
+    ///  item is selected. The default behavior is to just change the
+    ///  selection, and then make the user click again to check it. However,
     ///  some may prefer checking the item as soon as it is clicked.
     /// </summary>
     [SRCategory(nameof(SR.CatBehavior))]
@@ -182,7 +182,7 @@ public partial class CheckedListBox : ListBox
     }
 
     /// <summary>
-    ///  For CheckedListBoxes, multi-selection is not supported.  You can set
+    ///  For CheckedListBoxes, multi-selection is not supported. You can set
     ///  selection to be able to select one item or no items.
     /// </summary>
     public override SelectionMode SelectionMode
@@ -226,7 +226,7 @@ public partial class CheckedListBox : ListBox
                 _flat = !value;
 
                 // see if we have some items, and only invalidate if we do.
-                ObjectCollection items = (ObjectCollection)Items;
+                ObjectCollection items = Items;
                 if ((items is not null) && (items.Count > 0))
                 {
                     Invalidate();
@@ -243,8 +243,8 @@ public partial class CheckedListBox : ListBox
     [SRDescription(nameof(SR.UseCompatibleTextRenderingDescr))]
     public bool UseCompatibleTextRendering
     {
-        get => base.UseCompatibleTextRenderingInternal;
-        set => base.UseCompatibleTextRenderingInternal = value;
+        get => UseCompatibleTextRenderingInternal;
+        set => UseCompatibleTextRenderingInternal = value;
     }
 
     /// <summary>
@@ -364,7 +364,7 @@ public partial class CheckedListBox : ListBox
     }
 
     /// <summary>
-    ///  Gets the check value of the current item.  This value will be from the
+    ///  Gets the check value of the current item. This value will be from the
     ///  System.Windows.Forms.CheckState enumeration.
     /// </summary>
     public CheckState GetItemCheckState(int index)
@@ -389,7 +389,7 @@ public partial class CheckedListBox : ListBox
         if (IsHandleCreated)
         {
             RECT rect = default;
-            PInvoke.SendMessage(this, PInvoke.LB_GETITEMRECT, (WPARAM)index, ref rect);
+            PInvokeCore.SendMessage(this, PInvoke.LB_GETITEMRECT, (WPARAM)index, ref rect);
             PInvoke.InvalidateRect(this, &rect, bErase: false);
         }
     }
@@ -399,10 +399,10 @@ public partial class CheckedListBox : ListBox
     /// </summary>
     private void LbnSelChange()
     {
-        // prepare to change the selection.  we'll fire an event for
-        // this.  Note that we'll only change the selection when the
+        // prepare to change the selection. We'll fire an event for
+        // this. Note that we'll only change the selection when the
         // user clicks again on a currently selected item, or when the
-        // user has CheckOnClick set to true.  Otherwise
+        // user has CheckOnClick set to true. Otherwise,
         // just using the up and down arrows selects or deselects
         // every item around town ...
         //
@@ -461,13 +461,13 @@ public partial class CheckedListBox : ListBox
     protected override void OnHandleCreated(EventArgs e)
     {
         base.OnHandleCreated(e);
-        PInvoke.SendMessage(this, PInvoke.LB_SETITEMHEIGHT, (WPARAM)0, (LPARAM)ItemHeight);
+        PInvokeCore.SendMessage(this, PInvoke.LB_SETITEMHEIGHT, (WPARAM)0, (LPARAM)ItemHeight);
     }
 
     /// <summary>
-    ///  Actually goes and fires the drawItem event.  Inheriting controls
+    ///  Actually goes and fires the drawItem event. Inheriting controls
     ///  should use this to know when the event is fired [this is preferable to
-    ///  adding an event handler yourself for this event].  They should,
+    ///  adding an event handler yourself for this event]. They should,
     ///  however, remember to call base.OnDrawItem(e); to ensure the event is
     ///  still fired to external listeners
     /// </summary>
@@ -477,7 +477,7 @@ public partial class CheckedListBox : ListBox
 
         if (Font.Height < 0)
         {
-            Font = Control.DefaultFont;
+            Font = DefaultFont;
         }
 
         if (e.Index >= 0)
@@ -758,7 +758,7 @@ public partial class CheckedListBox : ListBox
         // Update the item height
         if (IsHandleCreated)
         {
-            PInvoke.SendMessage(this, PInvoke.LB_SETITEMHEIGHT, (WPARAM)0, (LPARAM)ItemHeight);
+            PInvokeCore.SendMessage(this, PInvoke.LB_SETITEMHEIGHT, (WPARAM)0, (LPARAM)ItemHeight);
         }
 
         // The base OnFontChanged will adjust the height of the CheckedListBox accordingly
@@ -766,9 +766,9 @@ public partial class CheckedListBox : ListBox
     }
 
     /// <summary>
-    ///  This is the code that actually fires the "keyPress" event.  The Checked
+    ///  This is the code that actually fires the "keyPress" event. The Checked
     ///  ListBox overrides this to look for space characters, since we
-    ///  want to use those to check or uncheck items periodically.  Don't
+    ///  want to use those to check or uncheck items periodically. Don't
     ///  forget to call base.OnKeyPress() to ensure that KeyPrese events
     ///  are correctly fired for all other keys.
     /// </summary>
@@ -786,7 +786,7 @@ public partial class CheckedListBox : ListBox
     }
 
     /// <summary>
-    ///  This is the code that actually fires the itemCheck event.  Don't
+    ///  This is the code that actually fires the itemCheck event. Don't
     ///  forget to call base.onItemCheck() to ensure that itemCheck vents
     ///  are correctly fired for all other keys.
     /// </summary>
@@ -815,9 +815,9 @@ public partial class CheckedListBox : ListBox
     }
 
     /// <summary>
-    ///  Actually goes and fires the selectedIndexChanged event.  Inheriting controls
+    ///  Actually goes and fires the selectedIndexChanged event. Inheriting controls
     ///  should use this to know when the event is fired [this is preferable to
-    ///  adding an event handler on yourself for this event].  They should,
+    ///  adding an event handler on yourself for this event]. They should,
     ///  however, remember to call base.OnSelectedIndexChanged(e); to ensure the event is
     ///  still fired to external listeners
     /// </summary>
@@ -849,7 +849,7 @@ public partial class CheckedListBox : ListBox
     }
 
     /// <summary>
-    ///  Sets the checked value of the given item.  This value should be from
+    ///  Sets the checked value of the given item. This value should be from
     ///  the System.Windows.Forms.CheckState enumeration.
     /// </summary>
     public void SetItemCheckState(int index, CheckState value)
@@ -875,7 +875,7 @@ public partial class CheckedListBox : ListBox
     }
 
     /// <summary>
-    ///  Sets the checked value of the given item.  This value should be a
+    ///  Sets the checked value of the given item. This value should be a
     ///  boolean.
     /// </summary>
     public void SetItemChecked(int index, bool value)
@@ -914,28 +914,17 @@ public partial class CheckedListBox : ListBox
     private void WmReflectVKeyToItem(ref Message m)
     {
         Keys keycode = (Keys)m.WParamInternal.LOWORD;
-        switch (keycode)
+        _killNextSelect = keycode switch
         {
-            case Keys.Up:
-            case Keys.Down:
-            case Keys.PageUp:
-            case Keys.PageDown:
-            case Keys.Home:
-            case Keys.End:
-            case Keys.Left:
-            case Keys.Right:
-                _killNextSelect = true;
-                break;
-            default:
-                _killNextSelect = false;
-                break;
-        }
+            Keys.Up or Keys.Down or Keys.PageUp or Keys.PageDown or Keys.Home or Keys.End or Keys.Left or Keys.Right => true,
+            _ => false,
+        };
 
         m.ResultInternal = (LRESULT)(-1);
     }
 
     /// <summary>
-    ///  The listBox's window procedure.  Inheriting classes can override this
+    ///  The listBox's window procedure. Inheriting classes can override this
     ///  to add extra functionality, but should not forget to call
     ///  base.wndProc(m); to ensure the button continues to function properly.
     /// </summary>

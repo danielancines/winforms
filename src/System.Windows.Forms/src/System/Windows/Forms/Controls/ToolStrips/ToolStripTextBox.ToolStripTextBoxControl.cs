@@ -165,7 +165,7 @@ public partial class ToolStripTextBox
                 {
                     try
                     {
-                        SystemEvents.UserPreferenceChanged += new UserPreferenceChangedEventHandler(OnUserPreferenceChanged);
+                        SystemEvents.UserPreferenceChanged += OnUserPreferenceChanged;
                     }
                     finally
                     {
@@ -177,7 +177,7 @@ public partial class ToolStripTextBox
             {
                 try
                 {
-                    SystemEvents.UserPreferenceChanged -= new UserPreferenceChangedEventHandler(OnUserPreferenceChanged);
+                    SystemEvents.UserPreferenceChanged -= OnUserPreferenceChanged;
                 }
                 finally
                 {
@@ -237,7 +237,8 @@ public partial class ToolStripTextBox
                 throw new Win32Exception();
             }
 
-            // Don't set the clipping region based on the WParam - windows seems to take out the two pixels intended for the non-client border.
+            // Don't set the clipping region based on the WParam
+            // - windows seems to take out the two pixels intended for the non-client border.
 
             bool focused = MouseIsOver || Focused;
             Color outerBorderColor = focused ? ColorTable.TextBoxBorder : BackColor;
@@ -269,7 +270,7 @@ public partial class ToolStripTextBox
 
         protected override void WndProc(ref Message m)
         {
-            if (m.MsgInternal == PInvoke.WM_NCPAINT)
+            if (m.MsgInternal == PInvokeCore.WM_NCPAINT)
             {
                 WmNCPaint(ref m);
                 return;

@@ -102,7 +102,7 @@ public partial class ComponentEditorForm : Form
         _cancelButton.Text = SR.CloseCaption;
         _dirty = false;
 
-        if (lastApply == false)
+        if (!lastApply)
         {
             for (int n = 0; n < _pageSites.Length; n++)
             {
@@ -166,14 +166,10 @@ public partial class ComponentEditorForm : Form
     [MemberNotNull(nameof(_selector))]
     private void OnConfigureUI()
     {
-        Font? uiFont = Control.DefaultFont;
-        if (_component.Site is not null)
+        Font? uiFont = DefaultFont;
+        if (_component.Site?.TryGetService(out IUIService? uiService) == true)
         {
-            IUIService? uiService = (IUIService?)_component.Site.GetService(typeof(IUIService));
-            if (uiService is not null)
-            {
-                uiFont = (Font?)uiService.Styles["DialogFont"];
-            }
+            uiFont = (Font?)uiService.Styles["DialogFont"];
         }
 
         Font = uiFont;
@@ -191,7 +187,7 @@ public partial class ComponentEditorForm : Form
         {
             ImageList = _selectorImageList
         };
-        _selector.AfterSelect += new TreeViewEventHandler(OnSelChangeSelector);
+        _selector.AfterSelect += OnSelChangeSelector;
 
         Label grayStrip = new Label
         {
@@ -269,34 +265,34 @@ public partial class ComponentEditorForm : Form
 
         _helpButton.Bounds = bounds;
         _helpButton.Text = SR.HelpCaption;
-        _helpButton.Click += new EventHandler(OnButtonClick);
+        _helpButton.Click += OnButtonClick;
         _helpButton.Enabled = false;
         _helpButton.FlatStyle = FlatStyle.System;
 
         bounds.X -= (BUTTON_WIDTH + BUTTON_PAD);
         _applyButton.Bounds = bounds;
         _applyButton.Text = SR.ApplyCaption;
-        _applyButton.Click += new EventHandler(OnButtonClick);
+        _applyButton.Click += OnButtonClick;
         _applyButton.Enabled = false;
         _applyButton.FlatStyle = FlatStyle.System;
 
         bounds.X -= (BUTTON_WIDTH + BUTTON_PAD);
         _cancelButton.Bounds = bounds;
         _cancelButton.Text = SR.CancelCaption;
-        _cancelButton.Click += new EventHandler(OnButtonClick);
+        _cancelButton.Click += OnButtonClick;
         _cancelButton.FlatStyle = FlatStyle.System;
         CancelButton = _cancelButton;
 
         bounds.X -= (BUTTON_WIDTH + BUTTON_PAD);
         _okButton.Bounds = bounds;
         _okButton.Text = SR.OKCaption;
-        _okButton.Click += new EventHandler(OnButtonClick);
+        _okButton.Click += OnButtonClick;
         _okButton.FlatStyle = FlatStyle.System;
         AcceptButton = _okButton;
 
         Controls.Clear();
-        Controls.AddRange(new Control[]
-        {
+        Controls.AddRange(
+        [
             _selector,
             grayStrip,
             _pageHost,
@@ -304,12 +300,13 @@ public partial class ComponentEditorForm : Form
             _cancelButton,
             _applyButton,
             _helpButton
-        });
+        ]);
 
-        // continuing with the old autoscale base size stuff, it works,
-        // and is currently set to a non-standard height
+        // Continuing with the old autoscale base size stuff, it works, and is currently set to a non-standard height.
         AutoScaleBaseSize = new Size(5, 14);
+#pragma warning disable CS0618 // Type or member is obsolete
         ApplyAutoScaling();
+#pragma warning restore CS0618
     }
 
     protected override void OnActivated(EventArgs e)
@@ -421,7 +418,7 @@ public partial class ComponentEditorForm : Form
     }
 
     /// <summary>
-    ///  Sets the controls of the form to dirty.  This enables the "apply"
+    ///  Sets the controls of the form to dirty. This enables the "apply"
     ///  button.
     /// </summary>
     internal virtual void SetDirty()

@@ -90,9 +90,9 @@ namespace System.Windows.Forms.Design
     {
         private BindingPickerTree? _treeViewCtrl;   // Tree view that shows the available data sources and data members
         private BindingPickerLink _addNewCtrl;     // Link that invokes the "Add Project Data Source" wizard
-        private Panel _addNewPanel;    // Panel containing the "Add Project Data Source" link
+        private readonly Panel _addNewPanel;    // Panel containing the "Add Project Data Source" link
         private HelpTextLabel _helpTextCtrl;   // Label that displays helpful text as user mouses over tree view nodes
-        private Panel _helpTextPanel;  // Panel containing the help text label
+        private readonly Panel _helpTextPanel;  // Panel containing the help text label
 
         private IServiceProvider? _serviceProvider; // Current VS service provider
         private IWindowsFormsEditorService? _windowsFormsEditorService; // Service used to invoke the picker inside a modal dropdown
@@ -129,7 +129,7 @@ namespace System.Windows.Forms.Design
         // When binding to a business object, the DesignBindingPicker needs to create an instance of the business object.
         // However, Activator.CreateInstance works only with RuntimeType - it does not work w/ Virtual Types.
         // We use the runtimeType static to determine if the type of business object is a runtime type or not.
-        private static Type runtimeType = typeof(object).GetType().GetType();
+        private static readonly Type s_runtimeType = typeof(object).GetType().GetType();
 
         /// <summary>
         /// Rebuilding binding picker according to new dpi received.
@@ -231,11 +231,13 @@ namespace System.Windows.Forms.Design
 
         private void InitTreeViewCtl()
         {
-            _treeViewCtrl = new BindingPickerTree();
-            _treeViewCtrl.HotTracking = true;
-            _treeViewCtrl.BackColor = SystemColors.Window;
-            _treeViewCtrl.ForeColor = SystemColors.WindowText;
-            _treeViewCtrl.BorderStyle = BorderStyle.None;
+            _treeViewCtrl = new BindingPickerTree
+            {
+                HotTracking = true,
+                BackColor = SystemColors.Window,
+                ForeColor = SystemColors.WindowText,
+                BorderStyle = BorderStyle.None
+            };
             _initialSize = _treeViewCtrl.Size;
             _treeViewCtrl.Dock = DockStyle.Fill;
             _treeViewCtrl.MouseMove += treeViewCtrl_MouseMove;
@@ -394,7 +396,7 @@ namespace System.Windows.Forms.Design
             _context = context;
             _showDataSources = showDataSources;
             _showDataMembers = showDataMembers;
-            _selectListMembers = showDataMembers ? selectListMembers : true;
+            _selectListMembers = !showDataMembers || selectListMembers;
             _rootDataSource = rootDataSource;
             _rootDataMember = rootDataMember;
 
@@ -719,15 +721,18 @@ namespace System.Windows.Forms.Design
             }
 
             // Special case: Data source is a list type (or list item type) rather than a list instance.
-            //    Arises when some component's DataSource property is bound to a Type, and the user opens the dropdown for the DataMember property.
-            //    We need to create a temporary instance of the correct list type, and use that as our data source for the purpose of determining
-            //    data members. Since only BindingSource supports type binding, we bind a temporary BindingSource to the specified type - it will
-            //    create an instance of the correct list type for us. Fixes VSWhidbey bugs 302757 and 280708.
+            //    Arises when some component's DataSource property is bound to a Type, and the user opens
+            //    the dropdown for the DataMember property.
+            //    We need to create a temporary instance of the correct list type,
+            //    and use that as our data source for the purpose of determining data members.
+            //    Since only BindingSource supports type binding, we bind a temporary BindingSource
+            //    to the specified type - it will create an instance of the correct list type for us.
+            //    Fixes VSWhidbey bugs 302757 and 280708.
             if (dataSource is Type)
             {
                 try
                 {
-                    BindingSource bindingSource = new();
+                    BindingSource bindingSource = [];
                     bindingSource.DataSource = dataSource;
                     dataSource = bindingSource.List;
                 }
@@ -876,7 +881,7 @@ namespace System.Windows.Forms.Design
                 DataMemberNode dataMemberNode = new(this, dataSource, dataMember + "." + property.Name, property.Name, isSubList);
                 nodes.Add(dataMemberNode);
 
-                // Auto-select support...
+                // Auto-select support.
                 if (_selectedItem is not null && _selectedItem.DataSource == dataMemberNode.DataSource)
                 {
                     if (_selectedItem.Equals(dataSource, dataMemberNode.DataMember))
@@ -886,8 +891,8 @@ namespace System.Windows.Forms.Design
                     }
                     else
                     {
-                        if (!string.IsNullOrEmpty(_selectedItem.DataMember) &&
-                            _selectedItem.DataMember.IndexOf(dataMemberNode.DataMember) == 0)
+                        if (!string.IsNullOrEmpty(_selectedItem.DataMember)
+                            && _selectedItem.DataMember.StartsWith(dataMemberNode.DataMember, StringComparison.Ordinal))
                         {
                             // If this node is an ancestor of the selected item, recursively start
                             // filling out sub-member tree (so that node for selected item will
@@ -1011,7 +1016,7 @@ namespace System.Windows.Forms.Design
 
             // vsw 477085: don't add the project data source if it points to a virtual type.
             Type? type = GetType(descriptor.TypeName, true, true);
-            if (type is not null && type.GetType() != runtimeType)
+            if (type is not null && type.GetType() != s_runtimeType)
             {
                 return;
             }
@@ -1052,8 +1057,7 @@ namespace System.Windows.Forms.Design
         /// </devdoc>
         private void AddProjectDataSourceContents(TreeNodeCollection nodes, DataSourceNode projectDataSourceNode)
         {
-            DataSourceDescriptor? dataSourceDescriptor = projectDataSourceNode.DataSource as DataSourceDescriptor;
-            if (dataSourceDescriptor is null)
+            if (projectDataSourceNode.DataSource is not DataSourceDescriptor dataSourceDescriptor)
             {
                 return;
             }
@@ -1151,7 +1155,7 @@ namespace System.Windows.Forms.Design
         {
             // vsw 477085: don't add the project data source if it points to a virtual type.
             Type? dsType = GetType(dataSourceDescriptor.TypeName, true, true);
-            if (dsType is not null && dsType.GetType() != runtimeType)
+            if (dsType is not null && dsType.GetType() != s_runtimeType)
             {
                 return;
             }
@@ -1191,7 +1195,7 @@ namespace System.Windows.Forms.Design
             }
 
             // Determine properties of list member
-            PropertyDescriptorCollection properties = ListBindingHelper.GetListItemProperties(dataSourceInstance, new PropertyDescriptor[] { propertyDescriptor });
+            PropertyDescriptorCollection properties = ListBindingHelper.GetListItemProperties(dataSourceInstance, [propertyDescriptor]);
             if (properties is null)
             {
                 return;
@@ -1238,7 +1242,6 @@ namespace System.Windows.Forms.Design
         /// <devdoc>
         ///  Puts a new BindingSource on the form, with the specified DataSource and DataMember values.
         /// </devdoc>
-        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
         private BindingSource? CreateNewBindingSource(object dataSource, string dataMember)
         {
             if (_designerHost is null || _dataSourceProviderService is null)
@@ -1247,7 +1250,7 @@ namespace System.Windows.Forms.Design
             }
 
             // Create the BindingSource
-            BindingSource bs = new();
+            BindingSource bs = [];
             try
             {
                 bs.DataSource = dataSource;
@@ -1473,7 +1476,7 @@ namespace System.Windows.Forms.Design
         private static bool IsBindableDataSource(object? dataSource)
         {
             // Check for expected interfaces (require at least one)
-            if (!(dataSource is IListSource || dataSource is IList || dataSource is Array))
+            if (dataSource is not (IListSource or IList or Array))
             {
                 return false;
             }
@@ -1838,7 +1841,7 @@ namespace System.Windows.Forms.Design
         {
             if (node is not null && IsHandleCreated)
             {
-                BeginInvoke(PostSelectTreeNodeCallback, new object[] { node });
+                BeginInvoke(PostSelectTreeNodeCallback, [node]);
             }
         }
 
@@ -1849,7 +1852,12 @@ namespace System.Windows.Forms.Design
         {
             protected override void OnPaint(PaintEventArgs e)
             {
-                TextFormatFlags formatFlags = TextFormatFlags.WordBreak | TextFormatFlags.EndEllipsis | TextFormatFlags.TextBoxControl;
+                TextFormatFlags formatFlags =
+                    TextFormatFlags.WordBreak |
+                    TextFormatFlags.EndEllipsis |
+                    TextFormatFlags.TextBoxControl |
+                    TextFormatFlags.PreserveGraphicsClipping |
+                    TextFormatFlags.PreserveGraphicsTranslateTransform;
                 Rectangle rect = new(ClientRectangle.Location, ClientRectangle.Size);
                 rect.Inflate(-2, -2);
                 TextRenderer.DrawText(e.Graphics, Text, Font, rect, ForeColor, formatFlags);
@@ -1949,7 +1957,7 @@ namespace System.Windows.Forms.Design
             // Cleared every time DesignBindingPicker dropdown is closed.
             // Every instance of BindingPickerTree has it's own cache,
             // but the basic set of images is shared, see s_defaultImages.
-            private readonly Dictionary<int, ImageList> _imageListCacheByDPI = new();
+            private readonly Dictionary<int, ImageList> _imageListCacheByDPI = [];
             private int _dpi = ScaleHelper.OneHundredPercentLogicalDpi;
 
             internal BindingPickerTree()
@@ -2283,7 +2291,7 @@ namespace System.Windows.Forms.Design
         /// </summary>
         internal class DataSourceNode : BindingPickerNode
         {
-            private object? _dataSource;
+            private readonly object? _dataSource;
 
             public DataSourceNode(DesignBindingPicker picker, object? dataSource, string? nodeName) : base(picker, nodeName)
             {
@@ -2310,7 +2318,7 @@ namespace System.Windows.Forms.Design
                 {
                     // If data members are included in tree, only
                     // they can be selected, not data sources.
-                    return _picker is null ? false : !_picker._showDataMembers;
+                    return _picker is not null && !_picker._showDataMembers;
                 }
             }
 
@@ -2361,17 +2369,18 @@ namespace System.Windows.Forms.Design
 
         internal class DataMemberNode : DataSourceNode
         {
-            private bool isList;
-            private string dataMember;
+            private readonly bool _isList;
+            private readonly string _dataMember;
 
-            public DataMemberNode(DesignBindingPicker picker,
-                                  object? dataSource,
-                                  string dataMember,
-                                  string dataField,
-                                  bool isList) : base(picker, dataSource, dataField)
+            public DataMemberNode(
+                DesignBindingPicker picker,
+                object? dataSource,
+                string dataMember,
+                string dataField,
+                bool isList) : base(picker, dataSource, dataField)
             {
-                this.dataMember = dataMember;
-                this.isList = isList;
+                _dataMember = dataMember;
+                _isList = isList;
                 BindingImageIndex = (int)(isList ? BindingImage.ListMember : BindingImage.FieldMember);
             }
 
@@ -2379,7 +2388,7 @@ namespace System.Windows.Forms.Design
             {
                 get
                 {
-                    return dataMember;
+                    return _dataMember;
                 }
             }
 
@@ -2388,7 +2397,7 @@ namespace System.Windows.Forms.Design
             {
                 get
                 {
-                    return isList;
+                    return _isList;
                 }
             }
 
@@ -2640,9 +2649,8 @@ namespace System.Windows.Forms.Design
 
                 // Instance the project data source on the form, and point a BindingSource
                 // at the appropriate list member of the form instance
-                DataSourceDescriptor? dataSourceDescriptor = DataSource as DataSourceDescriptor;
 
-                if (dataSourceDescriptor is null)
+                if (DataSource is not DataSourceDescriptor dataSourceDescriptor)
                 {
                     return DesignBinding.Null;
                 }

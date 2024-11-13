@@ -3,15 +3,12 @@
 
 #if NET9_0_OR_GREATER
 
-using System.Runtime.Versioning;
-
 namespace System.Drawing.Imaging.Effects;
 
 /// <summary>
 ///  Allows you to apply a tint to an image.
 /// </summary>
-[RequiresPreviewFeatures]
-public sealed unsafe class TintEffect : Effect
+public unsafe class TintEffect : Effect
 {
     private readonly TintParams _tintParams;
 

@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Drawing;
-using System.Windows.Forms.Primitives;
 using Moq;
 using Moq.Protected;
 using Windows.Win32.System.Variant;
@@ -188,8 +187,10 @@ public class DataGridViewCellAccessibleObjectTests : DataGridViewCell
     [WinFormsFact]
     public void DataGridViewCellAccessibleObject_Name_ReturnStringEmpty_IfOwningRowNotExist()
     {
-        SubDataGridViewCell cell = new();
-        cell.OwningColumn = new DataGridViewTextBoxColumn();
+        SubDataGridViewCell cell = new()
+        {
+            OwningColumn = new DataGridViewTextBoxColumn()
+        };
         AccessibleObject accessibleObject = new DataGridViewCellAccessibleObject(cell);
 
         Assert.Equal(string.Empty, accessibleObject.Name);
@@ -198,8 +199,10 @@ public class DataGridViewCellAccessibleObjectTests : DataGridViewCell
     [WinFormsFact]
     public void DataGridViewCellAccessibleObject_Name_ReturnStringEmpty_IfOwningColumnNotExist()
     {
-        SubDataGridViewCell cell = new();
-        cell.OwningRow = new DataGridViewRow();
+        SubDataGridViewCell cell = new()
+        {
+            OwningRow = new DataGridViewRow()
+        };
         AccessibleObject accessibleObject = new DataGridViewCellAccessibleObject(cell);
         Assert.Equal(string.Empty, accessibleObject.Name);
     }
@@ -207,9 +210,11 @@ public class DataGridViewCellAccessibleObjectTests : DataGridViewCell
     [WinFormsFact]
     public void DataGridViewCellAccessibleObject_Name_ReturnExpected_IfDataGridViewNotExist()
     {
-        SubDataGridViewCell cell = new();
-        cell.OwningRow = new DataGridViewRow();
-        cell.OwningColumn = new DataGridViewTextBoxColumn() { HeaderText = "Test", SortMode = DataGridViewColumnSortMode.NotSortable };
+        SubDataGridViewCell cell = new()
+        {
+            OwningRow = new DataGridViewRow(),
+            OwningColumn = new DataGridViewTextBoxColumn() { HeaderText = "Test", SortMode = DataGridViewColumnSortMode.NotSortable }
+        };
         AccessibleObject accessibleObject = new DataGridViewCellAccessibleObject(cell);
         string expected = string.Format(SR.DataGridView_AccDataGridViewCellName, cell.OwningColumn.HeaderText, -1);
 
@@ -364,7 +369,7 @@ public class DataGridViewCellAccessibleObjectTests : DataGridViewCell
     [MemberData(nameof(NoOwner_TestData))]
     public void DataGridViewCellAccessibleObject_DoDefaultAction_NoOwner_ThrowsInvalidOperationException(AccessibleObject accessibleObject)
     {
-        Assert.Throws<InvalidOperationException>(() => accessibleObject.DoDefaultAction());
+        Assert.Throws<InvalidOperationException>(accessibleObject.DoDefaultAction);
     }
 
     [WinFormsTheory]
@@ -461,6 +466,9 @@ public class DataGridViewCellAccessibleObjectTests : DataGridViewCell
     {
         Mock<DataGridViewCell> mockCell = new(MockBehavior.Strict);
         mockCell
+            .SetupSet(s => s.State = DataGridViewElementStates.None)
+            .Verifiable();
+        mockCell
             .SetupSet(s => s.State = DataGridViewElementStates.Visible)
             .Verifiable();
         mockCell
@@ -491,6 +499,9 @@ public class DataGridViewCellAccessibleObjectTests : DataGridViewCell
 
         Mock<DataGridViewCell> mockCell = new(MockBehavior.Strict);
         mockCell
+            .SetupSet(s => s.State = DataGridViewElementStates.None)
+            .Verifiable();
+        mockCell
             .SetupSet(s => s.State = DataGridViewElementStates.Visible)
             .Verifiable();
         mockCell
@@ -520,6 +531,9 @@ public class DataGridViewCellAccessibleObjectTests : DataGridViewCell
         Assert.True(dataGridView.IsHandleCreated);
 
         Mock<DataGridViewCell> mockCell = new(MockBehavior.Strict);
+        mockCell
+            .SetupSet(s => s.State = DataGridViewElementStates.None)
+            .Verifiable();
         mockCell
             .SetupSet(s => s.State = DataGridViewElementStates.Visible)
             .Verifiable();
@@ -557,6 +571,9 @@ public class DataGridViewCellAccessibleObjectTests : DataGridViewCell
 
         Mock<DataGridViewCell> mockCell = new(MockBehavior.Strict);
         mockCell
+            .SetupSet(s => s.State = DataGridViewElementStates.None)
+            .Verifiable();
+        mockCell
             .SetupSet(s => s.State = DataGridViewElementStates.Visible)
             .Verifiable();
         mockCell
@@ -589,6 +606,9 @@ public class DataGridViewCellAccessibleObjectTests : DataGridViewCell
         Mock<DataGridViewCell> mockCell = new(MockBehavior.Strict);
         mockCell
             .SetupSet(s => s.State = DataGridViewElementStates.Visible)
+            .Verifiable();
+        mockCell
+            .SetupSet(s => s.State = DataGridViewElementStates.None)
             .Verifiable();
         mockCell
             .SetupSet(s => s.Selected = It.IsAny<bool>())
@@ -720,7 +740,7 @@ public class DataGridViewCellAccessibleObjectTests : DataGridViewCell
         DataGridViewCellAccessibleObject accessibleObject = new(dataGridView.Rows[0].Cells[0]);
         var result = accessibleObject.GetPropertyValue((UIA_PROPERTY_ID)propertyId);
 
-        Assert.Equal(expected, result.IsEmpty ? false : (bool)result);
+        Assert.Equal(expected, !result.IsEmpty && (bool)result);
         Assert.False(dataGridView.IsHandleCreated);
     }
 
@@ -735,8 +755,10 @@ public class DataGridViewCellAccessibleObjectTests : DataGridViewCell
     [WinFormsFact]
     public void DataGridViewCellAccessibleObject_Row_ReturnExpected_IfDataGridViewNotExist()
     {
-        SubDataGridViewCell cell = new();
-        cell.OwningRow = new DataGridViewRow();
+        SubDataGridViewCell cell = new()
+        {
+            OwningRow = new DataGridViewRow()
+        };
 
         Assert.Equal(-1, cell.AccessibilityObject.Row);
     }
@@ -761,7 +783,7 @@ public class DataGridViewCellAccessibleObjectTests : DataGridViewCell
     }
 
     [WinFormsFact]
-    public void DataGridViewCellAccessicbleObject_Row_ReturnExpected_IfFirstRowHidden()
+    public void DataGridViewCellAccessibleObject_Row_ReturnExpected_IfFirstRowHidden()
     {
         using DataGridView dataGridView = new();
         dataGridView.Columns.Add("Column 1", "Column 1");
@@ -781,7 +803,7 @@ public class DataGridViewCellAccessibleObjectTests : DataGridViewCell
     }
 
     [WinFormsFact]
-    public void DataGridViewCellAccessicbleObject_Row_ReturnExpected_IfSecondRowHidden()
+    public void DataGridViewCellAccessibleObject_Row_ReturnExpected_IfSecondRowHidden()
     {
         using DataGridView dataGridView = new();
         dataGridView.Columns.Add("Column 1", "Column 1");
@@ -801,7 +823,7 @@ public class DataGridViewCellAccessibleObjectTests : DataGridViewCell
     }
 
     [WinFormsFact]
-    public void DataGridViewCellAccessicbleObject_Row_ReturnExpected_IfLastRowHidden()
+    public void DataGridViewCellAccessibleObject_Row_ReturnExpected_IfLastRowHidden()
     {
         using DataGridView dataGridView = new();
         dataGridView.Columns.Add("Column 1", "Column 1");
@@ -821,7 +843,7 @@ public class DataGridViewCellAccessibleObjectTests : DataGridViewCell
     }
 
     [WinFormsFact]
-    public void DataGridViewCellAccessibleObject_Сolumn_ReturnExpected_IfOwningColumnNotExist()
+    public void DataGridViewCellAccessibleObject_Column_ReturnExpected_IfOwningColumnNotExist()
     {
         AccessibleObject accessibleObject = new DataGridViewCellAccessibleObject(new SubDataGridViewCell());
 
@@ -831,8 +853,10 @@ public class DataGridViewCellAccessibleObjectTests : DataGridViewCell
     [WinFormsFact]
     public void DataGridViewCellAccessibleObject_Column_ReturnExpected_IfDataGridViewNotExist()
     {
-        SubDataGridViewCell cell = new();
-        cell.OwningColumn = new DataGridViewTextBoxColumn();
+        SubDataGridViewCell cell = new()
+        {
+            OwningColumn = new DataGridViewTextBoxColumn()
+        };
 
         Assert.Equal(-1, cell.AccessibilityObject.Column);
     }
@@ -1447,20 +1471,16 @@ public class DataGridViewCellAccessibleObjectTests : DataGridViewCell
     }
 
     // Unit test for https://github.com/dotnet/winforms/issues/7154
-    [WinFormsFact]
-    public void DataGridView_SwitchConfigured_AdjustsCellRowStartIndices()
+    [WinFormsTheory]
+    [InlineData([false, 1])]
+    [InlineData([true, 0])]
+    public void DataGridView_SwitchConfigured_AdjustsCellRowStartIndices(bool switchValue, int expectedIndex)
     {
-        LocalAppContextSwitches.SetDataGridViewUIAStartRowCountAtZero(true);
-
-        using DataGridView dataGridView = new();
+        using DataGridViewUIAStartRowCountAtZeroScope scope = new(switchValue);
+        using DataGridView dataGridView = new DataGridView();
         dataGridView.Columns.Add(new DataGridViewTextBoxColumn());
         dataGridView.Rows.Add(new DataGridViewRow());
-
-        Assert.Equal($"{string.Format(SR.DataGridView_AccRowName, 0)}, Not sorted.", dataGridView.Rows[0].Cells[0].AccessibilityObject.Name);
-
-        LocalAppContextSwitches.SetDataGridViewUIAStartRowCountAtZero(false);
-
-        Assert.Equal($"{string.Format(SR.DataGridView_AccRowName, 1)}, Not sorted.", dataGridView.Rows[0].Cells[0].AccessibilityObject.Name);
+        Assert.Equal($"{string.Format(SR.DataGridView_AccRowName, expectedIndex)}, Not sorted.", dataGridView.Rows[0].Cells[0].AccessibilityObject.Name);
     }
 
     private class SubDataGridViewCell : DataGridViewCell

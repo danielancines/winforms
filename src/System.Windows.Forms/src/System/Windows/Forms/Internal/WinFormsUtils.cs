@@ -158,7 +158,7 @@ internal sealed partial class WindowsFormsUtils
         }
 
 #if DEBUG
-        string windowText = PInvoke.GetWindowText(hwnd);
+        string windowText = PInvokeCore.GetWindowText(hwnd);
         string typeOfControl = "Unknown";
         string nameOfControl = "";
         Control? c = Control.FromHandle(hwnd);
@@ -234,9 +234,11 @@ internal sealed partial class WindowsFormsUtils
     ///  Strips all keyboard mnemonic prefixes from a given string, eg. turning "He&amp;lp" into "Help".
     /// </summary>
     /// <remarks>
-    ///  Note: Be careful not to call this multiple times on the same string, otherwise you'll turn
-    ///  something like "Fi&amp;sh &amp;&amp; Chips" into "Fish &amp; Chips" on the first call, and then "Fish Chips"
-    ///  on the second call.
+    ///  <para>
+    ///   Note: Be careful not to call this multiple times on the same string, otherwise you'll turn
+    ///   something like "Fi&amp;sh &amp;&amp; Chips" into "Fish &amp; Chips" on the first call, and then "Fish Chips"
+    ///   on the second call.
+    ///  </para>
     /// </remarks>
     [return: NotNullIfNotNull(nameof(text))]
     public static string? TextWithoutMnemonics(string? text)
@@ -281,7 +283,7 @@ internal sealed partial class WindowsFormsUtils
     /// </remarks>
     public static Point TranslatePoint(Point point, Control fromControl, Control toControl)
     {
-        PInvoke.MapWindowPoints(fromControl, toControl, ref point);
+        PInvokeCore.MapWindowPoints(fromControl, toControl, ref point);
         return point;
     }
 

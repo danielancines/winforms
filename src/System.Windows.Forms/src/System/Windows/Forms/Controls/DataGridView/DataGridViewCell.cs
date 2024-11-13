@@ -47,8 +47,8 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
     private static Bitmap? s_errorBmp;
 
     /// <summary>
-    /// Contains non-empty neighboring cells around the current cell.
-    /// Used in <see cref="IKeyboardToolTip.GetNeighboringToolsRectangles"/> method.
+    ///  Contains non-empty neighboring cells around the current cell.
+    ///  Used in <see cref="IKeyboardToolTip.GetNeighboringToolsRectangles"/> method.
     /// </summary>
     private readonly List<Rectangle> _nonEmptyNeighbors;
 
@@ -77,7 +77,8 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
     }
 
     // NOTE: currently this finalizer is unneeded (empty). See https://github.com/dotnet/winforms/issues/6858.
-    // All classes that are not need to be finalized must be checked in DataGridViewElement() constructor. Consider to modify it if needed.
+    // All classes that are not need to be finalized must be checked in DataGridViewElement() constructor.
+    // Consider to modify it if needed.
     ~DataGridViewCell() => Dispose(disposing: false);
 
     [Browsable(false)]
@@ -85,11 +86,10 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
     {
         get
         {
-            AccessibleObject? result = (AccessibleObject?)Properties.GetObject(s_propCellAccessibilityObject);
-            if (result is null)
+            if (!Properties.TryGetValue(s_propCellAccessibilityObject, out AccessibleObject? result))
             {
                 result = CreateAccessibilityInstance();
-                Properties.SetObject(s_propCellAccessibilityObject, result);
+                Properties.AddValue(s_propCellAccessibilityObject, result);
             }
 
             return result;
@@ -113,22 +113,20 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
 
     private ContextMenuStrip? ContextMenuStripInternal
     {
-        get => (ContextMenuStrip?)Properties.GetObject(s_propCellContextMenuStrip);
+        get => Properties.GetValueOrDefault<ContextMenuStrip>(s_propCellContextMenuStrip);
         set
         {
-            ContextMenuStrip? oldValue = (ContextMenuStrip?)Properties.GetObject(s_propCellContextMenuStrip);
+            ContextMenuStrip? oldValue = Properties.AddOrRemoveValue(s_propCellContextMenuStrip, value);
             if (oldValue != value)
             {
-                EventHandler disposedHandler = new(DetachContextMenuStrip);
                 if (oldValue is not null)
                 {
-                    oldValue.Disposed -= disposedHandler;
+                    oldValue.Disposed -= DetachContextMenuStrip;
                 }
 
-                Properties.SetObject(s_propCellContextMenuStrip, value);
                 if (value is not null)
                 {
-                    value.Disposed += disposedHandler;
+                    value.Disposed += DetachContextMenuStrip;
                 }
 
                 DataGridView?.OnCellContextMenuStripChanged(this);
@@ -207,18 +205,12 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
     [AllowNull]
     private string ErrorTextInternal
     {
-        get => (string?)Properties.GetObject(s_propCellErrorText) ?? string.Empty;
+        get => Properties.GetStringOrEmptyString(s_propCellErrorText);
         set
         {
-            string errorText = ErrorTextInternal;
-            if (!string.IsNullOrEmpty(value) || Properties.ContainsObject(s_propCellErrorText))
+            if (Properties.AddOrRemoveString(s_propCellErrorText, value))
             {
-                Properties.SetObject(s_propCellErrorText, value);
-            }
-
-            if (DataGridView is not null && !errorText.Equals(ErrorTextInternal))
-            {
-                DataGridView.OnCellErrorTextChanged(this);
+                DataGridView?.OnCellErrorTextChanged(this);
             }
         }
     }
@@ -282,22 +274,16 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
         }
     }
 
-    private bool HasErrorText
-    {
-        get => Properties.ContainsObjectThatIsNotNull(s_propCellErrorText);
-    }
+    private bool HasErrorText => Properties.ContainsKey(s_propCellErrorText);
 
     [Browsable(false)]
-    public bool HasStyle => Properties.ContainsObjectThatIsNotNull(s_propCellStyle);
+    public bool HasStyle => Properties.ContainsKey(s_propCellStyle);
 
-    internal bool HasToolTipText => Properties.ContainsObjectThatIsNotNull(s_propCellToolTipText);
+    internal bool HasToolTipText => Properties.ContainsKey(s_propCellToolTipText);
 
-    internal bool HasValue => Properties.ContainsObjectThatIsNotNull(s_propCellValue);
+    internal bool HasValue => Properties.ContainsKey(s_propCellValue);
 
-    private protected virtual bool HasValueType
-    {
-        get => Properties.ContainsObjectThatIsNotNull(s_propCellValueType);
-    }
+    private protected virtual bool HasValueType => Properties.ContainsKey(s_propCellValueType);
 
     #region IKeyboardToolTip implementation
     bool IKeyboardToolTip.CanShowToolTipsNow() => Visible && DataGridView is not null;
@@ -346,7 +332,7 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
 
     bool IKeyboardToolTip.IsHoveredWithMouse() => false;
 
-    bool IKeyboardToolTip.HasRtlModeEnabled() => DataGridView!.RightToLeft == RightToLeft.Yes;
+    bool IKeyboardToolTip.HasRtlModeEnabled() => DataGridView is not null && DataGridView.RightToLeft == RightToLeft.Yes;
 
     bool IKeyboardToolTip.AllowsToolTip() => true;
 
@@ -362,7 +348,7 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
 
     string? IKeyboardToolTip.GetCaptionForTool(ToolTip toolTip)
     {
-        if (DataGridView!.ShowCellErrors && !string.IsNullOrEmpty(ErrorText))
+        if (DataGridView is not null && DataGridView.ShowCellErrors && !string.IsNullOrEmpty(ErrorText))
         {
             return ErrorText;
         }
@@ -374,7 +360,7 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
 
     bool IKeyboardToolTip.IsBeingTabbedTo() => IsBeingTabbedTo();
 
-    internal virtual bool IsBeingTabbedTo() => DataGridView.AreCommonNavigationalKeysDown();
+    internal virtual bool IsBeingTabbedTo() => Control.AreCommonNavigationalKeysDown();
 
     bool IKeyboardToolTip.AllowsChildrenToShowToolTips() => true;
     #endregion
@@ -394,7 +380,7 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
         }
     }
 
-    internal bool IsAccessibilityObjectCreated => Properties.GetObject(s_propCellAccessibilityObject) is AccessibleObject;
+    internal bool IsAccessibilityObjectCreated => Properties.ContainsKey(s_propCellAccessibilityObject);
 
     /// <summary>
     ///  Indicates whether or not the parent grid view for this element has an accessible object associated with it.
@@ -633,12 +619,11 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
     {
         get
         {
-            DataGridViewCellStyle? dataGridViewCellStyle = (DataGridViewCellStyle?)Properties.GetObject(s_propCellStyle);
-            if (dataGridViewCellStyle is null)
+            if (!Properties.TryGetValue(s_propCellStyle, out DataGridViewCellStyle? dataGridViewCellStyle))
             {
                 dataGridViewCellStyle = new DataGridViewCellStyle();
                 dataGridViewCellStyle.AddScope(DataGridView, DataGridViewCellStyleScopes.Cell);
-                Properties.SetObject(s_propCellStyle, dataGridViewCellStyle);
+                Properties.AddValue(s_propCellStyle, dataGridViewCellStyle);
             }
 
             return dataGridViewCellStyle;
@@ -652,16 +637,10 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
                 dataGridViewCellStyle.RemoveScope(DataGridViewCellStyleScopes.Cell);
             }
 
-            if (value is not null || Properties.ContainsObject(s_propCellStyle))
-            {
-                value?.AddScope(DataGridView, DataGridViewCellStyleScopes.Cell);
+            value?.AddScope(DataGridView, DataGridViewCellStyleScopes.Cell);
+            Properties.AddOrRemoveValue(s_propCellStyle, value);
 
-                Properties.SetObject(s_propCellStyle, value);
-            }
-
-            if (((dataGridViewCellStyle is not null && value is null) ||
-                (dataGridViewCellStyle is null && value is not null) ||
-                (dataGridViewCellStyle is not null && value is not null && !dataGridViewCellStyle.Equals(Style))) && DataGridView is not null)
+            if (DataGridView is not null && !Equals(dataGridViewCellStyle, value))
             {
                 DataGridView.OnCellStyleChanged(this);
             }
@@ -676,14 +655,8 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
     [TypeConverter(typeof(StringConverter))]
     public object? Tag
     {
-        get => Properties.GetObject(s_propCellTag);
-        set
-        {
-            if (value is not null || Properties.ContainsObject(s_propCellTag))
-            {
-                Properties.SetObject(s_propCellTag, value);
-            }
-        }
+        get => Properties.GetValueOrDefault<object?>(s_propCellTag);
+        set => Properties.AddOrRemoveValue(s_propCellTag, value);
     }
 
     [Browsable(false)]
@@ -702,18 +675,12 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
     [AllowNull]
     private string ToolTipTextInternal
     {
-        get => (string?)Properties.GetObject(s_propCellToolTipText) ?? string.Empty;
+        get => Properties.GetStringOrEmptyString(s_propCellToolTipText);
         set
         {
-            string toolTipText = ToolTipTextInternal;
-            if (!string.IsNullOrEmpty(value) || Properties.ContainsObject(s_propCellToolTipText))
+            if (Properties.AddOrRemoveString(s_propCellToolTipText, value))
             {
-                Properties.SetObject(s_propCellToolTipText, value);
-            }
-
-            if (DataGridView is not null && !toolTipText.Equals(ToolTipTextInternal))
-            {
-                DataGridView.OnCellToolTipTextChanged(this);
+                DataGridView?.OnCellToolTipTextChanged(this);
             }
         }
     }
@@ -738,21 +705,14 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
     {
         get
         {
-            Type? cellValueType = (Type?)Properties.GetObject(s_propCellValueType);
-            if (cellValueType is null && OwningColumn is not null)
+            if (!Properties.TryGetValue(s_propCellValueType, out Type? cellValueType) && OwningColumn is not null)
             {
                 cellValueType = OwningColumn.ValueType;
             }
 
             return cellValueType;
         }
-        set
-        {
-            if (value is not null || Properties.ContainsObject(s_propCellValueType))
-            {
-                Properties.SetObject(s_propCellValueType, value);
-            }
-        }
+        set => Properties.AddOrRemoveValue(s_propCellValueType, value);
     }
 
     private TypeConverter? ValueTypeConverter
@@ -874,25 +834,25 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
         {
             X = (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1
         };
-        if (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+        if (advancedBorderStyle.Left is DataGridViewAdvancedCellBorderStyle.OutsetDouble or DataGridViewAdvancedCellBorderStyle.InsetDouble)
         {
             rect.X++;
         }
 
         rect.Y = (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
-        if (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+        if (advancedBorderStyle.Top is DataGridViewAdvancedCellBorderStyle.OutsetDouble or DataGridViewAdvancedCellBorderStyle.InsetDouble)
         {
             rect.Y++;
         }
 
         rect.Width = (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
-        if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+        if (advancedBorderStyle.Right is DataGridViewAdvancedCellBorderStyle.OutsetDouble or DataGridViewAdvancedCellBorderStyle.InsetDouble)
         {
             rect.Width++;
         }
 
         rect.Height = (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.None) ? 0 : 1;
-        if (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.OutsetDouble || advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+        if (advancedBorderStyle.Bottom is DataGridViewAdvancedCellBorderStyle.OutsetDouble or DataGridViewAdvancedCellBorderStyle.InsetDouble)
         {
             rect.Height++;
         }
@@ -917,7 +877,7 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
         return rect;
     }
 
-    // Called when the row that owns the editing control gets unshared.
+    // Called when the row that owns the editing control gets un-shared.
     // Too late in the product cycle to make this a public method.
     internal virtual void CacheEditingControl()
     {
@@ -1141,12 +1101,14 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
     }
 
     /// <summary>
-    /// Gets the value indicating whether DataGridView editing control should be processed in accessible
-    /// hierarchy restructuring. This check is necessary to not restructure the accessible hierarchy for
-    /// custom editing controls and for derived classes as inherited accessibility may differ or
-    /// may be not inherited at all.
+    ///  Gets the value indicating whether DataGridView editing control should be processed in accessible
+    ///  hierarchy restructuring. This check is necessary to not restructure the accessible hierarchy for
+    ///  custom editing controls and for derived classes as inherited accessibility may differ or
+    ///  may be not inherited at all.
     /// </summary>
-    /// <returns>True if accessible hierarchy should be manually recreated for the cell and editing control, otherwise False.</returns>
+    /// <returns>
+    ///  True if accessible hierarchy should be manually recreated for the cell and editing control, otherwise False.
+    /// </returns>
     private bool AccessibleRestructuringNeeded
     {
         get
@@ -1175,12 +1137,13 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
             ContextMenuStrip? contextMenuStrip = ContextMenuStripInternal;
             if (contextMenuStrip is not null)
             {
-                contextMenuStrip.Disposed -= new EventHandler(DetachContextMenuStrip);
+                contextMenuStrip.Disposed -= DetachContextMenuStrip;
             }
         }
 
-        // If you are adding releasing unmanaged resources code here (disposing == false), you need to remove this class type
-        // (and all of its subclasses) from check in DataGridViewElement() constructor and DataGridViewElement_Subclasses_SuppressFinalizeCall test!
+        // If you are adding releasing unmanaged resources code here (disposing == false), you need to remove this
+        // class type(and all of its subclasses) from check in DataGridViewElement() constructor and
+        // DataGridViewElement_Subclasses_SuppressFinalizeCall test!
         // Also consider to modify ~DataGridViewCell() description.
     }
 
@@ -1304,7 +1267,7 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
                     // The seemingly arbitrary 160 comes from RFC
                     // Code taken from ASP.NET file xsp\System\Web\httpserverutility.cs
                     // Don't entity encode high chars (160 to 256)
-                    if (ch >= 160 && ch < 256)
+                    if (ch is >= (char)160 and < (char)256)
                     {
                         output.Write("&#");
                         output.Write(((int)ch).ToString(NumberFormatInfo.InvariantInfo));
@@ -1576,23 +1539,25 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
     protected internal virtual string GetErrorText(int rowIndex)
     {
         string errorText = string.Empty;
-        object? objErrorText = Properties.GetObject(s_propCellErrorText);
+        string? objErrorText = Properties.GetValueOrDefault<string>(s_propCellErrorText);
         if (objErrorText is not null)
         {
-            errorText = (string)objErrorText;
+            errorText = objErrorText;
         }
-        else if (DataGridView is not null &&
-                 rowIndex != -1 &&
-                 rowIndex != DataGridView.NewRowIndex &&
-                 OwningColumn is not null &&
-                 OwningColumn.IsDataBound &&
-                 DataGridView.DataConnection is not null)
+        else if (DataGridView is not null
+            && rowIndex != -1
+            && rowIndex != DataGridView.NewRowIndex
+            && OwningColumn is not null
+            && OwningColumn.IsDataBound
+            && DataGridView.DataConnection is not null)
         {
             errorText = DataGridView.DataConnection.GetError(OwningColumn.BoundColumnIndex, ColumnIndex, rowIndex);
         }
 
-        if (DataGridView is not null && (DataGridView.VirtualMode || DataGridView.DataSource is not null) &&
-            ColumnIndex >= 0 && rowIndex >= 0)
+        if (DataGridView is not null
+            && (DataGridView.VirtualMode || DataGridView.DataSource is not null)
+            && ColumnIndex >= 0
+            && rowIndex >= 0)
         {
             errorText = DataGridView.OnCellErrorTextNeeded(ColumnIndex, rowIndex, errorText);
         }
@@ -2356,11 +2321,11 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
         TextFormatFlags flags = DataGridViewUtilities.ComputeTextFormatFlagsForCellStyleAlignment(rightToLeft, cellStyle.Alignment, cellStyle.WrapMode);
         if (cellStyle.WrapMode == DataGridViewTriState.True)
         {
-            return DataGridViewCell.MeasureTextHeight(g, text, cellStyle.Font, maxWidth, flags, out widthTruncated);
+            return MeasureTextHeight(g, text, cellStyle.Font!, maxWidth, flags, out widthTruncated);
         }
         else
         {
-            Size size = DataGridViewCell.MeasureTextSize(g, text, cellStyle.Font, flags);
+            Size size = MeasureTextSize(g, text, cellStyle.Font!, flags);
             widthTruncated = size.Width > maxWidth;
             return size.Height;
         }
@@ -2458,13 +2423,13 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
             Debug.Assert(ColumnIndex < dataGridView.Columns.Count);
         }
 
-        if (dataGridView is null ||
-            (dataGridView.AllowUserToAddRowsInternal && rowIndex > -1 && rowIndex == dataGridView.NewRowIndex && rowIndex != dataGridView.CurrentCellAddress.Y) ||
-            (!dataGridView.VirtualMode && OwningColumn is not null && !OwningColumn.IsDataBound) ||
-            rowIndex == -1 ||
-            ColumnIndex == -1)
+        if (dataGridView is null
+            || (dataGridView.AllowUserToAddRowsInternal && rowIndex > -1 && rowIndex == dataGridView.NewRowIndex && rowIndex != dataGridView.CurrentCellAddress.Y)
+            || (!dataGridView.VirtualMode && OwningColumn is not null && !OwningColumn.IsDataBound)
+            || rowIndex == -1
+            || ColumnIndex == -1)
         {
-            return Properties.GetObject(s_propCellValue);
+            return Properties.GetValueOrDefault<object>(s_propCellValue);
         }
         else if (OwningColumn is not null && OwningColumn.IsDataBound)
         {
@@ -2475,7 +2440,7 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
             }
             else if ((dataConnection.CurrencyManager?.Count ?? 0) <= rowIndex)
             {
-                return Properties.GetObject(s_propCellValue);
+                return Properties.GetValueOrDefault<object>(s_propCellValue);
             }
             else
             {
@@ -2611,25 +2576,25 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
             return new Size(0, 0);
         }
 
-        Size textOneLineSize = DataGridViewCell.MeasureTextSize(graphics, text, font, flags);
-        if ((float)(textOneLineSize.Width / textOneLineSize.Height) <= maxRatio)
+        Size textOneLineSize = MeasureTextSize(graphics, text, font, flags);
+        if (textOneLineSize.Width / textOneLineSize.Height <= maxRatio)
         {
             return textOneLineSize;
         }
 
         flags &= TextFormatSupportedFlags;
-        float maxWidth = (float)(textOneLineSize.Width * textOneLineSize.Width) / (float)textOneLineSize.Height / maxRatio * 1.1F;
+        float maxWidth = textOneLineSize.Width * textOneLineSize.Width / (float)textOneLineSize.Height / maxRatio * 1.1F;
         Size textSize;
         do
         {
             // Don't use passed in graphics so we can optimize measurement
             textSize = TextRenderer.MeasureText(text, font, new Size((int)maxWidth, int.MaxValue), flags);
-            if ((float)(textSize.Width / textSize.Height) <= maxRatio || textSize.Width > (int)maxWidth)
+            if (textSize.Width / textSize.Height <= maxRatio || textSize.Width > (int)maxWidth)
             {
                 return textSize;
             }
 
-            maxWidth = (float)textSize.Width * 0.9F;
+            maxWidth = textSize.Width * 0.9F;
         }
         while (maxWidth > 1.0F);
         return textSize;
@@ -2665,7 +2630,7 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(maxHeight);
 
-        Size oneLineSize = DataGridViewCell.MeasureTextSize(graphics, text, font, flags);
+        Size oneLineSize = MeasureTextSize(graphics, text, font, flags);
         if (oneLineSize.Height >= maxHeight || (flags & TextFormatFlags.SingleLine) != 0)
         {
             return oneLineSize.Width;
@@ -2674,7 +2639,7 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
         {
             flags &= TextFormatSupportedFlags;
             int lastFittingWidth = oneLineSize.Width;
-            float maxWidth = (float)lastFittingWidth * 0.9F;
+            float maxWidth = lastFittingWidth * 0.9F;
             Size textSize;
             do
             {
@@ -2687,7 +2652,7 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
                 else
                 {
                     lastFittingWidth = (int)maxWidth;
-                    maxWidth = (float)textSize.Width * 0.9F;
+                    maxWidth = textSize.Width * 0.9F;
                 }
             }
             while (maxWidth > 1.0F);
@@ -3259,8 +3224,8 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
             case DataGridViewAdvancedCellBorderStyle.OutsetPartial:
                 y1 = bounds.Y + 2;
                 y2 = bounds.Bottom - 3;
-                if (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
-                    advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+                if (advancedBorderStyle.Top is DataGridViewAdvancedCellBorderStyle.OutsetDouble or
+                    DataGridViewAdvancedCellBorderStyle.InsetDouble)
                 {
                     y1++;
                 }
@@ -3276,8 +3241,8 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
             case DataGridViewAdvancedCellBorderStyle.OutsetDouble:
                 y1 = bounds.Y + 1;
                 y2 = bounds.Bottom - 1;
-                if (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.OutsetPartial ||
-                    advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.None)
+                if (advancedBorderStyle.Top is DataGridViewAdvancedCellBorderStyle.OutsetPartial or
+                    DataGridViewAdvancedCellBorderStyle.None)
                 {
                     y1--;
                 }
@@ -3294,8 +3259,8 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
             case DataGridViewAdvancedCellBorderStyle.InsetDouble:
                 y1 = bounds.Y + 1;
                 y2 = bounds.Bottom - 1;
-                if (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.OutsetPartial ||
-                    advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.None)
+                if (advancedBorderStyle.Top is DataGridViewAdvancedCellBorderStyle.OutsetPartial or
+                    DataGridViewAdvancedCellBorderStyle.None)
                 {
                     y1--;
                 }
@@ -3327,8 +3292,8 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
             case DataGridViewAdvancedCellBorderStyle.OutsetPartial:
                 y1 = bounds.Y + 2;
                 y2 = bounds.Bottom - 3;
-                if (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
-                    advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+                if (advancedBorderStyle.Top is DataGridViewAdvancedCellBorderStyle.OutsetDouble or
+                    DataGridViewAdvancedCellBorderStyle.InsetDouble)
                 {
                     y1++;
                 }
@@ -3344,8 +3309,8 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
             case DataGridViewAdvancedCellBorderStyle.OutsetDouble:
                 y1 = bounds.Y + 1;
                 y2 = bounds.Bottom - 1;
-                if (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.OutsetPartial ||
-                    advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.None)
+                if (advancedBorderStyle.Top is DataGridViewAdvancedCellBorderStyle.OutsetPartial or
+                    DataGridViewAdvancedCellBorderStyle.None)
                 {
                     y1--;
                 }
@@ -3362,14 +3327,14 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
             case DataGridViewAdvancedCellBorderStyle.InsetDouble:
                 y1 = bounds.Y + 1;
                 y2 = bounds.Bottom - 1;
-                if (advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.OutsetPartial ||
-                    advancedBorderStyle.Top == DataGridViewAdvancedCellBorderStyle.None)
+                if (advancedBorderStyle.Top is DataGridViewAdvancedCellBorderStyle.OutsetPartial or
+                    DataGridViewAdvancedCellBorderStyle.None)
                 {
                     y1--;
                 }
 
-                if (advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.OutsetPartial ||
-                    advancedBorderStyle.Bottom == DataGridViewAdvancedCellBorderStyle.Inset)
+                if (advancedBorderStyle.Bottom is DataGridViewAdvancedCellBorderStyle.OutsetPartial or
+                    DataGridViewAdvancedCellBorderStyle.Inset)
                 {
                     y2++;
                 }
@@ -3389,14 +3354,14 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
             case DataGridViewAdvancedCellBorderStyle.Inset:
                 x1 = bounds.X;
                 x2 = bounds.Right - 1;
-                if (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
-                    advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+                if (advancedBorderStyle.Left is DataGridViewAdvancedCellBorderStyle.OutsetDouble or
+                    DataGridViewAdvancedCellBorderStyle.InsetDouble)
                 {
                     x1++;
                 }
 
-                if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.Inset ||
-                    advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.Outset)
+                if (advancedBorderStyle.Right is DataGridViewAdvancedCellBorderStyle.Inset or
+                    DataGridViewAdvancedCellBorderStyle.Outset)
                 {
                     x2--;
                 }
@@ -3407,14 +3372,14 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
             case DataGridViewAdvancedCellBorderStyle.Outset:
                 x1 = bounds.X;
                 x2 = bounds.Right - 1;
-                if (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
-                    advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+                if (advancedBorderStyle.Left is DataGridViewAdvancedCellBorderStyle.OutsetDouble or
+                    DataGridViewAdvancedCellBorderStyle.InsetDouble)
                 {
                     x1++;
                 }
 
-                if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.Inset ||
-                    advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.Outset)
+                if (advancedBorderStyle.Right is DataGridViewAdvancedCellBorderStyle.Inset or
+                    DataGridViewAdvancedCellBorderStyle.Outset)
                 {
                     x2--;
                 }
@@ -3428,8 +3393,8 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
                 if (advancedBorderStyle.Left != DataGridViewAdvancedCellBorderStyle.None)
                 {
                     x1++;
-                    if (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
-                        advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+                    if (advancedBorderStyle.Left is DataGridViewAdvancedCellBorderStyle.OutsetDouble or
+                        DataGridViewAdvancedCellBorderStyle.InsetDouble)
                     {
                         x1++;
                     }
@@ -3438,8 +3403,8 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
                 if (advancedBorderStyle.Right != DataGridViewAdvancedCellBorderStyle.None)
                 {
                     x2--;
-                    if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
-                        advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+                    if (advancedBorderStyle.Right is DataGridViewAdvancedCellBorderStyle.OutsetDouble or
+                        DataGridViewAdvancedCellBorderStyle.InsetDouble)
                     {
                         x2--;
                     }
@@ -3451,15 +3416,15 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
 
             case DataGridViewAdvancedCellBorderStyle.OutsetDouble:
                 x1 = bounds.X;
-                if (advancedBorderStyle.Left != DataGridViewAdvancedCellBorderStyle.OutsetPartial &&
-                    advancedBorderStyle.Left != DataGridViewAdvancedCellBorderStyle.None)
+                if (advancedBorderStyle.Left is not DataGridViewAdvancedCellBorderStyle.OutsetPartial and
+                    not DataGridViewAdvancedCellBorderStyle.None)
                 {
                     x1++;
                 }
 
                 x2 = bounds.Right - 2;
-                if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.OutsetPartial ||
-                    advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.None)
+                if (advancedBorderStyle.Right is DataGridViewAdvancedCellBorderStyle.OutsetPartial or
+                    DataGridViewAdvancedCellBorderStyle.None)
                 {
                     x2++;
                 }
@@ -3470,15 +3435,15 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
 
             case DataGridViewAdvancedCellBorderStyle.InsetDouble:
                 x1 = bounds.X;
-                if (advancedBorderStyle.Left != DataGridViewAdvancedCellBorderStyle.OutsetPartial &&
-                    advancedBorderStyle.Left != DataGridViewAdvancedCellBorderStyle.None)
+                if (advancedBorderStyle.Left is not DataGridViewAdvancedCellBorderStyle.OutsetPartial and
+                    not DataGridViewAdvancedCellBorderStyle.None)
                 {
                     x1++;
                 }
 
                 x2 = bounds.Right - 2;
-                if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.OutsetPartial ||
-                    advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.None)
+                if (advancedBorderStyle.Right is DataGridViewAdvancedCellBorderStyle.OutsetPartial or
+                    DataGridViewAdvancedCellBorderStyle.None)
                 {
                     x2++;
                 }
@@ -3507,8 +3472,8 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
             case DataGridViewAdvancedCellBorderStyle.Outset:
                 x1 = bounds.X;
                 x2 = bounds.Right - 1;
-                if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.InsetDouble ||
-                    advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.OutsetDouble)
+                if (advancedBorderStyle.Right is DataGridViewAdvancedCellBorderStyle.InsetDouble or
+                    DataGridViewAdvancedCellBorderStyle.OutsetDouble)
                 {
                     x2--;
                 }
@@ -3522,8 +3487,8 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
                 if (advancedBorderStyle.Left != DataGridViewAdvancedCellBorderStyle.None)
                 {
                     x1++;
-                    if (advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
-                        advancedBorderStyle.Left == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+                    if (advancedBorderStyle.Left is DataGridViewAdvancedCellBorderStyle.OutsetDouble or
+                        DataGridViewAdvancedCellBorderStyle.InsetDouble)
                     {
                         x1++;
                     }
@@ -3532,8 +3497,8 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
                 if (advancedBorderStyle.Right != DataGridViewAdvancedCellBorderStyle.None)
                 {
                     x2--;
-                    if (advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.OutsetDouble ||
-                        advancedBorderStyle.Right == DataGridViewAdvancedCellBorderStyle.InsetDouble)
+                    if (advancedBorderStyle.Right is DataGridViewAdvancedCellBorderStyle.OutsetDouble or
+                        DataGridViewAdvancedCellBorderStyle.InsetDouble)
                     {
                         x2--;
                     }
@@ -3902,7 +3867,7 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
         }
 
         PInvoke.UiaDisconnectProvider(AccessibilityObject);
-        Properties.SetObject(s_propCellAccessibilityObject, null);
+        Properties.RemoveValue(s_propCellAccessibilityObject);
     }
 
     protected virtual bool SetValue(int rowIndex, object? value)
@@ -3923,10 +3888,7 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
             }
             else if ((dataConnection.CurrencyManager?.Count ?? 0) <= rowIndex)
             {
-                if (value is not null || Properties.ContainsObject(s_propCellValue))
-                {
-                    Properties.SetObject(s_propCellValue, value);
-                }
+                Properties.AddOrRemoveValue(s_propCellValue, value);
             }
             else
             {
@@ -3963,10 +3925,7 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
             rowIndex == -1 ||
             ColumnIndex == -1)
         {
-            if (value is not null || Properties.ContainsObject(s_propCellValue))
-            {
-                Properties.SetObject(s_propCellValue, value);
-            }
+            Properties.AddOrRemoveValue(s_propCellValue, value);
         }
         else
         {
@@ -3994,7 +3953,7 @@ public abstract partial class DataGridViewCell : DataGridViewElement, ICloneable
 
     internal static bool TextFitsInBounds(Graphics graphics, string text, Font font, Size maxBounds, TextFormatFlags flags)
     {
-        int requiredHeight = DataGridViewCell.MeasureTextHeight(graphics, text, font, maxBounds.Width, flags, out bool widthTruncated);
+        int requiredHeight = MeasureTextHeight(graphics, text, font, maxBounds.Width, flags, out bool widthTruncated);
         return requiredHeight <= maxBounds.Height && !widthTruncated;
     }
 

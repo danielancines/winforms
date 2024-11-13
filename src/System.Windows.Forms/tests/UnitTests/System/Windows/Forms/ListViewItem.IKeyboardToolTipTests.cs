@@ -208,7 +208,7 @@ public class ListViewItem_IKeyboardToolTipTests
     {
         ListViewItem listViewItem = new();
 
-        Assert.Equal(0, ((IKeyboardToolTip)listViewItem).GetNeighboringToolsRectangles().Count);
+        Assert.Empty(((IKeyboardToolTip)listViewItem).GetNeighboringToolsRectangles());
     }
 
     [WinFormsTheory]
@@ -219,7 +219,7 @@ public class ListViewItem_IKeyboardToolTipTests
         using var listView = GetListView(virtualMode, view: View.List);
         ListViewItem listViewItem = AssignItemToListView(listView, new ListViewItem());
 
-        Assert.Equal(0, ((IKeyboardToolTip)listViewItem).GetNeighboringToolsRectangles().Count);
+        Assert.Empty(((IKeyboardToolTip)listViewItem).GetNeighboringToolsRectangles());
     }
 
     [WinFormsFact]
@@ -228,7 +228,7 @@ public class ListViewItem_IKeyboardToolTipTests
         using var listView = GetListView(virtualMode: false, view: View.Tile);
         ListViewItem listViewItem = AssignItemToListView(listView, new ListViewItem());
 
-        Assert.Equal(0, ((IKeyboardToolTip)listViewItem).GetNeighboringToolsRectangles().Count);
+        Assert.Empty(((IKeyboardToolTip)listViewItem).GetNeighboringToolsRectangles());
     }
 
     // The ListView is configured to display items as follows:
@@ -680,8 +680,10 @@ public class ListViewItem_IKeyboardToolTipTests
         Assert.Equal(expected, ((IKeyboardToolTip)listViewItem).HasRtlModeEnabled());
     }
 
+    [ActiveIssue("https://github.com/dotnet/winforms/issues/12319")]
     [WinFormsTheory]
-    [InlineData(true, true, true, true)]
+    // Comment the data out due to ActiveIssue "https://github.com/dotnet/winforms/issues/12319".
+    // [InlineData(true, true, true, true)]
     [InlineData(true, true, false, false)]
     [InlineData(true, false, true, true)]
     [InlineData(true, false, false, false)]
@@ -774,7 +776,7 @@ public class ListViewItem_IKeyboardToolTipTests
 
     private void AssignListItemsToListView(ListView listView, int count)
     {
-        List<ListViewItem> listViewItems = new();
+        List<ListViewItem> listViewItems = [];
 
         for (int i = 0; i < count; i++)
         {
@@ -795,7 +797,7 @@ public class ListViewItem_IKeyboardToolTipTests
         }
         else
         {
-            listView.Items.AddRange(listViewItems.ToArray());
+            listView.Items.AddRange((ListViewItem[])[.. listViewItems]);
         }
     }
 

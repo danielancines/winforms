@@ -766,7 +766,7 @@ public class ListBoxTests
         control.ColumnWidth = 123;
 
         RECT rc = default;
-        Assert.Equal(1, (int)PInvoke.SendMessage(control, PInvoke.LB_GETITEMRECT, 0, ref rc));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETITEMRECT, 0, ref rc));
         Assert.Equal(123, ((Rectangle)rc).Width);
     }
 
@@ -833,7 +833,7 @@ public class ListBoxTests
         control.DisplayMemberChanged += displayMemberHandler;
 
         // Set different.
-        List<int> dataSource1 = new();
+        List<int> dataSource1 = [];
         control.DataSource = dataSource1;
         Assert.Same(dataSource1, control.DataSource);
         Assert.Equal(1, dataSourceCallCount);
@@ -846,7 +846,7 @@ public class ListBoxTests
         Assert.Equal(0, displayMemberCallCount);
 
         // Set different.
-        List<int> dataSource2 = new();
+        List<int> dataSource2 = [];
         control.DataSource = dataSource2;
         Assert.Same(dataSource2, control.DataSource);
         Assert.Equal(2, dataSourceCallCount);
@@ -1459,10 +1459,10 @@ public class ListBoxTests
 
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         Assert.Equal(0, control.HorizontalExtent);
-        Assert.Equal(0, (int)PInvoke.SendMessage(control, PInvoke.LB_GETHORIZONTALEXTENT));
+        Assert.Equal(0, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETHORIZONTALEXTENT));
 
         control.HorizontalExtent = 10;
-        Assert.Equal(expected, (int)PInvoke.SendMessage(control, PInvoke.LB_GETHORIZONTALEXTENT));
+        Assert.Equal(expected, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETHORIZONTALEXTENT));
     }
 
     public static IEnumerable<object[]> HorizontalScrollbar_Set_TestData()
@@ -1798,7 +1798,7 @@ public class ListBoxTests
         };
 
         Assert.NotEqual(IntPtr.Zero, control.Handle);
-        Assert.Equal(expected, (int)PInvoke.SendMessage(control, PInvoke.LB_GETITEMHEIGHT) == 25);
+        Assert.Equal(expected, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETITEMHEIGHT) == 25);
     }
 
     [WinFormsTheory]
@@ -2439,8 +2439,8 @@ public class ListBoxTests
     [InlineData(false, 1)]
     public void ListBox_SelectedIndex_SetWithDataManager_SetsDataManagerPosition(bool formattingEnabled, int position)
     {
-        BindingContext bindingContext = new();
-        List<string> dataSource = new() { "item1", "item2", "item3" };
+        BindingContext bindingContext = [];
+        List<string> dataSource = ["item1", "item2", "item3"];
         using SubListBox control = new()
         {
             BindingContext = bindingContext,
@@ -2627,15 +2627,15 @@ public class ListBoxTests
         // Select last.
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         control.SelectedIndex = 1;
-        Assert.Equal(1, (int)PInvoke.SendMessage(control, PInvoke.LB_GETCURSEL));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETCURSEL));
 
         // Select first.
         control.SelectedIndex = 0;
-        Assert.Equal(0, (int)PInvoke.SendMessage(control, PInvoke.LB_GETCURSEL));
+        Assert.Equal(0, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETCURSEL));
 
         // Clear selection.
         control.SelectedIndex = -1;
-        Assert.Equal(-1, (int)PInvoke.SendMessage(control, PInvoke.LB_GETCURSEL));
+        Assert.Equal(-1, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETCURSEL));
     }
 
     [WinFormsTheory]
@@ -2654,21 +2654,21 @@ public class ListBoxTests
         // Select last.
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         control.SelectedIndex = 1;
-        Assert.Equal(1, (int)PInvoke.SendMessage(control, PInvoke.LB_GETCURSEL));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETCURSEL));
         Span<int> buffer = stackalloc int[5];
-        Assert.Equal(1, (int)PInvoke.SendMessage(control, PInvoke.LB_GETSELITEMS, (WPARAM)buffer.Length, ref buffer[0]));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETSELITEMS, (WPARAM)buffer.Length, ref buffer[0]));
         Assert.Equal(new int[] { 1, 0, 0, 0, 0 }, buffer.ToArray());
 
         // Select first.
         control.SelectedIndex = 0;
-        Assert.Equal(0, (int)PInvoke.SendMessage(control, PInvoke.LB_GETCURSEL));
-        Assert.Equal(2, (int)PInvoke.SendMessage(control, PInvoke.LB_GETSELITEMS, (WPARAM)buffer.Length, ref buffer[0]));
+        Assert.Equal(0, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETCURSEL));
+        Assert.Equal(2, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETSELITEMS, (WPARAM)buffer.Length, ref buffer[0]));
         Assert.Equal(new int[] { 0, 1, 0, 0, 0 }, buffer.ToArray());
 
         // Clear selection.
         control.SelectedIndex = -1;
-        Assert.Equal(0, (int)PInvoke.SendMessage(control, PInvoke.LB_GETCURSEL));
-        Assert.Equal(0, (int)PInvoke.SendMessage(control, PInvoke.LB_GETSELITEMS, (WPARAM)buffer.Length, ref buffer[0]));
+        Assert.Equal(0, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETCURSEL));
+        Assert.Equal(0, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETSELITEMS, (WPARAM)buffer.Length, ref buffer[0]));
         Assert.Equal(new int[] { 0, 1, 0, 0, 0 }, buffer.ToArray());
     }
 
@@ -2921,8 +2921,8 @@ public class ListBoxTests
     [InlineData(false, 1)]
     public void ListBox_SelectedItem_SetWithDataManager_SetsDataManagerPosition(bool formattingEnabled, int position)
     {
-        BindingContext bindingContext = new();
-        List<string> dataSource = new() { "item1", "item2", "item3" };
+        BindingContext bindingContext = [];
+        List<string> dataSource = ["item1", "item2", "item3"];
         using SubListBox control = new()
         {
             BindingContext = bindingContext,
@@ -3140,19 +3140,19 @@ public class ListBoxTests
         // Select last.
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         control.SelectedItem = "item2";
-        Assert.Equal(1, (int)PInvoke.SendMessage(control, PInvoke.LB_GETCURSEL));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETCURSEL));
 
         // Select invalid.
         control.SelectedItem = "NoSuchItem";
-        Assert.Equal(1, (int)PInvoke.SendMessage(control, PInvoke.LB_GETCURSEL));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETCURSEL));
 
         // Select first.
         control.SelectedItem = "item1";
-        Assert.Equal(0, (int)PInvoke.SendMessage(control, PInvoke.LB_GETCURSEL));
+        Assert.Equal(0, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETCURSEL));
 
         // Clear selection.
         control.SelectedItem = null;
-        Assert.Equal(-1, (int)PInvoke.SendMessage(control, PInvoke.LB_GETCURSEL));
+        Assert.Equal(-1, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETCURSEL));
     }
 
     [WinFormsTheory]
@@ -3171,28 +3171,28 @@ public class ListBoxTests
         // Select last.
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         control.SelectedItem = "item2";
-        Assert.Equal(1, (int)PInvoke.SendMessage(control, PInvoke.LB_GETCURSEL));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETCURSEL));
         Span<int> buffer = stackalloc int[5];
-        Assert.Equal(1, (int)PInvoke.SendMessage(control, PInvoke.LB_GETSELITEMS, (WPARAM)buffer.Length, ref buffer[0]));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETSELITEMS, (WPARAM)buffer.Length, ref buffer[0]));
         Assert.Equal(new int[] { 1, 0, 0, 0, 0 }, buffer.ToArray());
 
         // Select invalid.
         control.SelectedItem = "NoSuchItem";
-        Assert.Equal(1, (int)PInvoke.SendMessage(control, PInvoke.LB_GETCURSEL));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETCURSEL));
         buffer = stackalloc int[5];
-        Assert.Equal(1, (int)PInvoke.SendMessage(control, PInvoke.LB_GETSELITEMS, (WPARAM)buffer.Length, ref buffer[0]));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETSELITEMS, (WPARAM)buffer.Length, ref buffer[0]));
         Assert.Equal(new int[] { 1, 0, 0, 0, 0 }, buffer.ToArray());
 
         // Select first.
         control.SelectedItem = "item1";
-        Assert.Equal(0, (int)PInvoke.SendMessage(control, PInvoke.LB_GETCURSEL));
-        Assert.Equal(2, (int)PInvoke.SendMessage(control, PInvoke.LB_GETSELITEMS, (WPARAM)buffer.Length, ref buffer[0]));
+        Assert.Equal(0, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETCURSEL));
+        Assert.Equal(2, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETSELITEMS, (WPARAM)buffer.Length, ref buffer[0]));
         Assert.Equal(new int[] { 0, 1, 0, 0, 0 }, buffer.ToArray());
 
         // Clear selection.
         control.SelectedItem = null;
-        Assert.Equal(0, (int)PInvoke.SendMessage(control, PInvoke.LB_GETCURSEL));
-        Assert.Equal(0, (int)PInvoke.SendMessage(control, PInvoke.LB_GETSELITEMS, (WPARAM)buffer.Length, ref buffer[0]));
+        Assert.Equal(0, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETCURSEL));
+        Assert.Equal(0, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETSELITEMS, (WPARAM)buffer.Length, ref buffer[0]));
         Assert.Equal(new int[] { 0, 1, 0, 0, 0 }, buffer.ToArray());
     }
 
@@ -3304,25 +3304,25 @@ public class ListBoxTests
         int createdCallCount = 0;
         control.HandleCreated += (sender, e) => createdCallCount++;
 
-        // Set MakeCustom after the Handle is created to allow for default behaviour.
+        // Set MakeCustom after the Handle is created to allow for default behavior.
         control.MakeCustom = true;
 
         // Verify equal lengths.
-        control.GetSelCountResult = (IntPtr)1;
-        control.GetSelResult = new int[] { 2 };
+        control.GetSelCountResult = 1;
+        control.GetSelResult = [2];
         Dirty();
         Assert.Equal(new int[] { 2 }, control.SelectedIndices.Cast<int>());
 
         // Verify truncated
-        control.GetSelCountResult = (IntPtr)2;
-        control.GetSelResult = new int[] { 2 };
+        control.GetSelCountResult = 2;
+        control.GetSelResult = [2];
         Dirty();
         Assert.Equal(new int[] { 0, 2 }, control.SelectedIndices.Cast<int>());
 
         void Dirty()
         {
             // Simulate a selection change notification.
-            PInvoke.SendMessage(control, MessageId.WM_REFLECT | PInvoke.WM_COMMAND, WPARAM.MAKEWPARAM(0, (int)PInvoke.LBN_SELCHANGE));
+            PInvokeCore.SendMessage(control, MessageId.WM_REFLECT | PInvokeCore.WM_COMMAND, WPARAM.MAKEWPARAM(0, (int)PInvoke.LBN_SELCHANGE));
         }
     }
 
@@ -3344,7 +3344,7 @@ public class ListBoxTests
             {
                 Assert.Equal(GetSelCountResult, m.WParam);
                 Marshal.Copy(GetSelResult, 0, m.LParam, GetSelResult.Length);
-                m.Result = (IntPtr)GetSelResult.Length;
+                m.Result = GetSelResult.Length;
                 return;
             }
 
@@ -4428,7 +4428,7 @@ public class ListBoxTests
 
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         control.TopIndex = 1;
-        Assert.Equal(0, (int)PInvoke.SendMessage(control, PInvoke.LB_GETTOPINDEX));
+        Assert.Equal(0, (int)PInvokeCore.SendMessage(control, PInvoke.LB_GETTOPINDEX));
     }
 
     [WinFormsTheory]
@@ -4557,12 +4557,12 @@ public class ListBoxTests
         using SubListBox control = new();
 
         // Add multiple.
-        control.AddItemsCore(new object[] { "item1", "item2" });
+        control.AddItemsCore(["item1", "item2"]);
         Assert.Equal(new string[] { "item1", "item2" }, control.Items.Cast<object>());
         Assert.False(control.IsHandleCreated);
 
         // Add another.
-        control.AddItemsCore(new object[] { "item3" });
+        control.AddItemsCore(["item3"]);
         Assert.Equal(new string[] { "item1", "item2", "item3" }, control.Items.Cast<object>());
         Assert.False(control.IsHandleCreated);
 
@@ -4590,7 +4590,7 @@ public class ListBoxTests
         control.HandleCreated += (sender, e) => createdCallCount++;
 
         // Add multiple.
-        control.AddItemsCore(new object[] { "item1", "item2" });
+        control.AddItemsCore(["item1", "item2"]);
         Assert.Equal(new string[] { "item1", "item2" }, control.Items.Cast<object>());
         Assert.True(control.IsHandleCreated);
         Assert.Equal(1, invalidatedCallCount);
@@ -4598,7 +4598,7 @@ public class ListBoxTests
         Assert.Equal(0, createdCallCount);
 
         // Add another.
-        control.AddItemsCore(new object[] { "item3" });
+        control.AddItemsCore(["item3"]);
         Assert.Equal(new string[] { "item1", "item2", "item3" }, control.Items.Cast<object>());
         Assert.True(control.IsHandleCreated);
         Assert.Equal(2, invalidatedCallCount);
@@ -4845,7 +4845,7 @@ public class ListBoxTests
         control.HandleCreated += (sender, e) => createdCallCount++;
 
         Size result = control.GetPreferredSize(proposedSize);
-        Assert.True(result.Width > 0 && result.Width < 120);
+        Assert.True(result.Width is > 0 and < 120);
         Assert.Equal(control.PreferredHeight, result.Height);
         Assert.True(control.IsHandleCreated);
         Assert.Equal(0, invalidatedCallCount);
@@ -4878,7 +4878,7 @@ public class ListBoxTests
         control.HandleCreated += (sender, e) => createdCallCount++;
 
         Size result = control.GetPreferredSize(proposedSize);
-        Assert.True(result.Width > 0 && result.Width < 120);
+        Assert.True(result.Width is > 0 and < 120);
         Assert.Equal(control.PreferredHeight + 6, result.Height);
         Assert.True(control.IsHandleCreated);
         Assert.Equal(0, invalidatedCallCount);
@@ -5244,7 +5244,7 @@ public class ListBoxTests
         {
             DrawMode = drawMode,
             ExpectedIndex = expectedIndex,
-            GetItemHeightResult = (IntPtr)getItemRectResult
+            GetItemHeightResult = getItemRectResult
         };
         control.Items.Add("Item1");
         control.Items.Add("Item2");
@@ -5381,7 +5381,7 @@ public class ListBoxTests
 
     public static IEnumerable<object[]> GetItemRectangle_CustomGetItemRect_TestData()
     {
-        yield return new object[] { new RECT(), Rectangle.Empty };
+        yield return new object[] { default(RECT), Rectangle.Empty };
         yield return new object[] { new RECT(1, 2, 3, 4), new Rectangle(1, 2, 2, 2) };
     }
 
@@ -5815,8 +5815,8 @@ public class ListBoxTests
     [MemberData(nameof(OnSelectedIndexChanged_WithDataManager_TestData))]
     public void ListBox_OnSelectedIndexChanged_InvokeWithDataManager_CallsSelectedIndexChanged(bool formattingEnabled, int position, EventArgs eventArgs)
     {
-        BindingContext bindingContext = new();
-        List<string> dataSource = new() { "item1", "item2", "item3" };
+        BindingContext bindingContext = [];
+        List<string> dataSource = ["item1", "item2", "item3"];
         using SubListBox control = new()
         {
             BindingContext = bindingContext,
@@ -6118,30 +6118,30 @@ public class ListBoxTests
             listBox.CreateControl();
         }
 
-        listBox.Items.AddRange(new object[] { "1", "2", "3" });
+        listBox.Items.AddRange((object[])["1", "2", "3"]);
         listBox.SelectedItem = listBox.Items[0];
 
         Assert.Equal(3, listBox.Items.Count);
         Assert.Equal(listBox.Items[0], listBox.SelectedItem);
         Assert.Equal(0, listBox.SelectedIndex);
-        Assert.Equal(1, listBox.SelectedIndices.Count);
-        Assert.Equal(1, listBox.SelectedItems.Count);
+        Assert.Single(listBox.SelectedIndices);
+        Assert.Single(listBox.SelectedItems);
 
         listBox.Items.Remove(listBox.Items[2]);
 
         Assert.Equal(2, listBox.Items.Count);
         Assert.Equal(listBox.Items[0], listBox.SelectedItem);
         Assert.Equal(0, listBox.SelectedIndex);
-        Assert.Equal(1, listBox.SelectedIndices.Count);
-        Assert.Equal(1, listBox.SelectedItems.Count);
+        Assert.Single(listBox.SelectedIndices);
+        Assert.Single(listBox.SelectedItems);
 
         listBox.Items.Remove(listBox.Items[1]);
 
-        Assert.Equal(1, listBox.Items.Count);
+        Assert.Single(listBox.Items);
         Assert.Equal(listBox.Items[0], listBox.SelectedItem);
         Assert.Equal(0, listBox.SelectedIndex);
-        Assert.Equal(1, listBox.SelectedIndices.Count);
-        Assert.Equal(1, listBox.SelectedItems.Count);
+        Assert.Single(listBox.SelectedIndices);
+        Assert.Single(listBox.SelectedItems);
         Assert.Equal(createControl, listBox.IsHandleCreated);
     }
 
@@ -6159,7 +6159,7 @@ public class ListBoxTests
             listBox.CreateControl();
         }
 
-        listBox.Items.AddRange(new object[] { "1", "2", "3", "4" });
+        listBox.Items.AddRange((object[])["1", "2", "3", "4"]);
         listBox.SelectedItems.Add(listBox.Items[0]);
         listBox.SelectedItems.Add(listBox.Items[1]);
 
@@ -6199,7 +6199,7 @@ public class ListBoxTests
             listBox.CreateControl();
         }
 
-        listBox.Items.AddRange(new object[] { "1", "2", "3" });
+        listBox.Items.AddRange((object[])["1", "2", "3"]);
 
         for (int count = listBox.Items.Count; count > 1; count -= 1)
         {
@@ -6207,8 +6207,8 @@ public class ListBoxTests
 
             Assert.Equal(listBox.Items[0], listBox.SelectedItem);
             Assert.Equal(0, listBox.SelectedIndex);
-            Assert.Equal(1, listBox.SelectedIndices.Count);
-            Assert.Equal(1, listBox.SelectedItems.Count);
+            Assert.Single(listBox.SelectedIndices);
+            Assert.Single(listBox.SelectedItems);
 
             listBox.Items.Remove(listBox.Items[0]);
             count -= 1;
@@ -6216,8 +6216,8 @@ public class ListBoxTests
             Assert.Equal(count, listBox.Items.Count);
             Assert.Null(listBox.SelectedItem);
             Assert.Equal(-1, listBox.SelectedIndex);
-            Assert.Equal(0, listBox.SelectedIndices.Count);
-            Assert.Equal(0, listBox.SelectedItems.Count);
+            Assert.Empty(listBox.SelectedIndices);
+            Assert.Empty(listBox.SelectedItems);
         }
     }
 
@@ -6235,7 +6235,7 @@ public class ListBoxTests
             listBox.CreateControl();
         }
 
-        listBox.Items.AddRange(new object[] { "1", "2", "3" });
+        listBox.Items.AddRange((object[])["1", "2", "3"]);
 
         for (int count = listBox.Items.Count; count > 1; count -= 1)
         {
@@ -6243,8 +6243,8 @@ public class ListBoxTests
 
             Assert.Equal(listBox.Items[0], listBox.SelectedItem);
             Assert.Equal(0, listBox.SelectedIndex);
-            Assert.Equal(1, listBox.SelectedIndices.Count);
-            Assert.Equal(1, listBox.SelectedItems.Count);
+            Assert.Single(listBox.SelectedIndices);
+            Assert.Single(listBox.SelectedItems);
 
             listBox.Items.Remove(listBox.Items[0]);
 
@@ -6253,9 +6253,146 @@ public class ListBoxTests
             Assert.Equal(count, listBox.Items.Count);
             Assert.Null(listBox.SelectedItem);
             Assert.Equal(-1, listBox.SelectedIndex);
-            Assert.Equal(0, listBox.SelectedIndices.Count);
-            Assert.Equal(0, listBox.SelectedItems.Count);
+            Assert.Empty(listBox.SelectedIndices);
+            Assert.Empty(listBox.SelectedItems);
         }
+    }
+
+    [WinFormsTheory]
+    [InlineData(true, null, "")]
+    [InlineData(true, "TestItem", "TestItem")]
+    [InlineData(false, "TestItem", "TestItem")]
+    public void ListBox_GetItemText_ReturnsExpected(bool formattingEnabled, string selectedItem, string expected)
+    {
+        using ListBox listBox = new() { FormattingEnabled = formattingEnabled };
+        if (selectedItem is not null)
+        {
+            listBox.Items.Add(selectedItem);
+            listBox.SelectedItem = selectedItem;
+        }
+        else
+        {
+            listBox.SelectedItem = null;
+        }
+
+        string result = listBox.GetItemText(listBox.SelectedItem);
+        result.Should().Be(expected);
+    }
+
+    [WinFormsTheory]
+    [InlineData(DrawMode.OwnerDrawVariable, true)]
+    [InlineData(DrawMode.OwnerDrawFixed, false)]
+    [InlineData(DrawMode.Normal, false)]
+    public void ListBox_Refresh_CallsOnMeasureItemBasedOnDrawMode(DrawMode drawMode, bool expectedMeasureItemCalled)
+    {
+        using ListBox listBox = new()
+        {
+            DrawMode = drawMode,
+            Items = { "Item1", "Item2", "Item3" }
+        };
+
+        bool measureItemCalled = false;
+        listBox.MeasureItem += (sender, e) =>
+        {
+            measureItemCalled = true;
+        };
+
+        listBox.Refresh();
+
+        measureItemCalled.Should().Be(expectedMeasureItemCalled);
+    }
+
+    [WinFormsTheory]
+    [InlineData(new string[] { }, 0)]
+    [InlineData(new string[] { "Item1", "Item2" }, 2)]
+    public void ListBox_ItemsCollection_ReturnsExpectedCount(string[] items, int expectedCount)
+    {
+        using ListBox listBox = new();
+        foreach (string item in items)
+        {
+            listBox.Items.Add(item);
+        }
+
+        int itemCount = listBox.Items.Count;
+        itemCount.Should().Be(expectedCount);
+    }
+
+    [WinFormsFact]
+    public void ListBox_SelectionModeNone_ThrowsArgumentException()
+    {
+        using ListBox listBox = new();
+        listBox.SelectionMode = SelectionMode.None;
+
+        listBox.Items.Add("Item1");
+
+        Action action = () => listBox.SelectedIndex = 0;
+
+        action.Should().Throw<ArgumentException>()
+            .WithMessage("Cannot call this method when SelectionMode is SelectionMode.NONE.*");
+    }
+
+    [WinFormsTheory]
+    [InlineData(SelectionMode.One)]
+    [InlineData(SelectionMode.MultiSimple)]
+    [InlineData(SelectionMode.MultiExtended)]
+    public void ListBox_SelectionModeValid_DoesNotThrow(SelectionMode selectionMode)
+    {
+        using ListBox listBox = new();
+        listBox.SelectionMode = selectionMode;
+
+        listBox.Items.Add("Item1");
+
+        Action action = () => listBox.SelectedIndex = 0;
+
+        action.Should().NotThrow();
+    }
+
+    [WinFormsFact]
+    public void ListBox_PreferredHeight_RecreatingHandle_ReturnsCurrentHeight()
+    {
+        using ListBox listBox = new()
+        {
+            DrawMode = DrawMode.Normal,
+            BorderStyle = BorderStyle.None,
+            Items = { "Item 1", "Item 2", "Item 3" }
+        };
+
+        // Use TestAccessor to call the private RecreateHandle method
+        listBox.TestAccessor().Dynamic.RecreateHandle();
+
+        int totalItemHeight = 0;
+        for (int i = 0; i < listBox.Items.Count; i++)
+        {
+            totalItemHeight += listBox.GetItemHeight(i);
+        }
+
+        int expectedHeight = totalItemHeight + listBox.Padding.Vertical;
+
+        listBox.PreferredHeight.Should().Be(expectedHeight);
+    }
+
+    [WinFormsFact]
+    public void ListBox_PreferredHeight_CreatingHandle_ReturnsCurrentHeight()
+    {
+        using ListBox listBox = new()
+        {
+            DrawMode = DrawMode.Normal,
+            BorderStyle = BorderStyle.None,
+            Items = { "Item 1", "Item 2", "Item 3" }
+        };
+
+        // Use TestAccessor to call the private SetState method and set the state to 'true'
+        listBox.TestAccessor().Dynamic.SetState(1, true);
+
+        int totalItemHeight = 0;
+        for (int i = 0; i < listBox.Items.Count; i++)
+        {
+            totalItemHeight += listBox.GetItemHeight(i);
+        }
+
+        int expectedHeight = totalItemHeight + listBox.Padding.Vertical;
+
+        listBox.PreferredHeight.Should().Be(expectedHeight);
     }
 
     private class SubListBox : ListBox

@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <TargetFrameworks>$(NetCurrent);$(NetPrevious);$(NetMinimum);netstandard2.0;$(NetFrameworkMinimum)</TargetFrameworks>
+    <!-- Unset TargetFramework as this property gets set in Directory.Build.props. This is necessary to avoid over-building. -->
     <TargetFramework />
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <WarningsNotAsErrors>CS0618</WarningsNotAsErrors>
     <EnableAOTAnalyzer>false</EnableAOTAnalyzer>
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
-    <CLSCompliant>true</CLSCompliant>
     <ProduceReferenceAssembly>true</ProduceReferenceAssembly>
     <IsPackable>true</IsPackable>
     <IsShipping>true</IsShipping>
@@ -62,8 +62,8 @@
       <PrivateAssets>all</PrivateAssets>
     </ProjectReference>
 
-    <PackageReference Include="Microsoft.Win32.SystemEvents" Version="$(MicrosoftWin32SystemEventsPackageVersion)" />
-    <PackageReference Include="Microsoft.Windows.CsWin32" Version="$(MicrosoftWindowsCsWin32PackageVersion)">
+    <PackageReference Include="Microsoft.Win32.SystemEvents" />
+    <PackageReference Include="Microsoft.Windows.CsWin32">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -71,7 +71,6 @@
 
   <ItemGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">
     <Compile Include="..\..\Common\src\DisableRuntimeMarshalling.cs" Link="Common\DisableRuntimeMarshalling.cs" />
-    <Compile Include="..\..\Common\src\HandleRefMarshaller.cs" Link="Common\HandleRefMarshaller.cs" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETStandard'">

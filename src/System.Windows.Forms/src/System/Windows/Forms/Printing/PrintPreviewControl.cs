@@ -10,7 +10,7 @@ using Windows.Win32.UI.Accessibility;
 namespace System.Windows.Forms;
 
 /// <summary>
-///  The raw "preview" part of print previewing, without any dialogs or buttons.  Most <see cref="PrintPreviewControl"/>
+///  The raw "preview" part of print previewing, without any dialogs or buttons. Most <see cref="PrintPreviewControl"/>
 ///  objects are found on <see cref="PrintPreviewDialog"/> objects, but they don't have to be.
 /// </summary>
 [DefaultProperty(nameof(Document))]
@@ -345,7 +345,7 @@ public partial class PrintPreviewControl : Control
         Color backColor = GetBackColor(isHighContrast);
         using var backBrush = backColor.GetCachedSolidBrushScope();
 
-        PaintResizeBox(pevent, isHighContrast);
+        PaintResizeBox(pevent);
         PaintFocus(pevent, isHighContrast);
 
         if (_pageInfo is null || _pageInfo.Length == 0)
@@ -356,7 +356,7 @@ public partial class PrintPreviewControl : Control
 
             if (_pageInfo is not null || _exceptionPrinting)
             {
-                DrawMessage(pevent.Graphics, rect, _exceptionPrinting, isHighContrast);
+                DrawMessage(pevent.Graphics, rect, _exceptionPrinting);
             }
             else
             {
@@ -590,9 +590,9 @@ public partial class PrintPreviewControl : Control
         }
     }
 
-    private void DrawMessage(Graphics g, Rectangle rect, bool isExceptionPrinting, bool isHighContrast)
+    private void DrawMessage(Graphics g, Rectangle rect, bool isExceptionPrinting)
     {
-        using var brush = ForeColor.GetCachedSolidBrushScope();
+        using var brush = SystemColors.ControlText.GetCachedSolidBrushScope();
 
         using StringFormat format = new()
         {
@@ -696,7 +696,7 @@ public partial class PrintPreviewControl : Control
         }
     }
 
-    private void PaintResizeBox(PaintEventArgs e, bool isHighContrast)
+    private void PaintResizeBox(PaintEventArgs e)
     {
         if (!_hScrollBar.Visible || !_vScrollBar.Visible)
         {
@@ -1070,7 +1070,7 @@ public partial class PrintPreviewControl : Control
     {
         switch (m.MsgInternal)
         {
-            case PInvoke.WM_KEYDOWN:
+            case PInvokeCore.WM_KEYDOWN:
                 WmKeyDown(ref m);
                 break;
             default:

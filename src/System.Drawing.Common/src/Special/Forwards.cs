@@ -1,8 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-#pragma warning disable CS0618,CA2252
-
 #if NETCOREAPP
 // This is required for back-compatibility with legacy Xamarin which had these types in System.Drawing.Common.dll
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.Color))]
@@ -70,14 +68,18 @@
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.Drawing2D.WarpMode))]
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.Drawing2D.WrapMode))]
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.Font))]
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.FontConverter))]
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.FontFamily))]
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.FontStyle))]
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.Graphics))]
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.GraphicsUnit))]
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.Icon))]
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.IconConverter))]
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.IDeviceContext))]
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.Image))]
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.ImageConverter))]
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.ImageAnimator))]
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.ImageFormatConverter))]
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.Imaging.BitmapData))]
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.Imaging.ColorAdjustType))]
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.Imaging.ColorChannelFlag))]
@@ -116,6 +118,7 @@
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.Printing.Duplex))]
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.Printing.InvalidPrinterException))]
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.Printing.Margins))]
+[assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.Printing.MarginsConverter))]
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.Printing.PageSettings))]
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.Printing.PaperKind))]
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.Printing.PaperSize))]
@@ -161,5 +164,3 @@
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.TextureBrush))]
 [assembly: System.Runtime.CompilerServices.TypeForwardedTo(typeof(System.Drawing.ToolboxBitmapAttribute))]
 #endif
-
-#pragma warning restore CS0618

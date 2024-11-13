@@ -83,7 +83,7 @@ public partial class DataGridViewRowCollection : ICollection, IList
         InvalidateCachedRowCounts();
         InvalidateCachedRowsHeights();
         _dataGridView = dataGridView;
-        _rowStates = new List<DataGridViewElementStates>();
+        _rowStates = [];
         _items = new RowList(this);
     }
 
@@ -95,7 +95,7 @@ public partial class DataGridViewRowCollection : ICollection, IList
     {
         get
         {
-            // All rows need to be unshared
+            // All rows need to be un-shared
             // Accessing List property should be avoided.
             int rowCount = Count;
             for (int rowIndex = 0; rowIndex < rowCount; rowIndex++)
@@ -133,7 +133,7 @@ public partial class DataGridViewRowCollection : ICollection, IList
                     return dataGridViewRow;
                 }
 
-                // unshare row
+                // un-share row
                 DataGridViewRow newDataGridViewRow = (DataGridViewRow)dataGridViewRow.Clone();
                 newDataGridViewRow.Index = index;
                 newDataGridViewRow.DataGridView = dataGridViewRow.DataGridView;
@@ -793,7 +793,7 @@ public partial class DataGridViewRowCollection : ICollection, IList
         {
             if (DataGridView.DataConnection!.List is IBindingList list && list.AllowRemove && list.SupportsChangeNotification)
             {
-                ((IList)list).Clear();
+                list.Clear();
             }
             else
             {
@@ -1267,7 +1267,7 @@ public partial class DataGridViewRowCollection : ICollection, IList
         {
             if ((GetRowState(rowIndex) & includeFilter) == includeFilter)
             {
-                rowsHeight += ((DataGridViewRow)_items[rowIndex]).GetHeight(rowIndex);
+                rowsHeight += _items[rowIndex].GetHeight(rowIndex);
             }
         }
 
@@ -1295,7 +1295,7 @@ public partial class DataGridViewRowCollection : ICollection, IList
         {
             if ((GetRowState(rowIndex) & includeFilter) == includeFilter)
             {
-                rowsHeight += ((DataGridViewRow)_items[rowIndex]).GetHeight(rowIndex);
+                rowsHeight += _items[rowIndex].GetHeight(rowIndex);
             }
         }
 
@@ -1313,7 +1313,7 @@ public partial class DataGridViewRowCollection : ICollection, IList
         {
             if ((GetRowState(rowIndex) & includeFilter) == includeFilter)
             {
-                rowsHeight += ((DataGridViewRow)_items[rowIndex]).GetHeight(rowIndex);
+                rowsHeight += _items[rowIndex].GetHeight(rowIndex);
                 if (rowsHeight > heightLimit)
                 {
                     return true;
@@ -1834,12 +1834,12 @@ public partial class DataGridViewRowCollection : ICollection, IList
 
     internal void InvalidateCachedRowCount(DataGridViewElementStates includeFilter)
     {
-        Debug.Assert(includeFilter == DataGridViewElementStates.Displayed ||
-                     includeFilter == DataGridViewElementStates.Selected ||
-                     includeFilter == DataGridViewElementStates.ReadOnly ||
-                     includeFilter == DataGridViewElementStates.Resizable ||
-                     includeFilter == DataGridViewElementStates.Frozen ||
-                     includeFilter == DataGridViewElementStates.Visible);
+        Debug.Assert(includeFilter is DataGridViewElementStates.Displayed
+            or DataGridViewElementStates.Selected
+            or DataGridViewElementStates.ReadOnly
+            or DataGridViewElementStates.Resizable
+            or DataGridViewElementStates.Frozen
+            or DataGridViewElementStates.Visible);
 
         if (includeFilter == DataGridViewElementStates.Visible)
         {
@@ -1869,12 +1869,12 @@ public partial class DataGridViewRowCollection : ICollection, IList
 
     internal void InvalidateCachedRowsHeight(DataGridViewElementStates includeFilter)
     {
-        Debug.Assert(includeFilter == DataGridViewElementStates.Displayed ||
-                     includeFilter == DataGridViewElementStates.Selected ||
-                     includeFilter == DataGridViewElementStates.ReadOnly ||
-                     includeFilter == DataGridViewElementStates.Resizable ||
-                     includeFilter == DataGridViewElementStates.Frozen ||
-                     includeFilter == DataGridViewElementStates.Visible);
+        Debug.Assert(includeFilter is DataGridViewElementStates.Displayed
+            or DataGridViewElementStates.Selected
+            or DataGridViewElementStates.ReadOnly
+            or DataGridViewElementStates.Resizable
+            or DataGridViewElementStates.Frozen
+            or DataGridViewElementStates.Visible);
 
         if (includeFilter == DataGridViewElementStates.Visible)
         {
@@ -1919,7 +1919,7 @@ public partial class DataGridViewRowCollection : ICollection, IList
         OnCollectionChanged_PreNotification(e.Action, rowIndex, rowCount, ref dataGridViewRow, false);
         if (originalIndex == -1 && SharedRow(rowIndex).Index != -1)
         {
-            // row got unshared inside OnCollectionChanged_PreNotification
+            // row got un-shared inside OnCollectionChanged_PreNotification
             e = new CollectionChangeEventArgs(e.Action, dataGridViewRow);
         }
 
@@ -1945,7 +1945,7 @@ public partial class DataGridViewRowCollection : ICollection, IList
         OnCollectionChanged_PreNotification(e.Action, rowIndex, rowCount, ref dataGridViewRow, changeIsInsertion);
         if (originalIndex == -1 && SharedRow(rowIndex).Index != -1)
         {
-            // row got unshared inside OnCollectionChanged_PreNotification
+            // row got un-shared inside OnCollectionChanged_PreNotification
             e = new CollectionChangeEventArgs(e.Action, dataGridViewRow);
         }
 
@@ -2217,7 +2217,7 @@ public partial class DataGridViewRowCollection : ICollection, IList
 
         if (IsCollectionChangedListenedTo || dataGridViewRow.GetDisplayed(index))
         {
-            dataGridViewRow = this[index]; // need to unshare row because dev is listening to OnCollectionChanged event or the row is displayed
+            dataGridViewRow = this[index]; // need to un-share row because dev is listening to OnCollectionChanged event or the row is displayed
         }
 
         dataGridViewRow = SharedRow(index);
@@ -2227,7 +2227,7 @@ public partial class DataGridViewRowCollection : ICollection, IList
         if (dataGridViewRow.Index != -1)
         {
             _rowStates[index] = dataGridViewRow.State;
-            // Only detach unshared rows, since a shared row has never been accessed by the user
+            // Only detach un-shared rows, since a shared row has never been accessed by the user
             dataGridViewRow.DetachFromDataGridView();
         }
 
@@ -2281,7 +2281,12 @@ public partial class DataGridViewRowCollection : ICollection, IList
 
     internal void SetRowState(int rowIndex, DataGridViewElementStates state, bool value)
     {
-        Debug.Assert(state == DataGridViewElementStates.Displayed || state == DataGridViewElementStates.Selected || state == DataGridViewElementStates.ReadOnly || state == DataGridViewElementStates.Resizable || state == DataGridViewElementStates.Frozen || state == DataGridViewElementStates.Visible);
+        Debug.Assert(state is DataGridViewElementStates.Displayed
+            or DataGridViewElementStates.Selected
+            or DataGridViewElementStates.ReadOnly
+            or DataGridViewElementStates.Resizable
+            or DataGridViewElementStates.Frozen
+            or DataGridViewElementStates.Visible);
 
         DataGridViewRow dataGridViewRow = SharedRow(rowIndex);
         if (dataGridViewRow.Index == -1)
@@ -2289,9 +2294,7 @@ public partial class DataGridViewRowCollection : ICollection, IList
             // row is shared
             if (((_rowStates[rowIndex] & state) != 0) != value)
             {
-                if (state == DataGridViewElementStates.Frozen ||
-                    state == DataGridViewElementStates.Visible ||
-                    state == DataGridViewElementStates.ReadOnly)
+                if (state is DataGridViewElementStates.Frozen or DataGridViewElementStates.Visible or DataGridViewElementStates.ReadOnly)
                 {
                     dataGridViewRow.OnSharedStateChanging(rowIndex, state);
                 }
@@ -2310,7 +2313,7 @@ public partial class DataGridViewRowCollection : ICollection, IList
         }
         else
         {
-            // row is unshared
+            // row is un-shared
             switch (state)
             {
                 case DataGridViewElementStates.Displayed:
@@ -2433,7 +2436,7 @@ public partial class DataGridViewRowCollection : ICollection, IList
                     (_rowsHeightVisibleFrozen != -1 &&
                      ((rowStates & (DataGridViewElementStates.Visible | DataGridViewElementStates.Frozen)) == (DataGridViewElementStates.Visible | DataGridViewElementStates.Frozen))))
                 {
-                    // dataGridViewRow may become unshared in GetHeight call
+                    // dataGridViewRow may become un-shared in GetHeight call
                     rowHeightIncrement = adding ? dataGridViewRow!.GetHeight(rowIndex) : -dataGridViewRow!.GetHeight(rowIndex);
                     dataGridViewRow = SharedRow(rowIndex);
                 }

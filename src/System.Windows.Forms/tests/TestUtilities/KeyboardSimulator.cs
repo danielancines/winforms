@@ -12,14 +12,14 @@ public static class KeyboardSimulator
     public static void KeyDown(Control control, Keys key)
     {
         (nint keyCode, nint lParam) = GetKeyParameters(key);
-        PInvoke.SendMessage(control, PInvoke.WM_KEYDOWN, (WPARAM)keyCode, lParam);
+        PInvokeCore.SendMessage(control, PInvokeCore.WM_KEYDOWN, (WPARAM)keyCode, lParam);
     }
 
     public static void KeyPress(Control control, Keys key)
     {
         (nint keyCode, nint lParam) = GetKeyParameters(key);
-        PInvoke.SendMessage(control, PInvoke.WM_KEYDOWN, (WPARAM)keyCode, lParam);
-        PInvoke.SendMessage(control, PInvoke.WM_KEYUP, (WPARAM)keyCode, lParam);
+        PInvokeCore.SendMessage(control, PInvokeCore.WM_KEYDOWN, (WPARAM)keyCode, lParam);
+        PInvokeCore.SendMessage(control, PInvokeCore.WM_KEYUP, (WPARAM)keyCode, lParam);
     }
 
     private static (nint keyCode, nint lParam) GetKeyParameters(Keys key)
@@ -28,6 +28,6 @@ public static class KeyboardSimulator
         int scanCode = (int)key;
         const int repeatCount = 1;
         nint lParam = PARAM.FromLowHighUnsigned(repeatCount, scanCode);
-        return (keyCode , lParam);
+        return (keyCode, lParam);
     }
 }

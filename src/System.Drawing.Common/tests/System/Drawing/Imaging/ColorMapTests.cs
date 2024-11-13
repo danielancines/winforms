@@ -9,23 +9,27 @@ public class ColorMapTests
     public void Ctor_Default()
     {
         ColorMap cm = new();
-        Assert.Equal(new Color(), cm.OldColor);
-        Assert.Equal(new Color(), cm.NewColor);
+        Assert.Equal(default, cm.OldColor);
+        Assert.Equal(default, cm.NewColor);
     }
 
     [Fact]
     public void NewColor_SetValid_ReturnsExpected()
     {
-        ColorMap cm = new();
-        cm.NewColor = Color.AliceBlue;
+        ColorMap cm = new()
+        {
+            NewColor = Color.AliceBlue
+        };
         Assert.Equal(Color.AliceBlue, cm.NewColor);
     }
 
     [Fact]
     public void OldColor_SetValid_ReturnsExpected()
     {
-        ColorMap cm = new();
-        cm.OldColor = Color.AliceBlue;
+        ColorMap cm = new()
+        {
+            OldColor = Color.AliceBlue
+        };
         Assert.Equal(Color.AliceBlue, cm.OldColor);
     }
 }

@@ -5,7 +5,7 @@
 // Changes to this file must follow the https://aka.ms/api-review process.
 // ------------------------------------------------------------------------------
 
-#pragma warning disable CS8618,CS0169,CA1823,CA1066
+#pragma warning disable CS8618,CS0169,CA1725,CA1821,CA1823,CA1066,IDE0001,IDE0002,IDE1006,IDE0034,IDE0044,IDE0051,IDE0055,IDE1006
 
 namespace System.Drawing
 {
@@ -1976,7 +1976,6 @@ namespace System.Drawing.Imaging
     public sealed partial class ColorMatrix
     {
         public ColorMatrix() { throw new System.PlatformNotSupportedException(System.SR.SystemDrawingCommon_PlatformNotSupported);  }
-        [System.CLSCompliantAttribute(false)]
         public ColorMatrix(float[][] newColorMatrix) { throw new System.PlatformNotSupportedException(System.SR.SystemDrawingCommon_PlatformNotSupported);  }
         public float this[int row, int column] { get { throw new System.PlatformNotSupportedException(System.SR.SystemDrawingCommon_PlatformNotSupported);  } set { throw new System.PlatformNotSupportedException(System.SR.SystemDrawingCommon_PlatformNotSupported);  } }
         public float Matrix00 { get { throw new System.PlatformNotSupportedException(System.SR.SystemDrawingCommon_PlatformNotSupported);  } set { throw new System.PlatformNotSupportedException(System.SR.SystemDrawingCommon_PlatformNotSupported);  } }
@@ -2473,9 +2472,7 @@ namespace System.Drawing.Imaging
         public string? FormatDescription { get { throw new System.PlatformNotSupportedException(System.SR.SystemDrawingCommon_PlatformNotSupported);  } set { throw new System.PlatformNotSupportedException(System.SR.SystemDrawingCommon_PlatformNotSupported);  } }
         public System.Guid FormatID { get { throw new System.PlatformNotSupportedException(System.SR.SystemDrawingCommon_PlatformNotSupported);  } set { throw new System.PlatformNotSupportedException(System.SR.SystemDrawingCommon_PlatformNotSupported);  } }
         public string? MimeType { get { throw new System.PlatformNotSupportedException(System.SR.SystemDrawingCommon_PlatformNotSupported);  } set { throw new System.PlatformNotSupportedException(System.SR.SystemDrawingCommon_PlatformNotSupported);  } }
-        [System.CLSCompliantAttribute(false)]
         public byte[][]? SignatureMasks { get { throw new System.PlatformNotSupportedException(System.SR.SystemDrawingCommon_PlatformNotSupported);  } set { throw new System.PlatformNotSupportedException(System.SR.SystemDrawingCommon_PlatformNotSupported);  } }
-        [System.CLSCompliantAttribute(false)]
         public byte[][]? SignaturePatterns { get { throw new System.PlatformNotSupportedException(System.SR.SystemDrawingCommon_PlatformNotSupported);  } set { throw new System.PlatformNotSupportedException(System.SR.SystemDrawingCommon_PlatformNotSupported);  } }
         public int Version { get { throw new System.PlatformNotSupportedException(System.SR.SystemDrawingCommon_PlatformNotSupported);  } set { throw new System.PlatformNotSupportedException(System.SR.SystemDrawingCommon_PlatformNotSupported);  } }
         public static System.Drawing.Imaging.ImageCodecInfo[] GetImageDecoders() { throw new System.PlatformNotSupportedException(System.SR.SystemDrawingCommon_PlatformNotSupported);  }
@@ -3221,4 +3218,4 @@ namespace System.Drawing.Text
     }
 }
 
-#pragma warning restore CS8618
+#pragma warning restore CS8618,CS0169,CA1725,CA1821,CA1823,CA1066,IDE0001,IDE0002,IDE1006,IDE0034,IDE0044,IDE0051,IDE0055,IDE1006

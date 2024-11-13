@@ -11,11 +11,10 @@ namespace System.Windows.Forms.Design;
 /// <summary>
 ///  Provides an editor that can perform default file searching for bitmap (.bmp) files.
 /// </summary>
-[CLSCompliant(false)]
 public class ImageListImageEditor : ImageEditor
 {
     // Metafile types are not supported in the ImageListImageEditor and should not be displayed as an option.
-    internal static Type[] s_imageExtenders = new Type[] { typeof(BitmapEditor) };
+    internal static Type[] s_imageExtenders = [typeof(BitmapEditor)];
     private OpenFileDialog? _fileDialog;
 
     // Derived classes can implement a different list of supported image types.
@@ -28,7 +27,7 @@ public class ImageListImageEditor : ImageEditor
             return value;
         }
 
-        ArrayList images = new();
+        ArrayList images = [];
         if (!provider.TryGetService(out IWindowsFormsEditorService? editorService))
         {
             return images;
@@ -72,7 +71,7 @@ public class ImageListImageEditor : ImageEditor
                 foreach (string name in _fileDialog.FileNames)
                 {
                     using FileStream file = new(name, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    ImageListImage image = LoadImageFromStream(file, name.EndsWith(".ico"));
+                    ImageListImage image = LoadImageFromStream(file, name.EndsWith(".ico", StringComparison.Ordinal));
                     image.Name = Path.GetFileName(name);
                     images.Add(image);
                 }

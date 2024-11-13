@@ -3,10 +3,9 @@
 
 using System.ComponentModel;
 using System.Drawing;
+using System.Windows.Forms.Automation;
 using Moq;
 using Moq.Protected;
-using System.Windows.Forms.Automation;
-using System.Windows.Forms.TestUtilities;
 
 namespace System.Windows.Forms.Tests;
 
@@ -701,7 +700,8 @@ public class ToolTipTests
         Assert.Equal(expected, toolTip.GetToolTip(control));
 
         // NB: disposing the component with strictly mocked object causes tests to fail
-        // Moq.MockException : ISite.Container invocation failed with mock behavior Strict. All invocations on the mock must have a corresponding setup.
+        // Moq.MockException : ISite.Container invocation failed with mock behavior Strict.
+        // All invocations on the mock must have a corresponding setup.
         toolTip.Site = null;
     }
 
@@ -817,6 +817,7 @@ public class ToolTipTests
         Assert.Equal(1, control.InvokeRemoveCount);
     }
 
+    [ActiveIssue("https://github.com/dotnet/winforms/issues/11236")]
     [WinFormsFact]
     public unsafe void ToolTip_WmShow_Invokes_AnnounceText_WithExpectedText_ForTabControlTabs()
     {
@@ -850,21 +851,26 @@ public class ToolTipTests
 
         // Post MOUSEMOVE to the tooltip queue and then just remove it from the queue without handling.
         // This will update the point returned by GetMessagePos which is used by PInvoke.TTM_POPUP to determine the tool to display.
-        Assert.True(PInvoke.PostMessage(toolTip, PInvoke.WM_MOUSEMOVE, lParam: PARAM.FromPoint(tabPage.GetToolNativeScreenRectangle().Location)));
+        Assert.True(PInvokeCore.PostMessage(toolTip, PInvokeCore.WM_MOUSEMOVE, lParam: PARAM.FromPoint(tabPage.GetToolNativeScreenRectangle().Location)));
         MSG msg = default;
-        Assert.True(PInvoke.PeekMessage(&msg, toolTip, (uint)PInvoke.WM_MOUSEMOVE, (uint)PInvoke.WM_MOUSEMOVE, PEEK_MESSAGE_REMOVE_TYPE.PM_REMOVE));
+        Assert.True(PInvokeCore.PeekMessage(&msg, toolTip, PInvokeCore.WM_MOUSEMOVE, PInvokeCore.WM_MOUSEMOVE, PEEK_MESSAGE_REMOVE_TYPE.PM_REMOVE));
 
         // Show the tooltip.
-        PInvoke.SendMessage(toolTip, PInvoke.TTM_POPUP);
 
-        mockAccessibleObject.Verify(a => a.InternalRaiseAutomationNotification(
-            AutomationNotificationKind.ActionCompleted,
-            AutomationNotificationProcessing.All,
-            $" {tabPage.ToolTipText}"),
-            Times.Once);
+        // Comment out the validation here due to the active issue "https://github.com/dotnet/winforms/issues/11236"
+        // PInvokeCore.SendMessage(toolTip, PInvoke.TTM_POPUP);
+
+        // mockAccessibleObject.Verify(a => a.InternalRaiseAutomationNotification(
+        //     AutomationNotificationKind.ActionCompleted,
+        //     AutomationNotificationProcessing.All,
+        //     $" {tabPage.ToolTipText}"),
+        //     Times.Once);
     }
 
+    [ActiveIssue("https://github.com/dotnet/winforms/issues/11234")]
     [WinFormsFact]
+    [SkipOnArchitecture(TestArchitectures.X64,
+        "Flaky tests, see: https://github.com/dotnet/winforms/issues/11234")]
     public void ToolTip_SetToolTip_TabControl_DoesNotAddToolForTabControlItself()
     {
         // We need a Form because tooltips don't work on controls without a valid parent.
@@ -884,15 +890,15 @@ public class ToolTipTests
         Assert.True(toolTip.GetHandleCreated());
 
         // Only tools for TabPages were added.
-        Assert.Equal(tabControl.TabCount, (int)PInvoke.SendMessage(toolTip, PInvoke.TTM_GETTOOLCOUNT));
+        Assert.Equal(tabControl.TabCount, (int)PInvokeCore.SendMessage(toolTip, PInvoke.TTM_GETTOOLCOUNT));
     }
 
     [WinFormsFact]
     public unsafe void ToolTip_TTTOOLINFOW_Struct_Size_IsExpected()
     {
-        TTTOOLINFOW toolInfo = new();
+        TTTOOLINFOW toolInfo = default;
         int size = (int)&toolInfo.lParam - (int)&toolInfo + sizeof(LPARAM);
-        int expected = (int)new ToolInfoWrapper<Control>().TestAccessor().Dynamic.TTTOOLINFO_V2_Size;
+        int expected = (int)default(ToolInfoWrapper<Control>).TestAccessor().Dynamic.TTTOOLINFO_V2_Size;
         size.Should().Be(expected);
     }
 

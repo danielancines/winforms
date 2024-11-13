@@ -6,7 +6,6 @@ using System.ComponentModel;
 using System.ComponentModel.Design.Serialization;
 using System.Globalization;
 using Moq;
-using System.Windows.Forms.TestUtilities;
 
 namespace System.Windows.Forms.Tests;
 
@@ -87,7 +86,7 @@ public class PaddingConverterTests
     {
         PaddingConverter converter = new();
         InstanceDescriptor descriptor = Assert.IsType<InstanceDescriptor>(converter.ConvertTo(new Padding(1, 2, 3, 4), typeof(InstanceDescriptor)));
-        Assert.Equal(typeof(Padding).GetConstructor(new Type[] { typeof(int), typeof(int), typeof(int), typeof(int) }), descriptor.MemberInfo);
+        Assert.Equal(typeof(Padding).GetConstructor([typeof(int), typeof(int), typeof(int), typeof(int)]), descriptor.MemberInfo);
         Assert.Equal(new object[] { 1, 2, 3, 4 }, descriptor.Arguments);
     }
 
@@ -96,7 +95,7 @@ public class PaddingConverterTests
     {
         PaddingConverter converter = new();
         InstanceDescriptor descriptor = Assert.IsType<InstanceDescriptor>(converter.ConvertTo(new Padding(1, 1, 1, 1), typeof(InstanceDescriptor)));
-        Assert.Equal(typeof(Padding).GetConstructor(new Type[] { typeof(int) }), descriptor.MemberInfo);
+        Assert.Equal(typeof(Padding).GetConstructor([typeof(int)]), descriptor.MemberInfo);
         Assert.Equal(new object[] { 1 }, descriptor.Arguments);
     }
 
@@ -120,7 +119,7 @@ public class PaddingConverterTests
     public void PaddingConverter_ConvertTo_InvalidDestinationType_ThrowsNotSupportedException(Type destinationType)
     {
         PaddingConverter converter = new();
-        Assert.Throws<NotSupportedException>(() => converter.ConvertTo(new Padding(), destinationType));
+        Assert.Throws<NotSupportedException>(() => converter.ConvertTo(default(Padding), destinationType));
     }
 
     public static IEnumerable<object[]> CreateInstance_TestData()

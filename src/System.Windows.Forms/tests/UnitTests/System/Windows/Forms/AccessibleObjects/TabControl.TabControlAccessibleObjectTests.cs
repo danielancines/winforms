@@ -159,7 +159,7 @@ public class TabControl_TabControlAccessibilityObjectTests
         using TabControl tabControl = new();
         tabControl.CreateControl();
         TabPageCollection pages = tabControl.TabPages;
-        pages.AddRange(new TabPage[] { new(), new(), new() });
+        pages.AddRange([new(), new(), new()]);
 
         TabControlAccessibleObject accessibleObject = Assert.IsType<TabControlAccessibleObject>(tabControl.AccessibilityObject);
 
@@ -175,7 +175,7 @@ public class TabControl_TabControlAccessibilityObjectTests
     {
         using TabControl tabControl = new();
         TabPageCollection pages = tabControl.TabPages;
-        pages.AddRange(new TabPage[] { new(), new() });
+        pages.AddRange([new(), new()]);
 
         TabControlAccessibleObject accessibleObject = Assert.IsType<TabControlAccessibleObject>(tabControl.AccessibilityObject);
 
@@ -212,7 +212,7 @@ public class TabControl_TabControlAccessibilityObjectTests
     {
         using TabControl tabControl = new();
         TabPageCollection pages = tabControl.TabPages;
-        pages.AddRange(new TabPage[] { new(), new() });
+        pages.AddRange([new(), new()]);
         tabControl.CreateControl();
 
         TabControlAccessibleObject accessibleObject = Assert.IsType<TabControlAccessibleObject>(tabControl.AccessibilityObject);
@@ -233,7 +233,7 @@ public class TabControl_TabControlAccessibilityObjectTests
     {
         using TabControl tabControl = new();
         TabPageCollection pages = tabControl.TabPages;
-        pages.AddRange(new TabPage[] { new(), new(), new() });
+        pages.AddRange([new(), new(), new()]);
         tabControl.CreateControl();
 
         TabControlAccessibleObject accessibleObject = Assert.IsType<TabControlAccessibleObject>(tabControl.AccessibilityObject);
@@ -258,7 +258,7 @@ public class TabControl_TabControlAccessibilityObjectTests
     {
         using TabControl tabControl = new();
         TabPageCollection pages = tabControl.TabPages;
-        pages.AddRange(new TabPage[] { new(), new() });
+        pages.AddRange([new(), new()]);
 
         TabControlAccessibleObject accessibleObject = Assert.IsType<TabControlAccessibleObject>(tabControl.AccessibilityObject);
 
@@ -286,7 +286,7 @@ public class TabControl_TabControlAccessibilityObjectTests
     {
         using TabControl tabControl = new();
         TabPageCollection pages = tabControl.TabPages;
-        pages.AddRange(new TabPage[] { new(), new() });
+        pages.AddRange([new(), new()]);
         tabControl.CreateControl();
 
         TabControlAccessibleObject accessibleObject = Assert.IsType<TabControlAccessibleObject>(tabControl.AccessibilityObject);
@@ -304,7 +304,7 @@ public class TabControl_TabControlAccessibilityObjectTests
     {
         using TabControl tabControl = new();
         TabPageCollection pages = tabControl.TabPages;
-        pages.AddRange(new TabPage[] { new(), new() });
+        pages.AddRange([new(), new()]);
         tabControl.CreateControl();
 
         TabControlAccessibleObject accessibleObject = Assert.IsType<TabControlAccessibleObject>(tabControl.AccessibilityObject);
@@ -322,7 +322,7 @@ public class TabControl_TabControlAccessibilityObjectTests
     {
         using TabControl tabControl = new();
         TabPageCollection pages = tabControl.TabPages;
-        pages.AddRange(new TabPage[] { new(), new() });
+        pages.AddRange([new(), new()]);
         tabControl.CreateControl();
 
         TabControlAccessibleObject accessibleObject = Assert.IsType<TabControlAccessibleObject>(tabControl.AccessibilityObject);
@@ -340,7 +340,7 @@ public class TabControl_TabControlAccessibilityObjectTests
     {
         using TabControl tabControl = new();
         TabPageCollection pages = tabControl.TabPages;
-        pages.AddRange(new TabPage[] { new(), new() });
+        pages.AddRange([new(), new()]);
 
         TabControlAccessibleObject accessibleObject = Assert.IsType<TabControlAccessibleObject>(tabControl.AccessibilityObject);
 
@@ -385,7 +385,7 @@ public class TabControl_TabControlAccessibilityObjectTests
     {
         using TabControl tabControl = new();
         TabPageCollection pages = tabControl.TabPages;
-        pages.AddRange(new TabPage[] { new(), new(), new() });
+        pages.AddRange([new(), new(), new()]);
         tabControl.CreateControl();
 
         TabControlAccessibleObject accessibleObject = Assert.IsType<TabControlAccessibleObject>(tabControl.AccessibilityObject);
@@ -404,7 +404,7 @@ public class TabControl_TabControlAccessibilityObjectTests
     {
         using TabControl tabControl = new();
         TabPageCollection pages = tabControl.TabPages;
-        pages.AddRange(new TabPage[] { new(), new(), new() });
+        pages.AddRange([new(), new(), new()]);
         tabControl.CreateControl();
 
         tabControl.SelectedIndex = 1;
@@ -424,7 +424,7 @@ public class TabControl_TabControlAccessibilityObjectTests
     {
         using TabControl tabControl = new();
         TabPageCollection pages = tabControl.TabPages;
-        pages.AddRange(new TabPage[] { new(), new(), new() });
+        pages.AddRange([new(), new(), new()]);
         tabControl.CreateControl();
 
         TabControlAccessibleObject accessibleObject = Assert.IsType<TabControlAccessibleObject>(tabControl.AccessibilityObject);
@@ -452,14 +452,14 @@ public class TabControl_TabControlAccessibilityObjectTests
     {
         using TabControl tabControl = new();
         TabPageCollection pages = tabControl.TabPages;
-        pages.AddRange(new TabPage[] { new(), new(), new() });
+        pages.AddRange([new(), new(), new()]);
         tabControl.CreateControl();
         tabControl.SelectedIndex = selectedIndex;
 
         TabControlAccessibleObject accessibleObject = Assert.IsType<TabControlAccessibleObject>(tabControl.AccessibilityObject);
         IRawElementProviderSimple.Interface[] selectedAccessibleObjects = accessibleObject.GetSelection();
 
-        Assert.Equal(1, selectedAccessibleObjects.Length);
+        Assert.Single(selectedAccessibleObjects);
         Assert.Equal(pages[selectedIndex].TabAccessibilityObject, selectedAccessibleObjects[0]);
         Assert.True(pages[0].IsHandleCreated);
         Assert.Equal(selectedIndex == 1, pages[1].IsHandleCreated);
@@ -475,13 +475,13 @@ public class TabControl_TabControlAccessibilityObjectTests
     {
         using TabControl tabControl = new();
         TabPageCollection pages = tabControl.TabPages;
-        pages.AddRange(new TabPage[] { new(), new(), new() });
+        pages.AddRange([new(), new(), new()]);
         tabControl.SelectedIndex = selectedIndex;
 
         TabControlAccessibleObject accessibleObject = Assert.IsType<TabControlAccessibleObject>(tabControl.AccessibilityObject);
         IRawElementProviderSimple.Interface[] selectedAccessibleObjects = accessibleObject.GetSelection();
 
-        Assert.Equal(0, selectedAccessibleObjects.Length);
+        Assert.Empty(selectedAccessibleObjects);
         Assert.False(pages[0].IsHandleCreated);
         Assert.False(pages[1].IsHandleCreated);
         Assert.False(pages[2].IsHandleCreated);
@@ -497,7 +497,7 @@ public class TabControl_TabControlAccessibilityObjectTests
         TabControlAccessibleObject accessibleObject = Assert.IsType<TabControlAccessibleObject>(tabControl.AccessibilityObject);
         IRawElementProviderSimple.Interface[] selectedAccessibleObjects = accessibleObject.GetSelection();
 
-        Assert.Equal(0, selectedAccessibleObjects.Length);
+        Assert.Empty(selectedAccessibleObjects);
         Assert.True(tabControl.IsHandleCreated);
     }
 
@@ -787,7 +787,7 @@ public class TabControl_TabControlAccessibilityObjectTests
         using TabControl tabControl = new();
         TabControlAccessibleObject accessibleObject = (TabControlAccessibleObject)tabControl.AccessibilityObject;
         var result = accessibleObject.GetPropertyValue((UIA_PROPERTY_ID)propertyId);
-        Assert.Equal(expected, result.IsEmpty ? false : (bool)result);
+        Assert.Equal(expected, !result.IsEmpty && (bool)result);
         Assert.False(tabControl.IsHandleCreated);
     }
 }

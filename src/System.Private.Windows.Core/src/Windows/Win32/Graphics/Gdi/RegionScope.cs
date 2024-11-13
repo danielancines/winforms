@@ -24,19 +24,19 @@ internal unsafe ref struct RegionScope
     public HRGN Region { get; private set; }
 
     /// <summary>
-    ///  Creates a region with the given rectangle via <see cref="CreateRectRgn(int, int, int, int)"/>.
+    ///  Creates a region with the given rectangle via <see cref="PInvokeCore.CreateRectRgn(int, int, int, int)"/>.
     /// </summary>
     public RegionScope(Rectangle rectangle) =>
         Region = PInvokeCore.CreateRectRgn(rectangle.X, rectangle.Y, rectangle.Right, rectangle.Bottom);
 
     /// <summary>
-    ///  Creates a region with the given rectangle via <see cref="CreateRectRgn(int, int, int, int)"/>.
+    ///  Creates a region with the given rectangle via <see cref="PInvokeCore.CreateRectRgn(int, int, int, int)"/>.
     /// </summary>
     public RegionScope(int x1, int y1, int x2, int y2) =>
         Region = PInvokeCore.CreateRectRgn(x1, y1, x2, y2);
 
     /// <summary>
-    ///  Creates a clipping region copy via <see cref="GetClipRgn(HDC, HRGN)"/> for the given device context.
+    ///  Creates a clipping region copy via <see cref="PInvokeCore.GetClipRgn(HDC, HRGN)"/> for the given device context.
     /// </summary>
     /// <param name="hdc">Handle to a device context to copy the clipping region from.</param>
     public RegionScope(HDC hdc)
@@ -62,7 +62,7 @@ internal unsafe ref struct RegionScope
     /// </summary>
     public RegionScope(IPointer<GpRegion> region, IPointer<GpGraphics> graphics)
     {
-        InitializeFromGdiPlus(region.Pointer, graphics.Pointer);
+        InitializeFromGdiPlus(region.GetPointer(), graphics.GetPointer());
         GC.KeepAlive(region);
         GC.KeepAlive(graphics);
     }
@@ -97,14 +97,18 @@ internal unsafe ref struct RegionScope
     {
         GpGraphics* graphics = null;
         PInvokeCore.GdipCreateFromHWND(hwnd, &graphics).ThrowIfFailed();
-        InitializeFromGdiPlus(region.Pointer, graphics);
+        InitializeFromGdiPlus(region.GetPointer(), graphics);
         GC.KeepAlive(region);
     }
 
     /// <summary>
     ///  Returns true if this represents a null HRGN.
     /// </summary>
+#if DEBUG
     public bool IsNull => Region.IsNull;
+#else
+    public readonly bool IsNull => Region.IsNull;
+#endif
 
     public static implicit operator HRGN(RegionScope regionScope) => regionScope.Region;
 
@@ -113,7 +117,11 @@ internal unsafe ref struct RegionScope
     /// </summary>
     public void RelinquishOwnership() => Region = default;
 
+#if DEBUG
     public void Dispose()
+#else
+    public readonly void Dispose()
+#endif
     {
         if (!IsNull)
         {

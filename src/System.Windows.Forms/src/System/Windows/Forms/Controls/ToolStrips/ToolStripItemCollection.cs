@@ -236,9 +236,9 @@ public class ToolStripItemCollection : ArrangedElementCollection, IList
     {
         key.ThrowIfNullOrEmptyWithMessage(SR.FindKeyMayNotBeEmptyOrNull);
 
-        List<ToolStripItem> foundItems = new();
+        List<ToolStripItem> foundItems = [];
         FindInternal(key, searchAllChildren, this, foundItems);
-        return foundItems.ToArray();
+        return [.. foundItems];
     }
 
     /// <summary>
@@ -359,7 +359,7 @@ public class ToolStripItemCollection : ArrangedElementCollection, IList
             }
         }
 
-        // step 3 - we didn't find it.  Invalidate the last accessed index and return -1.
+        // step 3 - we didn't find it. Invalidate the last accessed index and return -1.
         _lastAccessedIndex = -1;
         return -1;
     }
@@ -384,7 +384,7 @@ public class ToolStripItemCollection : ArrangedElementCollection, IList
 
             if (_owner is not null)
             {
-                _owner.OnItemRemovedInternal(item);
+                _owner.OnItemRemovedInternal(item, this);
 
                 if (!_owner.IsDisposingItems)
                 {

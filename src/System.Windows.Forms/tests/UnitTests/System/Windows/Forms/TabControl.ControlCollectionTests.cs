@@ -51,7 +51,7 @@ public class TabControlControlCollectionTests
         int layoutCallCount2 = 0;
         value2.Layout += (sender, e) => layoutCallCount2++;
         int parentLayoutCallCount = 0;
-        List<LayoutEventArgs> events = new();
+        List<LayoutEventArgs> events = [];
         void parentHandler(object sender, LayoutEventArgs e)
         {
             Assert.Same(owner, sender);
@@ -174,7 +174,7 @@ public class TabControlControlCollectionTests
         int layoutCallCount2 = 0;
         value2.Layout += (sender, e) => layoutCallCount2++;
         int parentLayoutCallCount = 0;
-        List<LayoutEventArgs> events = new();
+        List<LayoutEventArgs> events = [];
         void parentHandler(object sender, LayoutEventArgs e)
         {
             Assert.Same(owner, sender);
@@ -334,7 +334,7 @@ public class TabControlControlCollectionTests
         int layoutCallCount2 = 0;
         value2.Layout += (sender, e) => layoutCallCount2++;
         int parentLayoutCallCount = 0;
-        List<LayoutEventArgs> events = new();
+        List<LayoutEventArgs> events = [];
         void parentHandler(object sender, LayoutEventArgs e)
         {
             Assert.Same(owner, sender);
@@ -475,7 +475,7 @@ public class TabControlControlCollectionTests
         int layoutCallCount2 = 0;
         value2.Layout += (sender, e) => layoutCallCount2++;
         int parentLayoutCallCount = 0;
-        List<LayoutEventArgs> events = new();
+        List<LayoutEventArgs> events = [];
         void parentHandler(object sender, LayoutEventArgs e)
         {
             Assert.Same(owner, sender);
@@ -732,7 +732,7 @@ public class TabControlControlCollectionTests
         using TabControl owner = new();
         TabControl.ControlCollection collection = Assert.IsType<TabControl.ControlCollection>(owner.Controls);
 
-        List<TabPage> items = new();
+        List<TabPage> items = [];
         for (int i = 0; i < 24; i++)
         {
             TabPage value = new();
@@ -765,7 +765,7 @@ public class TabControlControlCollectionTests
         collection.Add(page1);
         collection.Add(page2);
         collection.Add(page3);
-        Assert.Equal(3, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMCOUNT));
+        Assert.Equal(3, (int)PInvokeCore.SendMessage(owner, PInvoke.TCM_GETITEMCOUNT));
 
         char* buffer = stackalloc char[256];
         TCITEMW item = default;
@@ -775,7 +775,7 @@ public class TabControlControlCollectionTests
         item.mask = (TCITEMHEADERA_MASK)uint.MaxValue;
 
         // Get item 0.
-        Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 0, ref item));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(owner, PInvoke.TCM_GETITEMW, 0, ref item));
         Assert.Equal(TAB_CONTROL_ITEM_STATE.TCIS_BUTTONPRESSED, item.dwState);
         Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
@@ -783,7 +783,7 @@ public class TabControlControlCollectionTests
         Assert.Equal(-1, item.iImage);
 
         // Get item 1.
-        Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 1, ref item));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(owner, PInvoke.TCM_GETITEMW, 1, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
         Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
@@ -791,7 +791,7 @@ public class TabControlControlCollectionTests
         Assert.Equal(1, item.iImage);
 
         // Get item 2.
-        Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 2, ref item));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(owner, PInvoke.TCM_GETITEMW, 2, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
         Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
@@ -833,7 +833,7 @@ public class TabControlControlCollectionTests
         collection.Add(page1);
         collection.Add(page2);
         collection.Add(page3);
-        Assert.Equal(3, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMCOUNT));
+        Assert.Equal(3, (int)PInvokeCore.SendMessage(owner, PInvoke.TCM_GETITEMCOUNT));
 
         char* buffer = stackalloc char[256];
         TCITEMW item = default;
@@ -843,7 +843,7 @@ public class TabControlControlCollectionTests
         item.mask = (TCITEMHEADERA_MASK)uint.MaxValue;
 
         // Get item 0.
-        Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 0, ref item));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(owner, PInvoke.TCM_GETITEMW, 0, ref item));
         Assert.Equal(TAB_CONTROL_ITEM_STATE.TCIS_BUTTONPRESSED, item.dwState);
         Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
@@ -851,7 +851,7 @@ public class TabControlControlCollectionTests
         Assert.Equal(-1, item.iImage);
 
         // Get item 1.
-        Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 1, ref item));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(owner, PInvoke.TCM_GETITEMW, 1, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
         Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
@@ -859,7 +859,7 @@ public class TabControlControlCollectionTests
         Assert.Equal(1, item.iImage);
 
         // Get item 2.
-        Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 2, ref item));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(owner, PInvoke.TCM_GETITEMW, 2, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
         Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
@@ -893,16 +893,18 @@ public class TabControlControlCollectionTests
         };
         using TabPage value1 = new();
         using TabPage value2 = new();
-        var collection = new TabControl.ControlCollection(owner);
-        collection.Add(value1);
-        collection.Add(value2);
+        var collection = new TabControl.ControlCollection(owner)
+        {
+            value1,
+            value2
+        };
 
         int layoutCallCount1 = 0;
         value1.Layout += (sender, e) => layoutCallCount1++;
         int layoutCallCount2 = 0;
         value2.Layout += (sender, e) => layoutCallCount2++;
         int parentLayoutCallCount = 0;
-        List<LayoutEventArgs> events = new();
+        List<LayoutEventArgs> events = [];
         void parentHandler(object sender, LayoutEventArgs e)
         {
             Assert.Same(owner, sender);
@@ -989,16 +991,18 @@ public class TabControlControlCollectionTests
         };
         using TabPage value1 = new();
         using TabPage value2 = new();
-        var collection = new TabControl.ControlCollection(owner);
-        collection.Add(value1);
-        collection.Add(value2);
+        var collection = new TabControl.ControlCollection(owner)
+        {
+            value1,
+            value2
+        };
 
         int layoutCallCount1 = 0;
         value1.Layout += (sender, e) => layoutCallCount1++;
         int layoutCallCount2 = 0;
         value2.Layout += (sender, e) => layoutCallCount2++;
         int parentLayoutCallCount = 0;
-        List<LayoutEventArgs> events = new();
+        List<LayoutEventArgs> events = [];
         void parentHandler(object sender, LayoutEventArgs e)
         {
             Assert.Same(owner, sender);
@@ -1123,7 +1127,7 @@ public class TabControlControlCollectionTests
         int layoutCallCount2 = 0;
         value2.Layout += (sender, e) => layoutCallCount2++;
         int parentLayoutCallCount = 0;
-        List<LayoutEventArgs> events = new();
+        List<LayoutEventArgs> events = [];
         void parentHandler(object sender, LayoutEventArgs e)
         {
             Assert.Same(owner, sender);
@@ -1235,7 +1239,7 @@ public class TabControlControlCollectionTests
         int layoutCallCount2 = 0;
         value2.Layout += (sender, e) => layoutCallCount2++;
         int parentLayoutCallCount = 0;
-        List<LayoutEventArgs> events = new();
+        List<LayoutEventArgs> events = [];
         void parentHandler(object sender, LayoutEventArgs e)
         {
             Assert.Same(owner, sender);
@@ -1423,7 +1427,7 @@ public class TabControlControlCollectionTests
         using TabControl owner = new();
         TabControl.ControlCollection collection = Assert.IsType<TabControl.ControlCollection>(owner.Controls);
 
-        List<TabPage> items = new();
+        List<TabPage> items = [];
         for (int i = 0; i < 24; i++)
         {
             TabPage value = new();
@@ -1473,7 +1477,7 @@ public class TabControlControlCollectionTests
 
         Assert.NotEqual(IntPtr.Zero, owner.Handle);
         collection.Remove(page2);
-        Assert.Equal(2, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMCOUNT));
+        Assert.Equal(2, (int)PInvokeCore.SendMessage(owner, PInvoke.TCM_GETITEMCOUNT));
 
         char* buffer = stackalloc char[256];
         TCITEMW item = default;
@@ -1483,7 +1487,7 @@ public class TabControlControlCollectionTests
         item.mask = (TCITEMHEADERA_MASK)uint.MaxValue;
 
         // Get item 0.
-        Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 0, ref item));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(owner, PInvoke.TCM_GETITEMW, 0, ref item));
         Assert.Equal(TAB_CONTROL_ITEM_STATE.TCIS_BUTTONPRESSED, item.dwState);
         Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
@@ -1491,7 +1495,7 @@ public class TabControlControlCollectionTests
         Assert.Equal(-1, item.iImage);
 
         // Get item 2.
-        Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 1, ref item));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(owner, PInvoke.TCM_GETITEMW, 1, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
         Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
@@ -1531,7 +1535,7 @@ public class TabControlControlCollectionTests
 
         Assert.NotEqual(IntPtr.Zero, owner.Handle);
         collection.Remove(page2);
-        Assert.Equal(2, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMCOUNT));
+        Assert.Equal(2, (int)PInvokeCore.SendMessage(owner, PInvoke.TCM_GETITEMCOUNT));
 
         char* buffer = stackalloc char[256];
         TCITEMW item = default;
@@ -1541,7 +1545,7 @@ public class TabControlControlCollectionTests
         item.mask = (TCITEMHEADERA_MASK)uint.MaxValue;
 
         // Get item 0.
-        Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 0, ref item));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(owner, PInvoke.TCM_GETITEMW, 0, ref item));
         Assert.Equal(TAB_CONTROL_ITEM_STATE.TCIS_BUTTONPRESSED, item.dwState);
         Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);
@@ -1549,7 +1553,7 @@ public class TabControlControlCollectionTests
         Assert.Equal(-1, item.iImage);
 
         // Get item 1.
-        Assert.Equal(1, (int)PInvoke.SendMessage(owner, PInvoke.TCM_GETITEMW, 1, ref item));
+        Assert.Equal(1, (int)PInvokeCore.SendMessage(owner, PInvoke.TCM_GETITEMW, 1, ref item));
         Assert.Equal((TAB_CONTROL_ITEM_STATE)0, item.dwState);
         Assert.Equal(IntPtr.Zero, (nint)item.lParam);
         Assert.Equal(int.MaxValue, item.cchTextMax);

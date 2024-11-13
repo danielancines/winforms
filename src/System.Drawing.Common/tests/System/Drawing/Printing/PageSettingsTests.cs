@@ -1,6 +1,6 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-//
+
 // Copyright (C) 2004-2005 Novell, Inc (http://www.novell.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
@@ -34,11 +34,13 @@ public class PageSettingsTests
     [ConditionalFact(Helpers.AnyInstalledPrinters)]
     public void Clone_Success()
     {
-        PageSettings ps = new();
-        ps.Color = false;
-        ps.Landscape = true;
-        ps.Margins = new Margins(120, 130, 140, 150);
-        ps.PaperSize = new PaperSize("My Custom Size", 222, 333);
+        PageSettings ps = new()
+        {
+            Color = false,
+            Landscape = true,
+            Margins = new Margins(120, 130, 140, 150),
+            PaperSize = new PaperSize("My Custom Size", 222, 333)
+        };
         PageSettings clone = (PageSettings)ps.Clone();
 
         Assert.Equal(ps.Color, clone.Color);

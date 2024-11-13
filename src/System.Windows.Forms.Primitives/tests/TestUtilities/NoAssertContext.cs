@@ -20,7 +20,7 @@ public sealed class NoAssertContext : IDisposable
     // We do, however need to lock around hooking/unhooking our custom listener to make sure that we
     // are rerouting correctly if multiple threads are creating/disposing this class concurrently.
 
-    private static readonly object s_lock = new();
+    private static readonly Lock s_lock = new();
     private static bool s_hooked;
     private static bool s_hasDefaultListener;
     private static bool s_hasThrowingListener;
@@ -98,7 +98,9 @@ public sealed class NoAssertContext : IDisposable
         }
     }
 
+#pragma warning disable CA1821 // Remove empty Finalizers
     ~NoAssertContext()
+#pragma warning restore CA1821
     {
         // We need this class to be used in a using to effectively rationalize about a test.
         throw new InvalidOperationException($"Did not dispose {nameof(NoAssertContext)}");
@@ -111,7 +113,7 @@ public sealed class NoAssertContext : IDisposable
         {
         }
 
-        private TraceListener? DefaultListener
+        private static TraceListener? DefaultListener
         {
             get
             {

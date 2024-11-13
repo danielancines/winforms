@@ -47,13 +47,13 @@ public class ResXResourceReaderTests
         using MemoryStream resourceStream = new();
 
         using ResXResourceReader resxReader = new(resxPath);
-        Assert.Throws<ArgumentException>(() => resxReader.GetEnumerator());
+        Assert.Throws<ArgumentException>(resxReader.GetEnumerator);
     }
 
     [Fact]
     public void ResXResourceReader_Constructor_FileName()
     {
-        // Create a temp file and write the resx to it.        
+        // Create a temp file and write the resx to it.
         using TempFile tempFile = TempFile.Create(ResxHelper.CreateResx());
         using ResXResourceReader resXReader = new(tempFile.Path);
         IDictionaryEnumerator enumerator = resXReader.GetEnumerator();

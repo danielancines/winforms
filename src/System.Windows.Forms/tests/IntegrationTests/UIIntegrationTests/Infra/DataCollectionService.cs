@@ -12,12 +12,14 @@ namespace System.Windows.Forms.UITests;
 
 internal static class DataCollectionService
 {
-    private static readonly ConditionalWeakTable<Exception, StrongBox<bool>> LoggedExceptions = new();
-    private static ImmutableList<CustomLoggerData> _customInProcessLoggers = ImmutableList<CustomLoggerData>.Empty;
-    private static bool _firstChanceExceptionHandlerInstalled;
+    private static readonly ConditionalWeakTable<Exception, StrongBox<bool>> s_loggedExceptions = [];
+    private static ImmutableList<CustomLoggerData> s_customInProcessLoggers = [];
+    private static bool s_firstChanceExceptionHandlerInstalled;
 
     [ThreadStatic]
-    private static bool _inHandler;
+#pragma warning disable IDE1006 // Naming Styles
+    private static bool t_inHandler;
+#pragma warning restore IDE1006
 
     internal static ITest? CurrentTest { get; set; }
 
@@ -44,12 +46,14 @@ internal static class DataCollectionService
     }
 
     /// <summary>
-    /// Register a custom logger to collect data in the event of a test failure.
+    ///  Register a custom logger to collect data in the event of a test failure.
     /// </summary>
     /// <remarks>
-    /// <para>The <paramref name="logId"/> and <paramref name="extension"/> should be chosen to avoid conflicts with
-    /// other loggers. Otherwise, it is possible for logs to be overwritten during data collection. Built-in logs
-    /// include:</para>
+    /// <para>
+    ///  The <paramref name="logId"/> and <paramref name="extension"/> should be chosen to avoid conflicts with
+    ///  other loggers. Otherwise, it is possible for logs to be overwritten during data collection. Built-in logs
+    ///  include:
+    /// </para>
     ///
     /// <list type="table">
     ///   <listheader>
@@ -69,13 +73,15 @@ internal static class DataCollectionService
     ///   </item>
     /// </list>
     /// </remarks>
-    /// <param name="callback">The callback to invoke to collect log information. The argument to the callback is the fully-qualified file path where the log data should be written.</param>
+    /// <param name="callback">The callback to invoke to collect log information. The argument to the callback is
+    ///  the fully-qualified file path where the log data should be written.
+    /// </param>
     /// <param name="logId">An optional log identifier to include in the resulting file name.</param>
     /// <param name="extension">The extension to give the resulting file.</param>
     public static void RegisterCustomLogger(Action<string> callback, string logId, string extension)
     {
         ImmutableInterlocked.Update(
-            ref _customInProcessLoggers,
+            ref s_customInProcessLoggers,
             (loggers, newLogger) => loggers.Add(newLogger),
             new CustomLoggerData(callback, logId, extension));
     }
@@ -85,16 +91,16 @@ internal static class DataCollectionService
         var testMethod = testCase.TestMethod.Method;
         string testClass = testCase.TestMethod.TestClass.Class.Name;
         int lastDot = testClass.LastIndexOf('.');
-        testClass = testClass.Substring(lastDot + 1);
+        testClass = testClass[(lastDot + 1)..];
         return $"{testClass}.{testMethod.Name}";
     }
 
     internal static void InstallFirstChanceExceptionHandler()
     {
-        if (!_firstChanceExceptionHandlerInstalled)
+        if (!s_firstChanceExceptionHandlerInstalled)
         {
             AppDomain.CurrentDomain.FirstChanceException += OnFirstChanceException;
-            _firstChanceExceptionHandlerInstalled = true;
+            s_firstChanceExceptionHandlerInstalled = true;
         }
     }
 
@@ -133,7 +139,7 @@ internal static class DataCollectionService
             return false;
         }
 
-        var logged = LoggedExceptions.GetOrCreateValue(ex);
+        var logged = s_loggedExceptions.GetOrCreateValue(ex);
         if (logged.Value)
         {
             // Only log the first time an exception is thrown
@@ -147,7 +153,7 @@ internal static class DataCollectionService
 
     internal static void CaptureFailureState(string testName, Exception ex)
     {
-        if (_inHandler)
+        if (t_inHandler)
         {
             // Avoid stack overflow which could occur by recursively trying to capture failure states
             return;
@@ -155,7 +161,7 @@ internal static class DataCollectionService
 
         try
         {
-            _inHandler = true;
+            t_inHandler = true;
 
             string logDir = GetLogDirectory();
             var timestamp = DateTimeOffset.UtcNow;
@@ -170,14 +176,14 @@ internal static class DataCollectionService
             exceptionDetails.AppendLine("Stack Trace at Log Time:");
             exceptionDetails.AppendLine(new StackTrace(true).ToString());
             File.WriteAllText(CreateLogFileName(logDir, timestamp, testName, errorId, logId: string.Empty, "log"), exceptionDetails.ToString());
-            foreach (var (callback, logId, extension) in _customInProcessLoggers)
+            foreach (var (callback, logId, extension) in s_customInProcessLoggers)
             {
                 callback(CreateLogFileName(logDir, timestamp, testName, errorId, logId, extension));
             }
         }
         finally
         {
-            _inHandler = false;
+            t_inHandler = false;
         }
     }
 
@@ -193,13 +199,16 @@ internal static class DataCollectionService
     }
 
     /// <summary>
-    /// Computes a full log file name.
+    ///  Computes a full log file name.
     /// </summary>
     /// <param name="logDirectory">The location where logs are saved.</param>
     /// <param name="timestamp">The timestamp of the failure.</param>
     /// <param name="testName">The current test name, or <c>Unknown</c> if the test is not known.</param>
     /// <param name="errorId">The error ID, e.g. the name of the exception instance.</param>
-    /// <param name="logId">The log ID (e.g. <c>DotNet</c> or <c>Watson</c>). This may be an empty string for one log output of a particular <paramref name="extension"/>.</param>
+    /// <param name="logId">
+    ///  The log ID (e.g. <c>DotNet</c> or <c>Watson</c>). This may be an empty string for one log output of a
+    ///  particular <paramref name="extension"/>.
+    /// </param>
     /// <param name="extension">The log file extension, without a dot (e.g. <c>log</c>).</param>
     /// <returns>The fully qualified log file name.</returns>
     private static string CreateLogFileName(string logDirectory, DateTimeOffset timestamp, string testName, string errorId, string logId, string extension)
@@ -209,7 +218,7 @@ internal static class DataCollectionService
         string path = CombineElements(logDirectory, timestamp, testName, errorId, logId, extension);
         if (path.Length > MaxPath)
         {
-            testName = testName.Substring(0, Math.Max(0, testName.Length - (path.Length - MaxPath)));
+            testName = testName[..Math.Max(0, testName.Length - (path.Length - MaxPath))];
             path = CombineElements(logDirectory, timestamp, testName, errorId, logId, extension);
         }
 

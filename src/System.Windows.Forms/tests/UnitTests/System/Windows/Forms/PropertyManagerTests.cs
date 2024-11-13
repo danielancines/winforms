@@ -23,8 +23,8 @@ public class PropertyManagerTests
     [IntegerData<int>]
     public void PropertyManager_Position_Set_Nop(int value)
     {
-        BindingContext context = new();
-        BindingSource source = new();
+        BindingContext context = [];
+        BindingSource source = [];
         PropertyManager manager = Assert.IsType<PropertyManager>(context[new DataSource()]);
         manager.Position = value;
         Assert.Equal(0, manager.Position);
@@ -33,8 +33,8 @@ public class PropertyManagerTests
     [Fact]
     public void PropertyManager_GetListName_Invoke_ReturnsEmpty()
     {
-        BindingContext context = new();
-        BindingSource source = new();
+        BindingContext context = [];
+        BindingSource source = [];
         PropertyManager manager = Assert.IsType<PropertyManager>(context[new DataSource()]);
         Assert.Equal("System.Windows.Forms.Tests.PropertyManagerTests+DataSource.", manager.GetListName());
         Assert.Empty(manager.GetListName(null));
@@ -44,7 +44,7 @@ public class PropertyManagerTests
     public void PropertyManager_GetListName_NoDataSource_ThrowsArgumentException()
     {
         PropertyManager manager = new();
-        Assert.Throws<ArgumentException>(() => manager.GetListName());
+        Assert.Throws<ArgumentException>(manager.GetListName);
     }
 
     /*
@@ -390,18 +390,18 @@ public class PropertyManagerTests
     [Fact]
     public void PropertyManager_AddNew_Invoke_ThrowsNotSupportedException()
     {
-        BindingContext context = new();
-        BindingSource source = new();
+        BindingContext context = [];
+        BindingSource source = [];
         PropertyManager manager = Assert.IsType<PropertyManager>(context[new DataSource()]);
-        Assert.Throws<NotSupportedException>(() => manager.AddNew());
+        Assert.Throws<NotSupportedException>(manager.AddNew);
     }
 
     [Theory]
     [IntegerData<int>]
     public void PropertyManager_RemoveAt_Invoke_ThrowsNotSupportedException(int index)
     {
-        BindingContext context = new();
-        BindingSource source = new();
+        BindingContext context = [];
+        BindingSource source = [];
         PropertyManager manager = Assert.IsType<PropertyManager>(context[new DataSource()]);
         Assert.Throws<NotSupportedException>(() => manager.RemoveAt(index));
     }

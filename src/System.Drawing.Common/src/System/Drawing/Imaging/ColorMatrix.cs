@@ -299,7 +299,6 @@ public sealed class ColorMatrix
     /// <summary>
     ///  Initializes a new instance of the <see cref='ColorMatrix'/> class with the elements in the specified matrix.
     /// </summary>
-    [CLSCompliant(false)]
     public ColorMatrix(float[][] newColorMatrix)
     {
         _matrix00 = newColorMatrix[0][0];
@@ -333,8 +332,9 @@ public sealed class ColorMatrix
     /// <summary>
     ///  Initializes a new instance of the <see cref='ColorMatrix'/> class with the elements in the specified matrix.
     /// </summary>
+    /// <param name="newColorMatrix">The values of the elements of the new matrix.</param>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="newColorMatrix"/> did not have 25 values.</exception>
-    public unsafe ColorMatrix(ReadOnlySpan<float> newColorMatrix)
+    public unsafe ColorMatrix(params ReadOnlySpan<float> newColorMatrix)
     {
         ArgumentOutOfRangeException.ThrowIfNotEqual(newColorMatrix.Length, 25, nameof(newColorMatrix));
 
@@ -345,6 +345,7 @@ public sealed class ColorMatrix
     }
 #endif
 
+#pragma warning disable CA2201 // Do not raise reserved exception types - we're manually doing the index check here
     /// <summary>
     ///  Gets or sets the value of the specified element of this <see cref='ColorMatrix'/>.
     /// </summary>
@@ -385,6 +386,7 @@ public sealed class ColorMatrix
             }
         }
     }
+#pragma warning restore CA2201
 
     internal ref float GetPinnableReference() => ref _matrix00;
 }

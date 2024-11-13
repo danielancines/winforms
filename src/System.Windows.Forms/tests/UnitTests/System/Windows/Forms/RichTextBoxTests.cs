@@ -17,9 +17,9 @@ using Size = System.Drawing.Size;
 
 namespace System.Windows.Forms.Tests;
 
-public class RichTextBoxTests
+public partial class RichTextBoxTests
 {
-    private static int s_preferredHeight = Control.DefaultFont.Height + SystemInformation.BorderSize.Height * 4 + 3;
+    private static readonly int s_preferredHeight = Control.DefaultFont.Height + SystemInformation.BorderSize.Height * 4 + 3;
 
     [WinFormsFact]
     public void RichTextBox_Ctor_Default()
@@ -562,7 +562,7 @@ public class RichTextBoxTests
         Assert.Equal(0, createdCallCount);
 
         // Call EM_SETOPTIONS.
-        PInvoke.SendMessage(control, PInvoke.EM_SETOPTIONS, (WPARAM)(int)PInvoke.ECOOP_OR, (LPARAM)(int)PInvoke.ECO_AUTOWORDSELECTION);
+        PInvokeCore.SendMessage(control, PInvokeCore.EM_SETOPTIONS, (WPARAM)(int)PInvoke.ECOOP_OR, (LPARAM)(int)PInvoke.ECO_AUTOWORDSELECTION);
         Assert.False(control.AutoWordSelection);
         Assert.True(control.IsHandleCreated);
         Assert.Equal(0, invalidatedCallCount);
@@ -638,7 +638,7 @@ public class RichTextBoxTests
 
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         control.AutoWordSelection = value;
-        Assert.Equal(expected, (int)PInvoke.SendMessage(control, PInvoke.EM_GETOPTIONS));
+        Assert.Equal(expected, (int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETOPTIONS));
     }
 
     public static IEnumerable<object[]> BackColor_Set_TestData()
@@ -995,7 +995,7 @@ public class RichTextBoxTests
 
         protected override unsafe void WndProc(ref Message m)
         {
-            if (m.Msg == (int)PInvoke.EM_CANREDO)
+            if (m.Msg == (int)PInvokeCore.EM_CANREDO)
             {
                 m.Result = Result;
                 return;
@@ -1064,7 +1064,7 @@ public class RichTextBoxTests
 
         protected override unsafe void WndProc(ref Message m)
         {
-            if (m.Msg == (int)PInvoke.EM_CANUNDO)
+            if (m.Msg == (int)PInvokeCore.EM_CANUNDO)
             {
                 m.Result = Result;
                 return;
@@ -1109,7 +1109,7 @@ public class RichTextBoxTests
         Assert.Equal(0, createdCallCount);
 
         // Call EM_AUTOURLDETECT.
-        PInvoke.SendMessage(control, PInvoke.EM_AUTOURLDETECT, 0);
+        PInvokeCore.SendMessage(control, PInvokeCore.EM_AUTOURLDETECT, 0);
         Assert.True(control.DetectUrls);
         Assert.True(control.IsHandleCreated);
         Assert.Equal(0, invalidatedCallCount);
@@ -1186,7 +1186,7 @@ public class RichTextBoxTests
 
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         control.DetectUrls = value;
-        Assert.Equal(expected, (int)PInvoke.SendMessage(control, PInvoke.EM_GETAUTOURLDETECT));
+        Assert.Equal(expected, (int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETAUTOURLDETECT));
     }
 
     [WinFormsTheory]
@@ -1604,7 +1604,7 @@ public class RichTextBoxTests
         using (Font font = new(familyName, emSize, style, unit, gdiCharSet))
         {
             control.Font = font;
-            result = PInvoke.SendMessage(control, PInvoke.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_ALL, ref format);
+            result = PInvokeCore.SendMessage(control, PInvokeCore.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_ALL, ref format);
             Assert.NotEqual(0, result);
             Assert.Equal(familyName, format.FaceName.ToString());
             Assert.Equal(expectedYHeight, format.yHeight);
@@ -1621,10 +1621,10 @@ public class RichTextBoxTests
             dwMask = (CFM_MASK)int.MaxValue
         };
 
-        result = PInvoke.SendMessage(control, PInvoke.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_ALL, ref format1);
+        result = PInvokeCore.SendMessage(control, PInvokeCore.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_ALL, ref format1);
         Assert.NotEqual(0, result);
         Assert.Equal(Control.DefaultFont.Name, format1.FaceName.ToString());
-        Assert.Equal((int)(Control.DefaultFont.SizeInPoints * 20), (int)format1.yHeight);
+        Assert.Equal((int)(Control.DefaultFont.SizeInPoints * 20), format1.yHeight);
         Assert.True(format1.dwEffects.HasFlag(CFE_EFFECTS.CFE_AUTOBACKCOLOR));
         Assert.True(format1.dwEffects.HasFlag(CFE_EFFECTS.CFE_AUTOCOLOR));
         Assert.Equal(0, format1.bPitchAndFamily);
@@ -1747,7 +1747,7 @@ public class RichTextBoxTests
         {
             cbSize = (uint)sizeof(CHARFORMAT2W)
         };
-        Assert.NotEqual(0, (int)PInvoke.SendMessage(control, PInvoke.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_ALL, ref format));
+        Assert.NotEqual(0, (int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_ALL, ref format));
         Assert.Equal(0x785634, format.crTextColor);
     }
 
@@ -1762,7 +1762,7 @@ public class RichTextBoxTests
         {
             cbSize = (uint)sizeof(CHARFORMAT2W)
         };
-        Assert.NotEqual(0, (int)PInvoke.SendMessage(control, PInvoke.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_ALL, ref format));
+        Assert.NotEqual(0, (int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_ALL, ref format));
         Assert.Equal(0x785634, format.crTextColor);
 
         // Set different.
@@ -1771,7 +1771,7 @@ public class RichTextBoxTests
         {
             cbSize = (uint)sizeof(CHARFORMAT2W)
         };
-        Assert.NotEqual(0, (int)PInvoke.SendMessage(control, PInvoke.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_ALL, ref format));
+        Assert.NotEqual(0, (int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_ALL, ref format));
         Assert.Equal(0x907856, format.crTextColor);
     }
 
@@ -1841,7 +1841,7 @@ public class RichTextBoxTests
 
         protected override void WndProc(ref Message m)
         {
-            if (MakeCustom && m.Msg == (int)PInvoke.EM_GETLANGOPTIONS)
+            if (MakeCustom && m.Msg == (int)PInvokeCore.EM_GETLANGOPTIONS)
             {
                 m.Result = GetLangOptionsResult;
                 return;
@@ -1905,7 +1905,7 @@ public class RichTextBoxTests
 
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         control.LanguageOption = value;
-        Assert.Equal(value, (RichTextBoxLanguageOptions)(int)PInvoke.SendMessage(control, PInvoke.EM_GETLANGOPTIONS));
+        Assert.Equal(value, (RichTextBoxLanguageOptions)(int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETLANGOPTIONS));
     }
 
     [WinFormsFact]
@@ -1927,7 +1927,7 @@ public class RichTextBoxTests
         Assert.Equal(0, createdCallCount);
 
         // Call EM_LIMITTEXT.
-        PInvoke.SendMessage(control, PInvoke.EM_LIMITTEXT, 0, 1);
+        PInvokeCore.SendMessage(control, PInvokeCore.EM_LIMITTEXT, 0, 1);
         Assert.Equal(0x7FFFFFFF, control.MaxLength);
         Assert.True(control.IsHandleCreated);
         Assert.Equal(0, invalidatedCallCount);
@@ -1935,7 +1935,7 @@ public class RichTextBoxTests
         Assert.Equal(0, createdCallCount);
 
         // Call EM_EXLIMITTEXT.
-        PInvoke.SendMessage(control, PInvoke.EM_EXLIMITTEXT, 0, 2);
+        PInvokeCore.SendMessage(control, PInvokeCore.EM_EXLIMITTEXT, 0, 2);
         Assert.Equal(0x7FFFFFFF, control.MaxLength);
         Assert.True(control.IsHandleCreated);
         Assert.Equal(0, invalidatedCallCount);
@@ -2044,7 +2044,7 @@ public class RichTextBoxTests
 
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         control.MaxLength = value;
-        Assert.Equal(expected, (int)PInvoke.SendMessage(control, PInvoke.EM_GETLIMITTEXT));
+        Assert.Equal(expected, (int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETLIMITTEXT));
     }
 
     [WinFormsFact]
@@ -2366,12 +2366,12 @@ public class RichTextBoxTests
 
         protected override unsafe void WndProc(ref Message m)
         {
-            if (m.Msg == (int)PInvoke.EM_CANREDO)
+            if (m.Msg == (int)PInvokeCore.EM_CANREDO)
             {
                 m.Result = CanRedoResult;
                 return;
             }
-            else if (m.Msg == (int)PInvoke.EM_GETREDONAME)
+            else if (m.Msg == (int)PInvokeCore.EM_GETREDONAME)
             {
                 m.Result = GetRedoNameResult;
                 return;
@@ -3778,7 +3778,7 @@ public class RichTextBoxTests
         {
             cbSize = (uint)sizeof(PARAFORMAT)
         };
-        Assert.NotEqual(0, (int)PInvoke.SendMessage(control, PInvoke.EM_GETPARAFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
+        Assert.NotEqual(0, (int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETPARAFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
         Assert.Equal(expected, (int)format.wAlignment);
     }
 
@@ -3973,7 +3973,7 @@ public class RichTextBoxTests
         {
             cbSize = (uint)sizeof(CHARFORMAT2W)
         };
-        Assert.NotEqual(0, (int)PInvoke.SendMessage(control, PInvoke.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
+        Assert.NotEqual(0, (int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
         Assert.Equal(0x785634, format.crBackColor);
     }
 
@@ -4235,8 +4235,8 @@ public class RichTextBoxTests
         {
             cbSize = (uint)sizeof(PARAFORMAT)
         };
-        Assert.NotEqual(0, (int)PInvoke.SendMessage(control, PInvoke.EM_GETPARAFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
-        Assert.Equal(expectedOffset, (int)format.dxOffset);
+        Assert.NotEqual(0, (int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETPARAFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
+        Assert.Equal(expectedOffset, format.dxOffset);
         Assert.Equal(expected, (int)format.wNumbering);
     }
 
@@ -4429,7 +4429,7 @@ public class RichTextBoxTests
         {
             cbSize = (uint)sizeof(CHARFORMAT2W)
         };
-        Assert.NotEqual(0, (int)PInvoke.SendMessage(control, PInvoke.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
+        Assert.NotEqual(0, (int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
         Assert.Equal(900, format.yOffset);
     }
 
@@ -4618,7 +4618,7 @@ public class RichTextBoxTests
         {
             cbSize = (uint)sizeof(CHARFORMAT2W)
         };
-        Assert.NotEqual(0, (int)PInvoke.SendMessage(control, PInvoke.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
+        Assert.NotEqual(0, (int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
         Assert.Equal(0x785634, format.crTextColor);
     }
 
@@ -4859,9 +4859,9 @@ public class RichTextBoxTests
         control.SelectionFont = value;
         Font result1 = control.SelectionFont;
         Assert.NotSame(result1, value);
-        Assert.Equal(value?.Name, result1.Name);
-        Assert.Equal(value?.Size, result1.Size);
-        Assert.Equal(value?.Style, result1.Style);
+        Assert.Equal(value.Name, result1.Name);
+        Assert.Equal(value.Size, result1.Size);
+        Assert.Equal(value.Style, result1.Style);
         Assert.Equal(expectedGdiCharset, result1.GdiCharSet);
         Assert.True(control.IsHandleCreated);
         Assert.Equal(0, invalidatedCallCount);
@@ -4871,9 +4871,9 @@ public class RichTextBoxTests
         // Set same.
         control.SelectionFont = value;
         Font result2 = control.SelectionFont;
-        Assert.Equal(value?.Name, result2.Name);
-        Assert.Equal(value?.Size, result2.Size);
-        Assert.Equal(value?.Style, result2.Style);
+        Assert.Equal(value.Name, result2.Name);
+        Assert.Equal(value.Size, result2.Size);
+        Assert.Equal(value.Style, result2.Style);
         Assert.Equal(expectedGdiCharset, result2.GdiCharSet);
         Assert.True(control.IsHandleCreated);
         Assert.Equal(0, invalidatedCallCount);
@@ -4933,9 +4933,9 @@ public class RichTextBoxTests
             cbSize = (uint)sizeof(CHARFORMAT2W),
             dwMask = (CFM_MASK)int.MaxValue
         };
-        Assert.NotEqual(0, (int)PInvoke.SendMessage(control, PInvoke.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
+        Assert.NotEqual(0, (int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
         Assert.Equal("Arial", format.FaceName.ToString());
-        Assert.Equal(expectedYHeight, (int)format.yHeight);
+        Assert.Equal(expectedYHeight, format.yHeight);
         Assert.Equal(CFE_EFFECTS.CFE_AUTOBACKCOLOR | CFE_EFFECTS.CFE_AUTOCOLOR | (CFE_EFFECTS)expectedEffects, format.dwEffects);
         Assert.Equal(0, format.bPitchAndFamily);
     }
@@ -5153,7 +5153,7 @@ public class RichTextBoxTests
         {
             cbSize = (uint)sizeof(PARAFORMAT)
         };
-        Assert.NotEqual(0, (int)PInvoke.SendMessage(control, PInvoke.EM_GETPARAFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
+        Assert.NotEqual(0, (int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETPARAFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
         Assert.Equal(expected, format.dxOffset);
     }
 
@@ -5344,7 +5344,7 @@ public class RichTextBoxTests
         {
             cbSize = (uint)sizeof(PARAFORMAT)
         };
-        Assert.NotEqual(0, (int)PInvoke.SendMessage(control, PInvoke.EM_GETPARAFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
+        Assert.NotEqual(0, (int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETPARAFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
         Assert.Equal(expected, format.dxStartIndent);
     }
 
@@ -5546,7 +5546,7 @@ public class RichTextBoxTests
         control.SelectionLength = value;
         int selectionStart = 0;
         int selectionEnd = 0;
-        IntPtr result = PInvoke.SendMessage(control, PInvoke.EM_GETSEL, (WPARAM)(&selectionStart), (LPARAM)(&selectionEnd));
+        IntPtr result = PInvokeCore.SendMessage(control, PInvokeCore.EM_GETSEL, (WPARAM)(&selectionStart), (LPARAM)(&selectionEnd));
         Assert.Equal(1, PARAM.LOWORD(result));
         Assert.Equal(expected, PARAM.HIWORD(result));
         Assert.Equal(1, selectionStart);
@@ -5742,7 +5742,7 @@ public class RichTextBoxTests
             cbSize = (uint)sizeof(CHARFORMAT2W),
             dwMask = CFM_MASK.CFM_PROTECTED
         };
-        Assert.NotEqual(0, (int)PInvoke.SendMessage(control, PInvoke.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
+        Assert.NotEqual(0, (int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETCHARFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
         Assert.Equal(value, (format.dwEffects & CFE_EFFECTS.CFE_PROTECTED) != 0);
     }
 
@@ -5928,7 +5928,7 @@ public class RichTextBoxTests
         {
             cbSize = (uint)sizeof(PARAFORMAT)
         };
-        Assert.NotEqual(0, (int)PInvoke.SendMessage(control, PInvoke.EM_GETPARAFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
+        Assert.NotEqual(0, (int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETPARAFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
         Assert.Equal(expected, format.dxRightIndent);
     }
 
@@ -6136,7 +6136,7 @@ public class RichTextBoxTests
         control.SelectionStart = value;
         int selectionStart = 0;
         int selectionEnd = 0;
-        IntPtr result = PInvoke.SendMessage(control, PInvoke.EM_GETSEL, (WPARAM)(&selectionStart), (LPARAM)(&selectionEnd));
+        IntPtr result = PInvokeCore.SendMessage(control, PInvokeCore.EM_GETSEL, (WPARAM)(&selectionStart), (LPARAM)(&selectionEnd));
         Assert.Equal(expectedSelectionStart, PARAM.LOWORD(result));
         Assert.Equal(expectedEnd, PARAM.HIWORD(result));
         Assert.Equal(expectedSelectionStart, selectionStart);
@@ -6334,7 +6334,7 @@ public class RichTextBoxTests
     {
         using RichTextBox control = new()
         {
-            SelectionTabs = new int[] { 2, 3, 4 }
+            SelectionTabs = [2, 3, 4]
         };
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         int invalidatedCallCount = 0;
@@ -6370,12 +6370,12 @@ public class RichTextBoxTests
         using RichTextBox control = new();
 
         Assert.NotEqual(IntPtr.Zero, control.Handle);
-        control.SelectionTabs = new int[] { 1, 2, 3 };
+        control.SelectionTabs = [1, 2, 3];
         PARAFORMAT format = new()
         {
             cbSize = (uint)sizeof(PARAFORMAT)
         };
-        Assert.NotEqual(0, (int)PInvoke.SendMessage(control, PInvoke.EM_GETPARAFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
+        Assert.NotEqual(0, (int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETPARAFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
         Assert.Equal(3, format.cTabCount);
         Assert.Equal(15, format.rgxTabs[0]);
         Assert.Equal(30, format.rgxTabs[1]);
@@ -6383,7 +6383,7 @@ public class RichTextBoxTests
 
         // Set null or empty.
         control.SelectionTabs = nullOrEmptyValue;
-        Assert.NotEqual(0, (int)PInvoke.SendMessage(control, PInvoke.EM_GETPARAFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
+        Assert.NotEqual(0, (int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETPARAFORMAT, (WPARAM)PInvoke.SCF_SELECTION, ref format));
         Assert.Equal(0, format.cTabCount);
     }
 
@@ -6529,7 +6529,7 @@ public class RichTextBoxTests
 
         protected override unsafe void WndProc(ref Message m)
         {
-            if (m.Msg == (int)PInvoke.EM_SELECTIONTYPE)
+            if (m.Msg == (int)PInvokeCore.EM_SELECTIONTYPE)
             {
                 Assert.Equal(IntPtr.Zero, m.WParam);
                 Assert.Equal(IntPtr.Zero, m.LParam);
@@ -6576,7 +6576,7 @@ public class RichTextBoxTests
         Assert.Equal(0, createdCallCount);
 
         // Call EM_SETOPTIONS.
-        PInvoke.SendMessage(control, PInvoke.EM_SETOPTIONS, (WPARAM)(int)PInvoke.ECOOP_OR, (LPARAM)(nint)PInvoke.ECO_SELECTIONBAR);
+        PInvokeCore.SendMessage(control, PInvokeCore.EM_SETOPTIONS, (WPARAM)(int)PInvoke.ECOOP_OR, (LPARAM)(nint)PInvoke.ECO_SELECTIONBAR);
         Assert.False(control.ShowSelectionMargin);
         Assert.True(control.IsHandleCreated);
         Assert.Equal(0, invalidatedCallCount);
@@ -6652,7 +6652,7 @@ public class RichTextBoxTests
 
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         control.ShowSelectionMargin = value;
-        Assert.Equal(expected, (int)PInvoke.SendMessage(control, PInvoke.EM_GETOPTIONS));
+        Assert.Equal(expected, (int)PInvokeCore.SendMessage(control, PInvokeCore.EM_GETOPTIONS));
     }
 
     [WinFormsFact]
@@ -6756,7 +6756,7 @@ public class RichTextBoxTests
 
         protected override unsafe void WndProc(ref Message m)
         {
-            if (m.Msg == (int)PInvoke.EM_GETTEXTLENGTHEX)
+            if (m.Msg == (int)PInvokeCore.EM_GETTEXTLENGTHEX)
             {
                 GETTEXTLENGTHEX* gtl = (GETTEXTLENGTHEX*)m.WParam;
                 Assert.Equal(GETTEXTLENGTHEX_FLAGS.GTL_NUMCHARS, gtl->flags);
@@ -6857,61 +6857,59 @@ public class RichTextBoxTests
         "Flaky tests, see: https://github.com/dotnet/winforms/issues/6609")]
     public void RichTextBox_Text_GetWithHandle_ReturnsExpected()
     {
-        using (RichTextBox control = new())
+        using RichTextBox control = new();
+        control.CreateControl();
+
+        int invalidatedCallCount = 0;
+        control.Invalidated += (sender, e) => invalidatedCallCount++;
+        int styleChangedCallCount = 0;
+        control.StyleChanged += (sender, e) => styleChangedCallCount++;
+        int createdCallCount = 0;
+        control.HandleCreated += (sender, e) => createdCallCount++;
+
+        // verify against RichEdit20W
+        using (var riched20 = new RichEdit20W())
         {
-            control.CreateControl();
+            riched20.CreateControl();
 
-            int invalidatedCallCount = 0;
-            control.Invalidated += (sender, e) => invalidatedCallCount++;
-            int styleChangedCallCount = 0;
-            control.StyleChanged += (sender, e) => styleChangedCallCount++;
-            int createdCallCount = 0;
-            control.HandleCreated += (sender, e) => createdCallCount++;
-
-            // verify against RichEdit20W
-            using (var riched20 = new RichEdit20W())
+            foreach (object[] testCaseData in RichTextBox_Text_GetWithHandle_TestData())
             {
-                riched20.CreateControl();
+                string text = (string)testCaseData[0];
+                string expectedText = (string)testCaseData[1];
+                string oldWayExpectedText = testCaseData.Length > 2 ? (string)testCaseData[2] : SAME;
+                string oldControlExpectedText = testCaseData.Length > 3 ? (string)testCaseData[3] : SAME;
 
-                foreach (object[] testCaseData in RichTextBox_Text_GetWithHandle_TestData())
+                // NOTE: in certain scenarios the old way (using StreamOut() method) returned a different
+                // text value to the new way (via GetTextEx() method).
+                // If oldWayExpectedText is SAME, assume StreamOut() returned the same expectedText.
+                if (oldWayExpectedText is SAME)
                 {
-                    string text = (string)testCaseData[0];
-                    string expectedText = (string)testCaseData[1];
-                    string oldWayExpectedText = testCaseData.Length > 2 ? (string)testCaseData[2] : SAME;
-                    string oldControlExpectedText = testCaseData.Length > 3 ? (string)testCaseData[3] : SAME;
-
-                    // NOTE: in certain scenarios the old way (using StreamOut() method) returned a different
-                    // text value to the new way (via GetTextEx() method).
-                    // If oldWayExpectedText is SAME, assume StreamOut() returned the same expectedText.
-                    if (oldWayExpectedText is SAME)
-                    {
-                        oldWayExpectedText = expectedText;
-                    }
-
-                    // NOTE: in certain scenarios the old control returns a different text value to the new control.
-                    // If oldControlExpectedText is SAME, assume the old control returns the same expectedText.
-                    if (oldControlExpectedText is SAME)
-                    {
-                        oldControlExpectedText = expectedText;
-                    }
-
-                    control.Text = text;
-                    Assert.Equal(expectedText, control.Text);
-
-                    // verify the old behaviour via StreamOut(SF.TEXT | SF.UNICODE)
-                    string textOldWay = control.TestAccessor().Dynamic.StreamOut(PInvoke.SF_TEXT | PInvoke.SF_UNICODE);
-                    Assert.Equal(oldWayExpectedText, textOldWay);
-
-                    // verify against RichEdit20W
-                    riched20.Text = text;
-                    Assert.Equal(oldControlExpectedText, riched20.Text);
+                    oldWayExpectedText = expectedText;
                 }
-            }
 
-            Assert.Equal(0, invalidatedCallCount);
-            Assert.Equal(0, styleChangedCallCount);
-            Assert.Equal(0, createdCallCount);
+                // NOTE: in certain scenarios the old control returns a different text value to the new control.
+                // If oldControlExpectedText is SAME, assume the old control returns the same expectedText.
+                if (oldControlExpectedText is SAME)
+                {
+                    oldControlExpectedText = expectedText;
+                }
+
+                control.Text = text;
+                Assert.Equal(expectedText, control.Text);
+
+                // verify the old behavior via StreamOut(SF.TEXT | SF.UNICODE)
+                string textOldWay = control.TestAccessor().Dynamic.StreamOut(PInvoke.SF_TEXT | PInvoke.SF_UNICODE);
+                Assert.Equal(oldWayExpectedText, textOldWay);
+
+                // verify against RichEdit20W
+                riched20.Text = text;
+                Assert.Equal(oldControlExpectedText, riched20.Text);
+            }
         }
+
+        Assert.Equal(0, invalidatedCallCount);
+        Assert.Equal(0, styleChangedCallCount);
+        Assert.Equal(0, createdCallCount);
     }
 
     [WinFormsTheory]
@@ -6952,16 +6950,14 @@ public class RichTextBoxTests
         }
 
         // verify against RichEdit20W
-        using (var riched20 = new RichEdit20W())
-        {
-            Assert.Empty(riched20.Text);
-            Assert.False(riched20.IsHandleCreated);
+        using var riched20 = new RichEdit20W();
+        Assert.Empty(riched20.Text);
+        Assert.False(riched20.IsHandleCreated);
 
-            riched20.Text = text;
+        riched20.Text = text;
 
-            Assert.Equal(expected, riched20.Text);
-            Assert.False(riched20.IsHandleCreated);
-        }
+        Assert.Equal(expected, riched20.Text);
+        Assert.False(riched20.IsHandleCreated);
     }
 
     [WinFormsTheory]
@@ -7675,12 +7671,12 @@ public class RichTextBoxTests
 
         protected override unsafe void WndProc(ref Message m)
         {
-            if (m.Msg == (int)PInvoke.EM_CANUNDO)
+            if (m.Msg == (int)PInvokeCore.EM_CANUNDO)
             {
                 m.Result = CanUndoResult;
                 return;
             }
-            else if (m.Msg == (int)PInvoke.EM_GETUNDONAME)
+            else if (m.Msg == (int)PInvokeCore.EM_GETUNDONAME)
             {
                 m.Result = GetUndoNameResult;
                 return;
@@ -7725,7 +7721,7 @@ public class RichTextBoxTests
         Assert.Equal(0, createdCallCount);
 
         // Call EM_SETZOOM.
-        PInvoke.SendMessage(control, PInvoke.EM_SETZOOM, 2, 10);
+        PInvokeCore.SendMessage(control, PInvokeCore.EM_SETZOOM, 2, 10);
         Assert.Equal(0.2f, control.ZoomFactor);
         Assert.True(control.IsHandleCreated);
         Assert.Equal(0, invalidatedCallCount);
@@ -7759,7 +7755,7 @@ public class RichTextBoxTests
 
         protected override unsafe void WndProc(ref Message m)
         {
-            if (m.Msg == (int)PInvoke.EM_GETZOOM)
+            if (m.Msg == (int)PInvokeCore.EM_GETZOOM)
             {
                 int* pNumerator = (int*)m.WParam;
                 int* pDenominator = (int*)m.LParam;
@@ -7778,7 +7774,7 @@ public class RichTextBoxTests
     [InlineData(63.9f, 63.9f)]
     [InlineData(1.0f, 1.0f)]
     [InlineData(2.0f, 2.0f)]
-    [InlineData(float.NaN, -2147483.75f)]
+    [InlineData(float.NaN, 1.0f)]
     public void RichTextBox_ZoomFactor_Set_GetReturnsExpected(float value, float expected)
     {
         using RichTextBox control = new()
@@ -7899,7 +7895,7 @@ public class RichTextBoxTests
 
         protected override unsafe void WndProc(ref Message m)
         {
-            if (m.Msg == (int)PInvoke.EM_CANPASTE)
+            if (m.Msg == (int)PInvokeCore.EM_CANPASTE)
             {
                 m.Result = Result;
                 return;
@@ -7907,20 +7903,6 @@ public class RichTextBoxTests
 
             base.WndProc(ref m);
         }
-    }
-
-    [WinFormsFact]
-    public void RichTextBox_OleObject_IncompleteOleObject_DoNothing()
-    {
-        using RichTextBox control = new();
-        Assert.NotEqual(IntPtr.Zero, control.Handle);
-
-        using MemoryStream memoryStream = new();
-        using Bitmap bitmap = new(100, 100);
-        bitmap.Save(memoryStream, Drawing.Imaging.ImageFormat.Png);
-        Clipboard.SetData("Embed Source", memoryStream);
-
-        Assert.Equal(string.Empty, control.Text);
     }
 
     [WinFormsFact]
@@ -8514,8 +8496,8 @@ public class RichTextBoxTests
         using RichTextBox control = new();
         Assert.Throws<ArgumentOutOfRangeException>("start", () => control.Find("s", start, RichTextBoxFinds.NoHighlight));
         Assert.Throws<ArgumentOutOfRangeException>("start", () => control.Find("s", start, 0, RichTextBoxFinds.NoHighlight));
-        Assert.Throws<ArgumentOutOfRangeException>("start", () => control.Find(new char[] { 's' }, start));
-        Assert.Throws<ArgumentOutOfRangeException>("start", () => control.Find(new char[] { 's' }, start, 0));
+        Assert.Throws<ArgumentOutOfRangeException>("start", () => control.Find(['s'], start));
+        Assert.Throws<ArgumentOutOfRangeException>("start", () => control.Find(['s'], start, 0));
     }
 
     [WinFormsTheory]
@@ -8529,8 +8511,8 @@ public class RichTextBoxTests
         };
         Assert.Throws<ArgumentOutOfRangeException>("start", () => control.Find("s", start, RichTextBoxFinds.NoHighlight));
         Assert.Throws<ArgumentOutOfRangeException>("start", () => control.Find("s", start, 0, RichTextBoxFinds.NoHighlight));
-        Assert.Throws<ArgumentOutOfRangeException>("start", () => control.Find(new char[] { 's' }, start));
-        Assert.Throws<ArgumentOutOfRangeException>("start", () => control.Find(new char[] { 's' }, start, 0));
+        Assert.Throws<ArgumentOutOfRangeException>("start", () => control.Find(['s'], start));
+        Assert.Throws<ArgumentOutOfRangeException>("start", () => control.Find(['s'], start, 0));
     }
 
     [WinFormsFact]
@@ -8538,7 +8520,7 @@ public class RichTextBoxTests
     {
         using RichTextBox control = new();
         Assert.Throws<ArgumentOutOfRangeException>("end", () => control.Find("s", 0, -2, RichTextBoxFinds.NoHighlight));
-        Assert.Throws<ArgumentOutOfRangeException>("end", () => control.Find(new char[] { 's' }, 0, -2));
+        Assert.Throws<ArgumentOutOfRangeException>("end", () => control.Find(['s'], 0, -2));
     }
 
     [WinFormsFact]
@@ -8549,7 +8531,7 @@ public class RichTextBoxTests
             Text = "t"
         };
         Assert.Throws<ArgumentOutOfRangeException>("end", () => control.Find("s", 0, -2, RichTextBoxFinds.NoHighlight));
-        Assert.Throws<ArgumentOutOfRangeException>("end", () => control.Find(new char[] { 's' }, 0, -2));
+        Assert.Throws<ArgumentOutOfRangeException>("end", () => control.Find(['s'], 0, -2));
     }
 
     [WinFormsFact]
@@ -8561,8 +8543,8 @@ public class RichTextBoxTests
         };
         Assert.Throws<ArgumentException>(() => control.Find("s", 1, 0, RichTextBoxFinds.None));
         Assert.Throws<ArgumentException>(() => control.Find("s", 1, 0, RichTextBoxFinds.Reverse));
-        Assert.Throws<ArgumentOutOfRangeException>("end", () => control.Find(new char[] { 's' }, 1, 0));
-        Assert.Throws<ArgumentOutOfRangeException>("end", () => control.Find(new char[] { 's' }, 1, 0));
+        Assert.Throws<ArgumentOutOfRangeException>("end", () => control.Find(['s'], 1, 0));
+        Assert.Throws<ArgumentOutOfRangeException>("end", () => control.Find(['s'], 1, 0));
     }
 
     [WinFormsFact]
@@ -8920,7 +8902,7 @@ public class RichTextBoxTests
     {
         using CustomLineFromCharRichTextBox control = new()
         {
-            LineFromCharResult = (IntPtr)result
+            LineFromCharResult = result
         };
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         Assert.Equal(0, control.GetLineFromCharIndex(1));
@@ -8932,9 +8914,9 @@ public class RichTextBoxTests
 
         protected override void WndProc(ref Message m)
         {
-            if (m.Msg == (int)PInvoke.EM_LINEFROMCHAR)
+            if (m.Msg == (int)PInvokeCore.EM_LINEFROMCHAR)
             {
-                Assert.Equal((IntPtr)1, m.WParam);
+                Assert.Equal(1, m.WParam);
                 Assert.Equal(IntPtr.Zero, m.LParam);
                 m.Result = LineFromCharResult;
                 return;
@@ -8960,7 +8942,7 @@ public class RichTextBoxTests
     {
         using CustomExLineFromCharRichTextBox control = new()
         {
-            ExLineFromCharResult = (IntPtr)result
+            ExLineFromCharResult = result
         };
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         Assert.Equal(expected, control.GetLineFromCharIndex(1));
@@ -8972,10 +8954,10 @@ public class RichTextBoxTests
 
         protected override void WndProc(ref Message m)
         {
-            if (m.Msg == (int)PInvoke.EM_EXLINEFROMCHAR)
+            if (m.Msg == (int)PInvokeCore.EM_EXLINEFROMCHAR)
             {
                 Assert.Equal(IntPtr.Zero, m.WParam);
-                Assert.Equal((IntPtr)1, m.LParam);
+                Assert.Equal(1, m.LParam);
                 m.Result = ExLineFromCharResult;
                 return;
             }
@@ -9090,7 +9072,7 @@ public class RichTextBoxTests
     public static IEnumerable<object[]> OnContentsResized_TestData()
     {
         yield return new object[] { null };
-        yield return new object[] { new ContentsResizedEventArgs(new Rectangle()) };
+        yield return new object[] { new ContentsResizedEventArgs(default) };
     }
 
     [WinFormsTheory]
@@ -9774,7 +9756,7 @@ public class RichTextBoxTests
         int currentCodePage = (CodePagesEncodingProvider.Instance.GetEncoding(0) ?? Encoding.UTF8).CodePage;
 
         // The non-lossy conversion of nbsp only works single byte Windows code pages (e.g. not Japanese).
-        if (currentCodePage >= 1250 && currentCodePage <= 1258)
+        if (currentCodePage is >= 1250 and <= 1258)
         {
             Assert.Equal(input, control.Text[0]);
         }
@@ -9798,8 +9780,8 @@ public class RichTextBoxTests
             };
             Message m = new()
             {
-                Msg = (int)PInvoke.WM_GETDLGCODE,
-                Result = (IntPtr)250
+                Msg = (int)PInvokeCore.WM_GETDLGCODE,
+                Result = 250
             };
             control.WndProc(ref m);
             Assert.Equal(expectedResult, m.Result);
@@ -9825,8 +9807,8 @@ public class RichTextBoxTests
 
         Message m = new()
         {
-            Msg = (int)PInvoke.WM_GETDLGCODE,
-            Result = (IntPtr)250
+            Msg = (int)PInvokeCore.WM_GETDLGCODE,
+            Result = 250
         };
         control.WndProc(ref m);
         Assert.Equal(expectedResult, m.Result);
@@ -9853,8 +9835,8 @@ public class RichTextBoxTests
             };
             Message m = new()
             {
-                Msg = (int)PInvoke.WM_IME_NOTIFY,
-                Result = (IntPtr)250
+                Msg = (int)PInvokeCore.WM_IME_NOTIFY,
+                Result = 250
             };
             control.WndProc(ref m);
             Assert.Equal(IntPtr.Zero, m.Result);
@@ -9887,8 +9869,8 @@ public class RichTextBoxTests
         };
         Message m = new()
         {
-            Msg = (int)PInvoke.WM_IME_NOTIFY,
-            Result = (IntPtr)250
+            Msg = (int)PInvokeCore.WM_IME_NOTIFY,
+            Result = 250
         };
         control.WndProc(ref m);
         Assert.Equal(IntPtr.Zero, m.Result);
@@ -9921,8 +9903,8 @@ public class RichTextBoxTests
         };
         Message m = new()
         {
-            Msg = (int)PInvoke.WM_MOUSEHOVER,
-            Result = (IntPtr)250
+            Msg = (int)PInvokeCore.WM_MOUSEHOVER,
+            Result = 250
         };
         control.WndProc(ref m);
         Assert.Equal(IntPtr.Zero, m.Result);
@@ -9935,7 +9917,7 @@ public class RichTextBoxTests
 
     public static IEnumerable<object[]> WndProc_ReflectCommand_TestData()
     {
-        foreach (IntPtr lParam in new IntPtr[] { IntPtr.Zero, (IntPtr)1 })
+        foreach (IntPtr lParam in new IntPtr[] { IntPtr.Zero, 1 })
         {
             yield return new object[] { IntPtr.Zero, lParam, 0 };
             yield return new object[] { PARAM.FromLowHigh(0, (int)PInvoke.EN_CHANGE), lParam, 1 };
@@ -9971,10 +9953,10 @@ public class RichTextBoxTests
             Msg = (int)(MessageId.WM_REFLECT_COMMAND),
             WParam = wParam,
             LParam = lParam,
-            Result = (IntPtr)250
+            Result = 250
         };
         control.WndProc(ref m);
-        Assert.Equal((IntPtr)250, m.Result);
+        Assert.Equal(250, m.Result);
         Assert.Equal(expectedTextChangedCallCount, textChangedCallCount);
         Assert.Equal(0, hScrollCallCount);
         Assert.Equal(0, vScrollCallCount);
@@ -10013,10 +9995,10 @@ public class RichTextBoxTests
             Msg = (int)(MessageId.WM_REFLECT_COMMAND),
             WParam = wParam,
             LParam = lParam,
-            Result = (IntPtr)250
+            Result = 250
         };
         control.WndProc(ref m);
-        Assert.Equal((IntPtr)250, m.Result);
+        Assert.Equal(250, m.Result);
         Assert.Equal(expectedTextChangedCallCount, textChangedCallCount);
         Assert.Equal(0, hScrollCallCount);
         Assert.Equal(0, vScrollCallCount);
@@ -10079,10 +10061,10 @@ public class RichTextBoxTests
             Msg = (int)(MessageId.WM_REFLECT_COMMAND),
             WParam = wParam,
             LParam = control.Handle,
-            Result = (IntPtr)250
+            Result = 250
         };
         control.WndProc(ref m);
-        Assert.Equal((IntPtr)250, m.Result);
+        Assert.Equal(250, m.Result);
         Assert.Equal(expectedTextChangedCallCount, textChangedCallCount);
         Assert.Equal(expectedHScrollCallCount, hScrollCallCount);
         Assert.Equal(expectedVScrollCallCount, vScrollCallCount);
@@ -10095,7 +10077,7 @@ public class RichTextBoxTests
 
     public static IEnumerable<object[]> WndProc_ReflectNotify_TestData()
     {
-        foreach (IntPtr hWnd in new IntPtr[] { IntPtr.Zero, (IntPtr)1 })
+        foreach (IntPtr hWnd in new IntPtr[] { IntPtr.Zero, 1 })
         {
             yield return new object[] { hWnd, (int)PInvoke.EN_LINK };
             yield return new object[] { hWnd, (int)PInvoke.EN_DROPFILES };
@@ -10122,11 +10104,11 @@ public class RichTextBoxTests
             Msg = (int)(MessageId.WM_REFLECT_NOTIFY),
             HWnd = hWnd,
             LParam = (IntPtr)(&nmhdr),
-            Result = (IntPtr)250
+            Result = 250
         };
 
         control.WndProc(ref m);
-        Assert.Equal((IntPtr)0, m.Result);
+        Assert.Equal(0, m.Result);
         Assert.True(control.IsHandleCreated);
     }
 
@@ -10150,10 +10132,10 @@ public class RichTextBoxTests
             Msg = (int)(MessageId.WM_REFLECT_NOTIFY),
             HWnd = control.Handle,
             LParam = (IntPtr)(&dropFiles),
-            Result = (IntPtr)250
+            Result = 250
         };
         control.WndProc(ref m);
-        Assert.Equal((IntPtr)1, m.Result);
+        Assert.Equal(1, m.Result);
         Assert.Equal("text", control.Text);
         Assert.True(control.IsHandleCreated);
     }
@@ -10203,10 +10185,10 @@ public class RichTextBoxTests
             Msg = (int)(MessageId.WM_REFLECT_NOTIFY),
             HWnd = control.Handle,
             LParam = (IntPtr)(&selChange),
-            Result = (IntPtr)250
+            Result = 250
         };
         control.WndProc(ref m);
-        Assert.Equal((IntPtr)250, m.Result);
+        Assert.Equal(250, m.Result);
         Assert.Equal(expectedSelectionChangedCallCount, selectionChangedCallCount);
         Assert.Equal(0, control.SelectionLength);
         Assert.Equal(0, control.SelectionStart);
@@ -10242,17 +10224,17 @@ public class RichTextBoxTests
         try
         {
             Marshal.WriteInt32(ptr, IntPtr.Size * 2, (int)PInvoke.EN_PROTECTED);
-            Marshal.WriteInt32(ptr, IntPtr.Size * 2 + IntPtr.Size, (int)PInvoke.EM_SETCHARFORMAT);
+            Marshal.WriteInt32(ptr, IntPtr.Size * 2 + IntPtr.Size, (int)PInvokeCore.EM_SETCHARFORMAT);
             Marshal.WriteIntPtr(ptr, IntPtr.Size * 2 + IntPtr.Size + 4 + IntPtr.Size, (IntPtr)(&format));
             Message m = new()
             {
                 Msg = (int)(MessageId.WM_REFLECT_NOTIFY),
                 HWnd = control.Handle,
                 LParam = ptr,
-                Result = (IntPtr)250
+                Result = 250
             };
             control.WndProc(ref m);
-            Assert.Equal((IntPtr)expectedResult, m.Result);
+            Assert.Equal(expectedResult, m.Result);
             Assert.Equal(expectedProtectedCallCount, protectedCallCount);
             Assert.True(control.IsHandleCreated);
         }
@@ -10285,11 +10267,11 @@ public class RichTextBoxTests
             Msg = (int)(MessageId.WM_REFLECT_NOTIFY),
             HWnd = hWnd,
             LParam = (IntPtr)(&nmhdr),
-            Result = (IntPtr)250
+            Result = 250
         };
 
         control.WndProc(ref m);
-        Assert.Equal((IntPtr)0, m.Result);
+        Assert.Equal(0, m.Result);
         Assert.True(control.IsHandleCreated);
         Assert.Equal(0, invalidatedCallCount);
         Assert.Equal(0, styleChangedCallCount);
@@ -10324,10 +10306,10 @@ public class RichTextBoxTests
             Msg = (int)(MessageId.WM_REFLECT_NOTIFY),
             HWnd = control.Handle,
             LParam = (IntPtr)(&dropFiles),
-            Result = (IntPtr)250
+            Result = 250
         };
         control.WndProc(ref m);
-        Assert.Equal((IntPtr)1, m.Result);
+        Assert.Equal(1, m.Result);
         Assert.Equal("text", control.Text);
         Assert.True(control.IsHandleCreated);
         Assert.Equal(0, invalidatedCallCount);
@@ -10386,10 +10368,10 @@ public class RichTextBoxTests
             Msg = (int)(MessageId.WM_REFLECT_NOTIFY),
             HWnd = control.Handle,
             LParam = (IntPtr)(&reqResize),
-            Result = (IntPtr)250
+            Result = 250
         };
         control.WndProc(ref m);
-        Assert.Equal((IntPtr)250, m.Result);
+        Assert.Equal(250, m.Result);
         Assert.Equal(1, contentsResizedCallCount);
         Assert.Equal(0, layoutCallCount);
         Assert.Equal(0, resizeCallCount);
@@ -10437,10 +10419,10 @@ public class RichTextBoxTests
             Msg = (int)(MessageId.WM_REFLECT_NOTIFY),
             HWnd = control.Handle,
             LParam = (IntPtr)(&selChange),
-            Result = (IntPtr)250
+            Result = 250
         };
         control.WndProc(ref m);
-        Assert.Equal((IntPtr)250, m.Result);
+        Assert.Equal(250, m.Result);
         Assert.Equal(expectedSelectionChangedCallCount, selectionChangedCallCount);
         Assert.Equal(0, control.SelectionLength);
         Assert.Equal(0, control.SelectionStart);
@@ -10478,17 +10460,17 @@ public class RichTextBoxTests
         try
         {
             Marshal.WriteInt32(ptr, IntPtr.Size * 2, (int)PInvoke.EN_PROTECTED);
-            Marshal.WriteInt32(ptr, IntPtr.Size * 2 + IntPtr.Size, (int)PInvoke.EM_SETCHARFORMAT);
+            Marshal.WriteInt32(ptr, IntPtr.Size * 2 + IntPtr.Size, (int)PInvokeCore.EM_SETCHARFORMAT);
             Marshal.WriteIntPtr(ptr, IntPtr.Size * 2 + IntPtr.Size + 4 + IntPtr.Size, (IntPtr)(&format));
             Message m = new()
             {
                 Msg = (int)(MessageId.WM_REFLECT_NOTIFY),
                 HWnd = control.Handle,
                 LParam = ptr,
-                Result = (IntPtr)250
+                Result = 250
             };
             control.WndProc(ref m);
-            Assert.Equal((IntPtr)expectedResult, m.Result);
+            Assert.Equal(expectedResult, m.Result);
             Assert.Equal(expectedProtectedCallCount, protectedCallCount);
             Assert.True(control.IsHandleCreated);
             Assert.Equal(0, invalidatedCallCount);
@@ -10514,8 +10496,8 @@ public class RichTextBoxTests
             };
             Message m = new()
             {
-                Msg = (int)PInvoke.WM_SETFONT,
-                Result = (IntPtr)250
+                Msg = (int)PInvokeCore.WM_SETFONT,
+                Result = 250
             };
             int textChangedCallCount = 0;
             control.TextChanged += (sender, e) => textChangedCallCount++;
@@ -10523,7 +10505,7 @@ public class RichTextBoxTests
             Assert.Equal(IntPtr.Zero, m.Result);
             Assert.True(control.IsHandleCreated);
             Assert.Equal(0, textChangedCallCount);
-            IntPtr result = PInvoke.SendMessage(control, PInvoke.EM_GETMARGINS);
+            IntPtr result = PInvokeCore.SendMessage(control, PInvokeCore.EM_GETMARGINS);
             Assert.Equal(expectedMargin, PARAM.HIWORD(result));
             Assert.Equal(expectedMargin, PARAM.LOWORD(result));
         }
@@ -10545,19 +10527,19 @@ public class RichTextBoxTests
         control.StyleChanged += (sender, e) => styleChangedCallCount++;
         int createdCallCount = 0;
         control.HandleCreated += (sender, e) => createdCallCount++;
-        PInvoke.SendMessage(control, PInvoke.EM_SETMARGINS, (WPARAM)(uint)(PInvoke.EC_LEFTMARGIN | PInvoke.EC_RIGHTMARGIN), LPARAM.MAKELPARAM(1, 2));
+        PInvokeCore.SendMessage(control, PInvokeCore.EM_SETMARGINS, (WPARAM)(PInvoke.EC_LEFTMARGIN | PInvoke.EC_RIGHTMARGIN), LPARAM.MAKELPARAM(1, 2));
         int textChangedCallCount = 0;
         control.TextChanged += (sender, e) => textChangedCallCount++;
 
         Message m = new()
         {
-            Msg = (int)PInvoke.WM_SETFONT,
-            Result = (IntPtr)250
+            Msg = (int)PInvokeCore.WM_SETFONT,
+            Result = 250
         };
         control.WndProc(ref m);
         Assert.Equal(IntPtr.Zero, m.Result);
         Assert.Equal(0, textChangedCallCount);
-        IntPtr result = PInvoke.SendMessage(control, PInvoke.EM_GETMARGINS);
+        IntPtr result = PInvokeCore.SendMessage(control, PInvokeCore.EM_GETMARGINS);
         Assert.Equal(expectedLeft, PARAM.LOWORD(result));
         Assert.Equal(expectedRight, PARAM.HIWORD(result));
         Assert.True(control.IsHandleCreated);
@@ -10584,30 +10566,28 @@ public class RichTextBoxTests
             Assert.Contains(".RichEdit.", GetClassName(riched32.HWND), StringComparison.Ordinal);
         }
 
-        using (var riched20 = new RichEdit20W())
-        {
-            riched20.CreateControl();
-            Assert.Contains(".RichEdit20W.", GetClassName(riched20.HWND), StringComparison.Ordinal);
+        using var riched20 = new RichEdit20W();
+        riched20.CreateControl();
+        Assert.Contains(".RichEdit20W.", GetClassName(riched20.HWND), StringComparison.Ordinal);
 
-            string rtfString = @"{\rtf1\ansi{" +
-                @"The next line\par " +
-                @"is {\v ###NOT### }hidden\par in plain text!}}";
+        string rtfString = @"{\rtf1\ansi{" +
+            @"The next line\par " +
+            @"is {\v ###NOT### }hidden\par in plain text!}}";
 
-            riched20.Rtf = rtfString;
+        riched20.Rtf = rtfString;
 
-            using RichTextBox richTextBox = new();
-            richTextBox.CreateControl();
-            richTextBox.Rtf = rtfString;
+        using RichTextBox richTextBox = new();
+        richTextBox.CreateControl();
+        richTextBox.Rtf = rtfString;
 
-            Assert.Equal(riched20.TextLength, richTextBox.TextLength);
-            Assert.Equal(riched20.Text, richTextBox.Text);
-            Assert.Equal(richTextBox.Text.Length, richTextBox.TextLength);
+        Assert.Equal(riched20.TextLength, richTextBox.TextLength);
+        Assert.Equal(riched20.Text, richTextBox.Text);
+        Assert.Equal(richTextBox.Text.Length, richTextBox.TextLength);
 
-            int startOfIs = riched20.Text.IndexOf("is", StringComparison.Ordinal);
-            int endOfHidden = riched20.Text.IndexOf("hidden", StringComparison.Ordinal) + "hidden".Length;
-            richTextBox.Select(startOfIs, endOfHidden - startOfIs);
-            Assert.Equal("is ###NOT### hidden", richTextBox.SelectedText);
-        }
+        int startOfIs = riched20.Text.IndexOf("is", StringComparison.Ordinal);
+        int endOfHidden = riched20.Text.IndexOf("hidden", StringComparison.Ordinal) + "hidden".Length;
+        richTextBox.Select(startOfIs, endOfHidden - startOfIs);
+        Assert.Equal("is ###NOT### hidden", richTextBox.SelectedText);
     }
 
     [WinFormsTheory]
@@ -10646,6 +10626,249 @@ public class RichTextBoxTests
             Times.Once);
     }
 
+    [WinFormsTheory]
+    [InlineData(-1, -1, 0)]
+    [InlineData(0, 0, 0)]
+    [InlineData(10, 10, 1)]
+    public void RichTextBox_GetCharIndexFromPosition_Invoke_ReturnsExpected(int x, int y, int expectedIndex)
+    {
+        using RichTextBox richTextBox1 = new();
+        richTextBox1.Text = "Hello, World!";
+
+        Assert.NotEqual(0, richTextBox1.Handle);
+        int invalidatedCallCount = 0;
+        richTextBox1.Invalidated += (sender, e) => invalidatedCallCount++;
+        int styleChangedCallCount = 0;
+        richTextBox1.StyleChanged += (sender, e) => styleChangedCallCount++;
+        int createdCallCount = 0;
+        richTextBox1.HandleCreated += (sender, e) => createdCallCount++;
+
+        Point pt = new(x, y);
+        int index = richTextBox1.GetCharIndexFromPosition(pt);
+
+        Assert.Equal(expectedIndex, index);
+        Assert.True(richTextBox1.IsHandleCreated);
+        Assert.Equal(0, invalidatedCallCount);
+        Assert.Equal(0, styleChangedCallCount);
+        Assert.Equal(0, createdCallCount);
+    }
+
+    // DrawToBitmap doesn't work for this control, so we should hide it.
+    // We'll still call base so that this has a chance to work if it can.
+    [WinFormsFact]
+    public void RichTextBox_DrawToBitmap_Invoke_Success()
+    {
+        using Bitmap bitmap1 = new(10, 10);
+        using RichTextBox richTextBox1 = new();
+        richTextBox1.DrawToBitmap(bitmap1, new Rectangle(0, 0, 10, 10));
+
+        bitmap1.Width.Should().Be(10);
+        bitmap1.Height.Should().Be(10);
+    }
+
+    [WinFormsFact]
+    public void RichTextBox_SaveFilePath_Invoke_Success()
+    {
+        using RichTextBox richTextBox1 = new()
+        {
+            Rtf = @"{\rtf1\ansi{Sample for {\v HIDDEN }text}}"
+        };
+        using RichTextBox richTextBox2 = new();
+
+        string fileName = "SaveRichTextBox.rtf";
+        string projectDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..");
+        string filePath = $"{projectDirectory}/src/System.Windows.Forms/tests/UnitTests/TestResources/Files/{fileName}";
+
+        try
+        {
+            richTextBox1.SaveFile(filePath);
+            richTextBox2.LoadFile(filePath);
+            int startOfSample = richTextBox2.Text.IndexOf("Sample", StringComparison.Ordinal);
+            int endOfText = richTextBox2.Text.IndexOf("text", StringComparison.Ordinal) + "text".Length;
+            richTextBox2.Select(startOfSample, endOfText - startOfSample);
+
+            richTextBox2.Rtf.Should().NotBeNullOrEmpty();
+            richTextBox2.SelectedText.Should().Be("Sample for HIDDEN text");
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
+    }
+
+    [WinFormsTheory]
+    [InlineData(RichTextBoxStreamType.RichText)]
+    [InlineData(RichTextBoxStreamType.PlainText)]
+    [InlineData(RichTextBoxStreamType.UnicodePlainText)]
+    [InlineData(RichTextBoxStreamType.RichNoOleObjs)]
+    [InlineData(RichTextBoxStreamType.TextTextOleObjs)]
+    public void RichTextBox_SaveFile_Invoke_Success(RichTextBoxStreamType fileType)
+    {
+        using RichTextBox richTextBox1 = new();
+
+        string projectDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..");
+        string filePath = Path.Combine(projectDirectory, "src", "System.Windows.Forms", "tests", "UnitTests", "TestResources", "Files", "Test");
+
+        try
+        {
+            richTextBox1.SaveFile(filePath, fileType);
+            File.Exists(filePath).Should().BeTrue();
+        }
+        finally
+        {
+            File.Delete(filePath);
+        }
+    }
+
+    [WinFormsFact]
+    public void RichTextBox_DragDropEvent_AddRemove_Success()
+    {
+        using SubRichTextBox richTextBox1 = new();
+        int callCount = 0;
+        DragEventHandler handler = (sender, e) =>
+        {
+            sender.Should().Be(richTextBox1);
+            callCount++;
+        };
+
+        DragEventArgs dragEventArgs = new DragEventArgs(
+            data: null,
+            keyState: 0,
+            x: 0,
+            y: 0,
+            allowedEffect: DragDropEffects.None,
+            effect: DragDropEffects.None);
+
+        richTextBox1.DragDrop += handler;
+        richTextBox1.OnDragDrop(dragEventArgs);
+        callCount.Should().Be(1);
+
+        richTextBox1.DragDrop -= handler;
+        richTextBox1.OnDragDrop(dragEventArgs);
+        callCount.Should().Be(1);
+    }
+
+    [WinFormsFact]
+    public void RichTextBox_DragEnterEvent_AddRemove_Success()
+    {
+        using SubRichTextBox richTextBox1 = new();
+        int callCount = 0;
+        DragEventHandler handler = (sender, e) =>
+        {
+            sender.Should().Be(richTextBox1);
+            callCount++;
+        };
+
+        DragEventArgs dragEventArgs = new DragEventArgs(
+            data: null,
+            keyState: 0,
+            x: 0,
+            y: 0,
+            allowedEffect: DragDropEffects.None,
+            effect: DragDropEffects.None);
+
+        richTextBox1.DragEnter += handler;
+        richTextBox1.OnDragDrop(dragEventArgs);
+        callCount.Should().Be(0);
+
+        richTextBox1.DragEnter -= handler;
+        richTextBox1.OnDragDrop(dragEventArgs);
+        callCount.Should().Be(0);
+    }
+
+    [WinFormsFact]
+    public void RichTextBox_DragLeaveEvent_AddRemove_Success()
+    {
+        using SubRichTextBox richTextBox1 = new();
+        int callCount = 0;
+        EventHandler handler = (sender, e) =>
+        {
+            sender.Should().Be(richTextBox1);
+            e.Should().Be(EventArgs.Empty);
+            callCount++;
+        };
+
+        richTextBox1.DragLeave += handler;
+        richTextBox1.OnDragLeave(EventArgs.Empty);
+        callCount.Should().Be(1);
+
+        richTextBox1.DragLeave -= handler;
+        richTextBox1.OnDragLeave(EventArgs.Empty);
+        callCount.Should().Be(1);
+    }
+
+    [WinFormsFact]
+    public void RichTextBox_DragOverEvent_AddRemove_Success()
+    {
+        using SubRichTextBox richTextBox1 = new();
+        int callCount = 0;
+        DragEventHandler handler = (sender, e) =>
+        {
+            sender.Should().Be(richTextBox1);
+            callCount++;
+        };
+
+        DragEventArgs dragEventArgs = new DragEventArgs(
+            data: null,
+            keyState: 0,
+            x: 0,
+            y: 0,
+            allowedEffect: DragDropEffects.None,
+            effect: DragDropEffects.None);
+
+        richTextBox1.DragOver += handler;
+        richTextBox1.OnDragOver(dragEventArgs);
+        callCount.Should().Be(1);
+
+        richTextBox1.DragOver -= handler;
+        richTextBox1.OnDragOver(dragEventArgs);
+        callCount.Should().Be(1);
+    }
+
+    [WinFormsFact]
+    public void RichTextBox_GiveFeedbackEvent_AddRemove_Success()
+    {
+        using SubRichTextBox richTextBox1 = new();
+        int callCount = 0;
+        GiveFeedbackEventHandler handler = (sender, e) =>
+        {
+            sender.Should().Be(richTextBox1);
+            callCount++;
+        };
+
+        GiveFeedbackEventArgs giveFeedbackEventArgs = new(DragDropEffects.None, useDefaultCursors: true);
+
+        richTextBox1.GiveFeedback += handler;
+        richTextBox1.OnGiveFeedback(giveFeedbackEventArgs);
+        callCount.Should().Be(1);
+
+        richTextBox1.GiveFeedback -= handler;
+        richTextBox1.OnGiveFeedback(giveFeedbackEventArgs);
+        callCount.Should().Be(1);
+    }
+
+    [WinFormsFact]
+    public void RichTextBox_QueryContinueDragEvent_AddRemove_Success()
+    {
+        using SubRichTextBox richTextBox1 = new();
+        int callCount = 0;
+        QueryContinueDragEventHandler handler = (sender, e) =>
+        {
+            sender.Should().Be(richTextBox1);
+            callCount++;
+        };
+
+        QueryContinueDragEventArgs queryContinueDragEventArgs = new(keyState: 0, escapePressed: true, action: DragAction.Continue);
+
+        richTextBox1.QueryContinueDrag += handler;
+        richTextBox1.OnQueryContinueDrag(queryContinueDragEventArgs);
+        callCount.Should().Be(1);
+
+        richTextBox1.QueryContinueDrag -= handler;
+        richTextBox1.OnQueryContinueDrag(queryContinueDragEventArgs);
+        callCount.Should().Be(1);
+    }
+
     private class CustomGetParaFormatRichTextBox : RichTextBox
     {
         public bool MakeCustom { get; set; }
@@ -10654,7 +10877,7 @@ public class RichTextBoxTests
 
         protected override unsafe void WndProc(ref Message m)
         {
-            if (MakeCustom && m.Msg == (int)PInvoke.EM_GETPARAFORMAT)
+            if (MakeCustom && m.Msg == (int)PInvokeCore.EM_GETPARAFORMAT)
             {
                 PARAFORMAT* format = (PARAFORMAT*)m.LParam;
                 Assert.Equal(IntPtr.Zero, m.WParam);
@@ -10675,7 +10898,7 @@ public class RichTextBoxTests
 
         protected override unsafe void WndProc(ref Message m)
         {
-            if (MakeCustom && m.Msg == (int)PInvoke.EM_GETCHARFORMAT)
+            if (MakeCustom && m.Msg == (int)PInvokeCore.EM_GETCHARFORMAT)
             {
                 CHARFORMAT2W* format = (CHARFORMAT2W*)m.LParam;
                 Assert.Equal(ExpectedWParam, m.WParam);
@@ -10777,12 +11000,22 @@ public class RichTextBoxTests
         public new void SetStyle(ControlStyles flag, bool value) => base.SetStyle(flag, value);
 
         public new void WndProc(ref Message m) => base.WndProc(ref m);
+
+        public new void OnDragDrop(DragEventArgs e) => base.OnDragDrop(e);
+
+        public new void OnDragLeave(EventArgs e) => base.OnDragLeave(e);
+
+        public new void OnDragOver(DragEventArgs e) => base.OnDragOver(e);
+
+        public new void OnGiveFeedback(GiveFeedbackEventArgs e) => base.OnGiveFeedback(e);
+
+        public new void OnQueryContinueDrag(QueryContinueDragEventArgs e) => base.OnQueryContinueDrag(e);
     }
 
     private static unsafe string GetClassName(HWND hWnd)
     {
         int length = 0;
-        Span<char> buffer = stackalloc char[PInvoke.MaxClassName];
+        Span<char> buffer = stackalloc char[PInvokeCore.MaxClassName];
         fixed (char* lpClassName = buffer)
         {
             length = PInvoke.GetClassName(hWnd, lpClassName, buffer.Length);
@@ -10831,7 +11064,7 @@ public class RichTextBoxTests
                     _nativeDllHandle = PInvoke.LoadLibraryFromSystemPathIfAvailable(NativeDll);
 
                     int lastWin32Error = Marshal.GetLastWin32Error();
-                    if ((ulong)_nativeDllHandle < (ulong)32)
+                    if ((ulong)_nativeDllHandle < 32)
                     {
                         throw new Win32Exception(lastWin32Error, $"Failed to load '{NativeDll}'");
                     }

@@ -230,23 +230,19 @@ public sealed class Cursor : IDisposable, ISerializable, IHandle<HICON>, IHandle
     /// </summary>
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    private void Dispose(bool disposing)
-    {
         if (!_handle.IsNull && _freeHandle)
         {
             PInvoke.DestroyCursor(_handle);
             _handle = HCURSOR.Null;
         }
+
+        GC.SuppressFinalize(this);
     }
 
     /// <summary>
-    ///  Draws this image to a graphics object.  The drawing command originates on the graphics
-    ///  object, but a graphics object generally has no idea how to render a given image.  So,
-    ///  it passes the call to the actual image.  This version crops the image to the given
+    ///  Draws this image to a graphics object. The drawing command originates on the graphics
+    ///  object, but a graphics object generally has no idea how to render a given image. So,
+    ///  it passes the call to the actual image. This version crops the image to the given
     ///  dimensions and allows the user to specify a rectangle within the image to draw.
     /// </summary>
     private void DrawImageCore(Graphics graphics, Rectangle imageRect, Rectangle targetRect, bool stretch)
@@ -364,10 +360,7 @@ public sealed class Cursor : IDisposable, ISerializable, IHandle<HICON>, IHandle
         DrawImageCore(g, Rectangle.Empty, targetRect, stretch: true);
     }
 
-    ~Cursor()
-    {
-        Dispose(disposing: false);
-    }
+    ~Cursor() => Dispose();
 
     void ISerializable.GetObjectData(SerializationInfo si, StreamingContext context)
     {
@@ -410,17 +403,19 @@ public sealed class Cursor : IDisposable, ISerializable, IHandle<HICON>, IHandle
         try
         {
             using ComScope<IPicture> picture = new(null);
-            PInvoke.OleCreatePictureIndirect(lpPictDesc: null, IID.Get<IPicture>(), fOwn: true, picture).ThrowOnFailure();
+            PInvokeCore.OleCreatePictureIndirect(lpPictDesc: null, IID.Get<IPicture>(), fOwn: true, picture).ThrowOnFailure();
 
             using ComScope<IPersistStream> persist = new(null);
             picture.Value->QueryInterface(IID.Get<IPersistStream>(), persist).ThrowOnFailure();
 
             using var pStream = ComHelpers.GetComScope<IStream>(stream);
             persist.Value->Load(pStream);
+            picture.Value->get_Type(out PICTYPE type).ThrowOnFailure();
 
-            if (picture.Value->Type == PICTYPE.PICTYPE_ICON)
+            if (type == PICTYPE.PICTYPE_ICON)
             {
-                HICON cursorHandle = (HICON)picture.Value->Handle;
+                picture.Value->get_Handle(out OLE_HANDLE oleHandle);
+                HICON cursorHandle = (HICON)oleHandle;
                 Size picSize = ScaleHelper.ScaleToDpi(GetIconSize(cursorHandle), ScaleHelper.InitialSystemDpi);
 
                 _handle = (HCURSOR)PInvokeCore.CopyImage(

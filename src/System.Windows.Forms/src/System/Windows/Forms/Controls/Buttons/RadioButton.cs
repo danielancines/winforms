@@ -157,7 +157,7 @@ public partial class RadioButton : ButtonBase
 
                 if (IsHandleCreated)
                 {
-                    PInvoke.SendMessage(this, PInvoke.BM_SETCHECK, (WPARAM)(BOOL)value);
+                    PInvokeCore.SendMessage(this, PInvoke.BM_SETCHECK, (WPARAM)(BOOL)value);
                 }
 
                 Invalidate();
@@ -329,7 +329,7 @@ public partial class RadioButton : ButtonBase
 
         if (IsHandleCreated)
         {
-            PInvoke.SendMessage(this, PInvoke.BM_SETCHECK, (WPARAM)(BOOL)_isChecked);
+            PInvokeCore.SendMessage(this, PInvoke.BM_SETCHECK, (WPARAM)(BOOL)_isChecked);
         }
     }
 
@@ -363,7 +363,7 @@ public partial class RadioButton : ButtonBase
         base.OnClick(e);
     }
 
-    protected override void OnEnter(EventArgs e)
+    protected internal override void OnEnter(EventArgs e)
     {
         // Just like the Win32 RadioButton, fire a click if the user arrows onto the control.
         if (MouseButtons == MouseButtons.None)

@@ -3,8 +3,9 @@
 
 using System.Drawing;
 
-namespace WinformsControlsTest;
+namespace WinFormsControlsTest;
 
+[DesignerCategory("Default")]
 public class FormShowInTaskbar : Form
 {
     public FormShowInTaskbar()
@@ -47,11 +48,11 @@ public class FormShowInTaskbar : Form
             IntPtr formHandle = form.Handle;
             form.ShowInTaskbar = !form.ShowInTaskbar;
 
-            if (form.IsHandleCreated == false)
-                throw new Exception();
+            if (!form.IsHandleCreated)
+                throw new InvalidOperationException();
 
             if (formHandle == form.Handle)
-                throw new Exception();
+                throw new InvalidOperationException();
         };
 
         form.Controls.Add(btnTest);

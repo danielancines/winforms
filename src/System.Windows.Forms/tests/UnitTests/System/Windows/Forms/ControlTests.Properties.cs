@@ -5,8 +5,8 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms.Layout;
-using Moq;
 using System.Windows.Forms.TestUtilities;
+using Moq;
 using Windows.Win32.System.Ole;
 
 namespace System.Windows.Forms.Tests;
@@ -52,28 +52,42 @@ public partial class ControlTests
         Assert.Same(control, accessibleObject.Owner);
     }
 
-    public static IEnumerable<object[]> AccessibilityObject_CustomCreateAccessibilityInstance_TestData()
+    public static TheoryData<AccessibleObject, AccessibleObject> AccessibilityObject_CustomCreateAccessibilityInstance_TestData()
     {
-        yield return new object[] { null, null };
-
         AccessibleObject accessibleObject = new();
-        yield return new object[] { accessibleObject, accessibleObject };
-
-        var controlAccessibleObject = new Control.ControlAccessibleObject(new Control());
-        yield return new object[] { controlAccessibleObject, controlAccessibleObject };
+        return new TheoryData<AccessibleObject, AccessibleObject>
+        {
+            { accessibleObject, accessibleObject }
+        };
     }
 
     [WinFormsTheory]
     [MemberData(nameof(AccessibilityObject_CustomCreateAccessibilityInstance_TestData))]
     public void Control_AccessibilityObject_GetCustomCreateAccessibilityInstance_ReturnsExpected(AccessibleObject result, AccessibleObject expected)
     {
+        using CustomCreateAccessibilityInstanceControl control = new()
+        {
+            CreateAccessibilityResult = result
+        };
+
+        Assert.Same(expected, control.AccessibilityObject);
+        Assert.Same(control.AccessibilityObject, control.AccessibilityObject);
+        Assert.False(control.IsHandleCreated);
+    }
+
+    [WinFormsFact]
+    public void Control_AccessibilityObject_GetCustomCreateAccessibilityInstance_WithRealControlAccessibleObject_ReturnsExpected()
+    {
+        using Control control1 = new();
+        var controlAccessibleObject = new Control.ControlAccessibleObject(control1);
+
         using (new NoAssertContext())
         {
             using CustomCreateAccessibilityInstanceControl control = new()
             {
-                CreateAccessibilityResult = result
+                CreateAccessibilityResult = controlAccessibleObject
             };
-            Assert.Same(expected, control.AccessibilityObject);
+            Assert.Same(controlAccessibleObject, control.AccessibilityObject);
             Assert.Same(control.AccessibilityObject, control.AccessibilityObject);
             Assert.False(control.IsHandleCreated);
         }
@@ -2124,7 +2138,7 @@ public partial class ControlTests
     [WinFormsFact]
     public void Control_BindingContext_GetWithParent_ReturnsExpected()
     {
-        BindingContext bindingContext = new();
+        BindingContext bindingContext = [];
         using Control parent = new()
         {
             BindingContext = bindingContext
@@ -2139,7 +2153,7 @@ public partial class ControlTests
     [WinFormsFact]
     public void Control_BindingContext_GetWithParentCantAccessProperties_ReturnsExpected()
     {
-        BindingContext bindingContext = new();
+        BindingContext bindingContext = [];
         using SubAxHost parent = new("00000000-0000-0000-0000-000000000000")
         {
             BindingContext = bindingContext
@@ -2180,7 +2194,7 @@ public partial class ControlTests
     {
         using Control control = new()
         {
-            BindingContext = new BindingContext()
+            BindingContext = []
         };
 
         control.BindingContext = value;
@@ -2207,7 +2221,7 @@ public partial class ControlTests
         control.BindingContextChanged += handler;
 
         // Set different.
-        BindingContext context1 = new();
+        BindingContext context1 = [];
         control.BindingContext = context1;
         Assert.Same(context1, control.BindingContext);
         Assert.Equal(1, callCount);
@@ -2218,7 +2232,7 @@ public partial class ControlTests
         Assert.Equal(1, callCount);
 
         // Set different.
-        BindingContext context2 = new();
+        BindingContext context2 = [];
         control.BindingContext = context2;
         Assert.Same(context2, control.BindingContext);
         Assert.Equal(2, callCount);
@@ -2270,7 +2284,7 @@ public partial class ControlTests
         child2.BindingContextChanged += childHandler2;
 
         // Set different.
-        BindingContext context1 = new();
+        BindingContext context1 = [];
         control.BindingContext = context1;
         Assert.Same(context1, control.BindingContext);
         Assert.Same(context1, child1.BindingContext);
@@ -2289,7 +2303,7 @@ public partial class ControlTests
         Assert.Equal(1, childCallCount2);
 
         // Set different.
-        BindingContext context2 = new();
+        BindingContext context2 = [];
         control.BindingContext = context2;
         Assert.Same(context2, control.BindingContext);
         Assert.Same(context2, child1.BindingContext);
@@ -2323,8 +2337,8 @@ public partial class ControlTests
     [WinFormsFact]
     public void Control_BindingContext_SetWithChildrenWithBindingContextWithHandler_CallsBindingContextChanged()
     {
-        BindingContext childContext1 = new();
-        BindingContext childContext2 = new();
+        BindingContext childContext1 = [];
+        BindingContext childContext2 = [];
         using Control child1 = new()
         {
             BindingContext = childContext1
@@ -2363,7 +2377,7 @@ public partial class ControlTests
         child2.BindingContextChanged += childHandler2;
 
         // Set different.
-        BindingContext context1 = new();
+        BindingContext context1 = [];
         control.BindingContext = context1;
         Assert.Same(context1, control.BindingContext);
         Assert.Same(childContext1, child1.BindingContext);
@@ -2382,7 +2396,7 @@ public partial class ControlTests
         Assert.Equal(0, childCallCount2);
 
         // Set different.
-        BindingContext context2 = new();
+        BindingContext context2 = [];
         control.BindingContext = context2;
         Assert.Same(context2, control.BindingContext);
         Assert.Same(childContext1, child1.BindingContext);
@@ -3696,7 +3710,7 @@ public partial class ControlTests
     [WinFormsFact]
     public void Control_Cursor_GetUseWaitCursor_ReturnsExpected()
     {
-        using Cursor cursor = new((IntPtr)1);
+        using Cursor cursor = new(1);
         using Control control = new()
         {
             UseWaitCursor = true
@@ -3711,8 +3725,8 @@ public partial class ControlTests
     [WinFormsFact]
     public void Control_Cursor_GetWithParent_ReturnsExpected()
     {
-        using Cursor cursor1 = new((IntPtr)1);
-        using Cursor cursor2 = new((IntPtr)2);
+        using Cursor cursor1 = new(1);
+        using Cursor cursor2 = new(2);
         using Control parent = new()
         {
             Cursor = cursor1
@@ -3731,8 +3745,8 @@ public partial class ControlTests
     [WinFormsFact]
     public void Control_Cursor_GetWithParentCantAccessProperties_ReturnsExpected()
     {
-        using Cursor cursor1 = new((IntPtr)1);
-        using Cursor cursor2 = new((IntPtr)2);
+        using Cursor cursor1 = new(1);
+        using Cursor cursor2 = new(2);
         using SubAxHost parent = new("00000000-0000-0000-0000-000000000000")
         {
             Cursor = cursor1
@@ -3751,7 +3765,7 @@ public partial class ControlTests
     [WinFormsFact]
     public void Control_Cursor_GetWithDefaultCursor_ReturnsExpected()
     {
-        using Cursor cursor = new((IntPtr)1);
+        using Cursor cursor = new(1);
         using CustomDefaultCursorControl control = new();
         Assert.Same(control.DefaultCursorResult, control.Cursor);
 
@@ -3763,8 +3777,8 @@ public partial class ControlTests
     [WinFormsFact]
     public void Control_Cursor_GetWithDefaultCursorWithParent_ReturnsExpected()
     {
-        using Cursor cursor1 = new((IntPtr)1);
-        using Cursor cursor2 = new((IntPtr)2);
+        using Cursor cursor1 = new(1);
+        using Cursor cursor2 = new(2);
         using Control parent = new()
         {
             Cursor = cursor1
@@ -3782,7 +3796,7 @@ public partial class ControlTests
 
     private class CustomDefaultCursorControl : Control
     {
-        public Cursor DefaultCursorResult { get; } = new((IntPtr)1);
+        public Cursor DefaultCursorResult { get; } = new(1);
 
         protected override Cursor DefaultCursor => DefaultCursorResult;
     }
@@ -3859,8 +3873,8 @@ public partial class ControlTests
     [CommonMemberData(typeof(CommonTestHelperEx), nameof(CommonTestHelperEx.GetCursorTheoryData))]
     public void Control_Cursor_SetWithChildrenWithCursor_GetReturnsExpected(Cursor value)
     {
-        Cursor cursor1 = new((IntPtr)1);
-        Cursor cursor2 = new((IntPtr)1);
+        Cursor cursor1 = new(1);
+        Cursor cursor2 = new(1);
         using Control child1 = new()
         {
             Cursor = cursor1
@@ -3899,7 +3913,7 @@ public partial class ControlTests
         control.CursorChanged += handler;
 
         // Set different.
-        using Cursor cursor1 = new((IntPtr)1);
+        using Cursor cursor1 = new(1);
         control.Cursor = cursor1;
         Assert.Same(cursor1, control.Cursor);
         Assert.Equal(1, callCount);
@@ -3910,7 +3924,7 @@ public partial class ControlTests
         Assert.Equal(1, callCount);
 
         // Set different.
-        using Cursor cursor2 = new((IntPtr)2);
+        using Cursor cursor2 = new(2);
         control.Cursor = cursor2;
         Assert.Same(cursor2, control.Cursor);
         Assert.Equal(2, callCount);
@@ -3962,7 +3976,7 @@ public partial class ControlTests
         child2.CursorChanged += childHandler2;
 
         // Set different.
-        using Cursor cursor1 = new((IntPtr)1);
+        using Cursor cursor1 = new(1);
         control.Cursor = cursor1;
         Assert.Same(cursor1, control.Cursor);
         Assert.Same(cursor1, child1.Cursor);
@@ -3981,7 +3995,7 @@ public partial class ControlTests
         Assert.Equal(1, child2CallCount);
 
         // Set different.
-        using Cursor cursor2 = new((IntPtr)2);
+        using Cursor cursor2 = new(2);
         control.Cursor = cursor2;
         Assert.Same(cursor2, control.Cursor);
         Assert.Same(cursor2, child1.Cursor);
@@ -4015,8 +4029,8 @@ public partial class ControlTests
     [WinFormsFact]
     public void Control_Cursor_SetWithChildrenWithCursorWithHandler_CallsCursorChanged()
     {
-        using Cursor childCursor1 = new((IntPtr)1);
-        using Cursor childCursor2 = new((IntPtr)2);
+        using Cursor childCursor1 = new(1);
+        using Cursor childCursor2 = new(2);
         using Control child1 = new()
         {
             Cursor = childCursor1
@@ -4055,7 +4069,7 @@ public partial class ControlTests
         child2.CursorChanged += childHandler2;
 
         // Set different.
-        using Cursor cursor1 = new((IntPtr)3);
+        using Cursor cursor1 = new(3);
         control.Cursor = cursor1;
         Assert.Same(cursor1, control.Cursor);
         Assert.Same(childCursor1, child1.Cursor);
@@ -4074,7 +4088,7 @@ public partial class ControlTests
         Assert.Equal(0, child2CallCount);
 
         // Set different.
-        using Cursor cursor2 = new((IntPtr)4);
+        using Cursor cursor2 = new(4);
         control.Cursor = cursor2;
         Assert.Same(cursor2, control.Cursor);
         Assert.Same(childCursor1, child1.Cursor);
@@ -7680,7 +7694,7 @@ public partial class ControlTests
 
     public static IEnumerable<object[]> Margin_Set_TestData()
     {
-        yield return new object[] { new Padding(), new Padding() };
+        yield return new object[] { default(Padding), default(Padding) };
         yield return new object[] { new Padding(1, 2, 3, 4), new Padding(1, 2, 3, 4) };
         yield return new object[] { new Padding(1), new Padding(1) };
         yield return new object[] { new Padding(-1, -2, -3, -4), Padding.Empty };
@@ -9386,7 +9400,7 @@ public partial class ControlTests
 
     public static IEnumerable<object[]> Padding_Set_TestData()
     {
-        yield return new object[] { new Padding(), new Padding(), 0, 0 };
+        yield return new object[] { default(Padding), default(Padding), 0, 0 };
         yield return new object[] { new Padding(1, 2, 3, 4), new Padding(1, 2, 3, 4), 1, 1 };
         yield return new object[] { new Padding(1), new Padding(1), 1, 1 };
         yield return new object[] { new Padding(-1, -2, -3, -4), Padding.Empty, 1, 2 };
@@ -9466,11 +9480,11 @@ public partial class ControlTests
 
     public static IEnumerable<object[]> Padding_SetWithHandle_TestData()
     {
-        yield return new object[] { false, new Padding(), new Padding(), 0, 0, 0, 0 };
+        yield return new object[] { false, default(Padding), default(Padding), 0, 0, 0, 0 };
         yield return new object[] { false, new Padding(1, 2, 3, 4), new Padding(1, 2, 3, 4), 1, 0, 1, 0 };
         yield return new object[] { false, new Padding(1), new Padding(1), 1, 0, 1, 0 };
         yield return new object[] { false, new Padding(-1, -2, -3, -4), Padding.Empty, 1, 0, 2, 0 };
-        yield return new object[] { true, new Padding(), new Padding(), 0, 0, 0, 0 };
+        yield return new object[] { true, default(Padding), default(Padding), 0, 0, 0, 0 };
         yield return new object[] { true, new Padding(1, 2, 3, 4), new Padding(1, 2, 3, 4), 1, 1, 1, 1 };
         yield return new object[] { true, new Padding(1), new Padding(1), 1, 1, 1, 1 };
         yield return new object[] { true, new Padding(-1, -2, -3, -4), Padding.Empty, 1, 1, 2, 2 };
@@ -9887,13 +9901,13 @@ public partial class ControlTests
 
         control.Region = value;
         Assert.Same(value, control.Region);
-        Assert.Throws<ArgumentException>(() => oldValue.MakeEmpty());
+        Assert.Throws<ArgumentException>(oldValue.MakeEmpty);
         Assert.False(control.IsHandleCreated);
 
         // Set same.
         control.Region = value;
         Assert.Same(value, control.Region);
-        Assert.Throws<ArgumentException>(() => oldValue.MakeEmpty());
+        Assert.Throws<ArgumentException>(oldValue.MakeEmpty);
         Assert.False(control.IsHandleCreated);
     }
 
@@ -9946,7 +9960,7 @@ public partial class ControlTests
 
         control.Region = value;
         Assert.Same(value, control.Region);
-        Assert.Throws<ArgumentException>(() => oldValue.MakeEmpty());
+        Assert.Throws<ArgumentException>(oldValue.MakeEmpty);
         Assert.True(control.IsHandleCreated);
         Assert.Equal(0, invalidatedCallCount);
         Assert.Equal(0, styleChangedCallCount);
@@ -9955,7 +9969,7 @@ public partial class ControlTests
         // Set same.
         control.Region = value;
         Assert.Same(value, control.Region);
-        Assert.Throws<ArgumentException>(() => oldValue.MakeEmpty());
+        Assert.Throws<ArgumentException>(oldValue.MakeEmpty);
         Assert.True(control.IsHandleCreated);
         Assert.Equal(0, invalidatedCallCount);
         Assert.Equal(0, styleChangedCallCount);
@@ -10506,12 +10520,12 @@ public partial class ControlTests
     }
 
     [WinFormsTheory]
-    [CommonMemberData(typeof(ControlTests), nameof(ControlTests.Get_Control_ShowFocusCues_GetWithHandleMessageSent_ReturnsExpected))]
+    [CommonMemberData(typeof(ControlTests), nameof(Get_Control_ShowFocusCues_GetWithHandleMessageSent_ReturnsExpected))]
     public void Control_ShowFocusCues_GetWithHandleMessageSent_ReturnsExpected(int wParam, bool expected)
     {
         using SubControl control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
-        PInvoke.SendMessage(control, PInvoke.WM_UPDATEUISTATE, (WPARAM)wParam);
+        PInvokeCore.SendMessage(control, PInvokeCore.WM_UPDATEUISTATE, (WPARAM)wParam);
         Assert.Equal(expected, control.ShowFocusCues);
     }
 
@@ -10565,12 +10579,12 @@ public partial class ControlTests
     }
 
     [WinFormsTheory]
-    [CommonMemberData(typeof(ControlTests), nameof(ControlTests.Get_Control_ShowKeyboardCues_GetWithHandleMessageSent_ReturnsExpected))]
+    [CommonMemberData(typeof(ControlTests), nameof(Get_Control_ShowKeyboardCues_GetWithHandleMessageSent_ReturnsExpected))]
     public void Control_ShowKeyboardCues_GetWithHandleMessageSent_ReturnsExpected(int wParam, bool expected)
     {
         using SubControl control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
-        PInvoke.SendMessage(control, PInvoke.WM_UPDATEUISTATE, (WPARAM)wParam);
+        PInvokeCore.SendMessage(control, PInvokeCore.WM_UPDATEUISTATE, (WPARAM)wParam);
         Assert.Equal(expected, control.ShowKeyboardCues);
     }
 
@@ -10936,7 +10950,7 @@ public partial class ControlTests
             .Returns(null)
             .Verifiable();
 
-        using Cursor controlCursor = new((IntPtr)3);
+        using Cursor controlCursor = new(3);
         Font controlFont = SystemFonts.StatusFont;
         using Control control = new()
         {

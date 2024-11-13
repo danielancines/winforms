@@ -12,16 +12,16 @@ public partial class ToolStripComboBox
     {
         internal class ToolStripComboBoxFlatComboAdapter : FlatComboAdapter
         {
-            public ToolStripComboBoxFlatComboAdapter(ComboBox comboBox) : base(comboBox, smallButton: true)
+            public ToolStripComboBoxFlatComboAdapter(ComboBox comboBox) : base(comboBox, shouldRedrawAsSmallButton: true)
             {
             }
 
             private static bool UseBaseAdapter(ComboBox comboBox)
             {
-                ToolStripComboBoxControl? toolStripComboBox = comboBox as ToolStripComboBoxControl;
-                if (toolStripComboBox is null || toolStripComboBox.Owner?.Renderer is not ToolStripProfessionalRenderer)
+                if (comboBox is not ToolStripComboBoxControl toolStripComboBox
+                    || toolStripComboBox.Owner?.Renderer is not ToolStripProfessionalRenderer)
                 {
-                    Debug.Assert(toolStripComboBox is not null, "Why are we here and not a toolstrip combo?");
+                    Debug.Assert(comboBox is ToolStripComboBoxControl, "Why are we here and not a toolstrip combo?");
                     return true;
                 }
 
@@ -143,12 +143,14 @@ public partial class ToolStripComboBox
 
                 // If the width is odd - favor pushing it over one pixel right.
                 middle.X += (dropDownRect.Width % 2);
-                g.FillPolygon(brush, new Point[]
-                {
-                    new(middle.X - FlatComboAdapter.s_offsetPixels, middle.Y - 1),
-                    new(middle.X + FlatComboAdapter.s_offsetPixels + 1, middle.Y - 1),
-                    new(middle.X, middle.Y + FlatComboAdapter.s_offsetPixels)
-                });
+                g.FillPolygon(
+                    brush,
+                    (ReadOnlySpan<Point>)
+                    [
+                        new(middle.X - s_offsetPixels, middle.Y - 1),
+                        new(middle.X + s_offsetPixels + 1, middle.Y - 1),
+                        new(middle.X, middle.Y + s_offsetPixels)
+                    ]);
             }
         }
     }

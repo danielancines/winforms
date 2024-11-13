@@ -17,7 +17,7 @@ namespace Windows.Win32.Foundation;
 ///  <para>
 ///   Fields should be nulled out before calling <see cref="Dispose()"/>. Releasing the COM pointer during disposal
 ///   can result in callbacks to containing classes. Rather than evaluate the risk of this for every class, always
-///   follow this pattern. <see cref="DisposeHelper.NullAndDispose"/> facilitates doing this safely.
+///   follow this pattern. <see cref="M:System.DisposeHelper.NullAndDispose``1(``0@)"/> facilitates doing this safely.
 ///  </para>
 /// </remarks>
 internal unsafe class AgileComPointer<TInterface> :
@@ -68,6 +68,14 @@ internal unsafe class AgileComPointer<TInterface> :
         return currentUnknown.Value == otherUnknown.Value;
     }
 
+    /// <inheritdoc cref="IsSameNativeObject(AgileComPointer{TInterface})"/>
+    public bool IsSameNativeObject(TInterface* other)
+    {
+        using var currentUnknown = GetInterface<IUnknown>();
+        using ComScope<IUnknown> otherUnknown = ComScope<IUnknown>.QueryFrom(other);
+        return currentUnknown.Value == otherUnknown.Value;
+    }
+
     /// <summary>
     ///  Gets the default interface. Throws if failed.
     /// </summary>
@@ -112,7 +120,7 @@ internal unsafe class AgileComPointer<TInterface> :
     public object GetManagedObject()
     {
         using var scope = GetInterface();
-        return ComHelpers.GetObjectForIUnknown(scope.AsUnknown);
+        return ComHelpers.GetObjectForIUnknown(scope);
     }
 
     ~AgileComPointer()

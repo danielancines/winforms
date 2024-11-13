@@ -580,12 +580,14 @@ public class ListViewSubItemTests
         using BinaryFormatterScope formatterScope = new(enable: true);
         using MemoryStream stream = new();
 #pragma warning disable SYSLIB0011 // Type or member is obsolete
-        BinaryFormatter formatter = new();
+        // cs/binary-formatter-without-binder
+        BinaryFormatter formatter = new(); // CodeQL [SM04191] : This is a test. Safe use because the deserialization process is performed on trusted data and the types are controlled and validated.
         new BinaryFormatter().Serialize(stream, subItem);
         stream.Seek(0, SeekOrigin.Begin);
 
-        ListViewItem.ListViewSubItem result = Assert.IsType<ListViewItem.ListViewSubItem>(formatter.Deserialize(stream));
-#pragma warning restore SYSLIB0011 // Type or member is obsolete
+        // cs/dangerous-binary-deserialization
+        ListViewItem.ListViewSubItem result = Assert.IsType<ListViewItem.ListViewSubItem>(formatter.Deserialize(stream)); // CodeQL[SM03722] : Testing legacy feature. This is a safe use of BinaryFormatter because the data is trusted and the types are controlled and validated.
+#pragma warning restore SYSLIB0011
         Assert.Equal(subItem.BackColor, result.BackColor);
         Assert.Equal(subItem.Font, result.Font);
         Assert.Equal(subItem.ForeColor, result.ForeColor);

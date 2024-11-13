@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Drawing;
+using System.Runtime.InteropServices;
 
 namespace System.Windows.Forms.Tests;
 
@@ -117,12 +118,12 @@ public class TreeNode_TreeNodeIKeyboardToolTipTests
     {
         List<TreeNode> treeNodesList = GetHierarchyNodes();
         using TreeView treeView = new() { ShowNodeToolTips = showNodeToolTips };
-        treeView.Nodes.AddRange(treeNodesList.ToArray());
+        treeView.Nodes.AddRange([.. treeNodesList]);
         TreeNode firstTreeNode = treeView.Nodes[0];
 
         IList<Rectangle> neighboringRectangles = ((IKeyboardToolTip)firstTreeNode).GetNeighboringToolsRectangles();
 
-        Assert.Equal(1, neighboringRectangles.Count);
+        Assert.Single(neighboringRectangles);
         Assert.Contains(GetRectangle(treeView, treeView.Nodes[1]), neighboringRectangles);
     }
 
@@ -133,7 +134,7 @@ public class TreeNode_TreeNodeIKeyboardToolTipTests
     {
         List<TreeNode> treeNodesList = GetHierarchyNodes();
         using TreeView treeView = new() { ShowNodeToolTips = showNodeToolTips };
-        treeView.Nodes.AddRange(treeNodesList.ToArray());
+        treeView.Nodes.AddRange([.. treeNodesList]);
         TreeNode middleTreeNode = treeView.Nodes[1];
 
         IList<Rectangle> neighboringRectangles = ((IKeyboardToolTip)middleTreeNode).GetNeighboringToolsRectangles();
@@ -150,12 +151,12 @@ public class TreeNode_TreeNodeIKeyboardToolTipTests
     {
         List<TreeNode> treeNodesList = GetHierarchyNodes();
         using TreeView treeView = new() { ShowNodeToolTips = showNodeToolTips };
-        treeView.Nodes.AddRange(treeNodesList.ToArray());
+        treeView.Nodes.AddRange([.. treeNodesList]);
         TreeNode lastTreeNode = treeView.Nodes[0];
 
         IList<Rectangle> neighboringRectangles = ((IKeyboardToolTip)lastTreeNode).GetNeighboringToolsRectangles();
 
-        Assert.Equal(1, neighboringRectangles.Count);
+        Assert.Single(neighboringRectangles);
         Assert.Contains(GetRectangle(treeView, treeView.Nodes[1]), neighboringRectangles);
     }
 
@@ -166,7 +167,7 @@ public class TreeNode_TreeNodeIKeyboardToolTipTests
     {
         List<TreeNode> treeNodesList = GetHierarchyNodes();
         using TreeView treeView = new() { ShowNodeToolTips = showNodeToolTips };
-        treeView.Nodes.AddRange(treeNodesList.ToArray());
+        treeView.Nodes.AddRange([.. treeNodesList]);
         TreeNode rootNode = treeView.Nodes[0];
         rootNode.Expand();
         TreeNode firstSubNode = rootNode.Nodes[0];
@@ -185,7 +186,7 @@ public class TreeNode_TreeNodeIKeyboardToolTipTests
     {
         List<TreeNode> treeNodesList = GetHierarchyNodes();
         using TreeView treeView = new() { ShowNodeToolTips = showNodeToolTips };
-        treeView.Nodes.AddRange(treeNodesList.ToArray());
+        treeView.Nodes.AddRange([.. treeNodesList]);
         TreeNode rootNode = treeView.Nodes[0];
         rootNode.Expand();
         TreeNode middleSubNode = rootNode.Nodes[1];
@@ -204,7 +205,7 @@ public class TreeNode_TreeNodeIKeyboardToolTipTests
     {
         List<TreeNode> treeNodesList = GetHierarchyNodes();
         using TreeView treeView = new() { ShowNodeToolTips = showNodeToolTips };
-        treeView.Nodes.AddRange(treeNodesList.ToArray());
+        treeView.Nodes.AddRange([.. treeNodesList]);
         TreeNode rootNode = treeView.Nodes[0];
         rootNode.Expand();
         TreeNode lastSubNode = rootNode.Nodes[2];
@@ -223,7 +224,7 @@ public class TreeNode_TreeNodeIKeyboardToolTipTests
     {
         List<TreeNode> treeNodesList = GetHierarchyNodes();
         using TreeView treeView = new() { ShowNodeToolTips = showNodeToolTips };
-        treeView.Nodes.AddRange(treeNodesList.ToArray());
+        treeView.Nodes.AddRange([.. treeNodesList]);
         TreeNode rootNode = treeView.Nodes[0];
         rootNode.Expand();
         TreeNode lastSubNode = rootNode.Nodes[2];
@@ -244,7 +245,7 @@ public class TreeNode_TreeNodeIKeyboardToolTipTests
     {
         List<TreeNode> treeNodesList = GetHierarchyNodes();
         using TreeView treeView = new() { ShowNodeToolTips = showNodeToolTips };
-        treeView.Nodes.AddRange(treeNodesList.ToArray());
+        treeView.Nodes.AddRange([.. treeNodesList]);
         TreeNode firstNode = treeView.Nodes[0];
         firstNode.Expand();
         TreeNode middleNode = treeView.Nodes[1];
@@ -263,7 +264,7 @@ public class TreeNode_TreeNodeIKeyboardToolTipTests
     {
         List<TreeNode> treeNodesList = GetHierarchyNodes();
         using TreeView treeView = new() { ShowNodeToolTips = showNodeToolTips };
-        treeView.Nodes.AddRange(treeNodesList.ToArray());
+        treeView.Nodes.AddRange([.. treeNodesList]);
         TreeNode firstNode = treeView.Nodes[0];
         firstNode.Expand();
         TreeNode subNode = firstNode.Nodes[2];
@@ -284,7 +285,7 @@ public class TreeNode_TreeNodeIKeyboardToolTipTests
     {
         List<TreeNode> treeNodesList = GetHierarchyNodes();
         using TreeView treeView = new() { ShowNodeToolTips = showNodeToolTips };
-        treeView.Nodes.AddRange(treeNodesList.ToArray());
+        treeView.Nodes.AddRange([.. treeNodesList]);
         TreeNode rootNode = treeView.Nodes[0];
         rootNode.Expand();
         TreeNode lastSubNode = rootNode.Nodes[2];
@@ -302,9 +303,9 @@ public class TreeNode_TreeNodeIKeyboardToolTipTests
     {
         List<TreeNode> treeNodesList = GetHierarchyNodes();
 
-        Assert.Equal(0, ((IKeyboardToolTip)treeNodesList[0]).GetNeighboringToolsRectangles().Count);
-        Assert.Equal(0, ((IKeyboardToolTip)treeNodesList[1]).GetNeighboringToolsRectangles().Count);
-        Assert.Equal(0, ((IKeyboardToolTip)treeNodesList[2]).GetNeighboringToolsRectangles().Count);
+        Assert.Empty(((IKeyboardToolTip)treeNodesList[0]).GetNeighboringToolsRectangles());
+        Assert.Empty(((IKeyboardToolTip)treeNodesList[1]).GetNeighboringToolsRectangles());
+        Assert.Empty(((IKeyboardToolTip)treeNodesList[2]).GetNeighboringToolsRectangles());
     }
 
     [WinFormsTheory]
@@ -349,6 +350,7 @@ public class TreeNode_TreeNodeIKeyboardToolTipTests
     }
 
     [WinFormsTheory]
+    [ActiveIssue("https://github.com/dotnet/winforms/issues/11752")]
     [InlineData(true, true, true)]
     [InlineData(true, false, false)]
     [InlineData(false, true, false)]
@@ -358,6 +360,12 @@ public class TreeNode_TreeNodeIKeyboardToolTipTests
         bool isHovered,
         bool expected)
     {
+        // Skip validation on X64 due to the active issue "https://github.com/dotnet/winforms/issues/11752"
+        if (insideTreeView && isHovered && expected && RuntimeInformation.ProcessArchitecture == Architecture.X64)
+        {
+            return;
+        }
+
         Point initialPosition = Cursor.Position;
         try
         {
@@ -409,7 +417,7 @@ public class TreeNode_TreeNodeIKeyboardToolTipTests
 
     private List<TreeNode> GetHierarchyNodes()
     {
-        List<TreeNode> treeNodesList = new();
+        List<TreeNode> treeNodesList = [];
 
         TreeNode rootNode1 = new();
         TreeNode rootNode2 = new();
@@ -422,7 +430,7 @@ public class TreeNode_TreeNodeIKeyboardToolTipTests
         TreeNode subSubNode = new();
 
         subNode3.Nodes.Add(subSubNode);
-        rootNode1.Nodes.AddRange(new TreeNode[] { subNode1, subNode2, subNode3 });
+        rootNode1.Nodes.AddRange([subNode1, subNode2, subNode3]);
         treeNodesList.AddRange(new TreeNode[] { rootNode1, rootNode2, rootNode3 });
         return treeNodesList;
     }

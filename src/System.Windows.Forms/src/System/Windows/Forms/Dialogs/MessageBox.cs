@@ -3,6 +3,7 @@
 
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Windows.Forms.Primitives;
 
 namespace System.Windows.Forms;
 
@@ -73,7 +74,7 @@ public class MessageBox
     private static void PopHelpInfo()
     {
         // we roll our own stack here because we want a pretty lightweight implementation.
-        // usually there's only going to be one message box shown at a time.  But if
+        // usually there's only going to be one message box shown at a time. But if
         // someone shows two message boxes (say by launching them via a WM_TIMER message)
         // we've got to gracefully handle the current help info.
         if (t_helpInfoTable is null)
@@ -99,7 +100,7 @@ public class MessageBox
     private static void PushHelpInfo(HelpInfo hpi)
     {
         // we roll our own stack here because we want a pretty lightweight implementation.
-        // usually there's only going to be one message box shown at a time.  But if
+        // usually there's only going to be one message box shown at a time. But if
         // someone shows two message boxes (say by launching them via a WM_TIMER message)
         // we've got to gracefully handle the current help info.
 
@@ -446,6 +447,11 @@ public class MessageBox
         MessageBoxOptions options,
         bool showHelp)
     {
+        if (LocalAppContextSwitches.NoClientNotifications)
+        {
+            return DialogResult.None;
+        }
+
         MESSAGEBOX_STYLE style = GetMessageBoxStyle(owner, buttons, icon, defaultButton, options, showHelp);
 
         HandleRef<HWND> handle = default;
@@ -483,7 +489,7 @@ public class MessageBox
             // Right after the dialog box is closed, Windows sends WM_SETFOCUS back to the previously active control
             // but since we have disabled this thread main window the message is lost. So we have to send it again after
             // we enable the main window.
-            PInvoke.SendMessage(handle, PInvoke.WM_SETFOCUS);
+            PInvokeCore.SendMessage(handle, PInvokeCore.WM_SETFOCUS);
         }
     }
 }

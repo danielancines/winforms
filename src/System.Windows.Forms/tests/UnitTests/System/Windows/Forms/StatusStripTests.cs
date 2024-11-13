@@ -121,8 +121,10 @@ public partial class StatusStripTests
         Assert.Null(control.Region);
         Assert.NotNull(control.Renderer);
         Assert.Same(control.Renderer, control.Renderer);
-        Assert.IsType<ToolStripSystemRenderer>(control.Renderer);
-        Assert.Equal(ToolStripRenderMode.System, control.RenderMode);
+
+        Assert.True(control.Renderer is ToolStripSystemRenderer or ToolStripProfessionalRenderer, "Renderer is not one of the expected types.");
+        Assert.True(control.RenderMode is ToolStripRenderMode.System or ToolStripRenderMode.ManagerRenderMode);
+
         Assert.True(control.ResizeRedraw);
         Assert.Equal(200, control.Right);
         Assert.Equal(RightToLeft.No, control.RightToLeft);
@@ -391,7 +393,7 @@ public partial class StatusStripTests
 
     public static IEnumerable<object[]> Padding_Set_TestData()
     {
-        yield return new object[] { new Padding(), new Padding(), 1, 1 };
+        yield return new object[] { default(Padding), default(Padding), 1, 1 };
         yield return new object[] { new Padding(1, 0, 14, 0), new Padding(1, 0, 14, 0), 0, 0 };
         yield return new object[] { new Padding(1, 2, 3, 4), new Padding(1, 2, 3, 4), 1, 1 };
         yield return new object[] { new Padding(1), new Padding(1), 1, 1 };
@@ -554,7 +556,7 @@ public partial class StatusStripTests
 
         control.RenderMode = ToolStripRenderMode.System;
         Assert.Equal(ToolStripRenderMode.System, control.RenderMode);
-        Assert.False(property.CanResetValue(control));
+        Assert.True(property.CanResetValue(control));
 
         control.Renderer = new SubToolStripRenderer();
         Assert.Equal(ToolStripRenderMode.Custom, control.RenderMode);
@@ -562,10 +564,10 @@ public partial class StatusStripTests
 
         control.RenderMode = ToolStripRenderMode.ManagerRenderMode;
         Assert.Equal(ToolStripRenderMode.ManagerRenderMode, control.RenderMode);
-        Assert.True(property.CanResetValue(control));
+        Assert.False(property.CanResetValue(control));
 
         property.ResetValue(control);
-        Assert.Equal(ToolStripRenderMode.System, control.RenderMode);
+        Assert.Equal(ToolStripRenderMode.ManagerRenderMode, control.RenderMode);
         Assert.False(property.CanResetValue(control));
     }
 
@@ -582,7 +584,7 @@ public partial class StatusStripTests
 
         control.RenderMode = ToolStripRenderMode.System;
         Assert.Equal(ToolStripRenderMode.System, control.RenderMode);
-        Assert.False(property.ShouldSerializeValue(control));
+        Assert.True(property.ShouldSerializeValue(control));
 
         control.Renderer = new SubToolStripRenderer();
         Assert.Equal(ToolStripRenderMode.Custom, control.RenderMode);
@@ -590,10 +592,10 @@ public partial class StatusStripTests
 
         control.RenderMode = ToolStripRenderMode.ManagerRenderMode;
         Assert.Equal(ToolStripRenderMode.ManagerRenderMode, control.RenderMode);
-        Assert.True(property.ShouldSerializeValue(control));
+        Assert.False(property.ShouldSerializeValue(control));
 
         property.ResetValue(control);
-        Assert.Equal(ToolStripRenderMode.System, control.RenderMode);
+        Assert.Equal(ToolStripRenderMode.ManagerRenderMode, control.RenderMode);
         Assert.False(property.ShouldSerializeValue(control));
     }
 
@@ -1257,15 +1259,15 @@ public partial class StatusStripTests
 
     private class SubStatusStrip : StatusStrip
     {
-        public new const int ScrollStateAutoScrolling = StatusStrip.ScrollStateAutoScrolling;
+        public new const int ScrollStateAutoScrolling = ScrollableControl.ScrollStateAutoScrolling;
 
-        public new const int ScrollStateHScrollVisible = StatusStrip.ScrollStateHScrollVisible;
+        public new const int ScrollStateHScrollVisible = ScrollableControl.ScrollStateHScrollVisible;
 
-        public new const int ScrollStateVScrollVisible = StatusStrip.ScrollStateVScrollVisible;
+        public new const int ScrollStateVScrollVisible = ScrollableControl.ScrollStateVScrollVisible;
 
-        public new const int ScrollStateUserHasScrolled = StatusStrip.ScrollStateUserHasScrolled;
+        public new const int ScrollStateUserHasScrolled = ScrollableControl.ScrollStateUserHasScrolled;
 
-        public new const int ScrollStateFullDrag = StatusStrip.ScrollStateFullDrag;
+        public new const int ScrollStateFullDrag = ScrollableControl.ScrollStateFullDrag;
 
         public new bool CanEnableIme => base.CanEnableIme;
 

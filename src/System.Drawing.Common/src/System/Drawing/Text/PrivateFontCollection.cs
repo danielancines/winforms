@@ -13,11 +13,15 @@ public sealed unsafe class PrivateFontCollection : FontCollection
     /// <summary>
     ///  Initializes a new instance of the <see cref='PrivateFontCollection'/> class.
     /// </summary>
-    public PrivateFontCollection() : base()
+    public PrivateFontCollection() : base(Create())
+    {
+    }
+
+    private static GpFontCollection* Create()
     {
         GpFontCollection* fontCollection;
         PInvoke.GdipNewPrivateFontCollection(&fontCollection).ThrowIfFailed();
-        _nativeFontCollection = fontCollection;
+        return fontCollection;
     }
 
     /// <summary>
@@ -25,26 +29,14 @@ public sealed unsafe class PrivateFontCollection : FontCollection
     /// </summary>
     protected override void Dispose(bool disposing)
     {
-        if (_nativeFontCollection is not null)
-        {
-            GpFontCollection* nativeFontCollection = _nativeFontCollection;
+        GpFontCollection* nativeFontCollection = this.Pointer();
 
-            try
+        if (nativeFontCollection is not null)
+        {
+            Status status = PInvoke.GdipDeletePrivateFontCollection(&nativeFontCollection);
+            if (disposing)
             {
-#if DEBUG
-                Status status = !Gdip.Initialized ? Status.Ok :
-#endif
-                PInvoke.GdipDeletePrivateFontCollection(&nativeFontCollection);
-#if DEBUG
                 Debug.Assert(status == Status.Ok, $"GDI+ returned an error status: {status}");
-#endif
-            }
-            catch (Exception ex) when (!ClientUtils.IsSecurityOrCriticalException(ex))
-            {
-            }
-            finally
-            {
-                _nativeFontCollection = null;
             }
         }
 
@@ -56,31 +48,16 @@ public sealed unsafe class PrivateFontCollection : FontCollection
     /// </summary>
     public void AddFontFile(string filename)
     {
-        if (_nativeFontCollection is null)
-        {
-#pragma warning disable CA2208 // Instantiate argument exceptions correctly
-            // This is the default behavior on Desktop. The ArgumentException originates from GdipPrivateAddFontFile which would
-            // refuse the null pointer.
-            throw new ArgumentException();
-#pragma warning restore CA2208
-        }
+        ArgumentNullException.ThrowIfNull(filename);
 
-        if (filename is null)
-        {
-            throw new ArgumentNullException(nameof(filename));
-        }
-
-        // this ensure the filename is valid (or throw the correct exception)
-        string fullPath = Path.GetFullPath(filename);
-
-        if (!File.Exists(fullPath))
+        if (!File.Exists(filename))
         {
             throw new FileNotFoundException();
         }
 
-        fixed (char* p = fullPath)
+        fixed (char* p = filename)
         {
-            PInvoke.GdipPrivateAddFontFile(_nativeFontCollection, p).ThrowIfFailed();
+            PInvoke.GdipPrivateAddFontFile(this.Pointer(), p).ThrowIfFailed();
             GC.KeepAlive(this);
         }
 
@@ -93,7 +70,7 @@ public sealed unsafe class PrivateFontCollection : FontCollection
     /// </summary>
     public void AddMemoryFont(IntPtr memory, int length)
     {
-        PInvoke.GdipPrivateAddMemoryFont(_nativeFontCollection, (void*)memory, length).ThrowIfFailed();
+        PInvoke.GdipPrivateAddMemoryFont(this.Pointer(), (void*)memory, length).ThrowIfFailed();
         GC.KeepAlive(this);
     }
 

@@ -3,8 +3,8 @@
 
 using System.ComponentModel;
 using System.Drawing;
-using Moq;
 using System.Windows.Forms.TestUtilities;
+using Moq;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
 
@@ -2091,9 +2091,9 @@ public class ProgressBarTests
     {
         foreach (ProgressBarStyle style in Enum.GetValues(typeof(ProgressBarStyle)))
         {
-            foreach (object[] testData in CommonTestHelper.GetEventArgsTheoryData())
+            foreach (EventArgs testData in CommonTestHelper.GetEventArgsTheoryData())
             {
-                yield return new object[] { style, testData[0] };
+                yield return new object[] { style, testData };
             }
         }
     }
@@ -2550,7 +2550,7 @@ public class ProgressBarTests
             Style = ProgressBarStyle.Marquee,
             Step = step
         };
-        Assert.Throws<InvalidOperationException>(() => control.PerformStep());
+        Assert.Throws<InvalidOperationException>(control.PerformStep);
     }
 
     [WinFormsFact]

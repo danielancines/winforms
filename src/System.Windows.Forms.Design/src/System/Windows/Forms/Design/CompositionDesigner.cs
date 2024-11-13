@@ -17,7 +17,7 @@ public class ComponentDocumentDesigner : ComponentDesigner, IRootDesigner, ITool
     ITypeDescriptorFilterService
 {
     /// <summary>
-    ///  Gets  the control for this designer.
+    ///  Gets the control for this designer.
     /// </summary>
     public Control Control => throw new NotImplementedException(SR.NotImplementedByDesign);
 
@@ -75,7 +75,7 @@ public class ComponentDocumentDesigner : ComponentDesigner, IRootDesigner, ITool
     }
 
     /// <summary>
-    ///  The view for this document.  The designer
+    ///  The view for this document. The designer
     ///  should assume that the view will be shown shortly
     ///  after this call is made and make any necessary
     ///  preparations.
@@ -125,7 +125,6 @@ public class ComponentDocumentDesigner : ComponentDesigner, IRootDesigner, ITool
     ///  Gets a value indicating whether the specified tool is supported by this
     ///  designer.
     /// </summary>
-    [CLSCompliant(false)]
     protected virtual bool GetToolSupported(ToolboxItem tool)
     {
         throw new NotImplementedException(SR.NotImplementedByDesign);

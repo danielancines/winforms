@@ -173,7 +173,7 @@ public partial class CollectionEditor
                 return;
             }
 
-            if (ContextMenuStrip is not {Visible: true})
+            if (ContextMenuStrip is not { Visible: true })
             {
                 SetButtonDrawState();
                 if (Parent is not null && Bounds.Contains(Parent.PointToClient(Cursor.Position)) && !_dropDownRectangle.Contains(mevent.Location))
@@ -262,7 +262,7 @@ public partial class CollectionEditor
             State = PushButtonState.Pressed;
             if (ContextMenuStrip is not null)
             {
-                ContextMenuStrip.Closed += new ToolStripDropDownClosedEventHandler(ContextMenuStrip_Closed);
+                ContextMenuStrip.Closed += ContextMenuStrip_Closed;
                 ContextMenuStrip.Show(this, 0, Height);
             }
         }
@@ -271,7 +271,7 @@ public partial class CollectionEditor
         {
             if (sender is ContextMenuStrip cms)
             {
-                cms.Closed -= new ToolStripDropDownClosedEventHandler(ContextMenuStrip_Closed);
+                cms.Closed -= ContextMenuStrip_Closed;
             }
 
             SetButtonDrawState();

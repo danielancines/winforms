@@ -262,7 +262,7 @@ public partial class LinkLabel : Label, IButtonControl
     [SRDescription(nameof(SR.LinkLabelLinkVisitedDescr))]
     public bool LinkVisited
     {
-        get => _links.Count == 0 ? false : _links[0].Visited;
+        get => _links.Count != 0 && _links[0].Visited;
         set
         {
             if (value == LinkVisited)
@@ -298,10 +298,10 @@ public partial class LinkLabel : Label, IButtonControl
                 // We want to instantly change the cursor if the mouse is within our bounds.
                 // This includes the case where the mouse is over one of our children
                 PInvoke.GetCursorPos(out Point p);
-                PInvoke.GetWindowRect(this, out var r);
+                PInvokeCore.GetWindowRect(this, out var r);
                 if ((r.left <= p.X && p.X < r.right && r.top <= p.Y && p.Y < r.bottom) || PInvoke.GetCapture() == HWND)
                 {
-                    PInvoke.SendMessage(this, PInvoke.WM_SETCURSOR, (WPARAM)HWND, (LPARAM)(int)PInvoke.HTCLIENT);
+                    PInvokeCore.SendMessage(this, PInvokeCore.WM_SETCURSOR, (WPARAM)HWND, (LPARAM)(int)PInvoke.HTCLIENT);
                 }
             }
         }
@@ -571,7 +571,7 @@ public partial class LinkLabel : Label, IButtonControl
                 padding = TextPaddingOptions.LeftAndRightPadding;
             }
 
-            using var hfont = GdiCache.GetHFONT(Font);
+            using var hfont = GdiCache.GetHFONTScope(Font);
             DRAWTEXTPARAMS dtParams = hfont.GetTextMargins(padding);
 
             iLeftMargin = dtParams.iLeftMargin;
@@ -613,7 +613,7 @@ public partial class LinkLabel : Label, IButtonControl
     }
 
     /// <summary>
-    ///  Calculate character ranges taking into account the locale.  Provided for surrogate chars support.
+    ///  Calculate character ranges taking into account the locale. Provided for surrogate chars support.
     /// </summary>
     private CharacterRange[] AdjustCharacterRangesForSurrogateChars()
     {
@@ -621,7 +621,7 @@ public partial class LinkLabel : Label, IButtonControl
 
         if (string.IsNullOrEmpty(text))
         {
-            return Array.Empty<CharacterRange>();
+            return [];
         }
 
         StringInfo stringInfo = new(text);
@@ -641,7 +641,7 @@ public partial class LinkLabel : Label, IButtonControl
 
         ranges.Add(new CharacterRange(0, text.Length));
 
-        return ranges.ToArray();
+        return [.. ranges];
     }
 
     /// <summary>
@@ -1155,18 +1155,16 @@ public partial class LinkLabel : Label, IButtonControl
 
         Rectangle imageBounds = CalcImageRenderBounds(image, ClientRectangle, RtlTranslateAlignment(ImageAlign));
 
-        using GraphicsStateScope backgroundPaintScope = new(e.Graphics);
+        using (GraphicsStateScope backgroundPaintScope = new(e.Graphics))
         {
             e.Graphics.ExcludeClip(imageBounds);
             base.OnPaintBackground(e);
         }
 
         using GraphicsStateScope imagePaintScope = new(e.Graphics);
-        {
-            e.Graphics.IntersectClip(imageBounds);
-            base.OnPaintBackground(e);
-            DrawImage(e.Graphics, image, ClientRectangle, RtlTranslateAlignment(ImageAlign));
-        }
+        e.Graphics.IntersectClip(imageBounds);
+        base.OnPaintBackground(e);
+        DrawImage(e.Graphics, image, ClientRectangle, RtlTranslateAlignment(ImageAlign));
     }
 
     protected override void OnFontChanged(EventArgs e)
@@ -1376,10 +1374,8 @@ public partial class LinkLabel : Label, IButtonControl
 
     private void PaintLinkBackground(Graphics g)
     {
-        using (PaintEventArgs e = new(g, ClientRectangle))
-        {
-            InvokePaintBackground(this, e);
-        }
+        using PaintEventArgs e = new(g, ClientRectangle);
+        InvokePaintBackground(this, e);
     }
 
     void IButtonControl.PerformClick()
@@ -1628,7 +1624,7 @@ public partial class LinkLabel : Label, IButtonControl
     private bool ShouldSerializeUseCompatibleTextRendering()
     {
         // Serialize code if LinkLabel cannot support the feature or the property's value is  not the default.
-        return !CanUseTextRenderer || UseCompatibleTextRendering != Control.UseCompatibleTextRenderingDefault;
+        return !CanUseTextRenderer || UseCompatibleTextRendering != UseCompatibleTextRenderingDefault;
     }
 
     /// <summary>
@@ -1765,7 +1761,7 @@ public partial class LinkLabel : Label, IButtonControl
     {
         switch (msg.MsgInternal)
         {
-            case PInvoke.WM_SETCURSOR:
+            case PInvokeCore.WM_SETCURSOR:
                 WmSetCursor(ref msg);
                 break;
             default:

@@ -12,7 +12,7 @@ using Size = System.Drawing.Size;
 
 namespace System.Windows.Forms.Tests;
 
-public class ButtonBaseTests
+public class ButtonBaseTests : AbstractButtonBaseTests
 {
     [WinFormsFact]
     public void ButtonBase_Ctor_Default()
@@ -5703,7 +5703,7 @@ public class ButtonBaseTests
         };
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         control.OnKeyDown(new KeyEventArgs(key));
-        Assert.Equal(expected, (int)PInvoke.SendMessage(control, PInvoke.BM_GETSTATE));
+        Assert.Equal(expected, (int)PInvokeCore.SendMessage(control, PInvoke.BM_GETSTATE));
     }
 
     [WinFormsTheory]
@@ -5728,7 +5728,7 @@ public class ButtonBaseTests
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         control.OnMouseDown(new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
         control.OnKeyDown(new KeyEventArgs(key));
-        Assert.Equal(expected, (int)PInvoke.SendMessage(control, PInvoke.BM_GETSTATE));
+        Assert.Equal(expected, (int)PInvokeCore.SendMessage(control, PInvoke.BM_GETSTATE));
     }
 
     [WinFormsFact]
@@ -5982,7 +5982,7 @@ public class ButtonBaseTests
         };
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         control.OnKeyUp(new KeyEventArgs(key));
-        Assert.Equal(expected, (int)PInvoke.SendMessage(control, PInvoke.BM_GETSTATE));
+        Assert.Equal(expected, (int)PInvokeCore.SendMessage(control, PInvoke.BM_GETSTATE));
     }
 
     [WinFormsTheory]
@@ -6007,7 +6007,7 @@ public class ButtonBaseTests
         Assert.NotEqual(IntPtr.Zero, control.Handle);
         control.OnMouseDown(new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
         control.OnKeyUp(new KeyEventArgs(key));
-        Assert.Equal(expected, (int)PInvoke.SendMessage(control, PInvoke.BM_GETSTATE));
+        Assert.Equal(expected, (int)PInvokeCore.SendMessage(control, PInvoke.BM_GETSTATE));
     }
 
     [WinFormsFact]
@@ -7613,8 +7613,8 @@ public class ButtonBaseTests
             control.LostFocus += (sender, e) => callCount++;
             Message m = new()
             {
-                Msg = (int)PInvoke.WM_CANCELMODE,
-                Result = (IntPtr)250
+                Msg = (int)PInvokeCore.WM_CANCELMODE,
+                Result = 250
             };
             control.WndProc(ref m);
             Assert.Equal(IntPtr.Zero, m.Result);
@@ -7644,8 +7644,8 @@ public class ButtonBaseTests
             control.LostFocus += (sender, e) => callCount++;
             Message m = new()
             {
-                Msg = (int)PInvoke.WM_CANCELMODE,
-                Result = (IntPtr)250
+                Msg = (int)PInvokeCore.WM_CANCELMODE,
+                Result = 250
             };
             control.WndProc(ref m);
             Assert.Equal(IntPtr.Zero, m.Result);
@@ -7676,8 +7676,8 @@ public class ButtonBaseTests
             control.LostFocus += (sender, e) => callCount++;
             Message m = new()
             {
-                Msg = (int)PInvoke.WM_CANCELMODE,
-                Result = (IntPtr)250
+                Msg = (int)PInvokeCore.WM_CANCELMODE,
+                Result = 250
             };
             control.WndProc(ref m);
             Assert.Equal(IntPtr.Zero, m.Result);
@@ -7706,7 +7706,7 @@ public class ButtonBaseTests
 
             Message buttonM = new()
             {
-                Msg = (int)PInvoke.WM_LBUTTONUP
+                Msg = (int)PInvokeCore.WM_LBUTTONUP
             };
             int mouseUpCallCount = 0;
             control.MouseUp += (sender, e) =>
@@ -7715,8 +7715,8 @@ public class ButtonBaseTests
                 control.LostFocus += (sender, e) => callCount++;
                 Message m = new()
                 {
-                    Msg = (int)PInvoke.WM_CANCELMODE,
-                    Result = (IntPtr)250
+                    Msg = (int)PInvokeCore.WM_CANCELMODE,
+                    Result = 250
                 };
                 control.WndProc(ref m);
                 Assert.Equal(IntPtr.Zero, m.Result);
@@ -7756,8 +7756,8 @@ public class ButtonBaseTests
         control.LostFocus += (sender, e) => callCount++;
         Message m = new()
         {
-            Msg = (int)PInvoke.WM_CANCELMODE,
-            Result = (IntPtr)250
+            Msg = (int)PInvokeCore.WM_CANCELMODE,
+            Result = 250
         };
         control.WndProc(ref m);
         Assert.Equal(IntPtr.Zero, m.Result);
@@ -7801,8 +7801,8 @@ public class ButtonBaseTests
         control.LostFocus += (sender, e) => callCount++;
         Message m = new()
         {
-            Msg = (int)PInvoke.WM_CANCELMODE,
-            Result = (IntPtr)250
+            Msg = (int)PInvokeCore.WM_CANCELMODE,
+            Result = 250
         };
         control.WndProc(ref m);
         Assert.Equal(IntPtr.Zero, m.Result);
@@ -7844,8 +7844,8 @@ public class ButtonBaseTests
         control.LostFocus += (sender, e) => callCount++;
         Message m = new()
         {
-            Msg = (int)PInvoke.WM_CANCELMODE,
-            Result = (IntPtr)250
+            Msg = (int)PInvokeCore.WM_CANCELMODE,
+            Result = 250
         };
         control.WndProc(ref m);
         Assert.Equal(IntPtr.Zero, m.Result);
@@ -7884,7 +7884,7 @@ public class ButtonBaseTests
 
         Message buttonM = new()
         {
-            Msg = (int)PInvoke.WM_LBUTTONUP
+            Msg = (int)PInvokeCore.WM_LBUTTONUP
         };
         int mouseUpCallCount = 0;
         control.MouseUp += (sender, e) =>
@@ -7893,8 +7893,8 @@ public class ButtonBaseTests
             control.LostFocus += (sender, e) => callCount++;
             Message m = new()
             {
-                Msg = (int)PInvoke.WM_CANCELMODE,
-                Result = (IntPtr)250
+                Msg = (int)PInvokeCore.WM_CANCELMODE,
+                Result = 250
             };
             control.WndProc(ref m);
             Assert.Equal(IntPtr.Zero, m.Result);
@@ -7938,8 +7938,8 @@ public class ButtonBaseTests
             };
             Message m = new()
             {
-                Msg = (int)PInvoke.WM_CAPTURECHANGED,
-                Result = (IntPtr)250
+                Msg = (int)PInvokeCore.WM_CAPTURECHANGED,
+                Result = 250
             };
             control.WndProc(ref m);
             Assert.Equal(IntPtr.Zero, m.Result);
@@ -7974,8 +7974,8 @@ public class ButtonBaseTests
             };
             Message m = new()
             {
-                Msg = (int)PInvoke.WM_CAPTURECHANGED,
-                Result = (IntPtr)250
+                Msg = (int)PInvokeCore.WM_CAPTURECHANGED,
+                Result = 250
             };
             control.WndProc(ref m);
             Assert.Equal(IntPtr.Zero, m.Result);
@@ -8011,8 +8011,8 @@ public class ButtonBaseTests
             };
             Message m = new()
             {
-                Msg = (int)PInvoke.WM_CAPTURECHANGED,
-                Result = (IntPtr)250
+                Msg = (int)PInvokeCore.WM_CAPTURECHANGED,
+                Result = 250
             };
             control.WndProc(ref m);
             Assert.Equal(IntPtr.Zero, m.Result);
@@ -8041,7 +8041,7 @@ public class ButtonBaseTests
 
             Message buttonM = new()
             {
-                Msg = (int)PInvoke.WM_LBUTTONUP
+                Msg = (int)PInvokeCore.WM_LBUTTONUP
             };
             int mouseUpCallCount = 0;
             control.MouseUp += (sender, e) =>
@@ -8055,8 +8055,8 @@ public class ButtonBaseTests
                 };
                 Message m = new()
                 {
-                    Msg = (int)PInvoke.WM_CAPTURECHANGED,
-                    Result = (IntPtr)250
+                    Msg = (int)PInvokeCore.WM_CAPTURECHANGED,
+                    Result = 250
                 };
                 control.WndProc(ref m);
                 Assert.Equal(IntPtr.Zero, m.Result);
@@ -8101,8 +8101,8 @@ public class ButtonBaseTests
         };
         Message m = new()
         {
-            Msg = (int)PInvoke.WM_CAPTURECHANGED,
-            Result = (IntPtr)250
+            Msg = (int)PInvokeCore.WM_CAPTURECHANGED,
+            Result = 250
         };
         control.WndProc(ref m);
         Assert.Equal(IntPtr.Zero, m.Result);
@@ -8151,8 +8151,8 @@ public class ButtonBaseTests
         };
         Message m = new()
         {
-            Msg = (int)PInvoke.WM_CAPTURECHANGED,
-            Result = (IntPtr)250
+            Msg = (int)PInvokeCore.WM_CAPTURECHANGED,
+            Result = 250
         };
         control.WndProc(ref m);
         Assert.Equal(IntPtr.Zero, m.Result);
@@ -8199,8 +8199,8 @@ public class ButtonBaseTests
         };
         Message m = new()
         {
-            Msg = (int)PInvoke.WM_CAPTURECHANGED,
-            Result = (IntPtr)250
+            Msg = (int)PInvokeCore.WM_CAPTURECHANGED,
+            Result = 250
         };
         control.WndProc(ref m);
         Assert.Equal(IntPtr.Zero, m.Result);
@@ -8239,7 +8239,7 @@ public class ButtonBaseTests
 
         Message buttonM = new()
         {
-            Msg = (int)PInvoke.WM_LBUTTONUP
+            Msg = (int)PInvokeCore.WM_LBUTTONUP
         };
         int mouseUpCallCount = 0;
         control.MouseUp += (sender, e) =>
@@ -8253,8 +8253,8 @@ public class ButtonBaseTests
             };
             Message m = new()
             {
-                Msg = (int)PInvoke.WM_CAPTURECHANGED,
-                Result = (IntPtr)250
+                Msg = (int)PInvokeCore.WM_CAPTURECHANGED,
+                Result = 250
             };
             control.WndProc(ref m);
             Assert.Equal(IntPtr.Zero, m.Result);
@@ -8443,8 +8443,8 @@ public class ButtonBaseTests
             };
             Message m = new()
             {
-                Msg = (int)PInvoke.WM_KILLFOCUS,
-                Result = (IntPtr)250
+                Msg = (int)PInvokeCore.WM_KILLFOCUS,
+                Result = 250
             };
             control.WndProc(ref m);
             Assert.Equal(IntPtr.Zero, m.Result);
@@ -8479,8 +8479,8 @@ public class ButtonBaseTests
             };
             Message m = new()
             {
-                Msg = (int)PInvoke.WM_KILLFOCUS,
-                Result = (IntPtr)250
+                Msg = (int)PInvokeCore.WM_KILLFOCUS,
+                Result = 250
             };
             control.WndProc(ref m);
             Assert.Equal(IntPtr.Zero, m.Result);
@@ -8516,8 +8516,8 @@ public class ButtonBaseTests
             };
             Message m = new()
             {
-                Msg = (int)PInvoke.WM_KILLFOCUS,
-                Result = (IntPtr)250
+                Msg = (int)PInvokeCore.WM_KILLFOCUS,
+                Result = 250
             };
             control.WndProc(ref m);
             Assert.Equal(IntPtr.Zero, m.Result);
@@ -8546,7 +8546,7 @@ public class ButtonBaseTests
 
             Message buttonM = new()
             {
-                Msg = (int)PInvoke.WM_LBUTTONUP
+                Msg = (int)PInvokeCore.WM_LBUTTONUP
             };
             int mouseUpCallCount = 0;
             control.MouseUp += (sender, e) =>
@@ -8560,8 +8560,8 @@ public class ButtonBaseTests
                 };
                 Message m = new()
                 {
-                    Msg = (int)PInvoke.WM_KILLFOCUS,
-                    Result = (IntPtr)250
+                    Msg = (int)PInvokeCore.WM_KILLFOCUS,
+                    Result = 250
                 };
                 control.WndProc(ref m);
                 Assert.Equal(IntPtr.Zero, m.Result);
@@ -8606,8 +8606,8 @@ public class ButtonBaseTests
         };
         Message m = new()
         {
-            Msg = (int)PInvoke.WM_KILLFOCUS,
-            Result = (IntPtr)250
+            Msg = (int)PInvokeCore.WM_KILLFOCUS,
+            Result = 250
         };
         control.WndProc(ref m);
         Assert.Equal(IntPtr.Zero, m.Result);
@@ -8656,8 +8656,8 @@ public class ButtonBaseTests
         };
         Message m = new()
         {
-            Msg = (int)PInvoke.WM_KILLFOCUS,
-            Result = (IntPtr)250
+            Msg = (int)PInvokeCore.WM_KILLFOCUS,
+            Result = 250
         };
         control.WndProc(ref m);
         Assert.Equal(IntPtr.Zero, m.Result);
@@ -8704,8 +8704,8 @@ public class ButtonBaseTests
         };
         Message m = new()
         {
-            Msg = (int)PInvoke.WM_KILLFOCUS,
-            Result = (IntPtr)250
+            Msg = (int)PInvokeCore.WM_KILLFOCUS,
+            Result = 250
         };
         control.WndProc(ref m);
         Assert.Equal(IntPtr.Zero, m.Result);
@@ -8744,7 +8744,7 @@ public class ButtonBaseTests
 
         Message buttonM = new()
         {
-            Msg = (int)PInvoke.WM_LBUTTONUP
+            Msg = (int)PInvokeCore.WM_LBUTTONUP
         };
         int mouseUpCallCount = 0;
         control.MouseUp += (sender, e) =>
@@ -8758,8 +8758,8 @@ public class ButtonBaseTests
             };
             Message m = new()
             {
-                Msg = (int)PInvoke.WM_KILLFOCUS,
-                Result = (IntPtr)250
+                Msg = (int)PInvokeCore.WM_KILLFOCUS,
+                Result = 250
             };
             control.WndProc(ref m);
             Assert.Equal(IntPtr.Zero, m.Result);
@@ -8809,8 +8809,8 @@ public class ButtonBaseTests
         };
         Message m = new()
         {
-            Msg = (int)PInvoke.WM_MOUSEHOVER,
-            Result = (IntPtr)250
+            Msg = (int)PInvokeCore.WM_MOUSEHOVER,
+            Result = 250
         };
         control.WndProc(ref m);
         Assert.Equal(IntPtr.Zero, m.Result);
@@ -8823,47 +8823,47 @@ public class ButtonBaseTests
 
     public static IEnumerable<object[]> WndProc_MouseUp_TestData()
     {
-        yield return new object[] { true, (int)PInvoke.WM_LBUTTONUP, IntPtr.Zero, IntPtr.Zero, (IntPtr)250, MouseButtons.Left, 1, 0, 0 };
-        yield return new object[] { true, (int)PInvoke.WM_LBUTTONUP, PARAM.FromLowHigh(1, 2), IntPtr.Zero, (IntPtr)250, MouseButtons.Left, 1, 1, 2 };
-        yield return new object[] { true, (int)PInvoke.WM_LBUTTONUP, PARAM.FromLowHigh(-1, -2), IntPtr.Zero, (IntPtr)250, MouseButtons.Left, 1, -1, -2 };
-        yield return new object[] { false, (int)PInvoke.WM_LBUTTONUP, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, MouseButtons.Left, 1, 0, 0 };
-        yield return new object[] { false, (int)PInvoke.WM_LBUTTONUP, PARAM.FromLowHigh(1, 2), IntPtr.Zero, IntPtr.Zero, MouseButtons.Left, 1, 1, 2 };
-        yield return new object[] { false, (int)PInvoke.WM_LBUTTONUP, PARAM.FromLowHigh(-1, -2), IntPtr.Zero, IntPtr.Zero, MouseButtons.Left, 1, -1, -2 };
+        yield return new object[] { true, (int)PInvokeCore.WM_LBUTTONUP, IntPtr.Zero, IntPtr.Zero, (IntPtr)250, MouseButtons.Left, 1, 0, 0 };
+        yield return new object[] { true, (int)PInvokeCore.WM_LBUTTONUP, PARAM.FromLowHigh(1, 2), IntPtr.Zero, (IntPtr)250, MouseButtons.Left, 1, 1, 2 };
+        yield return new object[] { true, (int)PInvokeCore.WM_LBUTTONUP, PARAM.FromLowHigh(-1, -2), IntPtr.Zero, (IntPtr)250, MouseButtons.Left, 1, -1, -2 };
+        yield return new object[] { false, (int)PInvokeCore.WM_LBUTTONUP, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, MouseButtons.Left, 1, 0, 0 };
+        yield return new object[] { false, (int)PInvokeCore.WM_LBUTTONUP, PARAM.FromLowHigh(1, 2), IntPtr.Zero, IntPtr.Zero, MouseButtons.Left, 1, 1, 2 };
+        yield return new object[] { false, (int)PInvokeCore.WM_LBUTTONUP, PARAM.FromLowHigh(-1, -2), IntPtr.Zero, IntPtr.Zero, MouseButtons.Left, 1, -1, -2 };
 
-        yield return new object[] { true, (int)PInvoke.WM_MBUTTONUP, IntPtr.Zero, IntPtr.Zero, (IntPtr)250, MouseButtons.Middle, 1, 0, 0 };
-        yield return new object[] { true, (int)PInvoke.WM_MBUTTONUP, PARAM.FromLowHigh(1, 2), IntPtr.Zero, (IntPtr)250, MouseButtons.Middle, 1, 1, 2 };
-        yield return new object[] { true, (int)PInvoke.WM_MBUTTONUP, PARAM.FromLowHigh(-1, -2), IntPtr.Zero, (IntPtr)250, MouseButtons.Middle, 1, -1, -2 };
-        yield return new object[] { false, (int)PInvoke.WM_MBUTTONUP, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, MouseButtons.Middle, 1, 0, 0 };
-        yield return new object[] { false, (int)PInvoke.WM_MBUTTONUP, PARAM.FromLowHigh(1, 2), IntPtr.Zero, IntPtr.Zero, MouseButtons.Middle, 1, 1, 2 };
-        yield return new object[] { false, (int)PInvoke.WM_MBUTTONUP, PARAM.FromLowHigh(-1, -2), IntPtr.Zero, IntPtr.Zero, MouseButtons.Middle, 1, -1, -2 };
+        yield return new object[] { true, (int)PInvokeCore.WM_MBUTTONUP, IntPtr.Zero, IntPtr.Zero, (IntPtr)250, MouseButtons.Middle, 1, 0, 0 };
+        yield return new object[] { true, (int)PInvokeCore.WM_MBUTTONUP, PARAM.FromLowHigh(1, 2), IntPtr.Zero, (IntPtr)250, MouseButtons.Middle, 1, 1, 2 };
+        yield return new object[] { true, (int)PInvokeCore.WM_MBUTTONUP, PARAM.FromLowHigh(-1, -2), IntPtr.Zero, (IntPtr)250, MouseButtons.Middle, 1, -1, -2 };
+        yield return new object[] { false, (int)PInvokeCore.WM_MBUTTONUP, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, MouseButtons.Middle, 1, 0, 0 };
+        yield return new object[] { false, (int)PInvokeCore.WM_MBUTTONUP, PARAM.FromLowHigh(1, 2), IntPtr.Zero, IntPtr.Zero, MouseButtons.Middle, 1, 1, 2 };
+        yield return new object[] { false, (int)PInvokeCore.WM_MBUTTONUP, PARAM.FromLowHigh(-1, -2), IntPtr.Zero, IntPtr.Zero, MouseButtons.Middle, 1, -1, -2 };
 
-        yield return new object[] { true, (int)PInvoke.WM_RBUTTONUP, IntPtr.Zero, IntPtr.Zero, (IntPtr)250, MouseButtons.Right, 1, 0, 0 };
-        yield return new object[] { true, (int)PInvoke.WM_RBUTTONUP, PARAM.FromLowHigh(1, 2), IntPtr.Zero, (IntPtr)250, MouseButtons.Right, 1, 1, 2 };
-        yield return new object[] { true, (int)PInvoke.WM_RBUTTONUP, PARAM.FromLowHigh(-1, -2), IntPtr.Zero, (IntPtr)250, MouseButtons.Right, 1, -1, -2 };
-        yield return new object[] { false, (int)PInvoke.WM_RBUTTONUP, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, MouseButtons.Right, 1, 0, 0 };
-        yield return new object[] { false, (int)PInvoke.WM_RBUTTONUP, PARAM.FromLowHigh(1, 2), IntPtr.Zero, IntPtr.Zero, MouseButtons.Right, 1, 1, 2 };
-        yield return new object[] { false, (int)PInvoke.WM_RBUTTONUP, PARAM.FromLowHigh(-1, -2), IntPtr.Zero, IntPtr.Zero, MouseButtons.Right, 1, -1, -2 };
+        yield return new object[] { true, (int)PInvokeCore.WM_RBUTTONUP, IntPtr.Zero, IntPtr.Zero, (IntPtr)250, MouseButtons.Right, 1, 0, 0 };
+        yield return new object[] { true, (int)PInvokeCore.WM_RBUTTONUP, PARAM.FromLowHigh(1, 2), IntPtr.Zero, (IntPtr)250, MouseButtons.Right, 1, 1, 2 };
+        yield return new object[] { true, (int)PInvokeCore.WM_RBUTTONUP, PARAM.FromLowHigh(-1, -2), IntPtr.Zero, (IntPtr)250, MouseButtons.Right, 1, -1, -2 };
+        yield return new object[] { false, (int)PInvokeCore.WM_RBUTTONUP, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, MouseButtons.Right, 1, 0, 0 };
+        yield return new object[] { false, (int)PInvokeCore.WM_RBUTTONUP, PARAM.FromLowHigh(1, 2), IntPtr.Zero, IntPtr.Zero, MouseButtons.Right, 1, 1, 2 };
+        yield return new object[] { false, (int)PInvokeCore.WM_RBUTTONUP, PARAM.FromLowHigh(-1, -2), IntPtr.Zero, IntPtr.Zero, MouseButtons.Right, 1, -1, -2 };
 
-        yield return new object[] { true, (int)PInvoke.WM_XBUTTONUP, IntPtr.Zero, IntPtr.Zero, (IntPtr)250, MouseButtons.None, 1, 0, 0 };
-        yield return new object[] { true, (int)PInvoke.WM_XBUTTONUP, PARAM.FromLowHigh(1, 2), IntPtr.Zero, (IntPtr)250, MouseButtons.None, 1, 1, 2 };
-        yield return new object[] { true, (int)PInvoke.WM_XBUTTONUP, PARAM.FromLowHigh(-1, -2), IntPtr.Zero, (IntPtr)250, MouseButtons.None, 1, -1, -2 };
-        yield return new object[] { false, (int)PInvoke.WM_XBUTTONUP, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, MouseButtons.None, 1, 0, 0 };
-        yield return new object[] { false, (int)PInvoke.WM_XBUTTONUP, PARAM.FromLowHigh(1, 2), IntPtr.Zero, IntPtr.Zero, MouseButtons.None, 1, 1, 2 };
-        yield return new object[] { false, (int)PInvoke.WM_XBUTTONUP, PARAM.FromLowHigh(-1, -2), IntPtr.Zero, IntPtr.Zero, MouseButtons.None, 1, -1, -2 };
+        yield return new object[] { true, (int)PInvokeCore.WM_XBUTTONUP, IntPtr.Zero, IntPtr.Zero, (IntPtr)250, MouseButtons.None, 1, 0, 0 };
+        yield return new object[] { true, (int)PInvokeCore.WM_XBUTTONUP, PARAM.FromLowHigh(1, 2), IntPtr.Zero, (IntPtr)250, MouseButtons.None, 1, 1, 2 };
+        yield return new object[] { true, (int)PInvokeCore.WM_XBUTTONUP, PARAM.FromLowHigh(-1, -2), IntPtr.Zero, (IntPtr)250, MouseButtons.None, 1, -1, -2 };
+        yield return new object[] { false, (int)PInvokeCore.WM_XBUTTONUP, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, MouseButtons.None, 1, 0, 0 };
+        yield return new object[] { false, (int)PInvokeCore.WM_XBUTTONUP, PARAM.FromLowHigh(1, 2), IntPtr.Zero, IntPtr.Zero, MouseButtons.None, 1, 1, 2 };
+        yield return new object[] { false, (int)PInvokeCore.WM_XBUTTONUP, PARAM.FromLowHigh(-1, -2), IntPtr.Zero, IntPtr.Zero, MouseButtons.None, 1, -1, -2 };
 
-        yield return new object[] { true, (int)PInvoke.WM_XBUTTONUP, IntPtr.Zero, PARAM.FromLowHigh(2, 1), (IntPtr)250, MouseButtons.XButton1, 1, 0, 0 };
-        yield return new object[] { true, (int)PInvoke.WM_XBUTTONUP, PARAM.FromLowHigh(1, 2), PARAM.FromLowHigh(2, 1), (IntPtr)250, MouseButtons.XButton1, 1, 1, 2 };
-        yield return new object[] { true, (int)PInvoke.WM_XBUTTONUP, PARAM.FromLowHigh(-1, -2), PARAM.FromLowHigh(2, 1), (IntPtr)250, MouseButtons.XButton1, 1, -1, -2 };
-        yield return new object[] { false, (int)PInvoke.WM_XBUTTONUP, IntPtr.Zero, PARAM.FromLowHigh(2, 1), IntPtr.Zero, MouseButtons.XButton1, 1, 0, 0 };
-        yield return new object[] { false, (int)PInvoke.WM_XBUTTONUP, PARAM.FromLowHigh(1, 2), PARAM.FromLowHigh(2, 1), IntPtr.Zero, MouseButtons.XButton1, 1, 1, 2 };
-        yield return new object[] { false, (int)PInvoke.WM_XBUTTONUP, PARAM.FromLowHigh(-1, -2), PARAM.FromLowHigh(2, 1), IntPtr.Zero, MouseButtons.XButton1, 1, -1, -2 };
+        yield return new object[] { true, (int)PInvokeCore.WM_XBUTTONUP, IntPtr.Zero, PARAM.FromLowHigh(2, 1), (IntPtr)250, MouseButtons.XButton1, 1, 0, 0 };
+        yield return new object[] { true, (int)PInvokeCore.WM_XBUTTONUP, PARAM.FromLowHigh(1, 2), PARAM.FromLowHigh(2, 1), (IntPtr)250, MouseButtons.XButton1, 1, 1, 2 };
+        yield return new object[] { true, (int)PInvokeCore.WM_XBUTTONUP, PARAM.FromLowHigh(-1, -2), PARAM.FromLowHigh(2, 1), (IntPtr)250, MouseButtons.XButton1, 1, -1, -2 };
+        yield return new object[] { false, (int)PInvokeCore.WM_XBUTTONUP, IntPtr.Zero, PARAM.FromLowHigh(2, 1), IntPtr.Zero, MouseButtons.XButton1, 1, 0, 0 };
+        yield return new object[] { false, (int)PInvokeCore.WM_XBUTTONUP, PARAM.FromLowHigh(1, 2), PARAM.FromLowHigh(2, 1), IntPtr.Zero, MouseButtons.XButton1, 1, 1, 2 };
+        yield return new object[] { false, (int)PInvokeCore.WM_XBUTTONUP, PARAM.FromLowHigh(-1, -2), PARAM.FromLowHigh(2, 1), IntPtr.Zero, MouseButtons.XButton1, 1, -1, -2 };
 
-        yield return new object[] { true, (int)PInvoke.WM_XBUTTONUP, IntPtr.Zero, PARAM.FromLowHigh(1, 2), (IntPtr)250, MouseButtons.XButton2, 1, 0, 0 };
-        yield return new object[] { true, (int)PInvoke.WM_XBUTTONUP, PARAM.FromLowHigh(1, 2), PARAM.FromLowHigh(1, 2), (IntPtr)250, MouseButtons.XButton2, 1, 1, 2 };
-        yield return new object[] { true, (int)PInvoke.WM_XBUTTONUP, PARAM.FromLowHigh(-1, -2), PARAM.FromLowHigh(1, 2), (IntPtr)250, MouseButtons.XButton2, 1, -1, -2 };
-        yield return new object[] { false, (int)PInvoke.WM_XBUTTONUP, IntPtr.Zero, PARAM.FromLowHigh(1, 2), IntPtr.Zero, MouseButtons.XButton2, 1, 0, 0 };
-        yield return new object[] { false, (int)PInvoke.WM_XBUTTONUP, PARAM.FromLowHigh(1, 2), PARAM.FromLowHigh(1, 2), IntPtr.Zero, MouseButtons.XButton2, 1, 1, 2 };
-        yield return new object[] { false, (int)PInvoke.WM_XBUTTONUP, PARAM.FromLowHigh(-1, -2), PARAM.FromLowHigh(1, 2), IntPtr.Zero, MouseButtons.XButton2, 1, -1, -2 };
+        yield return new object[] { true, (int)PInvokeCore.WM_XBUTTONUP, IntPtr.Zero, PARAM.FromLowHigh(1, 2), (IntPtr)250, MouseButtons.XButton2, 1, 0, 0 };
+        yield return new object[] { true, (int)PInvokeCore.WM_XBUTTONUP, PARAM.FromLowHigh(1, 2), PARAM.FromLowHigh(1, 2), (IntPtr)250, MouseButtons.XButton2, 1, 1, 2 };
+        yield return new object[] { true, (int)PInvokeCore.WM_XBUTTONUP, PARAM.FromLowHigh(-1, -2), PARAM.FromLowHigh(1, 2), (IntPtr)250, MouseButtons.XButton2, 1, -1, -2 };
+        yield return new object[] { false, (int)PInvokeCore.WM_XBUTTONUP, IntPtr.Zero, PARAM.FromLowHigh(1, 2), IntPtr.Zero, MouseButtons.XButton2, 1, 0, 0 };
+        yield return new object[] { false, (int)PInvokeCore.WM_XBUTTONUP, PARAM.FromLowHigh(1, 2), PARAM.FromLowHigh(1, 2), IntPtr.Zero, MouseButtons.XButton2, 1, 1, 2 };
+        yield return new object[] { false, (int)PInvokeCore.WM_XBUTTONUP, PARAM.FromLowHigh(-1, -2), PARAM.FromLowHigh(1, 2), IntPtr.Zero, MouseButtons.XButton2, 1, -1, -2 };
     }
 
     [WinFormsTheory]
@@ -8890,7 +8890,7 @@ public class ButtonBaseTests
                 Msg = msg,
                 LParam = lParam,
                 WParam = wParam,
-                Result = (IntPtr)250
+                Result = 250
             };
             control.WndProc(ref m);
             Assert.Equal(expectedResult, m.Result);
@@ -8926,7 +8926,7 @@ public class ButtonBaseTests
                 Msg = msg,
                 LParam = lParam,
                 WParam = wParam,
-                Result = (IntPtr)250
+                Result = 250
             };
             control.WndProc(ref m);
             Assert.Equal(expectedResult, m.Result);
@@ -8938,10 +8938,10 @@ public class ButtonBaseTests
     }
 
     [WinFormsTheory]
-    [InlineData((int)PInvoke.WM_LBUTTONUP)]
-    [InlineData((int)PInvoke.WM_MBUTTONUP)]
-    [InlineData((int)PInvoke.WM_RBUTTONUP)]
-    [InlineData((int)PInvoke.WM_XBUTTONUP)]
+    [InlineData((int)PInvokeCore.WM_LBUTTONUP)]
+    [InlineData((int)PInvokeCore.WM_MBUTTONUP)]
+    [InlineData((int)PInvokeCore.WM_RBUTTONUP)]
+    [InlineData((int)PInvokeCore.WM_XBUTTONUP)]
     public void ButtonBase_WndProc_InvokeMouseUpWithoutHandleNotEnabled_CallsMouseUp(int msg)
     {
         using (new NoAssertContext())
@@ -8955,10 +8955,10 @@ public class ButtonBaseTests
             Message m = new()
             {
                 Msg = msg,
-                Result = (IntPtr)250
+                Result = 250
             };
             control.WndProc(ref m);
-            Assert.Equal((IntPtr)250, m.Result);
+            Assert.Equal(250, m.Result);
             Assert.Equal(1, callCount);
             Assert.False(control.Capture);
             Assert.False(control.Focused);
@@ -8996,7 +8996,7 @@ public class ButtonBaseTests
             Msg = msg,
             LParam = lParam,
             WParam = wParam,
-            Result = (IntPtr)250
+            Result = 250
         };
         control.WndProc(ref m);
         Assert.Equal(expectedResult, m.Result);
@@ -9040,7 +9040,7 @@ public class ButtonBaseTests
             Msg = msg,
             LParam = lParam,
             WParam = wParam,
-            Result = (IntPtr)250
+            Result = 250
         };
         control.WndProc(ref m);
         Assert.Equal(expectedResult, m.Result);
@@ -9054,10 +9054,10 @@ public class ButtonBaseTests
     }
 
     [WinFormsTheory]
-    [InlineData((int)PInvoke.WM_LBUTTONUP)]
-    [InlineData((int)PInvoke.WM_MBUTTONUP)]
-    [InlineData((int)PInvoke.WM_RBUTTONUP)]
-    [InlineData((int)PInvoke.WM_XBUTTONUP)]
+    [InlineData((int)PInvokeCore.WM_LBUTTONUP)]
+    [InlineData((int)PInvokeCore.WM_MBUTTONUP)]
+    [InlineData((int)PInvokeCore.WM_RBUTTONUP)]
+    [InlineData((int)PInvokeCore.WM_XBUTTONUP)]
     public void ButtonBase_WndProc_InvokeMouseUpWithHandleNotEnabled_CallsMouseUp(int msg)
     {
         using SubButtonBase control = new()
@@ -9077,10 +9077,10 @@ public class ButtonBaseTests
         Message m = new()
         {
             Msg = msg,
-            Result = (IntPtr)250
+            Result = 250
         };
         control.WndProc(ref m);
-        Assert.Equal((IntPtr)250, m.Result);
+        Assert.Equal(250, m.Result);
         Assert.Equal(1, callCount);
         Assert.False(control.Capture);
         Assert.False(control.Focused);
@@ -9135,7 +9135,7 @@ public class ButtonBaseTests
             {
                 Msg = (int)(MessageId.WM_REFLECT_COMMAND),
                 WParam = wParam,
-                Result = (IntPtr)250
+                Result = 250
             };
             control.WndProc(ref m);
             Assert.Equal(expectedResult, m.Result);
@@ -9171,7 +9171,7 @@ public class ButtonBaseTests
         {
             Msg = (int)(MessageId.WM_REFLECT_COMMAND),
             WParam = wParam,
-            Result = (IntPtr)250
+            Result = 250
         };
         control.WndProc(ref m);
         Assert.Equal(expectedResult, m.Result);
@@ -9335,7 +9335,7 @@ public class ButtonBaseTests
         public new bool GetStyle(ControlStyles flag) => base.GetStyle(flag);
 
         public new bool GetTopLevel() => base.GetTopLevel();
-        
+
         public new void OnClick(EventArgs e) => base.OnClick(e);
 
         public new void OnEnabledChanged(EventArgs e) => base.OnEnabledChanged(e);
@@ -9376,4 +9376,6 @@ public class ButtonBaseTests
 
         public new void WndProc(ref Message m) => base.WndProc(ref m);
     }
+
+    protected override ButtonBase CreateButton() => new Button();
 }

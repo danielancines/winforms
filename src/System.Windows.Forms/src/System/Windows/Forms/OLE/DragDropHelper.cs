@@ -14,8 +14,8 @@ using IComDataObject = System.Runtime.InteropServices.ComTypes.IDataObject;
 namespace System.Windows.Forms;
 
 /// <summary>
-/// Helper class for drop targets to display the drag image while the cursor is over the target window and allows the
-/// application to specify the drag image bitmap that will be displayed during a drag-and-drop operation.
+///  Helper class for drop targets to display the drag image while the cursor is over the target window and allows the
+///  application to specify the drag image bitmap that will be displayed during a drag-and-drop operation.
 /// </summary>
 internal static unsafe class DragDropHelper
 {
@@ -200,12 +200,12 @@ internal static unsafe class DragDropHelper
         {
             try
             {
-                void* basePtr = PInvokeCore.GlobalLock((HGLOBAL)dragDropFormat.Medium.unionmember);
+                void* basePtr = PInvokeCore.GlobalLock(dragDropFormat.Medium.hGlobal);
                 return (basePtr is not null) && (*(BOOL*)basePtr == true);
             }
             finally
             {
-                PInvokeCore.GlobalUnlock((HGLOBAL)dragDropFormat.Medium.unionmember);
+                PInvokeCore.GlobalUnlock(dragDropFormat.Medium.hGlobal);
             }
         }
         else
@@ -396,7 +396,8 @@ internal static unsafe class DragDropHelper
     /// <remarks>
     ///  <para>
     ///   Some UI coloring is applied to the text in <paramref name="message"/> if used by specifying %1 in
-    ///   <paramref name="messageReplacementToken"/>. The characters %% and %1 are the subset of FormatMessage markers that are processed here.
+    ///   <paramref name="messageReplacementToken"/>. The characters %% and %1 are the subset of FormatMessage
+    ///   markers that are processed here.
     ///  </para>
     /// </remarks>
     public static unsafe void SetDropDescription(
@@ -408,12 +409,12 @@ internal static unsafe class DragDropHelper
         ArgumentNullException.ThrowIfNull(dataObject);
         SourceGenerated.EnumValidator.Validate(dropImageType, nameof(dropImageType));
 
-        if (message.Length >= PInvoke.MAX_PATH)
+        if (message.Length >= (int)PInvokeCore.MAX_PATH)
         {
             throw new ArgumentOutOfRangeException(nameof(message));
         }
 
-        if (messageReplacementToken.Length >= PInvoke.MAX_PATH)
+        if (messageReplacementToken.Length >= (int)PInvokeCore.MAX_PATH)
         {
             throw new ArgumentOutOfRangeException(nameof(messageReplacementToken));
         }
@@ -503,7 +504,8 @@ internal static unsafe class DragDropHelper
     /// </summary>
     /// <remarks>
     ///  <para>
-    ///   Specify <see langword="true"/> for <paramref name="usingDefaultDragImage"/> to use a layered window drag image with a size of 96x96.
+    ///   Specify <see langword="true"/> for <paramref name="usingDefaultDragImage"/> to use a layered window
+    ///   drag image with a size of 96x96.
     ///  </para>
     /// </remarks>
     private static void SetUsingDefaultDragImage(IComDataObject dataObject, bool usingDefaultDragImage)
@@ -521,7 +523,7 @@ internal static unsafe class DragDropHelper
         }
 
         HRESULT hr = PInvokeCore.CoCreateInstance(
-            in CLSID.DragDropHelper,
+            CLSID.DragDropHelper,
             pUnkOuter: null,
             CLSCTX.CLSCTX_INPROC_SERVER,
             out *dragDropHelper);

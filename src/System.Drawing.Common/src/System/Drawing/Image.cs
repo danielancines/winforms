@@ -21,10 +21,6 @@ namespace System.Drawing;
 [TypeConverter(typeof(ImageConverter))]
 public abstract unsafe class Image : MarshalByRefObject, IImage, IDisposable, ICloneable, ISerializable
 {
-#if FINALIZATION_WATCH
-    private string allocationSite = Graphics.GetAllocationStack();
-#endif
-
     // The signature of this delegate is incorrect. The signature of the corresponding
     // native callback function is:
     // extern "C" {
@@ -36,7 +32,9 @@ public abstract unsafe class Image : MarshalByRefObject, IImage, IDisposable, IC
     // to modify it, in order to preserve compatibility.
     public delegate bool GetThumbnailImageAbort();
 
-    GpImage* IPointer<GpImage>.Pointer => _nativeImage;
+    nint IPointer<GpImage>.Pointer => (nint)_nativeImage;
+
+    [NonSerialized]
     private GpImage* _nativeImage;
 
     private object? _userData;
@@ -55,9 +53,7 @@ public abstract unsafe class Image : MarshalByRefObject, IImage, IDisposable, IC
 
     private protected Image() { }
 
-#pragma warning disable CA2229 // Implement serialization constructors
     private protected Image(SerializationInfo info, StreamingContext context)
-#pragma warning restore CA2229 // Implement serialization constructors
     {
         byte[] dat = (byte[])info.GetValue("Data", typeof(byte[]))!; // Do not rename (binary serialization)
 
@@ -160,7 +156,7 @@ public abstract unsafe class Image : MarshalByRefObject, IImage, IDisposable, IC
     private static GpImage* LoadGdipImageFromStream(Stream stream, bool useEmbeddedColorManagement)
     {
         using var iStream = stream.ToIStream(makeSeekable: true);
-        return LoadGdipImageFromStream(iStream, useEmbeddedColorManagement: false);
+        return LoadGdipImageFromStream(iStream, useEmbeddedColorManagement);
     }
 
     private static unsafe GpImage* LoadGdipImageFromStream(IStream* stream, bool useEmbeddedColorManagement)
@@ -209,39 +205,14 @@ public abstract unsafe class Image : MarshalByRefObject, IImage, IDisposable, IC
 
     protected virtual void Dispose(bool disposing)
     {
-#if FINALIZATION_WATCH
-        Debug.WriteLineIf(!disposing && nativeImage is not null, $"""
-            **********************
-            Disposed through finalization:
-            {allocationSite}
-            """);
-#endif
         if (_nativeImage is null)
+        {
             return;
+        }
 
-        try
-        {
-#if DEBUG
-            Status status = !Gdip.Initialized ? Status.Ok :
-#endif
-            PInvoke.GdipDisposeImage(_nativeImage);
-#if DEBUG
-            Debug.Assert(status == Status.Ok, $"GDI+ returned an error status: {status}");
-#endif
-        }
-        catch (Exception ex)
-        {
-            if (ClientUtils.IsSecurityOrCriticalException(ex))
-            {
-                throw;
-            }
-
-            Debug.Fail($"Exception thrown during Dispose: {ex}");
-        }
-        finally
-        {
-            _nativeImage = null;
-        }
+        Status status = !Gdip.Initialized ? Status.Ok : PInvoke.GdipDisposeImage(_nativeImage);
+        _nativeImage = null;
+        Debug.Assert(status == Status.Ok, $"GDI+ returned an error status: {status}");
     }
 
     /// <summary>
@@ -358,7 +329,7 @@ public abstract unsafe class Image : MarshalByRefObject, IImage, IDisposable, IC
     }
 
     /// <summary>
-    ///  Adds an <see cref='Imagin.EncoderParameters'/> to this <see cref='Image'/>.
+    ///  Adds an <see cref='EncoderParameters'/> to this <see cref='Image'/>.
     /// </summary>
     public void SaveAdd(Imaging.EncoderParameters? encoderParams)
     {
@@ -387,7 +358,7 @@ public abstract unsafe class Image : MarshalByRefObject, IImage, IDisposable, IC
     }
 
     /// <summary>
-    ///  Adds an <see cref='Imaging.EncoderParameters'/> to the specified <see cref='Image'/>.
+    ///  Adds an <see cref='EncoderParameters'/> to the specified <see cref='Image'/>.
     /// </summary>
     public void SaveAdd(Image image, Imaging.EncoderParameters? encoderParams)
     {
@@ -543,16 +514,7 @@ public abstract unsafe class Image : MarshalByRefObject, IImage, IDisposable, IC
     /// <summary>
     ///  Gets the pixel format for this <see cref='Image'/>.
     /// </summary>
-    public PixelFormat PixelFormat
-    {
-        get
-        {
-            PixelFormat format;
-            Status status = PInvoke.GdipGetImagePixelFormat(_nativeImage, (int*)&format);
-            GC.KeepAlive(this);
-            return (status != Status.Ok) ? PixelFormat.Undefined : format;
-        }
-    }
+    public PixelFormat PixelFormat => (PixelFormat)this.GetPixelFormat();
 
     /// <summary>
     ///  Gets an array of the property IDs stored in this <see cref='Image'/>.
@@ -619,11 +581,9 @@ public abstract unsafe class Image : MarshalByRefObject, IImage, IDisposable, IC
     /// </summary>
     public RectangleF GetBounds(ref GraphicsUnit pageUnit)
     {
-        RectF bounds;
-        Unit unit = (Unit)pageUnit;
-        PInvoke.GdipGetImageBounds(_nativeImage, &bounds, &unit).ThrowIfFailed();
-        pageUnit = (GraphicsUnit)unit;
-        GC.KeepAlive(this);
+        // The Unit is hard coded to GraphicsUnit.Pixel in GDI+.
+        RectangleF bounds = this.GetImageBounds();
+        pageUnit = GraphicsUnit.Pixel;
         return bounds;
     }
 

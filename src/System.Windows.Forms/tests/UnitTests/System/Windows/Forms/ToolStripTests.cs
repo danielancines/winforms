@@ -6,9 +6,9 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms.TestUtilities;
 using Moq;
+using Windows.Win32.System.Ole;
 using Point = System.Drawing.Point;
 using Size = System.Drawing.Size;
-using Windows.Win32.System.Ole;
 
 namespace System.Windows.Forms.Tests;
 
@@ -329,7 +329,7 @@ public partial class ToolStripTests
     [WinFormsFact]
     public void ToolStrip_Ctor_NullValueInItems_ThrowsArgumentNullException()
     {
-        Assert.Throws<ArgumentNullException>("value", () => new ToolStrip(new ToolStripItem[] { null }));
+        Assert.Throws<ArgumentNullException>("value", () => new ToolStrip([null]));
     }
 
     [WinFormsFact]
@@ -1080,7 +1080,7 @@ public partial class ToolStripTests
     [WinFormsFact]
     public void ToolStrip_BindingContext_GetWithParent_ReturnsExpected()
     {
-        BindingContext bindingContext = new();
+        BindingContext bindingContext = [];
         using Control parent = new()
         {
             BindingContext = bindingContext
@@ -1095,7 +1095,7 @@ public partial class ToolStripTests
     [WinFormsFact]
     public void ToolStrip_BindingContext_GetWithParentCantAccessProperties_ReturnsExpected()
     {
-        BindingContext bindingContext = new();
+        BindingContext bindingContext = [];
         using SubAxHost parent = new("00000000-0000-0000-0000-000000000000")
         {
             BindingContext = bindingContext
@@ -1136,7 +1136,7 @@ public partial class ToolStripTests
     {
         using ToolStrip control = new()
         {
-            BindingContext = new BindingContext()
+            BindingContext = []
         };
 
         control.BindingContext = value;
@@ -1163,7 +1163,7 @@ public partial class ToolStripTests
         control.BindingContextChanged += handler;
 
         // Set different.
-        BindingContext context1 = new();
+        BindingContext context1 = [];
         control.BindingContext = context1;
         Assert.Same(context1, control.BindingContext);
         Assert.Equal(1, callCount);
@@ -1174,7 +1174,7 @@ public partial class ToolStripTests
         Assert.Equal(1, callCount);
 
         // Set different.
-        BindingContext context2 = new();
+        BindingContext context2 = [];
         control.BindingContext = context2;
         Assert.Same(context2, control.BindingContext);
         Assert.Equal(2, callCount);
@@ -1357,7 +1357,7 @@ public partial class ToolStripTests
         control.CursorChanged += handler;
 
         // Set different.
-        using Cursor cursor1 = new((IntPtr)1);
+        using Cursor cursor1 = new(1);
         control.Cursor = cursor1;
         Assert.Same(cursor1, control.Cursor);
         Assert.Equal(1, callCount);
@@ -1368,7 +1368,7 @@ public partial class ToolStripTests
         Assert.Equal(1, callCount);
 
         // Set different.
-        using Cursor cursor2 = new((IntPtr)2);
+        using Cursor cursor2 = new(2);
         control.Cursor = cursor2;
         Assert.Same(cursor2, control.Cursor);
         Assert.Equal(2, callCount);
@@ -1616,6 +1616,46 @@ public partial class ToolStripTests
         Assert.Same(childFont1, child1.Font);
         Assert.Same(childFont2, child2.Font);
         Assert.Equal(3, callCount);
+    }
+
+    [WinFormsFact]
+    public void ToolStrip_Font_ApplyParentFontToMenus_GetReturnFont_SameAsForm()
+    {
+        using ApplyParentFontToMenusScope scope = new(enable: true);
+        using Font font = new("Microsoft Sans Serif", 8.25f);
+        using Form form = new();
+        using ToolStrip toolStrip1 = new();
+        using SubToolStripItem item1 = new();
+        using SubToolStripItem item2 = new();
+
+        toolStrip1.Items.Add(item1);
+        toolStrip1.Items.Add(item2);
+        form.Controls.Add(toolStrip1);
+        form.Font = font;
+
+        Assert.Same(form.Font, toolStrip1.Font);
+        Assert.Same(form.Font, item1.Font);
+        Assert.Same(form.Font, item2.Font);
+    }
+
+    [WinFormsFact]
+    public void ToolStrip_Font_ApplyParentFontToMenus_GetReturnFont_SameAsToolStripManagerDefaultFont()
+    {
+        using ApplyParentFontToMenusScope scope = new(enable: false);
+        using Font font = new("Microsoft Sans Serif", 8.25f);
+        using Form form = new();
+        using ToolStrip toolStrip1 = new();
+        using SubToolStripItem item1 = new();
+        using SubToolStripItem item2 = new();
+
+        toolStrip1.Items.Add(item1);
+        toolStrip1.Items.Add(item2);
+        form.Controls.Add(toolStrip1);
+        form.Font = font;
+
+        Assert.Equal(ToolStripManager.DefaultFont, toolStrip1.Font);
+        Assert.Equal(ToolStripManager.DefaultFont, item1.Font);
+        Assert.Equal(ToolStripManager.DefaultFont, item2.Font);
     }
 
     public static IEnumerable<object[]> DefaultDropDownDirection_Get_TestData()
@@ -2438,7 +2478,7 @@ public partial class ToolStripTests
         int parentLayoutCallCount = 0;
         void parentHandler(object sender, LayoutEventArgs e)
         {
-            if (e.AffectedProperty == "Dock" || e.AffectedProperty == "Orientation")
+            if (e.AffectedProperty is "Dock" or "Orientation")
             {
                 Assert.Same(parent, sender);
                 Assert.Same(control, e.AffectedControl);
@@ -2544,7 +2584,7 @@ public partial class ToolStripTests
         int parentLayoutCallCount = 0;
         void parentHandler(object sender, LayoutEventArgs e)
         {
-            if (e.AffectedProperty == "Dock" || e.AffectedProperty == "Orientation")
+            if (e.AffectedProperty is "Dock" or "Orientation")
             {
                 Assert.Same(parent, sender);
                 Assert.Same(control, e.AffectedControl);
@@ -4771,7 +4811,7 @@ public partial class ToolStripTests
         using ToolStripButton toolStripButton1 = new();
         using ToolStripButton toolStripButton2 = new();
         using ToolStripButton toolStripButton3 = new();
-        toolStrip.Items.AddRange(new ToolStripItem[] { toolStripButton1, toolStripButton2, toolStripButton3 });
+        toolStrip.Items.AddRange((ToolStripButton[])[toolStripButton1, toolStripButton2, toolStripButton3]);
 
         if (useTabKey)
         {
@@ -4792,7 +4832,7 @@ public partial class ToolStripTests
         using ToolStripButton toolStripButton1 = new();
         using ToolStripButton toolStripButton2 = new();
         using ToolStripButton toolStripButton3 = new();
-        toolStrip.Items.AddRange(new ToolStripItem[] { toolStripButton1, toolStripButton2, toolStripButton3 });
+        toolStrip.Items.AddRange((ToolStripButton[])[toolStripButton1, toolStripButton2, toolStripButton3]);
 
         if (useTabKey)
         {
@@ -4817,7 +4857,7 @@ public partial class ToolStripTests
         using ToolStripButton toolStripButton1 = new();
         using ToolStripButton toolStripButton2 = new();
         using ToolStripButton toolStripButton3 = new();
-        toolStrip.Items.AddRange(new ToolStripItem[] { toolStripButton1, toolStripButton2, toolStripButton3 });
+        toolStrip.Items.AddRange((ToolStripButton[])[toolStripButton1, toolStripButton2, toolStripButton3]);
 
         if (useTabKey)
         {
@@ -4838,7 +4878,7 @@ public partial class ToolStripTests
         using ToolStripButton toolStripButton1 = new();
         using ToolStripButton toolStripButton2 = new();
         using ToolStripButton toolStripButton3 = new();
-        toolStrip.Items.AddRange(new ToolStripItem[] { toolStripButton1, toolStripButton2, toolStripButton3 });
+        toolStrip.Items.AddRange((ToolStripButton[])[toolStripButton1, toolStripButton2, toolStripButton3]);
 
         if (useTabKey)
         {
@@ -5964,8 +6004,8 @@ public partial class ToolStripTests
                     yield return new object[] { parent, hScroll, vScroll, true, Color.Red, new Bitmap(10, 10, PixelFormat.Format32bppArgb), ImageLayout.Tile, expected2 };
                     yield return new object[] { parent, hScroll, vScroll, false, Color.Empty, new Bitmap(10, 10, PixelFormat.Format32bppArgb), ImageLayout.Tile, expected2 };
                     yield return new object[] { parent, hScroll, vScroll, false, Color.Red, new Bitmap(10, 10, PixelFormat.Format32bppArgb), ImageLayout.Tile, expected2 };
-                    yield return new object[] { parent, hScroll, vScroll, true, Color.FromArgb(100, 50, 100, 150), new Bitmap(10, 10, PixelFormat.Format32bppArgb), ImageLayout.Tile, expected3 };
-                    yield return new object[] { parent, hScroll, vScroll, true, Color.FromArgb(0, 50, 100, 150), new Bitmap(10, 10, PixelFormat.Format32bppArgb), ImageLayout.Tile, expected3 };
+                    yield return new object[] { parent, hScroll, vScroll, true, Color.FromArgb(100, 50, 100, 150), new Bitmap(10, 10, PixelFormat.Format32bppArgb), ImageLayout.Tile, expected2 };
+                    yield return new object[] { parent, hScroll, vScroll, true, Color.FromArgb(0, 50, 100, 150), new Bitmap(10, 10, PixelFormat.Format32bppArgb), ImageLayout.Tile, expected2 };
                 }
             }
         }
@@ -6101,8 +6141,8 @@ public partial class ToolStripTests
 
                 yield return new object[] { hScroll, vScroll, true, Color.Empty, new Bitmap(10, 10, PixelFormat.Format32bppArgb), ImageLayout.Tile, 1 };
                 yield return new object[] { hScroll, vScroll, true, Color.Red, new Bitmap(10, 10, PixelFormat.Format32bppArgb), ImageLayout.Tile, 1 };
-                yield return new object[] { hScroll, vScroll, true, Color.FromArgb(100, 50, 100, 150), new Bitmap(10, 10, PixelFormat.Format32bppArgb), ImageLayout.Tile, 2 };
-                yield return new object[] { hScroll, vScroll, true, Color.FromArgb(0, 50, 100, 150), new Bitmap(10, 10, PixelFormat.Format32bppArgb), ImageLayout.Tile, 2 };
+                yield return new object[] { hScroll, vScroll, true, Color.FromArgb(100, 50, 100, 150), new Bitmap(10, 10, PixelFormat.Format32bppArgb), ImageLayout.Tile, 1 };
+                yield return new object[] { hScroll, vScroll, true, Color.FromArgb(0, 50, 100, 150), new Bitmap(10, 10, PixelFormat.Format32bppArgb), ImageLayout.Tile, 1 };
                 yield return new object[] { hScroll, vScroll, false, Color.Empty, new Bitmap(10, 10, PixelFormat.Format32bppArgb), ImageLayout.Tile, 1 };
                 yield return new object[] { hScroll, vScroll, false, Color.Red, new Bitmap(10, 10, PixelFormat.Format32bppArgb), ImageLayout.Tile, 1 };
             }
@@ -6863,7 +6903,7 @@ public partial class ToolStripTests
     public void ToolStrip_ProcessCmdKey_InvokeWithoutParent_ReturnsFalse(Keys keyData)
     {
         using SubToolStrip control = new();
-        Message m = new();
+        Message m = default;
         Assert.False(control.ProcessCmdKey(ref m, keyData));
         Assert.False(control.IsHandleCreated);
     }
@@ -6881,7 +6921,7 @@ public partial class ToolStripTests
         {
             Parent = parent
         };
-        Message msg = new();
+        Message msg = default;
         Assert.False(control.ProcessCmdKey(ref msg, keyData));
         Assert.False(control.IsHandleCreated);
     }
@@ -7100,38 +7140,47 @@ public partial class ToolStripTests
         Assert.Throws<NotSupportedException>(() => control.SetItemLocation(item, Point.Empty));
     }
 
+    [ActiveIssue("https://github.com/dotnet/winforms/issues/11418")]
     [WinFormsFact]
+    [SkipOnArchitecture(TestArchitectures.X64,
+       "Flaky tests, see: https://github.com/dotnet/winforms/issues/11418")]
     public void ToolStrip_WndProc_InvokeMouseActivate_Success()
     {
         using SubToolStrip control = new();
         Message m = new()
         {
-            Msg = (int)PInvoke.WM_MOUSEACTIVATE,
-            Result = (IntPtr)250
+            Msg = (int)PInvokeCore.WM_MOUSEACTIVATE,
+            Result = 250
         };
         control.WndProc(ref m);
         Assert.Equal(IntPtr.Zero, m.Result);
         Assert.True(control.IsHandleCreated);
     }
 
+    [ActiveIssue("https://github.com/dotnet/winforms/issues/11382")]
     [WinFormsFact]
+    [SkipOnArchitecture(TestArchitectures.X86 | TestArchitectures.X64,
+       "Flaky tests, see: https://github.com/dotnet/winforms/issues/11382")]
     public void ToolStrip_WndProc_InvokeMouseActivateWithHandle_Success()
     {
         using SubToolStrip control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
+
         int invalidatedCallCount = 0;
-        control.Invalidated += (sender, e) => invalidatedCallCount++;
         int styleChangedCallCount = 0;
-        control.StyleChanged += (sender, e) => styleChangedCallCount++;
         int createdCallCount = 0;
+
+        control.Invalidated += (sender, e) => invalidatedCallCount++;
+        control.StyleChanged += (sender, e) => styleChangedCallCount++;
         control.HandleCreated += (sender, e) => createdCallCount++;
 
         Message m = new()
         {
-            Msg = (int)PInvoke.WM_MOUSEACTIVATE,
-            Result = (IntPtr)250
+            Msg = (int)PInvokeCore.WM_MOUSEACTIVATE,
+            Result = 250
         };
         control.WndProc(ref m);
+
         Assert.Equal(IntPtr.Zero, m.Result);
         Assert.True(control.IsHandleCreated);
         Assert.Equal(0, invalidatedCallCount);
@@ -7144,25 +7193,28 @@ public partial class ToolStripTests
     {
         using SubToolStrip control = new();
         Assert.NotEqual(IntPtr.Zero, control.Handle);
+
         int invalidatedCallCount = 0;
-        control.Invalidated += (sender, e) => invalidatedCallCount++;
         int styleChangedCallCount = 0;
-        control.StyleChanged += (sender, e) => styleChangedCallCount++;
         int createdCallCount = 0;
+        int callCount = 0;
+        control.Invalidated += (sender, e) => invalidatedCallCount++;
+        control.StyleChanged += (sender, e) => styleChangedCallCount++;
         control.HandleCreated += (sender, e) => createdCallCount++;
 
-        int callCount = 0;
         control.MouseHover += (sender, e) =>
         {
             Assert.Same(control, sender);
             Assert.Same(EventArgs.Empty, e);
             callCount++;
         };
+
         Message m = new()
         {
-            Msg = (int)PInvoke.WM_MOUSEHOVER,
-            Result = (IntPtr)250
+            Msg = (int)PInvokeCore.WM_MOUSEHOVER,
+            Result = 250
         };
+
         control.WndProc(ref m);
         Assert.Equal(IntPtr.Zero, m.Result);
         Assert.Equal(1, callCount);
@@ -7240,7 +7292,7 @@ public partial class ToolStripTests
         using ToolStripMenuItem toolStripMenuItem1 = new();
         using ToolStripMenuItem toolStripMenuItem2 = new();
         using ToolStripMenuItem toolStripMenuItem3 = new();
-        toolStrip.Items.AddRange(new ToolStripItem[] { toolStripMenuItem1, toolStripMenuItem2, toolStripMenuItem3 });
+        toolStrip.Items.AddRange((ToolStripItem[])[toolStripMenuItem1, toolStripMenuItem2, toolStripMenuItem3]);
 
         toolStrip.TestAccessor().Dynamic.LastKeyData = Keys.Left;
         ToolStripItem previousToolStripItem1 = toolStrip.GetNextItem(start: null, ArrowDirection.Left);
@@ -7250,6 +7302,160 @@ public partial class ToolStripTests
         Assert.Equal(toolStrip.Items[0], previousToolStripItem2);
 
         Assert.False(toolStrip.IsHandleCreated);
+    }
+
+    [WinFormsFact]
+    public async Task ToolStrip_MouseHoverTimerStartSuccess()
+    {
+        using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+        using MenuStrip menuStrip = new();
+        using ToolStripItem toolStripItem = menuStrip.Items.Add("toolStripItem");
+        toolStripItem.MouseHover += (sender, e) => cancellationTokenSource.Cancel();
+        ((MouseHoverTimer)menuStrip.TestAccessor().Dynamic.MouseHoverTimer).Start(toolStripItem);
+        await Assert.ThrowsAsync<TaskCanceledException>(() => Task.Delay(SystemInformation.MouseHoverTime * 2, cancellationTokenSource.Token));
+    }
+
+    [WinFormsFact]
+    public void ToolStrip_MouseHoverTimer_ItemDispose()
+    {
+        WeakReference<ToolStripItem> currentItemWR;
+        using MenuStrip menuStrip = new();
+        MouseHoverTimer mouseHoverTimer = (MouseHoverTimer)menuStrip.TestAccessor().Dynamic.MouseHoverTimer;
+        TimerStartAndItemDispose();
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        Assert.False(currentItemWR.TryGetTarget(out _));
+
+        void TimerStartAndItemDispose()
+        {
+            using ToolStripItem toolStripItem = menuStrip.Items.Add("toolStripItem");
+            mouseHoverTimer.Start(toolStripItem);
+            currentItemWR = mouseHoverTimer.TestAccessor().Dynamic._currentItem;
+            Assert.True(currentItemWR.TryGetTarget(out _));
+        }
+    }
+
+    [WinFormsFact]
+    public void ToolStrip_displayedItems_Clear()
+    {
+        using ToolStripMenuItem toolStripMenuItem = new(nameof(toolStripMenuItem));
+        using ToolStripMenuItem listToolStripMenuItem = new(nameof(listToolStripMenuItem));
+        toolStripMenuItem.DropDownItems.Add(listToolStripMenuItem);
+        toolStripMenuItem.DropDownOpened += (sender, e) =>
+        {
+            for (int i = 0; i < 4; i++)
+                listToolStripMenuItem.DropDownItems.Add("MenuItem" + i);
+
+            listToolStripMenuItem.DropDown.PerformLayout(); // needed to populate DisplayedItems collection
+        };
+
+        toolStripMenuItem.DropDownClosed += (sender, e) =>
+        {
+            while (listToolStripMenuItem.DropDownItems.Count > 0)
+                listToolStripMenuItem.DropDownItems[listToolStripMenuItem.DropDownItems.Count - 1].Dispose();
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        };
+
+        toolStripMenuItem.ShowDropDown();
+        Assert.Equal(4, listToolStripMenuItem.DropDown.DisplayedItems.Count);
+        toolStripMenuItem.HideDropDown();
+        Assert.Empty(listToolStripMenuItem.DropDown.DisplayedItems);
+    }
+
+    [WinFormsTheory]
+    [InlineData(10, 10)]
+    [InlineData(0, 0)]
+    [InlineData(-10, -10)]
+    public void ToolStrip_GetChildAtPoint_WithoutSkipValue_Invoke_ReturnsExpected(int x, int y)
+    {
+        using ToolStrip toolStrip = new();
+        var child = toolStrip.GetChildAtPoint(new Point(x, y));
+
+        child.Should().BeNull();
+    }
+
+    [WinFormsTheory]
+    [InlineData(GetChildAtPointSkip.None)]
+    [InlineData(GetChildAtPointSkip.Disabled)]
+    [InlineData(GetChildAtPointSkip.Invisible)]
+    [InlineData(GetChildAtPointSkip.Transparent)]
+    public void ToolStrip_GetChildAtPoint_WithSkipValue_Invoke_ReturnsExpected(GetChildAtPointSkip skipValue)
+    {
+        using ToolStrip toolStrip = new();
+        var child = toolStrip.GetChildAtPoint(new Point(10, 10), skipValue);
+
+        child.Should().BeNull();
+    }
+
+    [WinFormsFact]
+    public void ToolStrip_ResetMinimumSize_Invoke_Success()
+    {
+        using ToolStrip toolStrip = new();
+        Size oldSize = toolStrip.MinimumSize;
+
+        toolStrip.ResetMinimumSize();
+
+        oldSize.Should().NotBe(toolStrip.MinimumSize);
+        toolStrip.MinimumSize.Should().Be(new Size(-1, -1));
+    }
+
+    [WinFormsFact]
+    public void ToolStrip_ResetGripMargin_SetsGripMarginToDefault()
+    {
+        using ToolStrip toolStrip = new();
+        var defaultMargin = toolStrip.Grip.DefaultMargin;
+        toolStrip.GripMargin = new Padding(10, 10, 10, 10);
+
+        toolStrip.TestAccessor().Dynamic.ResetGripMargin();
+
+        toolStrip.GripMargin.Should().Be(defaultMargin);
+    }
+
+    [WinFormsFact]
+    public void ToolStrip_SetAutoScrollMargin_Invoke_Success()
+    {
+        using var toolStrip = new ToolStrip() { AutoScrollMargin = new Size(10, 20) };
+
+        toolStrip.AutoScrollMargin.Should().Be(new Size(10, 20));
+    }
+
+    [WinFormsFact]
+    public void ToolStrip_ShouldSerializeLayoutStyle_Invoke_ReturnsExpected()
+    {
+        using ToolStrip toolStrip = new();
+        toolStrip.ShouldSerializeLayoutStyle().Should().BeFalse();
+
+        toolStrip.LayoutStyle = ToolStripLayoutStyle.Flow;
+        toolStrip.ShouldSerializeLayoutStyle().Should().BeTrue();
+
+        toolStrip.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
+        toolStrip.ShouldSerializeLayoutStyle().Should().BeTrue();
+
+        toolStrip.LayoutStyle = ToolStripLayoutStyle.VerticalStackWithOverflow;
+        toolStrip.ShouldSerializeLayoutStyle().Should().BeTrue();
+
+        toolStrip.LayoutStyle = ToolStripLayoutStyle.Table;
+        toolStrip.ShouldSerializeLayoutStyle().Should().BeTrue();
+
+        toolStrip.LayoutStyle = ToolStripLayoutStyle.StackWithOverflow;
+        toolStrip.ShouldSerializeLayoutStyle().Should().BeFalse();
+    }
+
+    [WinFormsFact]
+    public void ToolStrip_ShouldSerializeGripMargin_Invoke_ReturnsExpected()
+    {
+        using ToolStrip toolStrip = new() { GripMargin = new Padding(1) };
+        ((bool)toolStrip.TestAccessor().Dynamic.ShouldSerializeGripMargin()).Should().BeTrue();
+
+        var defaultGripMargin = (Padding)toolStrip.TestAccessor().Dynamic.DefaultGripMargin;
+        toolStrip.GripMargin = defaultGripMargin;
+        ((bool)toolStrip.TestAccessor().Dynamic.ShouldSerializeGripMargin()).Should().BeFalse();
     }
 
     private class SubAxHost : AxHost
@@ -7299,15 +7505,15 @@ public partial class ToolStripTests
 
     private class SubToolStrip : ToolStrip
     {
-        public new const int ScrollStateAutoScrolling = ToolStrip.ScrollStateAutoScrolling;
+        public new const int ScrollStateAutoScrolling = ScrollableControl.ScrollStateAutoScrolling;
 
-        public new const int ScrollStateHScrollVisible = ToolStrip.ScrollStateHScrollVisible;
+        public new const int ScrollStateHScrollVisible = ScrollableControl.ScrollStateHScrollVisible;
 
-        public new const int ScrollStateVScrollVisible = ToolStrip.ScrollStateVScrollVisible;
+        public new const int ScrollStateVScrollVisible = ScrollableControl.ScrollStateVScrollVisible;
 
-        public new const int ScrollStateUserHasScrolled = ToolStrip.ScrollStateUserHasScrolled;
+        public new const int ScrollStateUserHasScrolled = ScrollableControl.ScrollStateUserHasScrolled;
 
-        public new const int ScrollStateFullDrag = ToolStrip.ScrollStateFullDrag;
+        public new const int ScrollStateFullDrag = ScrollableControl.ScrollStateFullDrag;
 
         public SubToolStrip() : base()
         {
